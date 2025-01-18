@@ -1,0 +1,11 @@
+﻿@page
+@model MVP_Core.Pages.VerifyModel
+
+<h2>Email Verification</h2>
+
+@if (!string.IsNullOrEmpty(Model.Message))
+{
+    <div class="alert alert-info">
+        @Model.Message
+    </div>
+}

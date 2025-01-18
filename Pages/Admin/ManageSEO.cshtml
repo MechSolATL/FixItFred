@@ -1,0 +1,36 @@
+﻿@page
+@model IEnumerable<MVP_Core.Data.Models.SEO>
+@{
+    ViewData["Title"] = "Manage SEO";
+    Layout = "~/Pages/Shared/_Layout.cshtml";  // Corrected path
+}
+
+<h1>Manage SEO</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Page Name</th>
+            <th>Title</th>
+            <th>Meta Description</th>
+            <th>Keywords</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var seo in Model)
+        {
+            <tr>
+                <td>@seo.PageName</td>
+                <td>@seo.Title</td>
+                <td>@seo.MetaDescription</td>
+                <td>@seo.Keywords</td>
+                <td>
+                    <a asp-page="/Admin/EditSEO" asp-route-id="@seo.Id" class="btn btn-primary">Edit</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<a asp-page="/Admin/CreateSEO" class="btn btn-success">Add New SEO</a>

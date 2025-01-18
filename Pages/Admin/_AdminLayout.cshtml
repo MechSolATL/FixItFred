@@ -1,0 +1,51 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Admin Panel</title>
+    <link rel="stylesheet" href="~/css/admin.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+</head>
+<body>
+    <div class="d-flex" id="wrapper">
+        <!-- Sidebar -->
+        <div class="bg-dark border-right" id="sidebar-wrapper">
+            <div class="sidebar-heading text-white">Admin Panel</div>
+            <div class="list-group list-group-flush">
+                <a href="/Admin/Dashboard" class="list-group-item list-group-item-action bg-dark text-white">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </a>
+                <a href="/Admin/Users" class="list-group-item list-group-item-action bg-dark text-white">
+                    <i class="fas fa-users"></i> Users
+                </a>
+                <a href="/Admin/Settings" class="list-group-item list-group-item-action bg-dark text-white">
+                    <i class="fas fa-cogs"></i> Settings
+                </a>
+            </div>
+        </div>
+        <!-- Page Content -->
+        <div id="page-content-wrapper">
+            <nav class="navbar navbar-expand-lg navbar-dark bg-dark border-bottom">
+                <button class="btn btn-primary" id="menu-toggle"><i class="fas fa-bars"></i></button>
+                <div class="navbar-brand mx-auto">Admin Panel</div>
+            </nav>
+            <div class="container-fluid mt-4">
+                @RenderBody()
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer text-muted text-center mt-4">
+        <div class="container">
+            &copy; @DateTime.Now.Year - Admin Panel
+        </div>
+    </footer>
+
+    <script>
+        document.getElementById("menu-toggle").addEventListener("click", function () {
+            document.getElementById("wrapper").classList.toggle("toggled");
+        });
+    </script>
+</body>
+</html>
