@@ -2,7 +2,7 @@ using MVP_Core.Data;
 using MVP_Core.Data.Models;
 using Microsoft.EntityFrameworkCore;
 using MVP_Core.Services;
-
+using Microsoft.AspNetCore.Diagnostics;
 
 internal class Program
 {
@@ -12,6 +12,7 @@ internal class Program
 
         // Configuration Settings
         builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+        builder.Configuration.AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true);
 
         // Services Registration
         builder.Services.AddControllersWithViews();
@@ -21,48 +22,113 @@ internal class Program
         builder.Services.AddScoped<SEOService>();
         builder.Services.AddScoped<ContentService>();
         builder.Services.AddScoped<EmailService>();
-        builder.Services.AddScoped<QuestionService>();  // Optional: Only if using questions
+        builder.Services.AddScoped<QuestionService>();
 
         // Database Context
+        var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+        if (string.IsNullOrEmpty(connectionString))
+        {
+            throw new InvalidOperationException("Database connection string is missing.");
+        }
         builder.Services.AddDbContext<ApplicationDbContext>(options =>
-            options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+            options.UseSqlServer(connectionString));
 
-        // Session Configuration (if needed)
+        // Session Configuration
         builder.Services.AddSession(options =>
         {
             options.IdleTimeout = TimeSpan.FromMinutes(20);
             options.Cookie.HttpOnly = true;
             options.Cookie.IsEssential = true;
+            options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+            options.Cookie.SameSite = SameSiteMode.Strict;
         });
 
-        // Basic Logging
-        builder.Logging.AddDebug();
-        builder.Logging.AddEventSourceLogger();
+        // Authorization Policies
+        builder.Services.AddAuthorizationBuilder()
+            .AddPolicy("AdminPolicy", policy => policy.RequireRole("Admin"));
 
-        if (builder.Environment.IsDevelopment())
+        // HSTS Configuration
+        builder.Services.AddHsts(options =>
         {
-            builder.Logging.AddConsole();
-        }
+            options.MaxAge = TimeSpan.FromDays(365);
+            options.IncludeSubDomains = true;
+            options.Preload = true;
+        });
 
+        // CORS Configuration (Optional)
+        builder.Services.AddCors(options =>
+        {
+            options.AddPolicy("AllowSpecificOrigins", builder =>
+                builder.WithOrigins("https://example.com")
+                       .AllowAnyHeader()
+                       .AllowAnyMethod());
+        });
+
+        // Enhanced Logging Configuration
+        builder.Logging.ClearProviders();
+        builder.Logging.AddSimpleConsole(options =>
+        {
+            options.IncludeScopes = true;
+            options.TimestampFormat = "[yyyy-MM-dd HH:mm:ss] ";
+            options.SingleLine = false;
+        });
+        builder.Logging.AddDebug();
+
+        // Build Application
         var app = builder.Build();
 
         // Middleware Configuration
-        if (app.Environment.IsDevelopment())
+        if (!app.Environment.IsDevelopment())
         {
-            app.UseDeveloperExceptionPage();
-        }
-        else
-        {
-            app.UseExceptionHandler("/Home/Error");
             app.UseHsts();
         }
 
         app.UseHttpsRedirection();
-        app.UseStaticFiles();
+        app.UseStaticFiles(new StaticFileOptions
+        {
+            OnPrepareResponse = ctx =>
+            {
+                ctx.Context.Response.Headers.Append("Cache-Control", "public,max-age=600");
+            }
+        });
         app.UseSession();
 
+        app.Use((context, next) =>
+        {
+            context.Response.Headers.Append("X-Content-Type-Options", "nosniff");
+            context.Response.Headers.XFrameOptions = "DENY";
+            context.Response.Headers.Append("Content-Security-Policy", "default-src 'self'; script-src 'self'");
+            return next();
+        });
+
         app.UseRouting();
+        app.UseAuthentication();
         app.UseAuthorization();
+
+        // Exception Handling
+        app.UseExceptionHandler(errorApp =>
+        {
+            errorApp.Run(context =>
+            {
+                var exceptionHandlerPathFeature = context.Features.Get<IExceptionHandlerPathFeature>();
+                var logger = app.Services.GetRequiredService<ILogger<Program>>();
+                logger.LogError(exceptionHandlerPathFeature?.Error, "Unhandled exception occurred.");
+
+                if (context.Response.StatusCode == 404)
+                {
+                    context.Response.Redirect("/Home/NotFound");
+                }
+                else
+                {
+                    context.Response.Redirect("/Home/Error");
+                }
+
+                return Task.CompletedTask;
+            });
+        });
+
+        // CORS Middleware
+        app.UseCors("AllowSpecificOrigins");
 
         // Map Razor Pages and Routes
         app.MapRazorPages();
