@@ -14,7 +14,21 @@ internal class Program
         builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
         builder.Configuration.AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true);
 
-        // Services Registration
+        // Resolve Environment
+        var environment = builder.Environment.EnvironmentName ?? "Development";
+        Console.WriteLine($"Resolved Environment: {environment}");
+
+        // Get Connection String
+        var connectionStringKey = environment.Equals("Development", StringComparison.OrdinalIgnoreCase) ? "Development" : "Production";
+        var connectionString = builder.Configuration.GetSection("ConnectionStrings")[connectionStringKey];
+
+        if (string.IsNullOrEmpty(connectionString))
+        {
+            throw new InvalidOperationException($"Database connection string for '{connectionStringKey}' is missing.");
+        }
+        Console.WriteLine($"Using Connection String: {connectionString}");
+
+        // Register Services
         builder.Services.AddControllersWithViews();
         builder.Services.AddRazorPages();
 
@@ -25,11 +39,6 @@ internal class Program
         builder.Services.AddScoped<QuestionService>();
 
         // Database Context
-        var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-        if (string.IsNullOrEmpty(connectionString))
-        {
-            throw new InvalidOperationException("Database connection string is missing.");
-        }
         builder.Services.AddDbContext<ApplicationDbContext>(options =>
             options.UseSqlServer(connectionString));
 

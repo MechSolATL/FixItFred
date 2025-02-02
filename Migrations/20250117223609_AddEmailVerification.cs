@@ -11,6 +11,8 @@ namespace MVP_Core.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            // Remove or comment out this block if Content already exists
+            /*
             migrationBuilder.CreateTable(
                 name: "Content",
                 columns: table => new
@@ -27,6 +29,7 @@ namespace MVP_Core.Migrations
                 {
                     table.PrimaryKey("PK_Content", x => x.Id);
                 });
+            */
 
             migrationBuilder.CreateTable(
                 name: "EmailVerifications",
@@ -88,17 +91,12 @@ namespace MVP_Core.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "Content");
+            migrationBuilder.DropTable(name: "EmailVerifications");
+            migrationBuilder.DropTable(name: "Questions");
+            migrationBuilder.DropTable(name: "SEOs");
 
-            migrationBuilder.DropTable(
-                name: "EmailVerifications");
-
-            migrationBuilder.DropTable(
-                name: "Questions");
-
-            migrationBuilder.DropTable(
-                name: "SEOs");
+            // Drop Content table only if necessary
+            // migrationBuilder.DropTable(name: "Content");
         }
     }
 }
