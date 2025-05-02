@@ -1,0 +1,145 @@
+﻿@page
+@model MVP_Core.Pages.Admin.ServerLogsModel
+
+@{
+    ViewData["Title"] = "Server Logs";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+}
+
+<h1 class="mt-4">🛡️ Server Logs & Page Visits</h1>
+
+@if (Model.Logs.Any())
+{
+    <div class="table-responsive mt-4">
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>Visited At (UTC)</th>
+                    <th>Page URL</th>
+                    <th>Status Code</th>
+                    <th>IP Address</th>
+                    <th>User Agent</th>
+                    <th>Referrer</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var log in Model.Logs)
+                {
+                    <tr>
+                        <td>@log.VisitTimestamp.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                        <td>@log.PageUrl</td>
+                        <td>@log.ResponseStatusCode</td>
+                        <td>@log.IpAddress</td>
+                        <td class="text-break">@log.UserAgent</td>
+                        <td class="text-break">@log.Referrer</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <hr class="my-5" />
+
+    <h2 class="mb-4">📈 Traffic Insights (Last 1000 Visits)</h2>
+    <div class="chart-container" style="max-width:800px; margin:auto;">
+        <canvas id="pageViewsChart"></canvas>
+    </div>
+
+    <hr class="my-5" />
+
+    <h2 class="mb-4">🧠 Browser Usage Breakdown</h2>
+    <div class="chart-container" style="max-width:800px; margin:auto;">
+        <canvas id="browserUsageChart"></canvas>
+    </div>
+
+    <hr class="my-5" />
+
+    <h2 class="mb-4">🌎 Referrer Sources</h2>
+    <div class="chart-container" style="max-width:800px; margin:auto;">
+        <canvas id="referrerChart"></canvas>
+    </div>
+
+    <hr class="my-5" />
+
+    <h2 class="mb-4 text-danger">🚨 Threat Monitor</h2>
+
+    @if (Model.Threats.Any())
+    {
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped">
+                <thead class="table-dark">
+                    <tr>
+                        <th>IP Address</th>
+                        <th>Total Hits</th>
+                        <th>Errors</th>
+                        <th>Suspicious Referrer?</th>
+                        <th>Bot Detected?</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var threat in Model.Threats)
+                    {
+                        <tr class="@(threat.TotalHits >= 20 || threat.ErrorCount >= 10 ? "table-danger" : "table-warning")">
+                            <td>@threat.IpAddress</td>
+                            <td>@threat.TotalHits</td>
+                            <td>@threat.ErrorCount</td>
+                            <td>@(threat.IsSuspiciousReferrer ? "⚠️ Yes" : "✅ No")</td>
+                            <td>@(threat.IsBotDetected ? "🤖 Yes" : "✅ No")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-success">
+            ✅ No suspicious activity detected!
+        </div>
+    }
+}
+else
+{
+    <div class="alert alert-warning mt-4">
+        🚨 No logs found yet. Your site hasn't had visitors or logging middleware isn't recording.
+    </div>
+}
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const rawData = @Html.Raw(Model.PageViewSummary);
+            const browserData = @Html.Raw(Model.BrowserSummary);
+            const referrerData = @Html.Raw(Model.ReferrerSummary);
+
+            const ctx = document.getElementById('pageViewsChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: rawData.labels,
+                    datasets: [{ label: 'Page Views', data: rawData.values }]
+                },
+                options: { scales: { y: { beginAtZero: true } } }
+            });
+
+            const browserCtx = document.getElementById('browserUsageChart').getContext('2d');
+            new Chart(browserCtx, {
+                type: 'pie',
+                data: {
+                    labels: browserData.labels,
+                    datasets: [{ data: browserData.values }]
+                }
+            });
+
+            const referrerCtx = document.getElementById('referrerChart').getContext('2d');
+            new Chart(referrerCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: referrerData.labels,
+                    datasets: [{ data: referrerData.values }]
+                }
+            });
+        });
+    </script>
+}

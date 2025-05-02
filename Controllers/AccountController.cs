@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using MVP_Core.Data.Models.ViewModels; // Assuming you will add LoginViewModel here
 
 namespace MVP_Core.Controllers
 {
@@ -7,7 +8,6 @@ namespace MVP_Core.Controllers
     {
         private readonly ILogger<AccountController> _logger = logger;
 
-        // GET: /Account/Login
         [HttpGet]
         public IActionResult Login()
         {
@@ -15,24 +15,30 @@ namespace MVP_Core.Controllers
             return View();
         }
 
-        // POST: /Account/Login
         [HttpPost]
-        public IActionResult Login(string username, string email)
+        [ValidateAntiForgeryToken]
+        public IActionResult Login(LoginViewModel model)
         {
-            _logger.LogInformation("POST Login attempt with username: {Username}, email: {Email}", username, email);
+            if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("Login POST invalid model state.");
+                return View(model);
+            }
+
+            _logger.LogInformation("POST Login attempt with username: {Username}, email: {Email}", model.Username, model.Email);
 
             // Simulate login logic
-            if (username == "testuser" && email == "testuser@example.com")
+            if (model.Username == "testuser" && model.Email == "testuser@example.com")
             {
                 TempData["SuccessMessage"] = "Login successful!";
-                _logger.LogInformation("Login successful for username: {Username}", username);
+                _logger.LogInformation("Login successful for username: {Username}", model.Username);
                 return RedirectToAction("ServiceRequest", "Request");
             }
             else
             {
                 TempData["ErrorMessage"] = "Invalid username or email.";
-                _logger.LogWarning("Login failed for username: {Username}", username);
-                return View();
+                _logger.LogWarning("Login failed for username: {Username}", model.Username);
+                return View(model);
             }
         }
     }

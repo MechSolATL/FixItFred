@@ -1,0 +1,39 @@
+﻿@page
+@model MVP_Core.Pages.Admin.ClicksModel
+@{
+    ViewData["Title"] = "User Click Logs";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+}
+
+<h1 class="mt-4">🖱️ User Click Logs</h1>
+
+@if (Model.ClickLogs.Any())
+{
+    <div class="table-responsive mt-4">
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>Timestamp (UTC)</th>
+                    <th>Page Name</th>
+                    <th>Click Event</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var log in Model.ClickLogs)
+                {
+                    <tr>
+                        <td>@log.VisitTimestamp.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                        <td>@log.PageName</td>
+                        <td class="text-break">@log.UserClick</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <div class="alert alert-warning mt-4">
+        No user clicks recorded yet.
+    </div>
+}

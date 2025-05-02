@@ -1,0 +1,76 @@
+﻿@page
+@model MVP_Core.Pages.Admin.ThreatsModel
+@{
+    ViewData["Title"] = "Threat Dashboard";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+}
+
+<h1 class="mt-4">🛡️ Threat Fortress - Active Threats</h1>
+
+@if (Model.Threats.Any())
+{
+    <div class="table-responsive mt-4">
+        <table class="table table-bordered table-striped">
+            <caption class="text-left font-weight-bold text-gray-700 mb-2">List of Detected Threats (times shown in UTC)</caption>
+            <thead class="thead-dark">
+                <tr>
+                    <th scope="col">IP Address</th>
+                    <th scope="col">User Agent</th>
+                    <th scope="col">Strikes</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">First Detected (UTC)</th>
+                    <th scope="col">Last Detected (UTC)</th>
+                    <th scope="col">Ban Lift Time (UTC)</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var threat in Model.Threats)
+                {
+                    <tr>
+                        <td>@threat.IpAddress</td>
+                        <td class="text-break" style="max-width: 300px;">@threat.UserAgent</td>
+                        <td>@threat.StrikeCount</td>
+                        <td>
+                            @if (threat.IsPermanentlyBlocked)
+                            {
+                                <span class="badge bg-danger">Permanent 🔥</span>
+                            }
+                            else if (threat.BanLiftTime.HasValue && threat.BanLiftTime > DateTime.UtcNow)
+                            {
+                                <span class="badge bg-warning text-dark">Temp Ban ⏳</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-success">Unblocked ✅</span>
+                            }
+                        </td>
+                        <td>@threat.FirstDetectedAt.ToString("yyyy-MM-dd HH:mm")</td>
+                        <td>@threat.LastDetectedAt.ToString("yyyy-MM-dd HH:mm")</td>
+                        <td>@(threat.BanLiftTime?.ToString("yyyy-MM-dd HH:mm") ?? "-")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <!-- Pagination Controls -->
+        <div class="d-flex justify-content-center mt-4">
+            @if (Model.Threats.HasPreviousPage)
+            {
+                <a class="btn btn-outline-primary mx-1" asp-page="./Threats" asp-route-PageIndex="@(Model.Threats.PageIndex - 1)">⬅️ Previous</a>
+            }
+
+            <span class="align-self-center mx-2">Page @Model.Threats.PageIndex of @Model.Threats.TotalPages</span>
+
+            @if (Model.Threats.HasNextPage)
+            {
+                <a class="btn btn-outline-primary mx-1" asp-page="./Threats" asp-route-PageIndex="@(Model.Threats.PageIndex + 1)">Next ➡️</a>
+            }
+        </div>
+    </div>
+}
+else
+{
+    <div class="alert alert-success mt-4">
+        🎯 Fortress is quiet. No threats detected yet.
+    </div>
+}

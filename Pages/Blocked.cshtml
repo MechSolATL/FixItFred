@@ -1,0 +1,74 @@
+﻿@page
+@model MVP_Core.Pages.BlockedModel
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Access Restricted - Mechanical Solutions Atlanta</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #121212;
+            color: #ffffff;
+            margin: 0;
+            padding: 5rem 2rem;
+            text-align: center;
+        }
+
+        main {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+        }
+
+        .emoji {
+            font-size: 5rem;
+            margin-bottom: 2rem;
+        }
+
+        .contact-link {
+            font-size: 0.9rem;
+            color: #ccc;
+            text-decoration: underline;
+        }
+
+            .contact-link:hover {
+                color: #fff;
+            }
+    </style>
+</head>
+
+<body>
+    <main>
+        <div class="emoji">🚫</div>
+        <h1>Access Temporarily Restricted</h1>
+
+        <p>@Model.BlockReason</p>
+
+        @if (Model.BanLiftTime.HasValue)
+        {
+            <p><strong>Access review time:</strong> @Model.BanLiftTime.Value.ToString("yyyy-MM-dd HH:mm 'UTC'")</p>
+        }
+
+        <p class="mt-4">
+            If you believe this is a mistake, please <a href="mailto:Admins@service-atlanta.com" class="contact-link">contact the Admin Team</a>.
+        </p>
+    </main>
+</body>
+</html>

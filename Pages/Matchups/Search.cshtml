@@ -1,0 +1,54 @@
+﻿@page
+@model MVP_Core.Pages.Matchups.SearchModel
+@{
+    Layout = "/Pages/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Search Heat Pump Matchups";
+}
+
+<h1 class="text-2xl font-bold mb-4">Search Installed Heat Pump Matchups</h1>
+
+<form method="get" class="mb-6" asp-antiforgery="true">
+    <input type="text" name="Query" value="@Model.Query" placeholder="Search by brand, model, or AHRI code..." class="border px-4 py-2 w-1/2 rounded shadow" />
+    <button type="submit" class="ml-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded shadow">
+        Search
+    </button>
+</form>
+
+@if (Model.Results.Any())
+{
+    <div class="overflow-x-auto">
+        <table class="table-auto w-full border text-sm bg-white shadow">
+            <thead class="bg-gray-100 text-left">
+                <tr>
+                    <th class="px-4 py-2">Brand</th>
+                    <th class="px-4 py-2">System Type</th>
+                    <th class="px-4 py-2">A-Coil</th>
+                    <th class="px-4 py-2">Outdoor Unit</th>
+                    <th class="px-4 py-2">Furnace</th>
+                    <th class="px-4 py-2">SEER</th>
+                    <th class="px-4 py-2">AHRI</th>
+                    <th class="px-4 py-2">Notes</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Results)
+                {
+                    <tr class="border-t hover:bg-gray-50">
+                        <td class="px-4 py-2">@item.Brand</td>
+                        <td class="px-4 py-2">@item.SystemType</td>
+                        <td class="px-4 py-2">@item.ACoilModel (@item.ACoilTonnage)</td>
+                        <td class="px-4 py-2">@item.OutdoorUnitModel (@item.OutdoorUnitTonnage)</td>
+                        <td class="px-4 py-2">@item.FurnaceModel (@item.FurnaceBTU)</td>
+                        <td class="px-4 py-2">@item.SEERRating</td>
+                        <td class="px-4 py-2">@item.AHRICode</td>
+                        <td class="px-4 py-2">@item.Notes</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else if (!string.IsNullOrWhiteSpace(Model.Query))
+{
+    <div class="text-red-600 font-semibold mt-4">❌ No matchups found for your search query.</div>
+}

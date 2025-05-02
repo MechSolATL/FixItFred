@@ -3,9 +3,13 @@
     public class PageVisit
     {
         public int Id { get; set; }
+
         public int SessionInfoId { get; set; }
+
         public string? PageName { get; set; }
-        public DateTime VisitTimestamp { get; set; }
+
+        public DateTime VisitTimestamp { get; set; } = DateTime.UtcNow;
+
         public string? UserClick { get; set; }
     }
 }

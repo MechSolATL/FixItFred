@@ -1,0 +1,100 @@
+﻿@page
+@model MVP_Core.Pages.Services.AirConditioningModel
+@{
+    Layout = "/Pages/Shared/_Layout.cshtml";
+
+    ViewData["Title"] = "Air Conditioning Service Request";
+    ViewData["MetaDescription"] = "Request expert air conditioning service from Service-Atlanta.";
+    ViewData["Keywords"] = "HVAC, air conditioning, cooling, AC repair, Service-Atlanta";
+    ViewData["Robots"] = "index, follow";
+}
+
+<!-- ⏳ Session Timeout Warning -->
+<div id="timeout-warning" class="hidden fixed top-0 left-0 w-full bg-red-600 text-white text-center py-2 font-bold z-50 animate-pulse" role="alert" aria-live="polite">
+    ⚠️ Session expires in <span id="timeout-seconds">60</span> seconds! Click anywhere to stay active.
+</div>
+
+<!-- 📊 Progress Bar -->
+<div class="progress-container" aria-hidden="true">
+    <div class="progress-bar" id="progressBar" style="width: @Model.ProgressPercent;"></div>
+</div>
+
+<h1 class="text-2xl font-bold mb-6" role="heading" aria-level="1">
+    Air Conditioning Service Request
+</h1>
+
+@if (!Model.IsVerified)
+{
+    <div class="alert alert-warning p-4 text-yellow-800 border border-yellow-400 bg-yellow-100 rounded" role="alert">
+        <strong>Email not verified.</strong><br />
+        Please <a href="/Verify" class="underline text-blue-700 font-semibold">verify your email</a> before proceeding with the service request.
+    </div>
+}
+else if (!string.IsNullOrEmpty(Model.Message))
+{
+    <div class="mb-4 p-3 rounded @(Model.IsSuccess ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800")" role="alert">
+        @Model.Message
+    </div>
+}
+
+@if (Model.IsVerified && Model.CurrentQuestion != null)
+{
+    <form method="post" asp-page-handler="Next" class="space-y-4">
+        @Html.AntiForgeryToken()
+
+        <div>
+            <label class="block text-gray-700 font-semibold mb-2">
+                @(Model.FirstName != null ? $"{Model.FirstName}, " : "") @Model.CurrentQuestion.Text
+            </label>
+
+            @if (Model.CurrentQuestion.InputType == "dropdown" && Model.CurrentQuestion.Options != null)
+            {
+                <select asp-for="UserAnswer" class="border rounded px-4 py-2 w-full" required aria-required="true">
+                    <option value="">-- Select --</option>
+                    @foreach (var option in Model.CurrentQuestion.Options)
+                    {
+                        <option value="@option.OptionText">@option.OptionText</option>
+                    }
+                </select>
+            }
+            else if (Model.CurrentQuestion.InputType == "textarea")
+            {
+                <textarea asp-for="UserAnswer" rows="4" class="border rounded px-4 py-2 w-full" required aria-required="true"></textarea>
+            }
+            else
+            {
+                <input type="text" asp-for="UserAnswer" class="border rounded px-4 py-2 w-full" required aria-required="true" />
+            }
+        </div>
+
+        <input type="hidden" name="questionId" value="@Model.CurrentQuestion.Id" />
+
+        <div class="flex justify-between mt-6">
+            <button type="submit" class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded shadow" aria-label="Next Question">
+                ➡️ Next
+            </button>
+        </div>
+    </form>
+
+    @if (Model.CurrentStep > 1)
+    {
+        <form method="post" asp-page-handler="Back" class="inline-block mt-4">
+            @Html.AntiForgeryToken()
+            <button type="submit" class="px-6 py-2 bg-gray-400 hover:bg-gray-500 text-white rounded shadow" aria-label="Go Back to Previous Question">
+                ⬅️ Back
+            </button>
+        </form>
+    }
+}
+else if (Model.IsVerified && Model.CurrentQuestion == null)
+{
+    <div class="text-center mt-10">
+        <h2 class="text-2xl font-semibold text-green-700 mb-4" role="heading" aria-level="2">
+            🎉 Air Conditioning Questionnaire Completed!
+        </h2>
+        <p class="text-gray-700 mb-6">Please review your answers and submit your request.</p>
+        <a href="/Services/AirConditioningFinal" class="inline-block px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded shadow">
+            Review and Submit 🚀
+        </a>
+    </div>
+}

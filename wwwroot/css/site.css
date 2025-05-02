@@ -1,22 +1,229 @@
-html {
-  font-size: 14px;
+/* ========================================
+   Global Base Styles
+========================================= */
+
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+
+:root {
+    --primary-color: #007bff;
+    --primary-dark: #004080;
+    --danger-color: #dc3545;
+    --danger-dark: #a71d2a;
+    --success-color: #28a745;
+    --success-dark: #1e7e34;
+    --font-main: 'Poppins', sans-serif;
+}
+
+/* Reset and Base */
+html, body {
+    font-family: var(--font-main);
+    font-size: 15px;
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    background-color: #f9fafb;
+    color: #222;
 }
 
 @media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+    html {
+        font-size: 16px;
+    }
 }
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+/* Accessibility: Focus outlines */
+a:focus, button:focus, input:focus, textarea:focus, select:focus {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
 }
 
-html {
-  position: relative;
-  min-height: 100%;
+/* ========================================
+   Typography
+========================================= */
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 600;
+    margin: 0.5rem 0;
 }
 
-body {
-  margin-bottom: 60px;
+h1 {
+    font-size: 2.5rem;
+}
+
+h2 {
+    font-size: 2rem;
+}
+
+h3 {
+    font-size: 1.75rem;
+}
+
+p {
+    margin: 1rem 0;
+    line-height: 1.6;
+}
+
+/* ========================================
+   Links
+========================================= */
+a {
+    color: var(--primary-color);
+    text-decoration: none;
+}
+
+    a:hover {
+        text-decoration: underline;
+    }
+
+/* ========================================
+   Buttons
+========================================= */
+button, .btn {
+    font-family: var(--font-main);
+    font-weight: 600;
+    padding: 10px 20px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    display: inline-block;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    color: #fff;
+}
+
+    .btn-primary:hover {
+        background-color: var(--primary-dark);
+    }
+
+.btn-danger {
+    background-color: var(--danger-color);
+    color: #fff;
+}
+
+    .btn-danger:hover {
+        background-color: var(--danger-dark);
+    }
+
+/* ========================================
+   Form Inputs
+========================================= */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+textarea,
+select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    margin: 6px 0 16px;
+    font-family: var(--font-main);
+    box-sizing: border-box;
+}
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+        border-color: var(--primary-color);
+        outline: none;
+    }
+
+/* ========================================
+   Layout
+========================================= */
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.content-wrapper {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 20px;
+    padding: 30px;
+    margin-top: 30px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+/* ========================================
+   Header & Footer
+========================================= */
+header, footer {
+    background: url('/stream/background?v=1') no-repeat center center;
+    background-size: cover;
+    background-color: #003366;
+    color: #fff;
+}
+
+footer {
+    background-color: rgba(0, 0, 0, 0.5);
+    text-align: center;
+    padding: 1rem 0;
+    font-size: 0.9rem;
+}
+
+    footer a {
+        color: #fff !important;
+        text-decoration: none;
+        font-size: 8pt;
+    }
+
+        footer a:hover {
+            color: #ccc !important;
+            text-decoration: underline;
+        }
+
+    footer small {
+        font-size: 8pt;
+        color: #fff;
+    }
+
+/* ========================================
+   Progress Bar
+========================================= */
+.progress-container {
+    width: 100%;
+    background-color: #e0e0e0;
+    height: 22px;
+    border-radius: 12px;
+    margin: 20px 0;
+}
+
+.progress-bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #00c6ff, #0072ff);
+    transition: width 0.6s ease;
+    border-radius: 12px;
+}
+
+/* ========================================
+   Alerts
+========================================= */
+.alert-success {
+    background-color: #d4edda;
+    color: #155724;
+    padding: 10px 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.alert-error,
+.alert-danger {
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 10px 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.alert-warning {
+    background-color: #fff3cd;
+    color: #856404;
+    padding: 10px 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
 }

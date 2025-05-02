@@ -1,0 +1,58 @@
+﻿@page
+@model MVP_Core.Pages.Admin.ManagePagesModel
+@{
+    ViewData["Title"] = "Manage Pages";
+    Layout = "~/Pages/Shared/_Layout.cshtml"; // ✅ Recommended to specify layout if shared
+}
+
+<h1 class="mt-4">🗂️ Manage Pages</h1>
+
+@if (!string.IsNullOrEmpty(Model.Message))
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @Model.Message
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@if (Model.Pages.Any())
+{
+    <div class="table-responsive mt-4">
+        <table class="table table-bordered table-striped align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>URL Path</th>
+                    <th>Public?</th>
+                    <th>Created At</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Pages)
+                {
+                    <tr>
+                        <td>@item.UrlPath</td>
+                        <td class="text-center">
+                            @(item.IsPublic ? "✅ Yes" : "❌ No")
+                        </td>
+                        <td>@item.CreatedAt.ToString("yyyy-MM-dd HH:mm")</td>
+                        <td class="text-center">
+                            <form method="post" asp-page-handler="ToggleVisibility" class="d-inline">
+                                <input type="hidden" name="id" value="@item.Id" />
+                                <button type="submit" class="btn btn-sm @(item.IsPublic ? "btn-danger" : "btn-success")">
+                                    @(item.IsPublic ? "Make Private" : "Make Public")
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <div class="alert alert-info mt-4">
+        📭 No pages available to manage yet.
+    </div>
+}

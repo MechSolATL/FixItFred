@@ -1,0 +1,74 @@
+﻿@page
+@model MVP_Core.Pages.Matchups.AddModel
+@{
+    Layout = "/Pages/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Add Heat Pump Matchup";
+}
+
+<h2 class="mt-4">Add Heat Pump Matchup</h2>
+
+@if (!string.IsNullOrEmpty(Model.Message))
+{
+    <div class="alert @(Model.IsSuccess ? "alert-success" : "alert-danger")" role="alert">
+        @Model.Message
+    </div>
+}
+
+<form method="post" class="mt-4" asp-antiforgery="true">
+    <div class="form-group">
+        <label asp-for="Match.Brand">Brand</label>
+        <input asp-for="Match.Brand" class="form-control" required />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Match.SystemType">System Type</label>
+        <input asp-for="Match.SystemType" class="form-control" placeholder="e.g. Heat Pump Only, Unitary" required />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Match.ACoilModel">A-Coil Model</label>
+        <input asp-for="Match.ACoilModel" class="form-control" required />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Match.ACoilTonnage">A-Coil Tonnage</label>
+        <input asp-for="Match.ACoilTonnage" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Match.OutdoorUnitModel">Outdoor Unit Model</label>
+        <input asp-for="Match.OutdoorUnitModel" class="form-control" required />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Match.OutdoorUnitTonnage">Outdoor Unit Tonnage</label>
+        <input asp-for="Match.OutdoorUnitTonnage" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Match.FurnaceModel">Furnace Model</label>
+        <input asp-for="Match.FurnaceModel" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Match.FurnaceBTU">Furnace BTU</label>
+        <input asp-for="Match.FurnaceBTU" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Match.SEERRating">SEER Rating</label>
+        <input asp-for="Match.SEERRating" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Match.AHRICode">AHRI Code</label>
+        <input asp-for="Match.AHRICode" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Match.Notes">Notes</label>
+        <textarea asp-for="Match.Notes" class="form-control" rows="3"></textarea>
+    </div>
+
+    <button type="submit" class="btn btn-primary mt-3">Save Matchup</button>
+</form>

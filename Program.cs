@@ -1,8 +1,15 @@
-using MVP_Core.Data;
-using MVP_Core.Data.Models;
-using Microsoft.EntityFrameworkCore;
-using MVP_Core.Services;
+﻿// ------------------------
+// Program.cs
+// ------------------------
+
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.EntityFrameworkCore;
+using MVP_Core.Data;
+using MVP_Core.Data.Seeders;
+using MVP_Core.Services;
+using MVP_Core.Services.Email;
+using System.Text.Json.Serialization;
 
 internal class Program
 {
@@ -10,39 +17,51 @@ internal class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
-        // Configuration Settings
+        // 🔧 Load Configuration
         builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
-        builder.Configuration.AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true);
 
-        // Resolve Environment
-        var environment = builder.Environment.EnvironmentName ?? "Development";
-        Console.WriteLine($"Resolved Environment: {environment}");
+        var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+            ?? throw new InvalidOperationException("Connection string 'DefaultConnection' is missing.");
 
-        // Get Connection String
-        var connectionStringKey = environment.Equals("Development", StringComparison.OrdinalIgnoreCase) ? "Development" : "Production";
-        var connectionString = builder.Configuration.GetSection("ConnectionStrings")[connectionStringKey];
+        Console.WriteLine("\u2705 Using Local Development Connection String");
 
-        if (string.IsNullOrEmpty(connectionString))
-        {
-            throw new InvalidOperationException($"Database connection string for '{connectionStringKey}' is missing.");
-        }
-        Console.WriteLine($"Using Connection String: {connectionString}");
+        // 🧱 MVC & Razor
+        builder.Services.AddControllersWithViews()
+            .AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
+                options.JsonSerializerOptions.WriteIndented = true;
+            });
 
-        // Register Services
-        builder.Services.AddControllersWithViews();
-        builder.Services.AddRazorPages();
+        builder.Services.AddRazorPages()
+            .AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
+            });
 
-        // Core Services Needed for MVP
-        builder.Services.AddScoped<SEOService>();
+        // ⚡ Blazor + SignalR
+        builder.Services.AddServerSideBlazor();
+        builder.Services.AddSignalR();
+
+        // 🧩 Application Services (Scoped DI)
+        builder.Services.AddScoped<ISeoService, SeoService>();
+        builder.Services.AddScoped<SeoService>(); // 👈 Register concrete type
+
         builder.Services.AddScoped<ContentService>();
         builder.Services.AddScoped<EmailService>();
         builder.Services.AddScoped<QuestionService>();
+        builder.Services.AddScoped<BackgroundImageService>();
+        builder.Services.AddScoped<SmsService>();
+        builder.Services.AddScoped<ProfileReviewService>();
+        builder.Services.AddScoped<MVP_Core.Services.AuditLogger>();
 
-        // Database Context
+        builder.Services.AddHostedService<MVP_Core.Services.BackupReminderService>();
+
+        // 🗃️ EF Core DbContext
         builder.Services.AddDbContext<ApplicationDbContext>(options =>
             options.UseSqlServer(connectionString));
 
-        // Session Configuration
+        // 🛎️ Session Setup
         builder.Services.AddSession(options =>
         {
             options.IdleTimeout = TimeSpan.FromMinutes(20);
@@ -52,28 +71,22 @@ internal class Program
             options.Cookie.SameSite = SameSiteMode.Strict;
         });
 
-        // Authorization Policies
-        builder.Services.AddAuthorizationBuilder()
-            .AddPolicy("AdminPolicy", policy => policy.RequireRole("Admin"));
+        // 🔐 Authentication
+        builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+            .AddCookie(options =>
+            {
+                options.LoginPath = "/Login";
+                options.AccessDeniedPath = "/AccessDenied";
+                options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
+                options.SlidingExpiration = true;
+            });
 
-        // HSTS Configuration
-        builder.Services.AddHsts(options =>
+        builder.Services.AddAuthorization(options =>
         {
-            options.MaxAge = TimeSpan.FromDays(365);
-            options.IncludeSubDomains = true;
-            options.Preload = true;
+            options.AddPolicy("AdminPolicy", policy => policy.RequireRole("Admin"));
         });
 
-        // CORS Configuration (Optional)
-        builder.Services.AddCors(options =>
-        {
-            options.AddPolicy("AllowSpecificOrigins", builder =>
-                builder.WithOrigins("https://example.com")
-                       .AllowAnyHeader()
-                       .AllowAnyMethod());
-        });
-
-        // Enhanced Logging Configuration
+        // 📋 Logging
         builder.Logging.ClearProviders();
         builder.Logging.AddSimpleConsole(options =>
         {
@@ -83,67 +96,56 @@ internal class Program
         });
         builder.Logging.AddDebug();
 
-        // Build Application
         var app = builder.Build();
 
-        // Middleware Configuration
+        // 🌐 Global Error Handling
         if (!app.Environment.IsDevelopment())
         {
+            app.UseExceptionHandler("/Error");
             app.UseHsts();
         }
-
-        app.UseHttpsRedirection();
-        app.UseStaticFiles(new StaticFileOptions
+        else
         {
-            OnPrepareResponse = ctx =>
-            {
-                ctx.Context.Response.Headers.Append("Cache-Control", "public,max-age=600");
-            }
-        });
-        app.UseSession();
+            app.UseDeveloperExceptionPage();
+        }
 
-        app.Use((context, next) =>
+        // 🛡️ Basic Security Headers
+        app.Use(async (context, next) =>
         {
             context.Response.Headers.Append("X-Content-Type-Options", "nosniff");
-            context.Response.Headers.XFrameOptions = "DENY";
-            context.Response.Headers.Append("Content-Security-Policy", "default-src 'self'; script-src 'self'");
-            return next();
+            context.Response.Headers.Append("X-Frame-Options", "DENY");
+            context.Response.Headers.Append("Content-Security-Policy", "default-src 'self'; script-src 'self';");
+            await next();
         });
 
+        // 🚦 Middleware Pipeline
+        app.UseHttpsRedirection();
+        app.UseStaticFiles();
+        app.UseSession();
         app.UseRouting();
         app.UseAuthentication();
         app.UseAuthorization();
+        app.UseStatusCodePagesWithReExecute("/Error");
 
-        // Exception Handling
-        app.UseExceptionHandler(errorApp =>
-        {
-            errorApp.Run(context =>
-            {
-                var exceptionHandlerPathFeature = context.Features.Get<IExceptionHandlerPathFeature>();
-                var logger = app.Services.GetRequiredService<ILogger<Program>>();
-                logger.LogError(exceptionHandlerPathFeature?.Error, "Unhandled exception occurred.");
-
-                if (context.Response.StatusCode == 404)
-                {
-                    context.Response.Redirect("/Home/NotFound");
-                }
-                else
-                {
-                    context.Response.Redirect("/Home/Error");
-                }
-
-                return Task.CompletedTask;
-            });
-        });
-
-        // CORS Middleware
-        app.UseCors("AllowSpecificOrigins");
-
-        // Map Razor Pages and Routes
+        // 📍 Endpoint Mapping
         app.MapRazorPages();
         app.MapControllerRoute(
             name: "default",
             pattern: "{controller=Home}/{action=Index}/{id?}");
+        app.MapBlazorHub();
+        app.MapFallbackToPage("/_Host");
+
+        // 🌱 Initial Database Seeding
+        using (var scope = app.Services.CreateScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            db.Database.Migrate();
+            DatabaseSeeder.Seed(db);
+            PagesSeeder.Seed(db);
+
+            var imagePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "assets", "MSA-Atlanta.jpg");
+            ImageSeeder.SeedBackgroundImage(db, imagePath);
+        }
 
         app.Run();
     }

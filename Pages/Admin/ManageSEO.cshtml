@@ -1,36 +1,53 @@
 ﻿@page
-@model IEnumerable<MVP_Core.Data.Models.SEO>
+@model MVP_Core.Pages.Admin.ManageSEOModel
 @{
-    ViewData["Title"] = "Manage SEO";
-    Layout = "~/Pages/Shared/_Layout.cshtml";  // Corrected path
+    ViewData["Title"] = "Manage SEO Metadata";
+    Layout = "~/Pages/Shared/_AdminLayout.cshtml";
 }
 
-<h1>Manage SEO</h1>
+<div class="container mt-5">
+    <h2 class="mb-4 text-primary">🔍 Manage SEO Settings</h2>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>Page Name</th>
-            <th>Title</th>
-            <th>Meta Description</th>
-            <th>Keywords</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var seo in Model)
-        {
-            <tr>
-                <td>@seo.PageName</td>
-                <td>@seo.Title</td>
-                <td>@seo.MetaDescription</td>
-                <td>@seo.Keywords</td>
-                <td>
-                    <a asp-page="/Admin/EditSEO" asp-route-id="@seo.Id" class="btn btn-primary">Edit</a>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+    @if (Model.SEOs != null && Model.SEOs.Any())
+    {
+        <table class="table table-hover table-bordered">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Page Name</th>
+                    <th>Title</th>
+                    <th>Meta Description</th>
+                    <th>Keywords</th>
+                    <th>Robots</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var seo in Model.SEOs)
+                {
+                    <tr>
+                        <td>@seo.PageName</td>
+                        <td>@seo.Title</td>
+                        <td>@seo.MetaDescription</td>
+                        <td>@seo.Keywords</td>
+                        <td>@seo.RobotsMeta</td>
+                        <td>
+                            <a href="/Admin/EditSEO?id=@seo.Id" class="btn btn-sm btn-primary">Edit</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <div class="alert alert-warning">
+            ⚠️ No SEO records found.
+        </div>
+    }
+</div>
 
-<a asp-page="/Admin/CreateSEO" class="btn btn-success">Add New SEO</a>
+@section Scripts {
+    <script>
+        console.log("✅ Manage SEO Page Loaded.");
+    </script>
+}

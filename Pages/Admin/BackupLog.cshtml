@@ -1,0 +1,169 @@
+﻿@page
+@model MVP_Core.Pages.Admin.BackupLogModel
+@{
+    ViewData["Title"] = "Backup Logs";
+}
+
+<h1 class="text-2xl font-bold mb-4">Backup Logs</h1>
+
+<!-- Admin Action Controls -->
+<div class="mb-6">
+    <div class="border-b border-gray-200">
+        <nav class="-mb-px flex space-x-8" aria-label="Tabs">
+            <button id="actions-tab" onclick="showActions()" aria-expanded="false" aria-controls="actions-panel"
+                    class="text-gray-500 hover:text-gray-700 whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm">
+                🔧 Admin Actions
+            </button>
+        </nav>
+    </div>
+
+    <div id="actions-panel" class="hidden mt-4 p-4 border rounded bg-gray-50">
+        <form method="post" asp-page-handler="InsertTestLog" class="inline-block mr-4">
+            @Html.AntiForgeryToken()
+            <button type="submit" class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded shadow">
+                ➕ Insert Test Backup Log
+            </button>
+        </form>
+
+        <form method="post" asp-page-handler="ClearOldLogs" onsubmit="return confirm('Are you sure you want to delete all backup logs older than 30 days?');" class="inline-block">
+            @Html.AntiForgeryToken()
+            <button type="submit" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded shadow">
+                🗑️ Clear Old Logs (30+ Days)
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- Status Filter -->
+<form method="get" class="mb-4 flex items-center space-x-4">
+    <div>
+        <label for="StatusFilter" class="mr-2 font-semibold">Filter by Status:</label>
+        <select id="StatusFilter" name="StatusFilter" onchange="this.form.submit()" class="border px-2 py-1 rounded">
+            @foreach (var option in new[] { "All", "Success", "Failed", "Warning" })
+            {
+                <option value="@option" selected="@(Model.StatusFilter == option)">
+                    @option
+                </option>
+            }
+        </select>
+    </div>
+</form>
+
+<!-- Backup Logs Table -->
+<table class="table-auto w-full border-collapse border border-gray-300">
+    <thead>
+        <tr class="bg-gray-200">
+            <th class="border border-gray-300 px-4 py-2">
+                <a asp-page="./BackupLog" asp-route-sortOrder="@Model.GetSortOrder("Date")" asp-route-StatusFilter="@Model.StatusFilter">
+                    Date @Model.GetSortIcon("Date")
+                </a>
+            </th>
+            <th class="border border-gray-300 px-4 py-2">
+                <a asp-page="./BackupLog" asp-route-sortOrder="@Model.GetSortOrder("Status")" asp-route-StatusFilter="@Model.StatusFilter">
+                    Status @Model.GetSortIcon("Status")
+                </a>
+            </th>
+            <th class="border border-gray-300 px-4 py-2">Message</th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            DateTime today = DateTime.Today;
+            DateTime yesterday = today.AddDays(-1);
+            DateTime sevenDaysAgo = today.AddDays(-7);
+
+            bool printedTodayHeader = false;
+            bool printedYesterdayHeader = false;
+            bool printedLast7DaysHeader = false;
+            bool printedOlderHeader = false;
+        }
+
+        @foreach (var log in Model.BackupLogs)
+        {
+            if (log.Date.Date == today && !printedTodayHeader)
+            {
+                <tr class="bg-green-100 text-green-900 font-bold">
+                    <td colspan="3" class="px-4 py-2">Today</td>
+                </tr>
+                printedTodayHeader = true;
+            }
+            else if (log.Date.Date == yesterday && !printedYesterdayHeader)
+            {
+                <tr class="bg-yellow-100 text-yellow-900 font-bold">
+                    <td colspan="3" class="px-4 py-2">Yesterday</td>
+                </tr>
+                printedYesterdayHeader = true;
+            }
+            else if (log.Date.Date > sevenDaysAgo && log.Date.Date < yesterday && !printedLast7DaysHeader)
+            {
+                <tr class="bg-blue-100 text-blue-900 font-bold">
+                    <td colspan="3" class="px-4 py-2">Last 7 Days</td>
+                </tr>
+                printedLast7DaysHeader = true;
+            }
+            else if (log.Date.Date <= sevenDaysAgo && !printedOlderHeader)
+            {
+                <tr class="bg-gray-100 text-gray-900 font-bold">
+                    <td colspan="3" class="px-4 py-2">Older</td>
+                </tr>
+                printedOlderHeader = true;
+            }
+
+            <tr class="hover:bg-gray-100">
+                <td class="border border-gray-300 px-4 py-2">@log.Date.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                <td class="border border-gray-300 px-4 py-2">
+                    <span class="px-3 py-1 rounded-full text-xs font-semibold @Model.GetBadgeColor(log.Status)">
+                        @log.Status
+                    </span>
+                </td>
+                <td class="border border-gray-300 px-4 py-2">@log.Message</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@if (!Model.BackupLogs.Any())
+{
+    <p class="text-gray-600 mt-4">No backup logs available.</p>
+}
+
+<!-- Pagination Controls -->
+<div class="mt-4 flex justify-center space-x-2">
+    @if (Model.PageIndex > 1)
+    {
+        <a asp-page="./BackupLog" asp-route-sortOrder="@Model.SortOrder" asp-route-StatusFilter="@Model.StatusFilter" asp-route-PageIndex="1"
+           class="px-3 py-2 bg-gray-200 hover:bg-gray-300 rounded">&laquo; First</a>
+
+        <a asp-page="./BackupLog" asp-route-sortOrder="@Model.SortOrder" asp-route-StatusFilter="@Model.StatusFilter" asp-route-PageIndex="@(Model.PageIndex - 1)"
+           class="px-3 py-2 bg-gray-200 hover:bg-gray-300 rounded">&lsaquo; Previous</a>
+    }
+
+    <span class="px-4 py-2 flex items-center">
+        Page @Model.PageIndex of @Model.BackupLogs.TotalPages
+    </span>
+
+    @if (Model.PageIndex < Model.BackupLogs.TotalPages)
+    {
+        <a asp-page="./BackupLog" asp-route-sortOrder="@Model.SortOrder" asp-route-StatusFilter="@Model.StatusFilter" asp-route-PageIndex="@(Model.PageIndex + 1)"
+           class="px-3 py-2 bg-gray-200 hover:bg-gray-300 rounded">Next &rsaquo;</a>
+
+        <a asp-page="./BackupLog" asp-route-sortOrder="@Model.SortOrder" asp-route-StatusFilter="@Model.StatusFilter" asp-route-PageIndex="@Model.BackupLogs.TotalPages"
+           class="px-3 py-2 bg-gray-200 hover:bg-gray-300 rounded">Last &raquo;</a>
+    }
+</div>
+
+<script>
+    function showActions() {
+        var panel = document.getElementById('actions-panel');
+        var button = document.getElementById('actions-tab');
+        var isHidden = panel.classList.contains('hidden');
+
+        if (isHidden) {
+            panel.classList.remove('hidden');
+            button.setAttribute('aria-expanded', 'true');
+        } else {
+            panel.classList.add('hidden');
+            button.setAttribute('aria-expanded', 'false');
+        }
+    }
+</script>

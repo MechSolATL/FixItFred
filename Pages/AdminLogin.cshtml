@@ -1,0 +1,24 @@
+﻿@page
+@model AdminLoginModel
+@{
+    ViewData["Title"] = "Admin Login";
+}
+
+<h2>Admin Login</h2>
+
+<form method="post">
+    <div>
+        <label>Username:</label>
+        <input type="text" asp-for="Username" required />
+    </div>
+    <div>
+        <label>Password:</label>
+        <input type="password" asp-for="Password" required />
+    </div>
+    <button type="submit">Login</button>
+</form>
+
+@if (Model.ErrorMessage != null)
+{
+    <p style="color:red;">@Model.ErrorMessage</p>
+}

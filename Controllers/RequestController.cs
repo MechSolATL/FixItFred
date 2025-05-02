@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MVP_Core.Data.Models;
-using MVP_Core.Services;
+using MVP_Core.Services.Email;
 
 namespace MVP_Core.Controllers
 {
@@ -16,21 +16,30 @@ namespace MVP_Core.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> ServiceRequest(ServiceRequest model)
         {
             if (!ModelState.IsValid)
             {
-                return View(model); // Return form with validation errors
+                return View(model);
             }
 
             // Save the service request
-            model.CreatedAt = DateTime.UtcNow;
-            model.Status = "Pending";
-            await _serviceRequestService.SaveRequestAsync(model);
+            var requestId = await _serviceRequestService.CreateServiceRequestAsync(
+                model.CustomerName,
+                model.Email,
+                model.Phone,
+                model.Address,
+                model.ServiceType,
+                model.ServiceSubtype,
+                model.Details,
+                model.SessionId,
+                model.IsUrgent
+            );
 
-            // Send email to user and admin
-            await _emailService.SendServiceRequestConfirmationEmailAsync(model.Email, model);
-            await _emailService.NotifyAdminOfNewRequest(model);
+            // Send email to customer and admin
+            await _emailService.SendServiceRequestConfirmationToCustomerAsync(model);
+            await _emailService.NotifyAdminOfNewRequestAsync(model);
 
             return RedirectToAction("Confirmation");
         }

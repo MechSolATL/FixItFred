@@ -1,18 +1,18 @@
-# MVP-Core
+﻿# MVP-Core
 
-MVP-Core is a robust, scalable web application framework designed to simplify the management of services such as SEO, content management, email communication, and dynamic question flows. Built on ASP.NET Core, it prioritizes security, performance, and maintainability.
+MVP-Core is a robust, scalable web application framework designed to streamline the management of Plumbing, Heating, Air Conditioning, and Water Filtration service requests, SEO metadata, dynamic content, email communication, and customer service flows. Built on ASP.NET Core 8, it prioritizes security, performance, and maintainability.
 
 ---
 
 ## **Features**
 
-- **SEO Management**: Dynamically manage SEO metadata for your pages.
+- **Service Request Flows**: Dynamic, question-driven service request engines per service type.
+- **SEO Management**: Manage SEO metadata dynamically for pages.
 - **Content Service**: Handle dynamic and static content delivery efficiently.
-- **Email Service**: Send transactional emails with SendGrid integration.
-- **Question Service**: Manage and display dynamic question flows based on user inputs.
-- **Secure Authentication and Authorization**: Role and policy-based access control.
-- **Session Management**: Secure and configurable session handling.
-- **CORS Support**: Enable cross-origin requests for specific domains.
+- **Email Service**: SMTP-based transactional emails (no third-party dependencies).
+- **Secure Authentication and Authorization**: Role- and policy-based access control.
+- **Session Management**: Secure and configurable session tracking.
+- **CORS Support**: Enable cross-origin requests securely.
 
 ---
 
@@ -20,9 +20,9 @@ MVP-Core is a robust, scalable web application framework designed to simplify th
 
 ### **Prerequisites**
 
-1. [.NET 6 SDK or higher](https://dotnet.microsoft.com/download)
-2. [SQL Server](https://www.microsoft.com/sql-server/sql-server-downloads) (or Azure SQL)
-3. [SendGrid Account](https://sendgrid.com/) for email services
+- [.NET 8.0 SDK or higher](https://dotnet.microsoft.com/download)
+- [SQL Server](https://www.microsoft.com/sql-server/sql-server-downloads)
+- SMTP email account (e.g., ProtonMail, custom server)
 
 ### **Installation**
 
@@ -34,25 +34,31 @@ MVP-Core is a robust, scalable web application framework designed to simplify th
     ```bash
     cd mvp-core
     ```
-3. Restore NuGet packages:
+3. Restore packages:
     ```bash
     dotnet restore
     ```
-4. Update the `appsettings.json` with your configurations:
-
+4. Update `appsettings.json`:
     ```json
-    "ConnectionStrings": {
+    {
+      "ConnectionStrings": {
         "DefaultConnection": "Your-SQL-Server-Connection-String"
-    },
-    "SendGrid": {
-        "ApiKey": "Your-SendGrid-API-Key"
+      },
+      "SMTP": {
+        "Host": "smtp.protonmail.ch",
+        "Port": 587,
+        "Username": "service-atlanta@pm.me",
+        "Password": "your-password",
+        "UseSSL": true,
+        "FromEmail": "ServiceRequests@service-atlanta.com",
+        "FromName": "Mechanical Solutions Atlanta (MSA) | Service-Atlanta.com"
+      }
     }
     ```
-5. Apply migrations and seed the database:
+5. Apply database migrations:
     ```bash
     dotnet ef database update
     ```
-
 6. Run the application:
     ```bash
     dotnet run
@@ -62,101 +68,128 @@ MVP-Core is a robust, scalable web application framework designed to simplify th
 
 ## **Project Structure**
 
-### **Folders**
-
-- **`Data`**: Contains the Entity Framework Core models and database context.
-- **`Services`**: Implements business logic for SEO, email, content, and question management.
-- **`Controllers`**: Manages HTTP requests and responses.
-- **`Pages`**: Razor pages for the UI.
-
-### **Key Files**
-
-- **`Program.cs`**: Configures middleware, services, and the application pipeline.
-- **`appsettings.json`**: Stores configuration data such as connection strings and API keys.
-- **`ApplicationDbContext.cs`**: Configures database tables and relationships.
+| Folder | Purpose |
+|:-------|:--------|
+| `/Data` | Entity Framework Core models and database context. |
+| `/Services` | Business logic (EmailService, SEOService, QuestionService, etc.) |
+| `/Pages/Services` | Service-specific Razor Pages (Plumbing, Heating, etc.) |
+| `/Pages/Shared` | Shared views (ThankYou page, SupportBox partial, etc.) |
+| `/Helpers` | Session extensions, utility classes. |
+| `/wwwroot` | Static files (CSS, JS, images). |
 
 ---
 
-## **Usage**
+## **Service Flow Example**
 
-### **SEO Management**
-- Dynamically retrieve and manage SEO metadata for pages.
-- Example:
-    ```csharp
-    var seoData = await _seoService.GetSeoData("HomePage");
-    ```
-
-### **Email Service**
-- Send verification and transactional emails via SendGrid.
-- Example:
-    ```csharp
-    await _emailService.SendVerificationEmailAsync(user.Email, verificationLink);
-    ```
-
-### **Dynamic Questions**
-- Manage dynamic question flows based on user responses.
-- Example:
-    ```csharp
-    var questions = await _questionService.GetQuestionsByCategory("Plumbing");
-    ```
+1. Customer starts a service request (e.g., `/Services/Plumbing`).
+2. Dynamic question flow adapts based on their answers.
+3. Customer submits a service request.
+4. Database saves the request with timestamped answers.
+5. SMTP sends:
+   - Confirmation Email to Customer.
+   - Notification Email to Admins.
+6. Thank You page shown with final confirmation.
 
 ---
 
 ## **Security Features**
 
-1. **HTTPS Enforcement**:
-    - Configured with `UseHttpsRedirection()` and HSTS.
-2. **Secure Cookies**:
-    - Session cookies are marked as `HttpOnly`, `Secure`, and `SameSite.Strict`.
-3. **Authorization**:
-    - Role-based and policy-based authorization implemented for access control.
+- **HTTPS Enforcement**: `UseHttpsRedirection()` + HSTS active.
+- **Secure Cookies**: HTTP-only, Secure, SameSite.Strict session cookies.
+- **Anti-Fraud Features**: Hard server-side session expiration + soft client countdown warnings.
+- **Authorization**: Admin dashboard protected by role-based policy.
 
 ---
 
 ## **Deployment**
 
-### **To IIS**
-1. Publish the application:
+### **Local Server (Windows IIS)**
+
+1. Publish the app:
     ```bash
     dotnet publish -c Release -o ./publish
     ```
-2. Deploy the contents of the `./publish` directory to your IIS site.
+2. Deploy `./publish` folder to IIS.
+3. Set Application Pool to **No Managed Code** (Kestrel handles runtime).
 
-### **To Azure**
-1. Use the Azure CLI to deploy:
-    ```bash
-    az webapp up --name <your-app-name> --resource-group <your-resource-group>
-    ```
+### **Azure App Service**
+
+```bash
+az webapp up --name your-app-name --resource-group your-resource-group
+```
+
+---
+
+## **Usage**
+
+### **Sending Email via SMTP**
+
+```csharp
+await _emailService.SendServiceRequestConfirmationEmailAsync(customer.Email, serviceRequest);
+await _emailService.NotifyAdminOfNewRequest(serviceRequest);
+```
+
+### **Saving a Service Request**
+
+```csharp
+var newRequest = new ServiceRequest {
+    CustomerName = "John Doe",
+    Email = "john@example.com",
+    ServiceType = "Plumbing",
+    Details = "Leaky faucet",
+    CreatedAt = DateTime.UtcNow
+};
+
+await _dbContext.ServiceRequests.AddAsync(newRequest);
+await _dbContext.SaveChangesAsync();
+```
 
 ---
 
 ## **Contributing**
 
-1. Fork the repository.
-2. Create a feature branch:
+1. Fork the repo.
+2. Create a branch:
     ```bash
-    git checkout -b feature-name
+    git checkout -b feature/my-feature
     ```
 3. Commit changes:
     ```bash
-    git commit -m "Add new feature"
+    git commit -m "Add my feature"
     ```
-4. Push to the branch:
+4. Push:
     ```bash
-    git push origin feature-name
+    git push origin feature/my-feature
     ```
-5. Create a pull request.
+5. Submit a Pull Request.
 
 ---
 
 ## **License**
 
-This project is licensed under the MIT License. See the `LICENSE` file for details.
+This project is licensed under the **MIT License**.
 
 ---
 
 ## **Contact**
 
-For any inquiries or issues, contact:
 - **Email**: Admins@service-atlanta.com
-- **Website**: [Mechanical Solutions Atlanta](https://service-atlanta.com)
+- **Website**: [https://service-atlanta.com](https://service-atlanta.com)
+
+---
+
+# ✅ Final Notes
+
+- No more SendGrid dependency — everything 100% SMTP server based.
+- Strong security practices.
+- Solid separation of concerns (Data / Services / Pages).
+- Future-proof structure for expansion.
+
+---
+
+## Legal Notice
+
+All code, designs, workflows, service structures, and business methods associated with Service-Atlanta.com and Mechanical Solutions Atlanta are protected under a Proprietary License.  
+Unauthorized use, duplication, or resale without express permission from Virtual Concepts is strictly prohibited.
+
+[View Protected Proprietary License](./Pages/Legal/License.cshtml)

@@ -1,0 +1,107 @@
+﻿@page
+@model MVP_Core.Pages.Admin.DashboardModel
+@{
+    ViewData["Title"] = "Admin Dashboard";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-5">
+    <h1 class="text-center mb-4">📋 Service Requests Dashboard</h1>
+
+    <!-- 🔎 Filters -->
+    <div class="card mb-4 p-4 shadow-sm">
+        <form method="get" class="row g-3 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label">Filter by Service Type</label>
+                <select name="ServiceType" class="form-select">
+                    <option value="">All</option>
+                    <option value="Plumbing">Plumbing</option>
+                    <option value="Air Conditioning">Air Conditioning</option>
+                    <option value="Water Filtration">Water Filtration</option>
+                    <option value="Heating">Heating</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Status</label>
+                <select name="Status" class="form-select">
+                    <option value="">All</option>
+                    <option value="Pending">Pending</option>
+                    <option value="Scheduled">Scheduled</option>
+                    <option value="Completed">Completed</option>
+                    <option value="Closed">Closed</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <button type="submit" class="btn btn-primary w-100">🔍 Apply Filters</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- 📄 Requests Table -->
+    <div class="table-responsive shadow-sm">
+        <table class="table table-hover table-bordered align-middle">
+            <thead class="table-dark text-center">
+                <tr>
+                    <th>Client</th>
+                    <th>Service</th>
+                    <th>Submitted</th>
+                    <th>Status</th>
+                    <th>Urgent</th>
+                    <th>Needs Follow-Up</th>
+                    <th>Phone</th>
+                    <th>Email</th>
+                    <th>Confirmed</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.ServiceRequests.Any())
+                {
+                    @foreach (var request in Model.ServiceRequests)
+                    {
+                        var urgentClass = request.IsUrgent ? "table-danger" : "";
+                        var followUpClass = request.NeedsFollowUp ? "table-warning" : "";
+                        var rowClass = $"{urgentClass} {followUpClass}".Trim();
+
+                        <tr class="@rowClass">
+                            <td>@request.CustomerName</td>
+                            <td>@request.ServiceType</td>
+                            <td>@request.CreatedAt.ToString("g")</td>
+                            <td>
+                                <span class="badge bg-@(request.Status == "Pending" ? "warning text-dark" : request.Status == "Scheduled" ? "info" : request.Status == "Completed" ? "success" : "secondary")">
+                                    @request.Status
+                                </span>
+                            </td>
+                            <td class="text-center">@(request.IsUrgent ? "🚨" : "-")</td>
+                            <td class="text-center">@(request.NeedsFollowUp ? "✔️" : "-")</td>
+                            <td>@request.Phone</td>
+                            <td>@request.Email</td>
+                            <td class="text-center">@(request.ClientConfirmedAt.HasValue ? "✅" : "❌")</td>
+                            <td class="text-center">
+                                <a href="/Admin/ViewRequest/@request.Id" class="btn btn-sm btn-primary mb-1">View</a><br />
+                                @if (!request.ClientConfirmedAt.HasValue && request.Status != "Scheduled")
+                                {
+                                    <a href="/Admin/ConfirmRequest/@request.Id" class="btn btn-sm btn-warning mb-1">Confirm</a>
+
+                                    <br />
+                                }
+                                @if (request.Status != "Closed")
+                                {
+                                    <a href="/Admin/CloseRequest/@request.Id" class="btn btn-sm btn-success">Close</a>
+                                }
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="10" class="text-center text-muted p-4">
+                            No service requests found.
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

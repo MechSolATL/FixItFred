@@ -1,0 +1,26 @@
+﻿@page
+@model MVP_Core.Pages.Services.ThankYouModel
+@{
+    ViewData["Title"] = "Thank You!";
+}
+
+<h1 class="text-4xl font-bold text-center text-green-700 my-10" role="alert">
+    <span aria-hidden="true">🎉</span> Thank You!
+</h1>
+
+<div class="bg-white p-6 rounded shadow-md mx-auto max-w-2xl text-center">
+    <p class="text-xl text-gray-800 mb-6">
+        Your service request has been received!
+        Our team will review it and contact you shortly. <span aria-hidden="true">🛠️</span>
+    </p>
+
+    <p class="text-gray-600 mb-6">
+        While you wait, you can call us if anything changes.
+    </p>
+
+    <partial name="~/Pages/Shared/Partials/_SupportBox.cshtml" />
+
+    <a href="/" class="inline-block mt-6 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-full">
+        <span aria-hidden="true">🔙</span> Return to Home
+    </a>
+</div>

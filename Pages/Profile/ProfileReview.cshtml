@@ -1,0 +1,66 @@
+﻿@page
+@model MVP_Core.Pages.Profile.ProfileReviewModel
+@{
+    ViewData["Title"] = "Profile Review – Service Atlanta";
+    Layout = "/Pages/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-5">
+    <h1 class="text-center mb-4" role="heading" aria-level="1">Profile Setup</h1>
+
+    <!-- Display Success/Error Message -->
+    @if (!string.IsNullOrEmpty(Model.Message))
+    {
+        <div class="alert @(Model.IsSuccess ? "alert-success" : "alert-danger")" role="alert">
+            @Model.Message
+        </div>
+    }
+
+    <form method="post" class="needs-validation" novalidate>
+        @Html.AntiForgeryToken()
+
+        <!-- Username -->
+        <div class="mb-3">
+            <label asp-for="ProfileData.Username" class="form-label">Username</label>
+            <input asp-for="ProfileData.Username" class="form-control" />
+            <span asp-validation-for="ProfileData.Username" class="text-danger"></span>
+        </div>
+
+        <!-- Email -->
+        <div class="mb-3">
+            <label asp-for="ProfileData.Email" class="form-label">Email Address</label>
+            <input asp-for="ProfileData.Email" class="form-control" type="email" />
+            <span asp-validation-for="ProfileData.Email" class="text-danger"></span>
+        </div>
+
+        <!-- Phone -->
+        <div class="mb-3">
+            <label asp-for="ProfileData.PhoneNumber" class="form-label">Phone Number</label>
+            <input asp-for="ProfileData.PhoneNumber" class="form-control" type="tel" />
+            <span asp-validation-for="ProfileData.PhoneNumber" class="text-danger"></span>
+        </div>
+
+        <!-- Verification Code -->
+        <div class="mb-3">
+            <label asp-for="ProfileData.VerificationCode" class="form-label">Verification Code</label>
+            <input asp-for="ProfileData.VerificationCode" class="form-control" />
+            <span asp-validation-for="ProfileData.VerificationCode" class="text-danger"></span>
+        </div>
+
+        <!-- Review Notes -->
+        <div class="mb-4">
+            <label asp-for="ProfileData.ReviewNotes" class="form-label">Review Notes</label>
+            <textarea asp-for="ProfileData.ReviewNotes" class="form-control" rows="4"></textarea>
+            <span asp-validation-for="ProfileData.ReviewNotes" class="text-danger"></span>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="d-grid">
+            <button type="submit" class="btn btn-primary btn-lg" aria-label="Submit Profile">Submit Profile</button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

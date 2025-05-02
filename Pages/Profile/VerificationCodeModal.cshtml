@@ -1,0 +1,27 @@
+﻿@page
+@model MVP_Core.Pages.Profile.VerificationCodeModalModel
+@{
+    Layout = "/Pages/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Enter Verification Code – Service Atlanta";
+}
+
+<h2 class="text-xl font-bold mb-4">Verify Your Code</h2>
+
+@if (!string.IsNullOrEmpty(Model.Message))
+{
+    <div class="alert @(Model.IsSuccess ? "alert-success" : "alert-danger")">
+        @Model.Message
+    </div>
+}
+
+<form method="post" class="space-y-4">
+    @Html.AntiForgeryToken()
+
+    <div class="form-group">
+        <label asp-for="Code" class="form-label">Enter Verification Code</label>
+        <input asp-for="Code" class="form-control" maxlength="10" placeholder="123456" required />
+        <span asp-validation-for="Code" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Verify</button>
+</form>

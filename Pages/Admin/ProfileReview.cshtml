@@ -1,0 +1,31 @@
+﻿@page
+@model MVP_Core.Pages.Admin.ProfileReviewModel
+@{
+    ViewData["Title"] = "Profile Review";
+    Layout = "/Pages/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-5">
+    <h2 class="text-center mb-4">🧾 Review Your Admin Profile</h2>
+
+    <form method="post" class="bg-light p-4 rounded shadow-sm">
+        <div class="mb-3">
+            <label class="form-label fw-bold">Username:</label>
+            <input type="text" class="form-control" value="@Model.Username" disabled aria-label="Admin username" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label fw-bold">Email:</label>
+            <input type="email" class="form-control" value="@Model.Email" disabled aria-label="Admin email" />
+        </div>
+
+        <div class="d-grid gap-2 mt-4">
+            <button type="submit" class="btn btn-success btn-lg" aria-label="Confirm profile review">
+                ✅ Confirm and Continue
+            </button>
+            <a asp-page="/Admin/EditProfile" class="btn btn-secondary btn-lg" aria-label="Edit admin profile">
+                ✏️ Edit Profile
+            </a>
+        </div>
+    </form>
+</div>
