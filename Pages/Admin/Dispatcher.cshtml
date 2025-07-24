@@ -5,6 +5,8 @@
     Layout = "/Pages/Shared/_Layout.cshtml";
     var statuses = new[] { "Unassigned", "Assigned", "En Route", "Complete" };
     var activeTab = Request.Query["tab"].ToString() ?? "Unassigned";
+    var filteredRequests = ViewData["RequestDetails"] as List<MVP_Core.Services.Admin.RequestSummaryDto> ?? new List<MVP_Core.Services.Admin.RequestSummaryDto>();
+    var techList = ViewData["TechnicianList"] as List<string> ?? new List<string>();
 }
 <div class="container-fluid mt-4">
     <h2 class="mb-4">?? Dispatcher Kanban Board</h2>
@@ -100,7 +102,7 @@
     @* --- End Smart Dispatcher Filter Panel --- *@
 
     @* --- Filtered Request Panel --- *@
-    @if (ViewData["RequestDetails"] is List<MVP_Core.Services.Admin.RequestSummaryDto> filteredRequests)
+    @if (filteredRequests.Any())
     {
         <div class="row mb-4">
             <div class="col-12">
@@ -121,19 +123,40 @@
                                 <th>Priority</th>
                                 <th>ZIP</th>
                                 <th>Delay (min)</th>
+                                <th>Reassign</th>
+                                <th>Emergency</th>
                             </tr>
                         </thead>
                         <tbody>
                         @foreach (var req in filteredRequests)
                         {
-                            <tr>
-                                <td>@req.Id</td>
+                            var emergencyClass = req.IsEmergency ? "border border-danger" : "";
+                            <tr class="@emergencyClass">
+                                <td>@req.Id @if (req.IsEmergency) { <span title="Emergency" class="text-danger fw-bold">??</span> }</td>
                                 <td>@req.ServiceType</td>
                                 <td>@req.Technician</td>
                                 <td>@req.Status</td>
                                 <td>@req.Priority</td>
                                 <td>@req.Zip</td>
                                 <td>@req.DelayMinutes</td>
+                                <td>
+                                    <form method="post" asp-page-handler="ReassignTech" style="display:inline;">
+                                        <input type="hidden" name="requestId" value="@req.Id" />
+                                        <select name="newTechnicianId" class="form-select form-select-sm d-inline-block w-auto me-1">
+                                            @foreach (var tech in techList)
+                                            {
+                                                <option value="@tech">@tech</option>
+                                            }
+                                        </select>
+                                        <button type="submit" class="btn btn-outline-primary btn-sm">Reassign</button>
+                                    </form>
+                                </td>
+                                <td>
+                                    <form method="post" asp-page-handler="FlagEmergency" style="display:inline;">
+                                        <input type="hidden" name="requestId" value="@req.Id" />
+                                        <button type="submit" class="btn btn-danger btn-sm">?? Emergency</button>
+                                    </form>
+                                </td>
                             </tr>
                         }
                         </tbody>
@@ -500,61 +523,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 </script>
 @* --- Click-to-Reassign Technician Flow --- *@
-@if (ViewData["RequestDetails"] is List<MVP_Core.Services.Admin.RequestSummaryDto> filteredRequests && ViewData["TechnicianList"] is List<string> techList)
-{
-    <div class="row mb-4">
-        <div class="col-12">
-            <h4>Filtered Requests</h4>
-            @if (!filteredRequests.Any())
-            {
-                <div class="alert alert-warning">No matching requests.</div>
-            }
-            else
-            {
-                <table class="table table-bordered table-hover">
-                    <thead class="table-light">
-                        <tr>
-                            <th>ID</th>
-                            <th>Service Type</th>
-                            <th>Technician</th>
-                            <th>Status</th>
-                            <th>Priority</th>
-                            <th>ZIP</th>
-                            <th>Delay (min)</th>
-                            <th>Reassign</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    @foreach (var req in filteredRequests)
-                    {
-                        <tr>
-                            <td>@req.Id</td>
-                            <td>@req.ServiceType</td>
-                            <td>@req.Technician</td>
-                            <td>@req.Status</td>
-                            <td>@req.Priority</td>
-                            <td>@req.Zip</td>
-                            <td>@req.DelayMinutes</td>
-                            <td>
-                                <form method="post" asp-page-handler="ReassignTech" style="display:inline;">
-                                    <input type="hidden" name="requestId" value="@req.Id" />
-                                    <select name="newTechnicianId" class="form-select form-select-sm d-inline-block w-auto me-1">
-                                        @foreach (var tech in techList)
-                                        {
-                                            <option value="@tech">@tech</option>
-                                        }
-                                    </select>
-                                    <button type="submit" class="btn btn-outline-primary btn-sm">Reassign</button>
-                                </form>
-                            </td>
-                        </tr>
-                    }
-                    </tbody>
-                </table>
-            }
-        </div>
-    </div>
-}
+@* Removed duplicate filteredRequests and techList declarations. Only declare once at the top and use throughout. Removed all other @if blocks that redeclare these variables. *@
 @* --- End Click-to-Reassign Technician Flow --- *@
 @* --- Dispatcher Notification Bar --- *@
 <div class="row mb-3">
@@ -630,67 +599,64 @@ document.addEventListener('DOMContentLoaded', function () {
     <a href="/Admin/DispatcherAudit" class="btn btn-outline-secondary">View Dispatcher Command Log</a>
 </footer>
 @* --- Emergency Mode Protocol --- *@
-@if (ViewData["RequestDetails"] is List<MVP_Core.Services.Admin.RequestSummaryDto> filteredRequests && ViewData["TechnicianList"] is List<string> techList)
+@if (filteredRequests.Any())
 {
     <div class="row mb-4">
         <div class="col-12">
             <h4>Filtered Requests</h4>
-            @if (!filteredRequests.Any())
-            {
-                <div class="alert alert-warning">No matching requests.</div>
-            }
-            else
-            {
-                <table class="table table-bordered table-hover">
-                    <thead class="table-light">
-                        <tr>
-                            <th>ID</th>
-                            <th>Service Type</th>
-                            <th>Technician</th>
-                            <th>Status</th>
-                            <th>Priority</th>
-                            <th>ZIP</th>
-                            <th>Delay (min)</th>
-                            <th>Reassign</th>
-                            <th>Emergency</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    @foreach (var req in filteredRequests)
-                    {
-                        var emergencyClass = req.IsEmergency ? "border border-danger" : "";
-                        <tr class="@emergencyClass">
-                            <td>@req.Id @if (req.IsEmergency) { <span title="Emergency" class="text-danger fw-bold">??</span> }</td>
-                            <td>@req.ServiceType</td>
-                            <td>@req.Technician</td>
-                            <td>@req.Status</td>
-                            <td>@req.Priority</td>
-                            <td>@req.Zip</td>
-                            <td>@req.DelayMinutes</td>
-                            <td>
-                                <form method="post" asp-page-handler="ReassignTech" style="display:inline;">
-                                    <input type="hidden" name="requestId" value="@req.Id" />
-                                    <select name="newTechnicianId" class="form-select form-select-sm d-inline-block w-auto me-1">
-                                        @foreach (var tech in techList)
-                                        {
-                                            <option value="@tech">@tech</option>
-                                        }
-                                    </select>
-                                    <button type="submit" class="btn btn-outline-primary btn-sm">Reassign</button>
-                                </form>
-                            </td>
-                            <td>
-                                <form method="post" asp-page-handler="FlagEmergency" style="display:inline;">
-                                    <input type="hidden" name="requestId" value="@req.Id" />
-                                    <button type="submit" class="btn btn-danger btn-sm">?? Emergency</button>
-                                </form>
-                            </td>
-                        </tr>
-                    }
-                    </tbody>
-                </table>
-            }
+            <table class="table table-bordered table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Service Type</th>
+                        <th>Technician</th>
+                        <th>Status</th>
+                        <th>Priority</th>
+                        <th>ZIP</th>
+                        <th>Delay (min)</th>
+                        <th>Reassign</th>
+                        <th>Emergency</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @foreach (var req in filteredRequests)
+                {
+                    var emergencyClass = req.IsEmergency ? "border border-danger" : "";
+                    <tr class="@emergencyClass">
+                        <td>@req.Id @if (req.IsEmergency) { <span title="Emergency" class="text-danger fw-bold">??</span> }</td>
+                        <td>@req.ServiceType</td>
+                        <td>@req.Technician</td>
+                        <td>@req.Status</td>
+                        <td>@req.Priority</td>
+                        <td>@req.Zip</td>
+                        <td>@req.DelayMinutes</td>
+                        <td>
+                            <form method="post" asp-page-handler="ReassignTech" style="display:inline;">
+                                <input type="hidden" name="requestId" value="@req.Id" />
+                                <select name="newTechnicianId" class="form-select form-select-sm d-inline-block w-auto me-1">
+                                    @foreach (var tech in techList)
+                                    {
+                                        <option value="@tech">@tech</option>
+                                    }
+                                </select>
+                                <button type="submit" class="btn btn-outline-primary btn-sm">Reassign</button>
+                            </form>
+                        </td>
+                        <td>
+                            <form method="post" asp-page-handler="FlagEmergency" style="display:inline;">
+                                <input type="hidden" name="requestId" value="@req.Id" />
+                                <button type="submit" class="btn btn-danger btn-sm">?? Emergency</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
         </div>
     </div>
+}
+else
+{
+    <div class="alert alert-warning">No matching requests.</div>
 }
 @* --- End Emergency Mode Protocol --- *@

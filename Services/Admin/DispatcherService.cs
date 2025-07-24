@@ -245,13 +245,6 @@ namespace MVP_Core.Services.Admin
         public string Type { get; set; }
         public string Message { get; set; }
     }
-    public class DispatcherAuditLog
-    {
-        public int Id { get; set; }
-        public DateTime Timestamp { get; set; }
-        public string Action { get; set; }
-        public string Details { get; set; }
-    }
     public class WatchdogAlert
     {
         public int RequestId { get; set; }
