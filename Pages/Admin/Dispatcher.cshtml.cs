@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using MVP_Core.Data.Models;
@@ -218,6 +219,7 @@ namespace MVP_Core.Pages.Admin
         [BindProperty]
         public int Index { get; set; }
 
+        [Authorize(Roles = "Dispatcher,Supervisor")]
         public IActionResult OnPostAssignTechnician()
         {
             if (RequestId <= 0)
@@ -229,8 +231,26 @@ namespace MVP_Core.Pages.Admin
             TempData["SystemMessages"] = result.Message;
             ViewData["RequestDetails"] = result.RequestDetails;
             ViewData["TechnicianList"] = result.TechnicianList;
+            // Assignment log
+            var techId = 1; // Stub: replace with actual assigned tech
+            var score = _dispatcherService.CalculateDispatchScore(techId);
+            var tier = score >= 80 ? "?? Ready" : score >= 50 ? "?? At Capacity" : "?? Overloaded";
+            var rationale = $"Tag match: Plumbing, ZIP match: 30345, Score: {score} ({tier})";
+            var tags = new List<string> { "Plumbing" };
+            _dispatcherService.LogAssignment(new AssignmentLogEntry
+            {
+                RequestId = RequestId,
+                TechnicianId = techId,
+                DispatcherName = User?.Identity?.Name ?? "system",
+                Timestamp = DateTime.UtcNow,
+                DispatchScore = score,
+                Tier = tier,
+                Rationale = rationale,
+                MatchedTags = tags
+            });
             return RedirectToPage();
         }
+        [Authorize]
         public IActionResult OnPostMoveUp()
         {
             if (RequestId <= 0)
@@ -242,6 +262,7 @@ namespace MVP_Core.Pages.Admin
             TempData["SystemMessages"] = result.Message;
             return RedirectToPage();
         }
+        [Authorize]
         public IActionResult OnPostMoveDown()
         {
             if (RequestId <= 0)
@@ -253,6 +274,7 @@ namespace MVP_Core.Pages.Admin
             TempData["SystemMessages"] = result.Message;
             return RedirectToPage();
         }
+        [Authorize(Roles = "Dispatcher,Supervisor")]
         public IActionResult OnPostReassign()
         {
             if (RequestId <= 0)
@@ -264,8 +286,10 @@ namespace MVP_Core.Pages.Admin
             TempData["SystemMessages"] = result.Message;
             return RedirectToPage();
         }
+        [Authorize(Roles = "Supervisor")]
         public IActionResult OnPostCancel()
         {
+            var role = "Supervisor";
             if (RequestId <= 0)
             {
                 TempData["SystemMessages"] = "Invalid RequestId.";
@@ -273,21 +297,22 @@ namespace MVP_Core.Pages.Admin
             }
             var result = _dispatcherService.Cancel(RequestId);
             TempData["SystemMessages"] = result.Message;
-            return RedirectToPage();
-        }
-        public IActionResult OnPostResendInstructions()
-        {
-            if (RequestId <= 0)
+            _dispatcherService.LogDispatcherAction(new DispatcherAuditLog
             {
-                TempData["SystemMessages"] = "Invalid RequestId.";
-                return RedirectToPage();
-            }
-            var result = _dispatcherService.ResendInstructions(RequestId);
-            TempData["SystemMessages"] = result.Message;
+                ActionType = "Cancel",
+                RequestId = RequestId,
+                TechnicianId = null,
+                PerformedBy = User?.Identity?.Name ?? "system",
+                PerformedByRole = role,
+                Timestamp = DateTime.UtcNow,
+                Notes = result.Message
+            });
             return RedirectToPage();
         }
+        [Authorize(Roles = "Supervisor")]
         public IActionResult OnPostEscalate()
         {
+            var role = "Supervisor";
             if (RequestId <= 0)
             {
                 TempData["SystemMessages"] = "Invalid RequestId.";
@@ -301,21 +326,41 @@ namespace MVP_Core.Pages.Admin
                 RequestId = RequestId,
                 TechnicianId = null,
                 PerformedBy = User?.Identity?.Name ?? "system",
+                PerformedByRole = role,
                 Timestamp = DateTime.UtcNow,
                 Notes = result.Message
             });
             return RedirectToPage();
         }
-        public IActionResult OnPostShowMap()
+        public IActionResult OnPostResendInstructions()
         {
             if (RequestId <= 0)
             {
                 TempData["SystemMessages"] = "Invalid RequestId.";
                 return RedirectToPage();
             }
-            var result = _dispatcherService.ShowMap(RequestId);
+            var result = _dispatcherService.ResendInstructions(RequestId);
             TempData["SystemMessages"] = result.Message;
             return RedirectToPage();
+        }
+        [Authorize(Roles = "Supervisor")]
+        public IActionResult OnPostFlagEmergency(int requestId)
+        {
+            var role = "Supervisor";
+            var dispatcherName = User?.Identity?.Name ?? "system";
+            bool success = _dispatcherService.FlagEmergency(requestId, dispatcherName);
+            TempData["SystemMessages"] = success ? "Request flagged as emergency." : "Failed to flag emergency.";
+            _dispatcherService.LogDispatcherAction(new DispatcherAuditLog
+            {
+                ActionType = "Override-Emergency",
+                RequestId = requestId,
+                TechnicianId = null,
+                PerformedBy = dispatcherName,
+                PerformedByRole = role,
+                Timestamp = DateTime.UtcNow,
+                Notes = "Dispatcher flagged emergency"
+            });
+            return Page();
         }
 
         // Handler for drag-and-drop Kanban reordering
@@ -440,8 +485,10 @@ namespace MVP_Core.Pages.Admin
             return Page();
         }
 
+        [Authorize(Roles = "Dispatcher,Supervisor")]
         public IActionResult OnPostReassignTech(int requestId, int newTechnicianId)
         {
+            var role = User.IsInRole("Supervisor") ? "Supervisor" : "Dispatcher";
             if (requestId <= 0 || newTechnicianId <= 0)
             {
                 TempData["SystemMessages"] = "Reassignment failed — check technician availability.";
@@ -455,6 +502,7 @@ namespace MVP_Core.Pages.Admin
                 RequestId = requestId,
                 TechnicianId = newTechnicianId,
                 PerformedBy = User?.Identity?.Name ?? "system",
+                PerformedByRole = role,
                 Timestamp = DateTime.UtcNow,
                 Notes = success ? "Technician reassigned." : "Failed reassignment."
             });

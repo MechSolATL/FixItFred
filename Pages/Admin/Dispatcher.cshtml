@@ -7,9 +7,23 @@
     var activeTab = Request.Query["tab"].ToString() ?? "Unassigned";
     var filteredRequests = ViewData["RequestDetails"] as List<MVP_Core.Services.Admin.RequestSummaryDto> ?? new List<MVP_Core.Services.Admin.RequestSummaryDto>();
     var techList = ViewData["TechnicianList"] as List<string> ?? new List<string>();
+    var broadcast = DispatcherService.GetActiveBroadcast();
+    var techHeartbeats = DispatcherService.GetAllTechnicianHeartbeats();
 }
 <div class="container-fluid mt-4">
     <h2 class="mb-4">?? Dispatcher Kanban Board</h2>
+    @* --- Broadcast Banner --- *@
+    @if (broadcast != null && broadcast.IsActive)
+    {
+        <div class="alert alert-danger text-center" role="alert">
+            ?? @broadcast.Message
+            @if (broadcast.ExpiresAt.HasValue)
+            {
+                <span class="ms-2 small text-muted">(Expires @broadcast.ExpiresAt.Value.ToLocalTime():t)</span>
+            }
+        </div>
+    }
+    @* --- End Broadcast Banner --- *@
     @* --- Dispatcher Metrics Overlay --- *@
     <div class="row mb-4">
         <div class="col-12">
@@ -125,6 +139,7 @@
                                 <th>Delay (min)</th>
                                 <th>Reassign</th>
                                 <th>Emergency</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -140,22 +155,46 @@
                                 <td>@req.Zip</td>
                                 <td>@req.DelayMinutes</td>
                                 <td>
+                                    @if (User.IsInRole("Dispatcher") || User.IsInRole("Supervisor")) {
                                     <form method="post" asp-page-handler="ReassignTech" style="display:inline;">
                                         <input type="hidden" name="requestId" value="@req.Id" />
+                                        @{
+                                            var skillTagMasterList = new[] { "Plumbing", "Air Conditioning", "Heating", "Water Filtration", "Trainee", "Mentor" };
+                                            string requiredSkill = req.ServiceType ?? "";
+                                            string jobZip = req.Zip ?? "";
+                                            var suggestedTechs = DispatcherService.GetSuggestedTechsBySkill(requiredSkill, jobZip);
+                                        }
                                         <select name="newTechnicianId" class="form-select form-select-sm d-inline-block w-auto me-1">
-                                            @foreach (var tech in techList)
+                                            @if (suggestedTechs != null && suggestedTechs.Any())
                                             {
-                                                <option value="@tech">@tech</option>
+                                                @foreach (var tech in suggestedTechs)
+                                                {
+                                                    <option value="@tech.TechnicianId">@tech.Name</option>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <option disabled>No matching techs — show all</option>
+                                                @foreach (var tech in techHeartbeats)
+                                                {
+                                                    <option value="@tech.TechnicianId">@tech.Name</option>
+                                                }
                                             }
                                         </select>
                                         <button type="submit" class="btn btn-outline-primary btn-sm">Reassign</button>
                                     </form>
+                                    }
                                 </td>
                                 <td>
+                                    @if (User.IsInRole("Supervisor")) {
                                     <form method="post" asp-page-handler="FlagEmergency" style="display:inline;">
                                         <input type="hidden" name="requestId" value="@req.Id" />
                                         <button type="submit" class="btn btn-danger btn-sm">?? Emergency</button>
                                     </form>
+                                    }
+                                </td>
+                                <td>
+                                    <a href="/Admin/DispatcherHistory?requestId=@req.Id" class="btn btn-outline-info btn-sm">View Timeline</a>
                                 </td>
                             </tr>
                         }
@@ -486,177 +525,8 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('orderJson').value = JSON.stringify(order);
         document.getElementById('reorderForm').submit();
     }
-    // SignalR hub connection
-    const connection = new signalR.HubConnectionBuilder()
-        .withUrl("/dispatcherHub")
-        .configureLogging(signalR.LogLevel.Information)
-        .build();
-    connection.on("JobStatusUpdated", function (jobId, newStatus) {
-        const jobElement = document.querySelector(`[data-request-id='${jobId}']`);
-        if (jobElement) {
-            const oldStatus = jobElement.dataset.status;
-            jobElement.dataset.status = newStatus;
-            document.getElementById(`kanban-${oldStatus}`).removeChild(jobElement);
-            document.getElementById(`kanban-${newStatus}`).appendChild(jobElement);
-            // Update charts
-            renderKanbanCharts();
-        }
-    });
-    connection.on("JobAssigned", function (jobId, technicianName) {
-        const jobElement = document.querySelector(`[data-request-id='${jobId}']`);
-        if (jobElement) {
-            jobElement.querySelector(".technician-name").textContent = technicianName;
-        }
-    });
-    connection.on("JobAutoAssigned", function (jobId, technicianName) {
-        const jobElement = document.querySelector(`[data-request-id='${jobId}']`);
-        if (jobElement) {
-            jobElement.querySelector(".technician-name").textContent = technicianName;
-            jobElement.classList.add("border-warning");
-            setTimeout(() => jobElement.classList.remove("border-warning"), 3000);
-        }
-    });
-    connection.start().catch(function (err) {
-        return console.error(err.toString());
-    });
 });
-
 </script>
-@* --- Click-to-Reassign Technician Flow --- *@
-@* Removed duplicate filteredRequests and techList declarations. Only declare once at the top and use throughout. Removed all other @if blocks that redeclare these variables. *@
-@* --- End Click-to-Reassign Technician Flow --- *@
-@* --- Dispatcher Notification Bar --- *@
-<div class="row mb-3">
-    <div class="col-12">
-        @if (ViewData["Notifications"] is List<MVP_Core.Models.Admin.DispatcherNotification> notifications && notifications.Any())
-        {
-            <ul class="list-unstyled notification-feed">
-                @foreach (var note in notifications)
-                {
-                    var alertClass = note.Type switch
-                    {
-                        "Emergency" => "alert-danger",
-                        "Delay" => "alert-warning",
-                        "Reassigned" => "alert-success",
-                        "Info" => "alert-info",
-                        _ => "alert-secondary"
-                    };
-                    <li class="alert @alertClass d-flex align-items-center justify-content-between mb-2">
-                        <span>
-                            <strong>@note.Timestamp.ToString("HH:mm")</strong> — @note.Message
-                        </span>
-                        <button type="button" class="btn-close ms-2" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </li>
-                }
-            </ul>
-        }
-        else
-        {
-            <div class="alert alert-secondary">No active alerts</div>
-        }
-    </div>
-</div>
-<style>
-.notification-feed .alert { transition: opacity 0.3s; }
-</style>
-@* --- End Dispatcher Notification Bar --- *@
-@* --- Watchdog Alerts Block --- *@
-<div class="row mb-3">
-    <div class="col-12">
-        @if (ViewData["WatchdogAlerts"] is List<MVP_Core.Models.Admin.WatchdogAlert> alerts && alerts.Any())
-        {
-            <ul class="list-unstyled watchdog-alerts">
-                @foreach (var alert in alerts)
-                {
-                    var alertClass = alert.AlertType switch
-                    {
-                        "ETAOverdue" => "alert-warning",
-                        "Inactivity" => "alert-danger",
-                        "Unassigned" => "alert-secondary",
-                        _ => "alert-info"
-                    };
-                    <li class="alert @alertClass d-flex align-items-center justify-content-between mb-2">
-                        <span>
-                            <strong>@alert.DetectedAt.ToString("HH:mm")</strong> — @alert.Message
-                        </span>
-                        <button type="button" class="btn btn-outline-secondary btn-sm ms-2">Snooze</button>
-                    </li>
-                }
-            </ul>
-        }
-        else
-        {
-            <div class="alert alert-secondary">No watchdog alerts</div>
-        }
-    </div>
-</div>
-<style>
-.watchdog-alerts .alert { transition: opacity 0.3s; }
-</style>
-@* --- End Watchdog Alerts Block --- *@
-
 <footer class="mt-5 text-center">
-    <a href="/Admin/DispatcherAudit" class="btn btn-outline-secondary">View Dispatcher Command Log</a>
+    <a href="/Admin/AssignmentLog" class="btn btn-outline-secondary">View Assignment Log</a>
 </footer>
-@* --- Emergency Mode Protocol --- *@
-@if (filteredRequests.Any())
-{
-    <div class="row mb-4">
-        <div class="col-12">
-            <h4>Filtered Requests</h4>
-            <table class="table table-bordered table-hover">
-                <thead class="table-light">
-                    <tr>
-                        <th>ID</th>
-                        <th>Service Type</th>
-                        <th>Technician</th>
-                        <th>Status</th>
-                        <th>Priority</th>
-                        <th>ZIP</th>
-                        <th>Delay (min)</th>
-                        <th>Reassign</th>
-                        <th>Emergency</th>
-                    </tr>
-                </thead>
-                <tbody>
-                @foreach (var req in filteredRequests)
-                {
-                    var emergencyClass = req.IsEmergency ? "border border-danger" : "";
-                    <tr class="@emergencyClass">
-                        <td>@req.Id @if (req.IsEmergency) { <span title="Emergency" class="text-danger fw-bold">??</span> }</td>
-                        <td>@req.ServiceType</td>
-                        <td>@req.Technician</td>
-                        <td>@req.Status</td>
-                        <td>@req.Priority</td>
-                        <td>@req.Zip</td>
-                        <td>@req.DelayMinutes</td>
-                        <td>
-                            <form method="post" asp-page-handler="ReassignTech" style="display:inline;">
-                                <input type="hidden" name="requestId" value="@req.Id" />
-                                <select name="newTechnicianId" class="form-select form-select-sm d-inline-block w-auto me-1">
-                                    @foreach (var tech in techList)
-                                    {
-                                        <option value="@tech">@tech</option>
-                                    }
-                                </select>
-                                <button type="submit" class="btn btn-outline-primary btn-sm">Reassign</button>
-                            </form>
-                        </td>
-                        <td>
-                            <form method="post" asp-page-handler="FlagEmergency" style="display:inline;">
-                                <input type="hidden" name="requestId" value="@req.Id" />
-                                <button type="submit" class="btn btn-danger btn-sm">?? Emergency</button>
-                            </form>
-                        </td>
-                    </tr>
-                }
-                </tbody>
-            </table>
-        </div>
-    </div>
-}
-else
-{
-    <div class="alert alert-warning">No matching requests.</div>
-}
-@* --- End Emergency Mode Protocol --- *@

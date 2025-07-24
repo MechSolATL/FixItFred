@@ -1,5 +1,6 @@
 using MVP_Core.Data.Models;
 using MVP_Core.Models.Admin;
+using MVP_Core.Models.Mobile;
 using System.Collections.Generic;
 using System;
 using System.Linq;
@@ -9,6 +10,16 @@ namespace MVP_Core.Services.Admin
     public class DispatcherService
     {
         private static List<DispatcherAuditLog> _auditLog = new();
+        private static List<DispatcherBroadcast> _broadcasts = new();
+        private static List<TechnicianStatusDto> _techHeartbeats = new()
+        {
+            new TechnicianStatusDto { TechnicianId = 1, Name = "Alice Smith", LastPing = DateTime.UtcNow.AddMinutes(-5) },
+            new TechnicianStatusDto { TechnicianId = 2, Name = "Bob Jones", LastPing = DateTime.UtcNow.AddMinutes(-12) },
+            new TechnicianStatusDto { TechnicianId = 3, Name = "Carlos Lee", LastPing = DateTime.UtcNow.AddMinutes(-22) },
+            new TechnicianStatusDto { TechnicianId = 4, Name = "Dana Patel", LastPing = DateTime.UtcNow.AddMinutes(-8) },
+            new TechnicianStatusDto { TechnicianId = 5, Name = "Evan Kim", LastPing = DateTime.UtcNow.AddMinutes(-18) }
+        };
+        private static List<AssignmentLogEntry> _assignmentLogs = new();
 
         public DispatcherResult AssignTechnician(int requestId)
         {
@@ -64,6 +75,36 @@ namespace MVP_Core.Services.Admin
                 new TechnicianStatusDto { TechnicianId = 4, Name = "Dana Patel", Status = "Unavailable", AssignedJobs = 0, LastUpdate = DateTime.Now.AddMinutes(-30) },
                 new TechnicianStatusDto { TechnicianId = 5, Name = "Evan Kim", Status = "Available", AssignedJobs = 1, LastUpdate = DateTime.Now.AddMinutes(-2) }
             };
+        }
+        public int CalculateDispatchScore(int techId)
+        {
+            // Factors: fewer open jobs = higher score, no callbacks = bonus, last ping < 10 min = bonus, >4 active requests = penalty, recent delays = penalty
+            var tech = _techHeartbeats.FirstOrDefault(t => t.TechnicianId == techId);
+            if (tech == null) return 0;
+            int score = 100;
+            // Mock: open jobs
+            int openJobs = new Random(techId).Next(0, 7);
+            score -= openJobs * 10;
+            // Mock: callbacks
+            int callbacks = new Random(techId + 100).Next(0, 3);
+            if (callbacks == 0) score += 10;
+            else score -= callbacks * 5;
+            // Last ping bonus
+            if ((DateTime.UtcNow - tech.LastPing).TotalMinutes < 10) score += 10;
+            // Overload penalty
+            if (openJobs > 4) score -= 20;
+            // Recent delays penalty
+            bool recentDelay = new Random(techId + 200).Next(0, 2) == 1;
+            if (recentDelay) score -= 10;
+            return Math.Max(0, Math.Min(100, score));
+        }
+        public List<TechnicianStatusDto> GetAllTechnicianHeartbeats()
+        {
+            foreach (var tech in _techHeartbeats)
+            {
+                tech.DispatchScore = CalculateDispatchScore(tech.TechnicianId);
+            }
+            return _techHeartbeats.OrderByDescending(t => t.DispatchScore).ToList();
         }
 
         public DispatcherStatsDto GetDispatcherStats()
@@ -132,6 +173,22 @@ namespace MVP_Core.Services.Admin
         }
         public List<DispatcherAuditLog> GetAuditLog() => _auditLog.OrderByDescending(x => x.Timestamp).ToList();
 
+        public List<MVP_Core.Models.Admin.DispatcherAuditLog> GetTimelineForRequest(int requestId)
+        {
+            return _auditLog
+                .Where(x => x.RequestId == requestId)
+                .OrderBy(x => x.Timestamp)
+                .ToList();
+        }
+
+        public List<MVP_Core.Models.Admin.DispatcherAuditLog> GetReplayTimeline(int requestId)
+        {
+            return _auditLog
+                .Where(x => x.RequestId == requestId)
+                .OrderBy(x => x.Timestamp)
+                .ToList();
+        }
+
         public List<WatchdogAlert> RunWatchdogScan()
         {
             var now = DateTime.UtcNow;
@@ -180,6 +237,17 @@ namespace MVP_Core.Services.Admin
                     DetectedAt = now
                 });
             }
+            // Heartbeat overdue alerts
+            foreach (var tech in _techHeartbeats.Where(t => (now - t.LastPing).TotalMinutes > 20))
+            {
+                alerts.Add(new WatchdogAlert
+                {
+                    RequestId = 0,
+                    AlertType = "TechHeartbeatDrop",
+                    Message = $"Technician {tech.Name} offline for over 20 minutes.",
+                    DetectedAt = now
+                });
+            }
             return alerts;
         }
         public bool FlagEmergency(int requestId, string dispatcherName)
@@ -203,6 +271,92 @@ namespace MVP_Core.Services.Admin
                 return true;
             }
             return false;
+        }
+        public DispatcherBroadcast? GetActiveBroadcast()
+        {
+            return _broadcasts.LastOrDefault(b => b.IsActive);
+        }
+        public void AddBroadcast(DispatcherBroadcast broadcast)
+        {
+            broadcast.Id = _broadcasts.Count + 1;
+            _broadcasts.Add(broadcast);
+        }
+
+        public TechnicianProfileDto GetTechnicianProfile(int techId)
+        {
+            // Mock data for demonstration
+            var tech = _techHeartbeats.FirstOrDefault(t => t.TechnicianId == techId);
+            if (tech == null) return null;
+            var rnd = new Random(techId);
+            return new TechnicianProfileDto
+            {
+                TechnicianId = tech.TechnicianId,
+                Name = tech.Name,
+                CloseRate7Days = Math.Round(rnd.NextDouble() * 0.5 + 0.5, 2),
+                CloseRate30Days = Math.Round(rnd.NextDouble() * 0.5 + 0.4, 2),
+                CallbackCount7Days = rnd.Next(0, 4),
+                TotalJobsLast30Days = rnd.Next(10, 40),
+                TopZIPs = new[] { "30303", "30305", "30309" },
+                Comments = new List<string> { "Great with customers.", "Needs to improve on-time rate." },
+                LastActive = tech.LastPing
+            };
+        }
+
+        public List<TechnicianStatusDto> GetSuggestedTechsBySkill(string requiredSkill, string zip)
+        {
+            // Stub: Use _techHeartbeats and mock profiles
+            var profiles = _techHeartbeats.Select(t => new TechnicianProfileDto
+            {
+                TechnicianId = t.TechnicianId,
+                Name = t.Name,
+                SkillTags = new List<string> { "Plumbing", "Heating", "Air Conditioning", "Water Filtration" }, // stub
+                TopZIPs = new[] { "30303", "30305", "30309" },
+                LastActive = t.LastPing
+            }).ToList();
+            var filtered = profiles
+                .Where(p => p.SkillTags.Contains(requiredSkill) && p.TopZIPs.Contains(zip))
+                .OrderBy(p => (DateTime.UtcNow - p.LastActive).TotalMinutes)
+                .ToList();
+            if (!filtered.Any())
+            {
+                // Fallback: show all
+                filtered = profiles;
+            }
+            // Map back to TechnicianStatusDto
+            return _techHeartbeats.Where(t => filtered.Any(f => f.TechnicianId == t.TechnicianId)).ToList();
+        }
+        public void LogAssignment(AssignmentLogEntry entry)
+        {
+            entry.Id = _assignmentLogs.Count + 1;
+            _assignmentLogs.Add(entry);
+        }
+        public List<AssignmentLogEntry> GetAssignmentLogs()
+        {
+            return _assignmentLogs.OrderByDescending(x => x.Timestamp).ToList();
+        }
+
+        public NextJobDto GetNextJobForTechnician(int techId)
+        {
+            var tech = _techHeartbeats.FirstOrDefault(t => t.TechnicianId == techId);
+            if (tech == null)
+                return null;
+            // Stub: mock job
+            return new NextJobDto
+            {
+                TechnicianId = tech.TechnicianId,
+                TechnicianName = tech.Name,
+                JobSummary = "A/C Install at Midtown Lofts",
+                ETA = DateTime.UtcNow.AddMinutes(35),
+                Address = "1234 Peachtree St NE, Atlanta, GA 30309",
+                DispatcherNote = "Customer requests early arrival. Bring extra filters.",
+                LastPing = tech.LastPing
+            };
+        }
+        public void UpdateTechnicianPing(int techId)
+        {
+            var tech = _techHeartbeats.FirstOrDefault(t => t.TechnicianId == techId);
+            if (tech != null)
+                tech.LastPing = DateTime.UtcNow;
         }
     }
 
@@ -251,5 +405,18 @@ namespace MVP_Core.Services.Admin
         public string AlertType { get; set; }
         public string Message { get; set; }
         public DateTime DetectedAt { get; set; }
+    }
+    public class TechnicianProfileDto
+    {
+        public int TechnicianId { get; set; }
+        public string Name { get; set; }
+        public double CloseRate7Days { get; set; }
+        public double CloseRate30Days { get; set; }
+        public int CallbackCount7Days { get; set; }
+        public int TotalJobsLast30Days { get; set; }
+        public string[] TopZIPs { get; set; }
+        public List<string> Comments { get; set; }
+        public DateTime LastActive { get; set; }
+        public List<string> SkillTags { get; set; } // Added SkillTags property
     }
 }

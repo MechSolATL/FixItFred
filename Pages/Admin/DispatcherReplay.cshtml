@@ -1,0 +1,62 @@
+@page
+@using MVP_Core.Models.Admin
+@inject MVP_Core.Services.Admin.DispatcherService DispatcherService
+@{
+    int requestId = 0;
+    int.TryParse(Request.Query["requestId"], out requestId);
+    var timeline = DispatcherService.GetReplayTimeline(requestId);
+    ViewData["Title"] = $"Action Replay — Request #{requestId}";
+    int step = 0;
+    int.TryParse(Request.Query["step"], out step);
+    if (step < 0) step = 0;
+    if (timeline != null && step >= timeline.Count) step = timeline.Count - 1;
+    var entry = (timeline != null && timeline.Count > 0 && step < timeline.Count) ? timeline[step] : null;
+}
+<h2 class="mb-4">Action Replay — Request #@requestId</h2>
+@if (requestId == 0)
+{
+    <div class="alert alert-danger">Invalid request ID</div>
+}
+else if (timeline == null || timeline.Count == 0)
+{
+    <div class="alert alert-info">No actions to replay for this request</div>
+}
+else if (entry != null)
+{
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="d-flex align-items-center mb-2">
+                @{
+                    var icon = entry.ActionType switch
+                    {
+                        "Assigned" => "??",
+                        "Reassign" => "??",
+                        "Override-Emergency" => "??",
+                        "ETAOverride" => "?",
+                        "Cancel" => "?",
+                        "Escalate" => "??",
+                        _ => "•"
+                    };
+                }
+                <span class="me-2" style="font-size:1.5em">@icon</span>
+                <span class="badge bg-primary me-2">@entry.ActionType</span>
+                <span class="badge bg-info">@entry.PerformedByRole @if(entry.PerformedByRole=="Supervisor") { <span title="Supervisor" class="ms-1">??</span> }</span>
+            </div>
+            <div class="mb-2"><strong>By:</strong> @entry.PerformedBy</div>
+            <div class="mb-2"><strong>Time:</strong> @(entry.Timestamp.Date == DateTime.UtcNow.Date ? "Today" : entry.Timestamp.ToString("MMM d")) at @entry.Timestamp.ToLocalTime().ToString("h:mm tt")</div>
+            @if (!string.IsNullOrEmpty(entry.Notes))
+            {
+                <div class="mb-2"><strong>Notes:</strong> @entry.Notes</div>
+            }
+        </div>
+    </div>
+    <div class="d-flex justify-content-between">
+        <a class="btn btn-outline-secondary" href="/Admin/DispatcherReplay?requestId=@requestId&step=@(step-1)" @(step==0 ? "disabled" : null)>Previous</a>
+        <a class="btn btn-outline-secondary" href="/Admin/DispatcherReplay?requestId=@requestId&step=@(step+1)" @(step==timeline.Count-1 ? "disabled" : null)>Next</a>
+        <button class="btn btn-outline-info" disabled>Auto-Play (Coming Soon)</button>
+    </div>
+    <div class="mt-3 text-muted">Step @step+1 of @timeline.Count</div>
+}
+<style>
+.card-body { min-height: 120px; }
+</style>

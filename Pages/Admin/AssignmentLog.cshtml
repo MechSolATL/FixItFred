@@ -1,0 +1,69 @@
+@page
+@using MVP_Core.Models.Admin
+@inject MVP_Core.Services.Admin.DispatcherService DispatcherService
+@{
+    ViewData["Title"] = "Assignment Log";
+    var logs = DispatcherService.GetAssignmentLogs();
+    string techFilter = Request.Query["techId"];
+    string dateFilter = Request.Query["date"];
+    if (!string.IsNullOrEmpty(techFilter))
+    {
+        if (int.TryParse(techFilter, out var techId))
+            logs = logs.Where(l => l.TechnicianId == techId).ToList();
+    }
+    if (!string.IsNullOrEmpty(dateFilter))
+    {
+        if (DateTime.TryParse(dateFilter, out var dt))
+            logs = logs.Where(l => l.Timestamp.Date == dt.Date).ToList();
+    }
+}
+<h2 class="mb-4">Assignment Log</h2>
+<form method="get" class="mb-3 row g-2 align-items-end">
+    <div class="col-md-3">
+        <label class="form-label">Technician ID</label>
+        <input type="number" name="techId" class="form-control" value="@techFilter" />
+    </div>
+    <div class="col-md-3">
+        <label class="form-label">Date</label>
+        <input type="date" name="date" class="form-control" value="@dateFilter" />
+    </div>
+    <div class="col-md-2">
+        <button type="submit" class="btn btn-primary">Filter</button>
+    </div>
+</form>
+<table class="table table-bordered table-hover">
+    <thead class="table-light">
+        <tr>
+            <th>Request ID</th>
+            <th>Technician ID</th>
+            <th>Dispatcher</th>
+            <th>Score</th>
+            <th>Tier</th>
+            <th>Tags</th>
+            <th>Rationale</th>
+            <th>Timestamp</th>
+        </tr>
+    </thead>
+    <tbody>
+    @if (logs == null || !logs.Any())
+    {
+        <tr><td colspan="8" class="text-center text-muted">No assignment logs found.</td></tr>
+    }
+    else
+    {
+        @foreach (var log in logs)
+        {
+            <tr>
+                <td>@log.RequestId</td>
+                <td>@log.TechnicianId</td>
+                <td>@log.DispatcherName</td>
+                <td>@log.DispatchScore</td>
+                <td>@log.Tier</td>
+                <td>@string.Join(", ", log.MatchedTags)</td>
+                <td>@log.Rationale</td>
+                <td>@log.Timestamp.ToLocalTime().ToString("g")</td>
+            </tr>
+        }
+    }
+    </tbody>
+</table>
