@@ -1,9 +1,6 @@
-﻿using System.Net;
+using System.Net;
 using System.Net.Mail;
 using System.Text.RegularExpressions;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Configuration;
-using MVP_Core.Data.Models;
 
 namespace MVP_Core.Services.Email
 {
@@ -26,7 +23,7 @@ namespace MVP_Core.Services.Email
             _configuration = configuration;
             _logger = logger;
 
-            var smtpSection = _configuration.GetSection("SMTP");
+            IConfigurationSection smtpSection = _configuration.GetSection("SMTP");
 
             _smtpHost = smtpSection.GetValue<string>("Host") ?? throw new InvalidOperationException("SMTP Host missing.");
             _smtpPort = smtpSection.GetValue<int>("Port");
@@ -53,12 +50,12 @@ namespace MVP_Core.Services.Email
                 throw new ArgumentException("Invalid email address.");
             }
 
-            using (var client = new SmtpClient(_smtpHost, _smtpPort))
+            using (SmtpClient client = new(_smtpHost, _smtpPort))
             {
                 client.Credentials = new NetworkCredential(_smtpUsername, _smtpPassword);
                 client.EnableSsl = _useSsl;
 
-                using (var message = new MailMessage())
+                using (MailMessage message = new())
                 {
                     message.From = new MailAddress(fromEmail, _fromName);
                     message.Subject = subject;
@@ -82,14 +79,14 @@ namespace MVP_Core.Services.Email
 
         public async Task SendVerificationEmailAsync(string email, string verificationLink)
         {
-            var subject = "Verify Your Email - Service Atlanta";
-            var plainText = $"Please verify your email: {verificationLink}";
-            var html = $@"
+            string subject = "Verify Your Email - Service Atlanta";
+            string plainText = $"Please verify your email: {verificationLink}";
+            string html = $@"
                 <div style='font-family:Poppins,sans-serif;line-height:1.6;'>
-                    <p>Hello 👋,</p>
+                    <p>Hello ??,</p>
                     <p>Please verify your email by clicking:</p>
                     <p><a href='{verificationLink}' style='color:#007BFF;'>Verify My Email</a></p>
-                    <p>If you didn't request this, no action needed. 🚀</p>
+                    <p>If you didn't request this, no action needed. ??</p>
                     <p>- Service-Atlanta.com</p>
                 </div>";
 
@@ -98,9 +95,9 @@ namespace MVP_Core.Services.Email
 
         public async Task SendServiceRequestConfirmationToCustomerAsync(ServiceRequest request)
         {
-            var subject = "Thank you for your Service Request!";
-            var plainText = $"Hi {request.CustomerName},\n\nThanks for submitting your request. We'll be in touch soon.\nService Type: {request.ServiceType}\nDetails: {request.Details}";
-            var html = $@"
+            string subject = "Thank you for your Service Request!";
+            string plainText = $"Hi {request.CustomerName},\n\nThanks for submitting your request. We'll be in touch soon.\nService Type: {request.ServiceType}\nDetails: {request.Details}";
+            string html = $@"
                 <div style='font-family:Arial,sans-serif;line-height:1.5;'>
                     <h2>Hello {request.CustomerName},</h2>
                     <p>Thanks for submitting your service request! Here's what we received:</p>
@@ -109,7 +106,7 @@ namespace MVP_Core.Services.Email
                         <li><strong>Details:</strong> {request.Details}</li>
                         <li><strong>Date:</strong> {request.CreatedAt:MMMM dd, yyyy}</li>
                     </ul>
-                    <p>We will be contacting you shortly!<br>– Mechanical Solutions Atlanta</p>
+                    <p>We will be contacting you shortly!<br>� Mechanical Solutions Atlanta</p>
                 </div>";
 
             await SendEmailAsync(_serviceRequestFromEmail, request.Email, subject, plainText, html);
@@ -117,9 +114,9 @@ namespace MVP_Core.Services.Email
 
         public async Task NotifyAdminOfNewRequestAsync(ServiceRequest request)
         {
-            var subject = "🛎️ New Service Request Received!";
-            var plainText = $"New request from {request.CustomerName}.";
-            var html = $@"
+            string subject = "??? New Service Request Received!";
+            string plainText = $"New request from {request.CustomerName}.";
+            string html = $@"
                 <div style='font-family:Arial,sans-serif;line-height:1.5;'>
                     <h2>New Service Request Submitted</h2>
                     <ul>
@@ -137,7 +134,7 @@ namespace MVP_Core.Services.Email
 
         private static bool IsValidEmail(string email)
         {
-            var emailRegex = @"^[^@\s]+@[^@\s]+\.[^@\s]+$";
+            string emailRegex = @"^[^@\s]+@[^@\s]+\.[^@\s]+$";
             return !string.IsNullOrWhiteSpace(email) && Regex.IsMatch(email, emailRegex);
         }
     }

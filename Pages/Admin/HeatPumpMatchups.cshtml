@@ -1,0 +1,63 @@
+@page
+@model MVP_Core.Pages.Admin.HeatPumpMatchupsModel
+@{
+    ViewData["Title"] = "Heat Pump Matchups";
+    Layout = "/Pages/Shared/_Layout.cshtml";
+}
+
+<h1 class="text-2xl font-bold mb-4">Heat Pump Matchups</h1>
+
+<form method="post" class="space-y-2 border p-4 rounded bg-white shadow">
+    <h2 class="font-semibold text-lg">? Add New Matchup</h2>
+
+    <input asp-for="NewMatchup.Brand" placeholder="Brand" class="input" />
+    <input asp-for="NewMatchup.SystemType" placeholder="System Type" class="input" />
+    <input asp-for="NewMatchup.ACoilModel" placeholder="A-Coil Model" class="input" />
+    <input asp-for="NewMatchup.ACoilTonnage" placeholder="A-Coil Tonnage" class="input" />
+    <input asp-for="NewMatchup.OutdoorUnitModel" placeholder="ODU Model" class="input" />
+    <input asp-for="NewMatchup.OutdoorUnitTonnage" placeholder="ODU Tonnage" class="input" />
+    <input asp-for="NewMatchup.FurnaceModel" placeholder="Furnace Model" class="input" />
+    <input asp-for="NewMatchup.FurnaceBTU" placeholder="Furnace BTU" class="input" />
+    <input asp-for="NewMatchup.SEERRating" placeholder="SEER Rating" class="input" />
+    <input asp-for="NewMatchup.AHRICode" placeholder="AHRI Code" class="input" />
+    <input asp-for="NewMatchup.Notes" placeholder="Notes" class="input" />
+
+    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">Save</button>
+</form>
+
+<hr class="my-6" />
+
+<h2 class="text-xl font-semibold mb-2">?? Existing Matchups</h2>
+<table class="table-auto w-full text-sm border-collapse border border-gray-300">
+    <thead class="bg-gray-200">
+        <tr>
+            <th class="border px-2 py-1">Brand</th>
+            <th class="border px-2 py-1">System</th>
+            <th class="border px-2 py-1">Coil</th>
+            <th class="border px-2 py-1">ODU</th>
+            <th class="border px-2 py-1">Furnace</th>
+            <th class="border px-2 py-1">SEER</th>
+            <th class="border px-2 py-1">AHRI</th>
+            <th class="border px-2 py-1">??</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var match in Model.Matchups)
+        {
+            <tr class="hover:bg-gray-100">
+                <td class="border px-2 py-1">@match.Brand</td>
+                <td class="border px-2 py-1">@match.SystemType</td>
+                <td class="border px-2 py-1">@match.ACoilModel</td>
+                <td class="border px-2 py-1">@match.OutdoorUnitModel</td>
+                <td class="border px-2 py-1">@match.FurnaceModel</td>
+                <td class="border px-2 py-1">@match.SEERRating</td>
+                <td class="border px-2 py-1">@match.AHRICode</td>
+                <td class="border px-2 py-1 text-center">
+                    <form method="post" asp-page-handler="Delete" asp-route-id="@match.Id" onsubmit="return confirm('Delete this matchup?');">
+                        <button type="submit" class="text-red-600 hover:underline">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,31 +1,22 @@
-﻿using MVP_Core.Data;
-using MVP_Core.Data.Models;
-using Microsoft.EntityFrameworkCore;
-
 namespace MVP_Core.Services
 {
-    public interface ISeoService
-    {
-        Task<SEO?> GetSeoByPageNameAsync(string pageName);
-    }
-
     public class SeoService : ISeoService
     {
-        private readonly ApplicationDbContext _dbContext;
-
-        public SeoService(ApplicationDbContext dbContext)
+        public Task<SeoMeta> GetSeoMetaAsync(string pageName)
         {
-            _dbContext = dbContext;
+            return Task.FromResult(new SeoMeta
+            {
+                PageName = pageName,
+                Title = "Sample Title",
+                MetaDescription = "Default SeoMeta description",
+                Keywords = "Keyword1, Keyword2",
+                Robots = "index, follow"
+            });
         }
 
-        public async Task<SEO?> GetSeoByPageNameAsync(string pageName)
+        public Task<SeoMeta> GetSeoByPageNameAsync(string pageName)
         {
-            if (string.IsNullOrWhiteSpace(pageName))
-                return null;
-
-            return await _dbContext.SEOs
-                .AsNoTracking()
-                .FirstOrDefaultAsync(seo => seo.PageName.ToLower() == pageName.ToLower());
+            return GetSeoMetaAsync(pageName); // Aliased version
         }
     }
 }

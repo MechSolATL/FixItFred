@@ -1,9 +1,3 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Data;
-using MVP_Core.Data.Models;
-
 namespace MVP_Core.Pages.Admin
 {
     public class UploadBackgroundModel : PageModel
@@ -30,20 +24,20 @@ namespace MVP_Core.Pages.Admin
                 return Page();
             }
 
-            using var memoryStream = new MemoryStream();
+            using MemoryStream memoryStream = new();
             await BackgroundImage.CopyToAsync(memoryStream);
 
-            var image = new BackgroundImage
+            BackgroundImage image = new()
             {
                 ImageData = memoryStream.ToArray(),
                 ContentType = BackgroundImage.ContentType,
                 UploadedAt = DateTime.UtcNow
             };
 
-            _context.BackgroundImages.Add(image);
-            await _context.SaveChangesAsync();
+            _ = _context.BackgroundImages.Add(image);
+            _ = _context.SaveChanges();
 
-            TempData["Success"] = "✅ Background image uploaded successfully!";
+            TempData["Success"] = "? Background image uploaded successfully!";
             return RedirectToPage("/Admin/UploadBackground");
         }
     }

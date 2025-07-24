@@ -1,41 +1,97 @@
-﻿@page
+@page
 @model MVP_Core.Pages.Services.PlumbingModel
+@inject MVP_Core.Services.ISeoService SeoService
 @{
     Layout = "/Pages/Shared/_Layout.cshtml";
-    ViewData["Title"] = "Plumbing Service Request";
+}
+<head>
+    @await Html.PartialAsync("/Pages/Shared/_SEOHead.cshtml")
+</head>
+
+@section Meta {
+    <meta name="description" content="@ViewData["MetaDescription"]" />
+    <meta name="keywords" content="@ViewData["Keywords"]" />
+    <meta name="robots" content="@ViewData["Robots"]" />
 }
 
-<!-- Countdown Timer Visual -->
-<div id="timeout-warning" class="hidden fixed top-0 left-0 w-full bg-red-600 text-white text-center py-2 font-bold z-50 animate-pulse">
-    <span aria-hidden="true">⚠️</span> Session expires in <span id="timeout-seconds">60</span> seconds! Click anywhere to stay active.
+<!-- ?? Session Timeout Warning -->
+<div id="timeout-warning" class="hidden fixed top-0 left-0 w-full bg-red-600 text-white text-center py-2 font-bold z-50 animate-pulse" role="alert" aria-live="assertive">
+    ?? Session expires in <span id="timeout-seconds">60</span> seconds! Click anywhere to stay active.
 </div>
 
-<!-- Progress Bar -->
-<div class="progress-container">
-    <div class="progress-bar" id="progressBar" style="width: @Model.ProgressPercent;"></div>
+<!-- ?? Top Section: Title + Carousel -->
+<div class="flex flex-col md:flex-row justify-between items-start gap-6 mb-6">
+    <h1 class="text-2xl font-bold" role="heading" aria-level="1">
+        Plumbing Service Request
+    </h1>
+
+    @if (Model?.CarouselImages?.Any() == true)
+    {
+        <div id="certificationCarousel" class="carousel slide max-w-md w-full md:w-96" data-bs-ride="carousel">
+            <div class="carousel-inner rounded shadow border border-gray-300">
+                @for (int i = 0; i < Model.CarouselImages.Count; i++)
+                {
+                    <div class="carousel-item @(i == 0 ? "active" : "")">
+                        <img src="~/assets/@Model.CarouselImages[i]" class="d-block w-100" alt="Partner Image @(i + 1)">
+                    </div>
+                }
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#certificationCarousel" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#certificationCarousel" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
+        </div>
+    }
 </div>
 
-<h1 class="text-2xl font-bold mb-6" role="heading" aria-level="1">
-    Plumbing Service Request
-</h1>
+<!-- ?? Marketing Section -->
+@if (!string.IsNullOrWhiteSpace(Model?.MarketingText))
+{
+    <div class="bg-blue-50 border-l-4 border-blue-400 text-blue-800 p-4 mb-6 rounded shadow-sm" role="region" aria-label="Marketing Text">
+        <div class="whitespace-pre-wrap">
+            @Model.MarketingText
+        </div>
+    </div>
+}
 
-@if (!Model.IsVerified)
+<!-- ?? Progress Bar -->
+@if (Model != null)
+{
+    <div class="progress-container mb-4">
+        <div class="progress-bar bg-success" id="progressBar"
+             style="width: @Model.ProgressPercent;"
+             role="progressbar"
+             aria-valuenow="@Model.CurrentStep"
+             aria-valuemin="0"
+             aria-valuemax="@Model.TotalQuestions">
+            Step @Model.CurrentStep of @Model.TotalQuestions
+        </div>
+    </div>
+}
+
+<!-- ?? Alerts -->
+@if (Model?.IsVerified == false)
 {
     <div class="alert alert-warning p-4 text-yellow-800 border border-yellow-400 bg-yellow-100 rounded" role="alert">
         <strong>Email not verified.</strong><br />
         Please <a href="/Verify" class="underline text-blue-700 font-semibold">verify your email</a> before proceeding with the service request.
     </div>
 }
-else if (!string.IsNullOrEmpty(Model.Message))
+else if (!string.IsNullOrEmpty(Model?.Message))
 {
     <div class="mb-4 p-3 rounded @(Model.IsSuccess ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800")" role="alert">
         @Model.Message
     </div>
 }
 
-@if (Model.IsVerified && Model.CurrentQuestion != null)
+<!-- ?? Question Form -->
+@if (Model?.IsVerified == true && Model.CurrentQuestion != null)
 {
-    <form method="post" asp-page-handler="Next" class="space-y-4">
+    <form method="post" asp-page-handler="Next" class="space-y-4" aria-label="Plumbing Question Form">
         @Html.AntiForgeryToken()
 
         <div>
@@ -45,7 +101,7 @@ else if (!string.IsNullOrEmpty(Model.Message))
 
             @if (Model.CurrentQuestion.InputType == "dropdown" && Model.CurrentQuestion.Options != null)
             {
-                <select asp-for="UserAnswer" class="border rounded px-4 py-2 w-full">
+                <select asp-for="UserAnswer" class="border rounded px-4 py-2 w-full" required>
                     <option value="">-- Select --</option>
                     @foreach (var option in Model.CurrentQuestion.Options)
                     {
@@ -55,11 +111,11 @@ else if (!string.IsNullOrEmpty(Model.Message))
             }
             else if (Model.CurrentQuestion.InputType == "textarea")
             {
-                <textarea asp-for="UserAnswer" rows="4" class="border rounded px-4 py-2 w-full"></textarea>
+                <textarea asp-for="UserAnswer" rows="4" class="border rounded px-4 py-2 w-full" maxlength="500" required></textarea>
             }
             else
             {
-                <input type="text" asp-for="UserAnswer" class="border rounded px-4 py-2 w-full" />
+                <input type="text" asp-for="UserAnswer" class="border rounded px-4 py-2 w-full" maxlength="500" required />
             }
         </div>
 
@@ -67,7 +123,7 @@ else if (!string.IsNullOrEmpty(Model.Message))
 
         <div class="flex justify-between mt-6">
             <button type="submit" class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded shadow" aria-label="Next Question">
-                <span aria-hidden="true">➡️</span> Next
+                ?? Next
             </button>
         </div>
     </form>
@@ -76,21 +132,21 @@ else if (!string.IsNullOrEmpty(Model.Message))
     {
         <form method="post" asp-page-handler="Back" class="inline-block mt-4">
             @Html.AntiForgeryToken()
-            <button type="submit" class="px-6 py-2 bg-gray-400 hover:bg-gray-500 text-white rounded shadow" aria-label="Go Back to Previous Question">
-                <span aria-hidden="true">⬅️</span> Back
+            <button type="submit" class="px-6 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded shadow" aria-label="Go Back">
+                ?? Back
             </button>
         </form>
     }
 }
-else if (Model.IsVerified && Model.CurrentQuestion == null)
+else if (Model?.IsVerified == true && Model.CurrentQuestion == null)
 {
-    <div class="text-center mt-10">
-        <h2 class="text-2xl font-semibold text-green-700 mb-4" role="heading" aria-level="2">
-            <span aria-hidden="true">🎉</span> Plumbing Questionnaire Completed!
+    <div class="text-center mt-10" role="region" aria-label="Form Completed">
+        <h2 class="text-2xl font-semibold text-green-700 mb-4">
+            ?? Plumbing Questionnaire Completed!
         </h2>
         <p class="text-gray-700 mb-6">Please review your answers and submit your request.</p>
         <a href="/Services/PlumbingFinal" class="inline-block px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded shadow">
-            Review and Submit <span aria-hidden="true">🚀</span>
+            Review and Submit ??
         </a>
     </div>
 }

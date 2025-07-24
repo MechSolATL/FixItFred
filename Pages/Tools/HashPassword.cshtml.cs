@@ -1,19 +1,32 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Helpers; // ✅ Import your PasswordHasher
+using MVP_Core.Services;
 
 namespace MVP_Core.Pages.Tools
 {
+    [ValidateAntiForgeryToken]
     public class HashPasswordModel : PageModel
     {
+        private readonly ISeoService _seoService;
+        private readonly IDeviceResolver _deviceResolver;
+
+        public HashPasswordModel(ISeoService seoService, IDeviceResolver deviceResolver)
+        {
+            _seoService = seoService;
+            _deviceResolver = deviceResolver;
+        }
+
         [BindProperty]
         public string InputPassword { get; set; } = string.Empty;
 
         public string? GeneratedHash { get; set; }
 
-        public void OnGet()
+        public async Task OnGetAsync()
         {
-            // Optional: Preload defaults if needed
+            var seo = await _seoService.GetSeoByPageNameAsync("Tools/HashPassword");
+            ViewData["Title"] = seo?.Title ?? "Hash Password";
+            ViewData["MetaDescription"] = seo?.MetaDescription;
+            ViewData["Keywords"] = seo?.Keywords;
+            ViewData["Robots"] = seo?.Robots;
+            ViewData["DeviceType"] = _deviceResolver.GetDeviceType(HttpContext);
         }
 
         public void OnPost()

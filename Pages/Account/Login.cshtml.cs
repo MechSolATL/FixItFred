@@ -1,12 +1,6 @@
-﻿using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Data;
-using MVP_Core.Helpers;
 using System.Security.Claims;
-using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace MVP_Core.Pages.Account
 {
@@ -42,7 +36,7 @@ namespace MVP_Core.Pages.Account
                 return Page();
             }
 
-            var adminUser = await _context.AdminUsers.FirstOrDefaultAsync(u => u.Username == Username);
+            AdminUser? adminUser = await _context.AdminUsers.FirstOrDefaultAsync(u => u.Username == Username);
 
             if (adminUser == null || !PasswordHasher.VerifyHashedPassword(adminUser.PasswordHash, Password))
             {
@@ -50,14 +44,14 @@ namespace MVP_Core.Pages.Account
                 return Page();
             }
 
-            var claims = new List<Claim>
-            {
+            List<Claim> claims =
+            [
                 new Claim(ClaimTypes.Name, adminUser.Username),
                 new Claim(ClaimTypes.Role, adminUser.Role ?? "Admin")
-            };
+            ];
 
-            var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-            var principal = new ClaimsPrincipal(identity);
+            ClaimsIdentity identity = new(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            ClaimsPrincipal principal = new(identity);
 
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
 

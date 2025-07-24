@@ -1,12 +1,6 @@
-﻿using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.EntityFrameworkCore;
-using MVP_Core.Data;
-using MVP_Core.Helpers;
-using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace MVP_Core.Pages
 {
@@ -19,7 +13,7 @@ namespace MVP_Core.Pages
             _context = context;
         }
 
-        // ✅ Ensures validation in UI and avoids CS8618
+        // ? Ensures validation in UI and avoids CS8618
         [BindProperty]
         [Required(ErrorMessage = "Username is required.")]
         public string Username { get; set; } = string.Empty;
@@ -28,7 +22,7 @@ namespace MVP_Core.Pages
         [Required(ErrorMessage = "Password is required.")]
         public string Password { get; set; } = string.Empty;
 
-        // ✅ Warning-free property
+        // ? Warning-free property
         public string ErrorMessage { get; set; } = string.Empty;
 
         public void OnGet()
@@ -44,7 +38,7 @@ namespace MVP_Core.Pages
                 return Page();
             }
 
-            var adminUser = await _context.AdminUsers
+            AdminUser? adminUser = await _context.AdminUsers
                 .FirstOrDefaultAsync(u => u.Username == Username);
 
             if (adminUser == null ||
@@ -54,14 +48,14 @@ namespace MVP_Core.Pages
                 return Page();
             }
 
-            var claims = new List<Claim>
-            {
+            List<Claim> claims =
+            [
                 new Claim(ClaimTypes.Name, adminUser.Username),
                 new Claim(ClaimTypes.Role, adminUser.Role ?? "Admin")
-            };
+            ];
 
-            var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-            var principal = new ClaimsPrincipal(identity);
+            ClaimsIdentity identity = new(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            ClaimsPrincipal principal = new(identity);
 
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
 

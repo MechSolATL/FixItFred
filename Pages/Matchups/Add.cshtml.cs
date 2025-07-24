@@ -1,13 +1,7 @@
-﻿// =========================
+// =========================
 // File: Pages/Matchups/Add.cshtml.cs
 // =========================
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.EntityFrameworkCore;
-using MVP_Core.Data;
-using MVP_Core.Data.Models;
-using System.Threading.Tasks;
 
 namespace MVP_Core.Pages.Matchups
 {
@@ -32,29 +26,29 @@ namespace MVP_Core.Pages.Matchups
             ViewData["Title"] = "Add Heat Pump Matchup";
             ViewData["Layout"] = "/Pages/Shared/_Layout.cshtml";
 
-            var seo = await _db.SEOs.FirstOrDefaultAsync(x => x.PageName == "MatchupsAdd");
-            if (seo != null)
+            SeoMeta? SeoMeta = await _db.SEOs.FirstOrDefaultAsync(static x => x.PageName == "MatchupsAdd");
+            if (SeoMeta != null)
             {
-                ViewData["MetaDescription"] = seo.MetaDescription;
-                ViewData["Keywords"] = seo.Keywords;
+                ViewData["MetaDescription"] = SeoMeta.MetaDescription;
+                ViewData["Keywords"] = SeoMeta.Keywords;
                 ViewData["Robots"] = "noindex, nofollow"; // Adjust if needed
             }
         }
 
-        public async Task<IActionResult> OnPostAsync()
+        public IActionResult OnPost()
         {
             if (!ModelState.IsValid || string.IsNullOrWhiteSpace(Match.ACoilModel) || string.IsNullOrWhiteSpace(Match.OutdoorUnitModel))
             {
-                Message = "⚠️ Please fill in at least A-Coil and Outdoor Unit model.";
+                Message = "?? Please fill in at least A-Coil and Outdoor Unit model.";
                 IsSuccess = false;
                 return Page();
             }
 
             Match.CreatedAt = DateTime.UtcNow;
-            _db.HeatPumpMatchups.Add(Match);
-            await _db.SaveChangesAsync();
+            _ = _db.HeatPumpMatchups.Add(Match);
+            _ = _db.SaveChanges();
 
-            Message = "✅ Heat pump match-up successfully saved.";
+            Message = "? Heat pump match-up successfully saved.";
             IsSuccess = true;
             ModelState.Clear();
             Match = new HeatPumpMatchup();

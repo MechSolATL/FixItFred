@@ -1,4 +1,3 @@
-﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -11,45 +10,45 @@ namespace MVP_Core.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
+            _ = migrationBuilder.DropTable(
                 name: "PageVisits");
 
-            migrationBuilder.DropColumn(
+            _ = migrationBuilder.DropColumn(
                 name: "StatusCode",
                 table: "PageVisitLogs");
 
-            migrationBuilder.RenameColumn(
+            _ = migrationBuilder.RenameColumn(
                 name: "IPAddress",
                 table: "PageVisitLogs",
                 newName: "IpAddress");
 
-            migrationBuilder.RenameColumn(
+            _ = migrationBuilder.RenameColumn(
                 name: "VisitTimeUtc",
                 table: "PageVisitLogs",
                 newName: "VisitTimestamp");
 
-            migrationBuilder.RenameColumn(
+            _ = migrationBuilder.RenameColumn(
                 name: "ReferrerUrl",
                 table: "PageVisitLogs",
                 newName: "Referrer");
 
-            migrationBuilder.AddColumn<bool>(
+            _ = migrationBuilder.AddColumn<bool>(
                 name: "IsRealUser",
                 table: "PageVisitLogs",
                 type: "bit",
                 nullable: false,
                 defaultValue: false);
 
-            migrationBuilder.AddColumn<int>(
+            _ = migrationBuilder.AddColumn<int>(
                 name: "ResponseStatusCode",
                 table: "PageVisitLogs",
                 type: "int",
                 nullable: false,
                 defaultValue: 0);
 
-            migrationBuilder.CreateTable(
+            _ = migrationBuilder.CreateTable(
                 name: "ThreatBlocks",
-                columns: table => new
+                columns: static table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
@@ -61,50 +60,50 @@ namespace MVP_Core.Migrations
                     LastDetectedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     BanLiftTime = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
-                constraints: table =>
+                constraints: static table =>
                 {
-                    table.PrimaryKey("PK_ThreatBlocks", x => x.Id);
+                    _ = table.PrimaryKey("PK_ThreatBlocks", static x => x.Id);
                 });
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
+            _ = migrationBuilder.DropTable(
                 name: "ThreatBlocks");
 
-            migrationBuilder.DropColumn(
+            _ = migrationBuilder.DropColumn(
                 name: "IsRealUser",
                 table: "PageVisitLogs");
 
-            migrationBuilder.DropColumn(
+            _ = migrationBuilder.DropColumn(
                 name: "ResponseStatusCode",
                 table: "PageVisitLogs");
 
-            migrationBuilder.RenameColumn(
+            _ = migrationBuilder.RenameColumn(
                 name: "IpAddress",
                 table: "PageVisitLogs",
                 newName: "IPAddress");
 
-            migrationBuilder.RenameColumn(
+            _ = migrationBuilder.RenameColumn(
                 name: "VisitTimestamp",
                 table: "PageVisitLogs",
                 newName: "VisitTimeUtc");
 
-            migrationBuilder.RenameColumn(
+            _ = migrationBuilder.RenameColumn(
                 name: "Referrer",
                 table: "PageVisitLogs",
                 newName: "ReferrerUrl");
 
-            migrationBuilder.AddColumn<int>(
+            _ = migrationBuilder.AddColumn<int>(
                 name: "StatusCode",
                 table: "PageVisitLogs",
                 type: "int",
                 nullable: true);
 
-            migrationBuilder.CreateTable(
+            _ = migrationBuilder.CreateTable(
                 name: "PageVisits",
-                columns: table => new
+                columns: static table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
@@ -113,9 +112,9 @@ namespace MVP_Core.Migrations
                     UserClick = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     VisitTimestamp = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
-                constraints: table =>
+                constraints: static table =>
                 {
-                    table.PrimaryKey("PK_PageVisits", x => x.Id);
+                    _ = table.PrimaryKey("PK_PageVisits", static x => x.Id);
                 });
         }
     }

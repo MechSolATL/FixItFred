@@ -1,0 +1,34 @@
+namespace MVP_Core.Services
+{
+    /// <summary>
+    /// Provides token management operations such as retrieving access tokens 
+    /// and logging token-related activities for auditing or integration use.
+    /// </summary>
+    public interface ITokenService
+    {
+        /// <summary>
+        /// Retrieves the current access token used to authenticate with external services like QuickBooks.
+        /// </summary>
+        /// <param name="cancellationToken">Optional cancellation token.</param>
+        /// <returns>A task that returns the access token string.</returns>
+        Task<string> GetAccessTokenAsync(CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Logs token-related events for auditing or debugging purposes.
+        /// </summary>
+        /// <param name="actionDescription">A descriptive message about the token activity.</param>
+        /// <param name="cancellationToken">Optional cancellation token.</param>
+        Task LogTokenActivityAsync(string actionDescription, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Retrieves a list of recent token logs for display or monitoring purposes.
+        /// </summary>
+        /// <param name="cancellationToken">Optional cancellation token.</param>
+        /// <returns>A list of <see cref="TokenLog"/> records.</returns>
+        Task<IList<Data.Models.TokenLog>> GetRecentTokenLogsAsync(CancellationToken cancellationToken = default);
+    }
+}
+
+
+
+

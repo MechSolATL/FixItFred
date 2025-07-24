@@ -1,10 +1,6 @@
 // ===============================
 // File: Pages/Admin/AuditLogs.cshtml.cs
 // ===============================
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Data;
-using MVP_Core.Data.Models;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
 
 namespace MVP_Core.Pages.Admin
@@ -19,12 +15,12 @@ namespace MVP_Core.Pages.Admin
             _db = db;
         }
 
-        public List<AuditLog> Logs { get; set; } = new();
+        public List<AuditLog> Logs { get; set; } = [];
 
         public async Task OnGetAsync()
         {
             Logs = await _db.AuditLogs
-                .OrderByDescending(l => l.Timestamp)
+                .OrderByDescending(static l => l.Timestamp)
                 .Take(200)
                 .ToListAsync();
         }

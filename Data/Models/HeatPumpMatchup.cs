@@ -1,9 +1,6 @@
-﻿// ===============================
+// ===============================
 // File: Data/Models/HeatPumpMatchup.cs
 // ===============================
-
-using System;
-using System.ComponentModel.DataAnnotations;
 
 namespace MVP_Core.Data.Models
 {

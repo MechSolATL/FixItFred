@@ -1,0 +1,80 @@
+@page
+@model MVP_Core.Pages.Admin.BlazorAdmin.AuditLogModel
+@{
+    ViewData["Title"] = "Audit Log";
+}
+<h2>Solace Compliance Audit Log</h2>
+@if (Model.Loading)
+{
+    <p>Loading audit log...</p>
+}
+else if (Model.AuditLogData == null)
+{
+    <div class="alert alert-danger">Failed to load audit log.</div>
+}
+else
+{
+    <p class="text-muted">Generated: @Model.AuditLogData.GeneratedAt.ToLocalTime().ToString("f")</p>
+    <div class="mb-3">
+        <button class="btn btn-outline-secondary me-2" onclick="downloadAuditLogJson()" title="Download JSON audit log">
+            <i class="fa-solid fa-file-arrow-down me-1"></i> Download JSON
+        </button>
+        <button class="btn btn-outline-primary" onclick="window.print()" title="Print or save as PDF">
+            <i class="fa-solid fa-file-pdf me-1"></i> Print to PDF
+        </button>
+    </div>
+    @foreach (var logGroup in Model.AuditLogData.Sections)
+    {
+        <h3>@logGroup.Section</h3>
+        <table class="table table-bordered table-sm mb-4">
+            <thead>
+                <tr>
+                    <th>File</th>
+                    <th>Timestamp</th>
+                    <th>Compliance Fixes</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var file in logGroup.Files)
+                {
+                    <tr>
+                        <td>@file.Filename</td>
+                        <td>@file.Timestamp.ToLocalTime().ToString("g")</td>
+                        <td>
+                            <ul>
+                                @foreach (var fix in file.ComplianceFixes)
+                                {
+                                    <li>@fix</li>
+                                }
+                            </ul>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    <div class="mt-5 border-top pt-3">
+        <strong>Signature:</strong> ____________________________ <br />
+        <span class="text-muted">Prepared for: @Model.AuditLogData.Signature.PreparedFor</span><br />
+        <span class="text-muted">Prepared by: @Model.AuditLogData.Signature.PreparedBy</span><br />
+        <span class="text-muted">Date: @Model.AuditLogData.Signature.Date</span>
+    </div>
+}
+@section Scripts {
+    <script src="~/js/audit-log.js"></script>
+    <script>
+        function downloadAuditLogJson() {
+            fetch('@Url.Page("AuditLog", "Json")')
+                .then(resp => resp.blob())
+                .then(blob => {
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'solace-auditlog.json';
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                });
+        }
+    </script>
+}

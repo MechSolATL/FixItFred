@@ -1,5 +1,5 @@
-﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MVP_Core.Data.Models
 {
@@ -44,6 +44,8 @@ namespace MVP_Core.Data.Models
         [MaxLength(100)]
         public string? AssignedTo { get; set; }
 
+        public int? AssignedTechnicianId { get; set; } // <-- Added for Blazor binding
+
         [Required]
         [MaxLength(50)]
         public string Status { get; set; } = "Pending";
@@ -56,5 +58,50 @@ namespace MVP_Core.Data.Models
 
         [MaxLength(100)]
         public string? SessionId { get; set; }
+
+        // Priority: Low, Normal, High
+        [MaxLength(20)]
+        public string Priority { get; set; } = "Normal";
+
+        // ? FIXED: Strongly typed one-to-many relationship
+        public List<UserResponse> Responses { get; set; } = [];
+
+        // SLA/Deadline
+        public DateTime? DueDate { get; set; } // Nullable due date for SLA
+
+        public DateTime? EscalatedAt { get; set; } // Set when SLA escalation occurs
+
+        public bool IsEscalated { get; set; } = false;
+
+        [MaxLength(200)]
+        public string? RequiredSkills { get; set; } // New property for required skills
+    }
+
+    public class SlaSetting
+    {
+        [Key]
+        public int Id { get; set; }
+        [Required]
+        [MaxLength(100)]
+        public string ServiceType { get; set; } = string.Empty;
+        // SLA in hours
+        public int SlaHours { get; set; } = 24;
+    }
+
+    public class KanbanHistoryLog
+    {
+        [Key]
+        public int Id { get; set; }
+        public int ServiceRequestId { get; set; }
+        [MaxLength(50)]
+        public string FromStatus { get; set; } = string.Empty;
+        [MaxLength(50)]
+        public string ToStatus { get; set; } = string.Empty;
+        public int? FromIndex { get; set; }
+        public int? ToIndex { get; set; }
+        public string? ChangedBy { get; set; }
+        public DateTime ChangedAt { get; set; } = DateTime.UtcNow;
+        [ForeignKey("ServiceRequestId")]
+        public ServiceRequest? ServiceRequest { get; set; }
     }
 }

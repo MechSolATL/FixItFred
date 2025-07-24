@@ -1,12 +1,10 @@
-﻿using Microsoft.AspNetCore.Http;
 using System.Text.Json;
-using System;
 
 namespace MVP_Core.Helpers
 {
     public static class SessionHelper
     {
-        private static readonly JsonSerializerOptions _serializerOptions = new JsonSerializerOptions
+        private static readonly JsonSerializerOptions _serializerOptions = new()
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
             WriteIndented = false,
@@ -15,15 +13,21 @@ namespace MVP_Core.Helpers
 
         public static void SetObject<T>(this ISession session, string key, T value)
         {
-            if (value == null) return;
+            if (value == null)
+            {
+                return;
+            }
+
             session.SetString(key, JsonSerializer.Serialize(value, _serializerOptions));
         }
 
         public static T? GetObject<T>(this ISession session, string key)
         {
-            var value = session.GetString(key);
+            string? value = session.GetString(key);
             if (string.IsNullOrEmpty(value))
+            {
                 return default;
+            }
 
             try
             {

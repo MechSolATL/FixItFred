@@ -1,3 +1,18 @@
-﻿@{
-    Layout = "_Layout";
+@*
+    ViewStart: Razor Layout Selector based on device type
+    Uses native detection via middleware (no Wangkanai)
+*@
+@{
+    // Fallback layout
+    string fallbackLayout = "/Pages/Shared/_Layout.cshtml";
+
+    // Read device type from ViewData (populated in PageModel.OnGet)
+    var deviceType = ViewData["DeviceType"]?.ToString()?.ToLowerInvariant();
+
+    Layout = deviceType switch
+    {
+        "mobile" => "/Pages/Shared/_LayoutMobile.cshtml",
+        "tablet" => "/Pages/Shared/_LayoutTablet.cshtml",
+        _ => fallbackLayout
+    };
 }

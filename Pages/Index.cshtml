@@ -1,9 +1,25 @@
-﻿@page
-@model IndexModel
+@page "/"
+@model MVP_Core.Pages.IndexModel
+@inject MVP_Core.Services.ISeoService SeoService
+
 @{
-    ViewData["Title"] = "Home page";
+    // Layout is set via _ViewStart.cshtml for device compliance
+    await Html.PartialAsync("/Pages/Shared/_SEOHead.cshtml");
 }
 
-<div style="position: absolute; top: 10px; right: 10px;">
+<div class="position-absolute top-0 end-0 m-3">
     <a href="/Account/Login" class="btn btn-primary">Log In</a>
 </div>
+
+<div class="text-center mt-5">
+    <h1>Welcome to Service Atlanta</h1>
+    <p class="lead">Your one-stop solution for expert Plumbing, HVAC, and Filtration Services</p>
+    <button class="btn btn-success btn-lg" onclick="openModal('Plumbing')">Start Plumbing Service</button>
+</div>
+
+<!-- Modal Loads Here -->
+<div id="modalHost"></div>
+
+@section Scripts {
+    <script src="/js/modal.js"></script>
+}

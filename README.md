@@ -4,6 +4,12 @@ MVP-Core is a robust, scalable web application framework designed to streamline 
 
 ---
 
+## **Attribution & Creative Legacy**
+
+This platform was developed in collaboration with AI under the creative direction of **Dino**, the original architect of the MechSolATL initiative and creator of Service-Atlanta.com. All core logic, flow design, and architectural choices reflect Dino’s leadership and contribution. AI was used solely to assist — not to originate — and any derivative ideas must reference this foundation.
+
+---
+
 ## **Features**
 
 - **Service Request Flows**: Dynamic, question-driven service request engines per service type.

@@ -1,7 +1,3 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using MVP_Core.Data.Models.ViewModels;
-using MVP_Core.Services;
-
 namespace MVP_Core.Controllers.Api
 {
     [Route("api/[controller]")]
@@ -22,7 +18,7 @@ namespace MVP_Core.Controllers.Api
         {
             _logger.LogInformation("Fetching root Plumbing questions...");
 
-            var questions = await _questionService.GetRootQuestionsAsync("Plumbing");
+            List<QuestionWithOptionsModel> questions = await _questionService.GetRootQuestionsAsync("Plumbing");
 
             if (questions == null || !questions.Any())
             {
@@ -49,9 +45,9 @@ namespace MVP_Core.Controllers.Api
                 return BadRequest("Answer parameter is required.");
             }
 
-            _logger.LogInformation("Looking for follow-up questions — ParentId: {ParentId}, Answer: {Answer}", parentId, answer);
+            _logger.LogInformation("Looking for follow-up questions � ParentId: {ParentId}, Answer: {Answer}", parentId, answer);
 
-            var followUps = await _questionService.GetFollowUpQuestionsAsync(parentId, answer.Trim());
+            List<QuestionWithOptionsModel> followUps = await _questionService.GetFollowUpQuestionsAsync(parentId, answer.Trim());
 
             if (followUps == null || !followUps.Any())
             {

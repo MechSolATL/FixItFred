@@ -1,5 +1,3 @@
-﻿using System.ComponentModel.DataAnnotations;
-
 namespace MVP_Core.Data.Models
 {
     /// <summary>

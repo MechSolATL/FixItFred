@@ -1,9 +1,3 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.EntityFrameworkCore;
-using MVP_Core.Data;
-using MVP_Core.Data.Models;
-
 namespace MVP_Core.Pages.Admin
 {
     public class ManagePagesModel : PageModel
@@ -15,7 +9,7 @@ namespace MVP_Core.Pages.Admin
             _dbContext = dbContext;
         }
 
-        public List<MVP_Core.Data.Models.Page> Pages { get; set; } = new();
+        public List<MVP_Core.Data.Models.Page> Pages { get; set; } = [];
 
         [TempData]
         public string? Message { get; set; }
@@ -23,13 +17,13 @@ namespace MVP_Core.Pages.Admin
         public async Task OnGetAsync()
         {
             Pages = await _dbContext.Pages
-                .OrderBy(p => p.UrlPath)
+                .OrderBy(static p => p.UrlPath)
                 .ToListAsync();
         }
 
         public async Task<IActionResult> OnPostToggleVisibilityAsync(int id)
         {
-            var page = await _dbContext.Pages.FindAsync(id);
+            Data.Models.Page? page = await _dbContext.Pages.FindAsync(id);
 
             if (page == null)
             {
@@ -39,8 +33,8 @@ namespace MVP_Core.Pages.Admin
             page.IsPublic = !page.IsPublic;
             page.UpdatedAt = DateTime.UtcNow;
 
-            await _dbContext.SaveChangesAsync();
-            Message = "✅ Page visibility updated!";
+            _ = _dbContext.SaveChanges();
+            Message = "? Page visibility updated!";
 
             return RedirectToPage();
         }

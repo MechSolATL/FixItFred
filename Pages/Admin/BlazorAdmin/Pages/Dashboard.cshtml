@@ -1,0 +1,135 @@
+@page
+@model MVP_Core.Pages.Admin.BlazorAdmin.DashboardModel
+@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+@if (User.IsInRole("Admin"))
+{
+    <h3>Welcome to the Blazor Admin Dashboard</h3>
+    <p>This is where you can quickly access all admin sections, pages, and tasks.</p>
+
+    <div class="admin-tabs-wrapper">
+        <ul class="nav nav-tabs mb-3 flex-nowrap overflow-auto" id="adminTab" role="tablist" style="white-space:nowrap;">
+            <li class="nav-item" role="presentation">
+                <a class="nav-link @(Model.ActiveTab == "requests" ? "active" : "")" href="?tab=requests" role="tab" title="Recent and all service requests">
+                    <i class="fa-solid fa-list-check me-1"></i> Service Requests
+                </a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link @(Model.ActiveTab == "seo" ? "active" : "")" href="?tab=seo" role="tab" title="SEO metadata management">
+                    <i class="fa-solid fa-magnifying-glass-chart me-1"></i> SEO Manager
+                </a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link @(Model.ActiveTab == "matchups" ? "active" : "")" href="?tab=matchups" role="tab" title="Equipment and heat pump matchups">
+                    <i class="fa-solid fa-sitemap me-1"></i> Matchups
+                </a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link @(Model.ActiveTab == "logs" ? "active" : "")" href="?tab=logs" role="tab" title="Backup, audit, server, and click logs">
+                    <i class="fa-solid fa-file-lines me-1"></i> Logs
+                </a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link @(Model.ActiveTab == "tools" ? "active" : "")" href="?tab=tools" role="tab" title="Admin tools and utilities">
+                    <i class="fa-solid fa-wrench me-1"></i> Tools
+                </a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link @(Model.ActiveTab == "audit" ? "active" : "")" href="?tab=audit" role="tab" title="Compliance audit log">
+                    <i class="fa-solid fa-clipboard-check me-1"></i> Audit Log
+                </a>
+            </li>
+        </ul>
+
+        <div class="tab-content">
+            @if (Model.ActiveTab == "requests")
+            {
+                <div class="tab-pane fade show active">
+                    <h5>Recent Service Requests</h5>
+                    @if (Model.ServiceRequests == null)
+                    {
+                        <p><em>Loading service requests...</em></p>
+                    }
+                    else if (!Model.ServiceRequests.Any())
+                    {
+                        <p><em>No service requests found.</em></p>
+                    }
+                    else
+                    {
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Customer</th>
+                                    <th>Service Type</th>
+                                    <th>Status</th>
+                                    <th>Created</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var req in Model.ServiceRequests)
+                                {
+                                    <tr>
+                                        <td>@req.Id</td>
+                                        <td>@req.CustomerName</td>
+                                        <td>@req.ServiceType</td>
+                                        <td>@req.Status</td>
+                                        <td>@req.CreatedAt.ToLocalTime().ToString("g")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                    <a class="btn btn-link mt-2" href="/Admin/ServiceRequests">View All Service Requests</a>
+                </div>
+            }
+            else if (Model.ActiveTab == "seo")
+            {
+                <div class="tab-pane fade show active">
+                    <h5>SEO Management</h5>
+                    <a class="btn btn-primary mb-2" href="/Admin/ManageSEO">Open SEO Manager</a>
+                </div>
+            }
+            else if (Model.ActiveTab == "matchups")
+            {
+                <div class="tab-pane fade show active">
+                    <h5>Matchups</h5>
+                    <a class="btn btn-primary mb-2" href="/Admin/Matchups">View/Edit Matchups</a>
+                    <a class="btn btn-secondary mb-2 ms-2" href="/Admin/HeatPumpMatchups">Heat Pump Matchups</a>
+                </div>
+            }
+            else if (Model.ActiveTab == "logs")
+            {
+                <div class="tab-pane fade show active">
+                    <h5>Logs</h5>
+                    <a class="btn btn-primary mb-2" href="/Admin/BackupLog">Backup Logs</a>
+                    <a class="btn btn-secondary mb-2 ms-2" href="/Admin/AuditLogs">Audit Logs</a>
+                    <a class="btn btn-secondary mb-2 ms-2" href="/Admin/ServerLogs">Server Logs</a>
+                    <a class="btn btn-secondary mb-2 ms-2" href="/Admin/Clicks">Click Logs</a>
+                </div>
+            }
+            else if (Model.ActiveTab == "tools")
+            {
+                <div class="tab-pane fade show active">
+                    <h5>Admin Tools</h5>
+                    @await Html.PartialAsync("~/Pages/Tools/HashPassword.cshtml")
+                    <a class="btn btn-secondary mb-2 ms-2" href="/Admin/QuickTest">Quick Test</a>
+                </div>
+            }
+            else if (Model.ActiveTab == "audit")
+            {
+                <div class="tab-pane fade show active">
+                    <h5>Audit Log</h5>
+                    @await Html.PartialAsync("~/Pages/Admin/BlazorAdmin/AuditLog.cshtml")
+                </div>
+            }
+        </div>
+    </div>
+}
+else
+{
+    <div class="alert alert-danger mt-4">You do not have access to this dashboard.</div>
+}

@@ -1,8 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 using MVP_Core.Controllers.Api;
-using MVP_Core.Services;
-using System.ComponentModel.DataAnnotations;
 
 namespace MVP_Core.Pages.Profile
 {
@@ -28,7 +24,7 @@ namespace MVP_Core.Pages.Profile
 
         public void OnGet()
         {
-            ViewData["Title"] = "Verify Code – Service Atlanta";
+            ViewData["Title"] = "Verify Code � Service Atlanta";
         }
 
         public async Task<IActionResult> OnPostAsync()
@@ -40,11 +36,11 @@ namespace MVP_Core.Pages.Profile
                 return Page();
             }
 
-            var success = await _emailVerificationService.VerifyCodeAsync(Email, Code);
+            bool success = await _emailVerificationService.VerifyCodeAsync(Email, Code);
 
             Message = success
-                ? "✅ Code verified successfully!"
-                : "❌ Invalid or expired code. Please try again.";
+                ? "? Code verified successfully!"
+                : "? Invalid or expired code. Please try again.";
 
             IsSuccess = success;
 

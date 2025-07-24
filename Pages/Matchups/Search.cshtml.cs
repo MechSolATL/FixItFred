@@ -2,42 +2,37 @@
 // File: Pages/Matchups/Search.cshtml.cs
 // ===============================
 
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Data;
-using MVP_Core.Data.Models;
-using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using MVP_Core.Services;
 
 namespace MVP_Core.Pages.Matchups
 {
     public class SearchModel : PageModel
     {
         private readonly ApplicationDbContext _db;
+        private readonly ISeoService _seoService;
 
-        public SearchModel(ApplicationDbContext db)
+        public SearchModel(ApplicationDbContext db, ISeoService seoService)
         {
             _db = db;
+            _seoService = seoService;
         }
 
         [BindProperty(SupportsGet = true)]
         public string Query { get; set; } = string.Empty;
 
-        public List<HeatPumpMatchup> Results { get; set; } = new();
+        public List<HeatPumpMatchup> Results { get; set; } = [];
 
         public async Task OnGetAsync()
         {
             ViewData["Title"] = "Search Heat Pump Matchups";
             ViewData["Layout"] = "/Pages/Shared/_Layout.cshtml";
 
-            var seo = await _db.SEOs.FirstOrDefaultAsync(s => s.PageName == "MatchupsSearch");
+            var seo = await _seoService.GetSeoByPageNameAsync("MatchupsSearch");
             if (seo != null)
             {
                 ViewData["MetaDescription"] = seo.MetaDescription;
                 ViewData["Keywords"] = seo.Keywords;
-                ViewData["Robots"] = "index, follow"; // Update as needed
+                ViewData["Robots"] = seo.Robots ?? "index, follow";
             }
 
             if (!string.IsNullOrWhiteSpace(Query))

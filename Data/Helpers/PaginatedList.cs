@@ -1,11 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-
-namespace MVP_Core.Helpers
+namespace MVP_Core.Data.Helpers
 {
     public class PaginatedList<T> : List<T>
     {
@@ -16,13 +9,15 @@ namespace MVP_Core.Helpers
         public PaginatedList(List<T> items, int count, int pageIndex, int pageSize)
         {
             if (pageIndex < 1)
+            {
                 throw new ArgumentOutOfRangeException(nameof(pageIndex), "PageIndex must be >= 1");
+            }
 
             PageIndex = pageIndex;
             TotalCount = count;
             TotalPages = (int)Math.Ceiling(count / (double)pageSize);
 
-            this.AddRange(items);
+            AddRange(items);
         }
 
         public bool HasPreviousPage => PageIndex > 1;
@@ -30,18 +25,30 @@ namespace MVP_Core.Helpers
 
         public static async Task<PaginatedList<T>> CreateAsync(IQueryable<T> source, int pageIndex, int pageSize, CancellationToken cancellationToken = default)
         {
-            if (source == null) throw new ArgumentNullException(nameof(source));
-            if (pageSize <= 0) throw new ArgumentOutOfRangeException(nameof(pageSize), "PageSize must be > 0");
+            if (source == null)
+            {
+                throw new ArgumentNullException(nameof(source));
+            }
 
-            var count = await source.CountAsync(cancellationToken);
+            if (pageSize <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(pageSize), "PageSize must be > 0");
+            }
 
-            if (pageIndex < 1) pageIndex = 1;
+            int count = await source.CountAsync(cancellationToken);
 
-            var totalPages = (int)Math.Ceiling(count / (double)pageSize);
+            if (pageIndex < 1)
+            {
+                pageIndex = 1;
+            }
+
+            int totalPages = (int)Math.Ceiling(count / (double)pageSize);
             if (totalPages > 0 && pageIndex > totalPages)
+            {
                 pageIndex = totalPages;
+            }
 
-            var items = await source
+            List<T> items = await source
                 .Skip((pageIndex - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync(cancellationToken);

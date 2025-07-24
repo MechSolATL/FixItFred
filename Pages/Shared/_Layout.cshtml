@@ -1,18 +1,26 @@
-﻿@*
-    Layout Master for Service Atlanta - Fully SEO and Accessibility Compliant
-    Status: Production Grade
-*@
+@{
+    Layout = null;
+    var deviceType = Context.Items["DeviceType"]?.ToString() ?? "Unknown";
+    var isMobile = deviceType == "Mobile";
+    ViewData["Title"] ??= "Service Atlanta";
+}
+
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Service Atlanta</title>
+    <meta name="description" content="@ViewData["MetaDescription"]" />
+    <meta name="keywords" content="@ViewData["Keywords"]" />
+    <meta name="robots" content="@ViewData["Robots"]" />
 
-    <!-- 🖌️ Fonts -->
+    <!-- ??? Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 
-    <!-- 🧩 Styles -->
+    <!-- ?? Styles -->
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/MVP_Core.styles.css" asp-append-version="true" />
@@ -55,8 +63,8 @@
     </style>
 </head>
 <body>
-    <!-- 🔝 Header -->
-    <header>
+    <!-- ?? Header -->
+    <header role="banner">
         <nav class="navbar navbar-expand-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container">
                 <a class="navbar-brand fw-bold" asp-area="" asp-page="/Index">Service Atlanta</a>
@@ -66,31 +74,43 @@
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Privacy">Privacy</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-page="/Services/Plumbing">Plumbing</a>
-                        </li>
+                        <li class="nav-item"><a class="nav-link text-dark" asp-area="" asp-page="/Index">Home</a></li>
+                        <li class="nav-item"><a class="nav-link text-dark" asp-area="" asp-page="/Privacy">Privacy</a></li>
+                        <li class="nav-item"><a class="nav-link text-dark" asp-page="/Services/Plumbing">Plumbing</a></li>
+                        <!-- TODO: Dynamically load other services here in future from DB or route -->
                     </ul>
                 </div>
             </div>
         </nav>
+
+        <!-- ?? Microsoft Advertising UET Tag -->
+        <script>
+            (function(w,d,t,r,u){
+              var f,n,i;
+              w[u]=w[u]||[],
+              f=function(){
+                var o={ti:"343190833", enableAutoSpaTracking: true};
+                o.q=w[u],w[u]=new UET(o),w[u].push("pageLoad")
+              },
+              n=d.createElement(t),n.src=r,n.async=1,n.onload=n.onreadystatechange=function(){
+                var s=this.readyState;
+                s && s!=="loaded" && s!=="complete" || (f(),n.onload=n.onreadystatechange=null)
+              },
+              i=d.getElementsByTagName(t)[0],i.parentNode.insertBefore(n,i)
+            })(window,document,"script","//bat.bing.com/bat.js","uetq");
+        </script>
     </header>
 
-    <!-- 📄 Page Body -->
-    <main class="container">
+    <!-- ?? Main Content -->
+    <main role="main" class="container">
         <div class="content-wrapper">
             @RenderBody()
         </div>
     </main>
 
-    <!-- 👣 Footer -->
-    <footer class="text-center mt-5" style="font-size:8pt; color:white; background-color:rgba(0, 0, 0, 0.5); padding: 15px;">
-        &copy; 1997–2025 <strong>Virtual Concepts</strong> for
+    <!-- ?? Footer -->
+    <footer class="text-center mt-5" style="font-size:8pt; color:white; background-color:rgba(0, 0, 0, 0.5); padding: 15px;" role="contentinfo">
+        &copy; 1997�2025 <strong>Virtual Concepts</strong> for
         <a href="https://service-atlanta.com" target="_blank" style="color:white; text-decoration:underline;">service-atlanta.com</a> |
         <strong>Mechanical Solutions Atlanta</strong>. All rights reserved.
         <br />
@@ -100,13 +120,13 @@
         <a href="/Legal/Terms" style="color:white; text-decoration:underline;">Terms</a>
     </footer>
 
-    <!-- 🔧 Scripts -->
+    <!-- ?? Scripts -->
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 
-    <!-- 🔐 Disable Right-Click, Ctrl+U, F12 -->
+    <!-- ?? Disable Right-Click, Ctrl+U, F12 -->
     <script>
         document.addEventListener('contextmenu', e => e.preventDefault());
         document.addEventListener('keydown', e => {
@@ -118,7 +138,7 @@
         });
     </script>
 
-    <!-- 🖱️ Click Tracking -->
+    <!-- ??? Click Tracking -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             document.body.addEventListener('click', e => {
@@ -138,5 +158,14 @@
             });
         });
     </script>
+
+    @if (TempData["ToastMessage"] is string msg)
+    {
+        <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1100;">
+            <div class="toast bg-success text-white show" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="toast-body">@msg</div>
+            </div>
+        </div>
+    }
 </body>
 </html>

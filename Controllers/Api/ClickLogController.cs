@@ -1,7 +1,3 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using MVP_Core.Data;
-using MVP_Core.Data.Models;
-
 namespace MVP_Core.Controllers.Api
 {
     [ApiController]
@@ -22,9 +18,9 @@ namespace MVP_Core.Controllers.Api
         }
 
         [HttpPost]
-        public async Task<IActionResult> LogClickAsync([FromBody] ClickLogInput input)
+        public IActionResult LogClick([FromBody] ClickLogInput input)
         {
-            var pageVisitLog = new PageVisitLog
+            PageVisitLog pageVisitLog = new()
             {
                 PageUrl = input.PageName,
                 Referrer = string.Empty, // Not available from API call
@@ -34,9 +30,8 @@ namespace MVP_Core.Controllers.Api
                 ResponseStatusCode = 200,
                 VisitTimestamp = DateTime.UtcNow
             };
-
-            _dbContext.PageVisitLogs.Add(pageVisitLog); // ✅ Correct DbSet: PageVisitLogs (NOT PageVisits)
-            await _dbContext.SaveChangesAsync();
+            _ = _dbContext.PageVisitLogs.Add(pageVisitLog); // ? Correct DbSet: PageVisitLogs (NOT PageVisits)
+            _ = _dbContext.SaveChanges();
 
             return Ok();
         }

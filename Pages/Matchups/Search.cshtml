@@ -1,4 +1,4 @@
-﻿@page
+@page
 @model MVP_Core.Pages.Matchups.SearchModel
 @{
     Layout = "/Pages/Shared/_Layout.cshtml";
@@ -50,5 +50,5 @@
 }
 else if (!string.IsNullOrWhiteSpace(Model.Query))
 {
-    <div class="text-red-600 font-semibold mt-4">❌ No matchups found for your search query.</div>
+    <div class="text-red-600 font-semibold mt-4">? No matchups found for your search query.</div>
 }

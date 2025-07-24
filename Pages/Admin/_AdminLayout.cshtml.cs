@@ -1,6 +1,4 @@
-using Microsoft.AspNetCore.Mvc.RazorPages;
-
-namespace MechSolATL.Pages.Services.Views.Admin
+namespace MVP_Core.Pages.Admin
 {
     public class _AdminLayoutModel : PageModel
     {

@@ -114,21 +114,27 @@ input[type="text"],
 input[type="email"],
 input[type="password"],
 textarea,
-select {
+select,
+.input {
     width: 100%;
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 8px;
     margin: 6px 0 16px;
     font-family: var(--font-main);
+    font-size: 1rem;
     box-sizing: border-box;
+    background-color: #fff;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
     input:focus,
     textarea:focus,
-    select:focus {
+    select:focus,
+    .input:focus {
         border-color: var(--primary-color);
         outline: none;
+        box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
     }
 
 /* ========================================

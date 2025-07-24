@@ -1,6 +1,3 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-
 namespace MVP_Core.Data.Models.ViewModels
 {
     public class QuestionWithOptionsModel
@@ -38,6 +35,6 @@ namespace MVP_Core.Data.Models.ViewModels
         [MaxLength(100)]
         public string? Page { get; set; }
 
-        public List<QuestionOption> Options { get; set; } = new();
+        public List<QuestionOption> Options { get; set; } = [];
     }
 }

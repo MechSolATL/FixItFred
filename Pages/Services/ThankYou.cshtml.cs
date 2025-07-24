@@ -1,41 +1,50 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Data;
-using MVP_Core.Data.Models;
-using MVP_Core.Models;
-using MVP_Core.Data.Models.ViewModels;
 using MVP_Core.Services.Email;
-using Microsoft.EntityFrameworkCore;
+using MVP_Core.Services;
 
 namespace MVP_Core.Pages.Services
 {
-    [IgnoreAntiforgeryToken] // 🛡️ Fix: Apply here globally to the PageModel, NOT individual handlers
+    [IgnoreAntiforgeryToken]
     public class ThankYouModel : PageModel
     {
         private readonly ApplicationDbContext _dbContext;
         private readonly QuestionService _questionService;
         private readonly EmailService _emailService;
+        private readonly ISeoService _seoService;
+        private readonly IDeviceResolver _deviceResolver;
 
         public List<SubmittedAnswerViewModel> SubmittedAnswers { get; set; } = [];
 
-        public ThankYouModel(ApplicationDbContext dbContext, QuestionService questionService, EmailService emailService)
+        public ThankYouModel(
+            ApplicationDbContext dbContext,
+            QuestionService questionService,
+            EmailService emailService,
+            ISeoService seoService,
+            IDeviceResolver deviceResolver)
         {
             _dbContext = dbContext;
             _questionService = questionService;
             _emailService = emailService;
+            _seoService = seoService;
+            _deviceResolver = deviceResolver;
         }
 
         public async Task<IActionResult> OnGetAsync()
         {
-            var sessionId = HttpContext.Session.GetString("CurrentSessionID");
+            SeoMeta? SeoMeta = await _seoService.GetSeoMetaAsync("ThankYou");
+            ViewData["Title"] = SeoMeta?.Title ?? "Thank You!";
+            ViewData["MetaDescription"] = SeoMeta?.MetaDescription ?? "Your service request was successfully submitted.";
+            ViewData["Keywords"] = SeoMeta?.Keywords ?? "service request confirmation, thank you";
+            ViewData["Robots"] = SeoMeta?.Robots ?? "noindex, nofollow";
+            ViewData["DeviceType"] = _deviceResolver.GetDeviceType(HttpContext);
 
+            string? sessionId = HttpContext.Session.GetString("CurrentSessionID");
             if (string.IsNullOrEmpty(sessionId))
             {
                 TempData["ErrorMessage"] = "Session expired or invalid.";
                 return RedirectToPage("/Error");
             }
 
-            var userResponses = await _dbContext.UserResponses
+            List<UserResponse> userResponses = await _dbContext.UserResponses
                 .Where(r => r.SessionID == sessionId)
                 .OrderBy(r => r.CreatedAt)
                 .ToListAsync();
@@ -46,9 +55,9 @@ namespace MVP_Core.Pages.Services
                 return RedirectToPage("/Error");
             }
 
-            foreach (var response in userResponses)
+            foreach (UserResponse response in userResponses)
             {
-                var question = await _dbContext.Questions.FirstOrDefaultAsync(q => q.Id == response.QuestionId);
+                Question? question = await _dbContext.Questions.FirstOrDefaultAsync(q => q.Id == response.QuestionId);
                 if (question != null)
                 {
                     SubmittedAnswers.Add(new SubmittedAnswerViewModel
@@ -64,7 +73,7 @@ namespace MVP_Core.Pages.Services
 
         public async Task<IActionResult> OnPostSubmitAsync()
         {
-            var session = HttpContext.Session.GetObject<ServiceRequestSession>("ServiceRequest");
+            ServiceRequestSession? session = HttpContext.Session.GetObject<ServiceRequestSession>("ServiceRequest");
 
             if (session == null || string.IsNullOrEmpty(session.CustomerName) || string.IsNullOrEmpty(session.PhoneNumber))
             {
@@ -72,13 +81,13 @@ namespace MVP_Core.Pages.Services
                 return RedirectToPage("/Error");
             }
 
-            using var transaction = await _dbContext.Database.BeginTransactionAsync();
+            using Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction transaction = await _dbContext.Database.BeginTransactionAsync();
 
             try
             {
-                var sessionId = HttpContext.Session.Id;
+                string sessionId = HttpContext.Session.Id;
 
-                var newRequest = new ServiceRequest
+                ServiceRequest newRequest = new()
                 {
                     CustomerName = session.CustomerName,
                     Phone = session.PhoneNumber,
@@ -91,19 +100,19 @@ namespace MVP_Core.Pages.Services
                     SessionId = sessionId
                 };
 
-                _dbContext.ServiceRequests.Add(newRequest);
-                await _dbContext.SaveChangesAsync();
+                _ = _dbContext.ServiceRequests.Add(newRequest);
+                _ = _dbContext.SaveChanges();
 
-                var userResponses = session.Answers.Select(answer => new UserResponse
+                List<UserResponse> userResponses = session.Answers.Select(a => new UserResponse
                 {
                     SessionID = sessionId,
-                    QuestionId = answer.Key,
-                    Response = answer.Value.Answer,
-                    CreatedAt = answer.Value.AnsweredAt
+                    QuestionId = a.Key,
+                    Response = a.Value.Answer,
+                    CreatedAt = a.Value.AnsweredAt
                 }).ToList();
 
                 _dbContext.UserResponses.AddRange(userResponses);
-                await _dbContext.SaveChangesAsync();
+                _ = _dbContext.SaveChanges();
 
                 await transaction.CommitAsync();
 
@@ -114,11 +123,10 @@ namespace MVP_Core.Pages.Services
                 }
                 catch
                 {
-                    // 🛑 Email failure should not block user flow.
+                    // Non-blocking email failure
                 }
 
                 HttpContext.Session.Clear();
-
                 return RedirectToPage("/Shared/ThankYouSuccess");
             }
             catch

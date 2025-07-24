@@ -1,10 +1,4 @@
-﻿// MVP_Core/Services/BackupReminderService.cs
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
-
+// MVP_Core/Services/BackupReminderService.cs
 namespace MVP_Core.Services
 {
     public class BackupReminderService : IHostedService, IDisposable
@@ -29,11 +23,11 @@ namespace MVP_Core.Services
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            var now = DateTimeOffset.UtcNow;
-            var nowEastern = TimeZoneInfo.ConvertTime(now, _easternTimeZone);
+            DateTimeOffset now = DateTimeOffset.UtcNow;
+            DateTimeOffset nowEastern = TimeZoneInfo.ConvertTime(now, _easternTimeZone);
 
-            var nextRun = GetNextSaturdayAt1AM(nowEastern);
-            var initialDelay = nextRun - nowEastern;
+            DateTimeOffset nextRun = GetNextSaturdayAt1AM(nowEastern);
+            TimeSpan initialDelay = nextRun - nowEastern;
 
             if (initialDelay < TimeSpan.Zero)
             {
@@ -42,19 +36,19 @@ namespace MVP_Core.Services
 
             _timer = new Timer(DoBackupReminderSafe, null, initialDelay, TimeSpan.FromDays(7));
 
-            _logger.LogInformation("🔔 BackupReminderService started. Next reminder in {Hours:F1} hours.", initialDelay.TotalHours);
+            _logger.LogInformation("?? BackupReminderService started. Next reminder in {Hours:F1} hours.", initialDelay.TotalHours);
             return Task.CompletedTask;
         }
 
         private static DateTimeOffset GetNextSaturdayAt1AM(DateTimeOffset now)
         {
-            var daysUntilSaturday = ((int)DayOfWeek.Saturday - (int)now.DayOfWeek + 7) % 7;
+            int daysUntilSaturday = ((int)DayOfWeek.Saturday - (int)now.DayOfWeek + 7) % 7;
             if (daysUntilSaturday == 0 && now.Hour >= 1)
             {
                 daysUntilSaturday = 7; // If it's already Saturday after 1AM, schedule next week
             }
 
-            var nextSaturday = now.Date.AddDays(daysUntilSaturday).AddHours(1); // 1:00 AM
+            DateTime nextSaturday = now.Date.AddDays(daysUntilSaturday).AddHours(1); // 1:00 AM
             return nextSaturday;
         }
 
@@ -62,7 +56,7 @@ namespace MVP_Core.Services
         {
             try
             {
-                _logger.LogWarning("🚨 [Backup Reminder] Please commit and push your GitHub repository for MechSolATL project!");
+                _logger.LogWarning("?? [Backup Reminder] Please commit and push your GitHub repository for MechSolATL project!");
             }
             catch (Exception ex)
             {
@@ -72,8 +66,8 @@ namespace MVP_Core.Services
 
         public Task StopAsync(CancellationToken cancellationToken)
         {
-            _logger.LogInformation("🛑 BackupReminderService stopping.");
-            _timer?.Change(Timeout.Infinite, 0);
+            _logger.LogInformation("?? BackupReminderService stopping.");
+            _ = (_timer?.Change(Timeout.Infinite, 0));
             return Task.CompletedTask;
         }
 

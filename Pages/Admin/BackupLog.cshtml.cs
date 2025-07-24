@@ -1,157 +1,108 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.EntityFrameworkCore;
-using MVP_Core.Data;
-using MVP_Core.Models;
-using MVP_Core.Helpers;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
-
 namespace MVP_Core.Pages.Admin
 {
+    [ValidateAntiForgeryToken] // Applied globally for Razor Pages
     public class BackupLogModel : PageModel
     {
-        private readonly ApplicationDbContext _context;
-        private readonly ILogger<BackupLogModel> _logger;
+        private readonly ApplicationDbContext _db;
 
-        public BackupLogModel(ApplicationDbContext context, ILogger<BackupLogModel> logger)
+        public BackupLogModel(ApplicationDbContext db)
         {
-            _context = context;
-            _logger = logger;
+            _db = db;
         }
 
-        public PaginatedList<BackupLog> BackupLogs { get; set; } = default!;
-
-        [BindProperty(SupportsGet = true)]
-        public string SortOrder { get; set; } = "DateDesc";
-
-        [BindProperty(SupportsGet = true)]
-        public int PageIndex { get; set; } = 1;
-
-        [BindProperty(SupportsGet = true)]
-        public string StatusFilter { get; set; } = "All";
-
-        private const int PageSize = 10;
+        public List<BackupLog> BackupLogs { get; set; } = [];
+        [BindProperty(SupportsGet = true)] public string StatusFilter { get; set; } = "All";
+        [BindProperty(SupportsGet = true)] public string SortOrder { get; set; } = "Date_desc";
+        [BindProperty(SupportsGet = true)] public int PageIndex { get; set; } = 1;
+        public int TotalPages { get; set; }
 
         public async Task<IActionResult> OnGetAsync()
         {
-            var query = _context.BackupLogs.AsQueryable();
+            IQueryable<BackupLog> query = _db.BackupLogs;
 
-            if (!string.IsNullOrEmpty(StatusFilter) && StatusFilter != "All")
+            if (StatusFilter != "All")
             {
                 query = query.Where(x => x.Status == StatusFilter);
             }
 
+            // Sorting
             query = SortOrder switch
             {
                 "Date" => query.OrderBy(x => x.Date),
-                "DateDesc" => query.OrderByDescending(x => x.Date),
                 "Status" => query.OrderBy(x => x.Status),
-                "StatusDesc" => query.OrderByDescending(x => x.Status),
-                _ => query.OrderByDescending(x => x.Date),
+                "Status_desc" => query.OrderByDescending(x => x.Status),
+                _ => query.OrderByDescending(x => x.Date) // Default
             };
 
-            BackupLogs = await PaginatedList<BackupLog>.CreateAsync(query, PageIndex, PageSize);
+            int pageSize = 25;
+            int totalRecords = await query.CountAsync();
+            TotalPages = (int)Math.Ceiling(totalRecords / (double)pageSize);
+            BackupLogs = await query.Skip((PageIndex - 1) * pageSize).Take(pageSize).ToListAsync();
+
+            ViewData["Title"] = "Backup Logs";
             return Page();
         }
 
         public string GetSortOrder(string column)
         {
-            return column switch
-            {
-                "Date" => SortOrder == "Date" ? "DateDesc" : "Date",
-                "Status" => SortOrder == "Status" ? "StatusDesc" : "Status",
-                _ => "DateDesc",
-            };
+            return SortOrder == column ? $"{column}_desc" : column;
         }
 
         public string GetSortIcon(string column)
         {
-            return (column, SortOrder) switch
-            {
-                ("Date", "Date") => "↑",
-                ("Date", "DateDesc") => "↓",
-                ("Status", "Status") => "↑",
-                ("Status", "StatusDesc") => "↓",
-                _ => string.Empty,
-            };
+            return SortOrder == column ? "??" :
+                   SortOrder == $"{column}_desc" ? "??" : "";
         }
 
         public string GetBadgeColor(string status)
         {
             return status switch
             {
-                "Success" => "bg-green-100 text-green-800",
-                "Failed" => "bg-red-100 text-red-800",
-                "Warning" => "bg-yellow-100 text-yellow-800",
-                _ => "bg-gray-100 text-gray-800"
+                "Success" => "bg-green-200 text-green-800",
+                "Failed" => "bg-red-200 text-red-800",
+                "Warning" => "bg-yellow-200 text-yellow-800",
+                _ => "bg-gray-200 text-gray-800"
             };
         }
 
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> OnPostInsertTestLogAsync()
+        public async Task<IActionResult> OnPostDeleteAsync(int id)
         {
-            try
+            BackupLog? log = await _db.BackupLogs.FindAsync(id);
+            if (log == null)
             {
-                var statuses = new[] { "Success", "Failed", "Warning" };
-                var random = new Random();
-                var randomStatus = statuses[random.Next(statuses.Length)];
-
-                var newLog = new BackupLog
-                {
-                    Date = DateTime.UtcNow,
-                    Status = randomStatus,
-                    Message = $"Test backup event generated ({randomStatus}) at {DateTime.UtcNow:HH:mm:ss}"
-                };
-
-                _context.BackupLogs.Add(newLog);
-                await _context.SaveChangesAsync();
-
-                _logger.LogInformation("Test backup log inserted: {Status} at {Time}", randomStatus, DateTime.UtcNow);
-
-                return RedirectToPage();
+                return NotFound();
             }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error inserting test backup log.");
-                ModelState.AddModelError(string.Empty, "Failed to insert test backup log.");
-                return await OnGetAsync();
-            }
+
+            _ = _db.BackupLogs.Remove(log);
+            _ = _db.SaveChanges();
+            return RedirectToPage();
         }
 
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> OnPostClearOldLogsAsync()
+        public IActionResult OnPostInsertTestLog()
         {
-            try
+            BackupLog log = new()
             {
-                var cutoffDate = DateTime.UtcNow.AddDays(-30);
+                Date = DateTime.Now,
+                Status = "Success",
+                BackupType = "Full",
+                Message = "Test backup completed.",
+                BackupSizeMB = 12,
+                DurationSeconds = 4,
+                SourceServer = Environment.MachineName
+            };
 
-                var oldLogs = await _context.BackupLogs
-                    .Where(log => log.Date < cutoffDate)
-                    .ToListAsync();
+            _ = _db.BackupLogs.Add(log);
+            _ = _db.SaveChanges();
+            return RedirectToPage();
+        }
 
-                if (oldLogs.Count > 0)
-                {
-                    _context.BackupLogs.RemoveRange(oldLogs);
-                    await _context.SaveChangesAsync();
-
-                    _logger.LogInformation("Cleared {Count} old backup logs older than 30 days.", oldLogs.Count);
-                }
-                else
-                {
-                    _logger.LogInformation("No backup logs older than 30 days found to delete.");
-                }
-
-                return RedirectToPage();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error clearing old backup logs.");
-                ModelState.AddModelError(string.Empty, "Failed to clear old backup logs.");
-                return await OnGetAsync();
-            }
+        public IActionResult OnPostClearOldLogs()
+        {
+            DateTime cutoff = DateTime.Now.AddDays(-30);
+            IQueryable<BackupLog> oldLogs = _db.BackupLogs.Where(x => x.Date < cutoff);
+            _db.BackupLogs.RemoveRange(oldLogs);
+            _ = _db.SaveChanges();
+            return RedirectToPage();
         }
     }
 }

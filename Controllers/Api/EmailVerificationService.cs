@@ -1,10 +1,8 @@
-﻿using MVP_Core.Data;
-using MVP_Core.Data.Models;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using System.Net;
 using System.Net.Mail;
+using System.Security.Cryptography;
+using Microsoft.EntityFrameworkCore;
+using MVP_Core.Controllers.Api;
 
 namespace MVP_Core.Controllers.Api
 {
@@ -30,19 +28,21 @@ namespace MVP_Core.Controllers.Api
         public async Task<bool> GenerateAndSendCodeAsync(string email)
         {
             if (string.IsNullOrWhiteSpace(email) || !email.Contains('@'))
+            {
                 return false;
+            }
 
             try
             {
-                var code = GenerateCode();
-                var expiration = DateTime.UtcNow.AddMinutes(15);
+                string code = GenerateCode();
+                DateTime expiration = DateTime.UtcNow.AddMinutes(15);
 
                 // Remove any existing record for this email
                 var existing = await _db.EmailVerifications.FirstOrDefaultAsync(e => e.Email == email);
                 if (existing != null)
                 {
                     _db.EmailVerifications.Remove(existing);
-                    await _db.SaveChangesAsync();
+                    await _db.SaveChangesAsync().ConfigureAwait(false);
                 }
 
                 var verification = new EmailVerification
@@ -54,9 +54,9 @@ namespace MVP_Core.Controllers.Api
                 };
 
                 _db.EmailVerifications.Add(verification);
-                await _db.SaveChangesAsync();
+                await _db.SaveChangesAsync().ConfigureAwait(false);
 
-                return await SendEmailAsync(email, code);
+                return await SendEmailAsync(email, code).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -71,19 +71,26 @@ namespace MVP_Core.Controllers.Api
         public async Task<bool> VerifyCodeAsync(string email, string submittedCode)
         {
             if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(submittedCode))
+            {
                 return false;
+            }
 
             var record = await _db.EmailVerifications
                 .FirstOrDefaultAsync(e => e.Email == email && !e.IsVerified);
 
             if (record == null || record.Expiration < DateTime.UtcNow)
+            {
+                _logger.LogWarning("Verification failed: record not found or expired for {Email}", email);
                 return false;
+            }
 
-            if (record.Code.Trim() != submittedCode.Trim())
+            if (!SecureEquals(record.Code.Trim(), submittedCode.Trim()))
+            {
                 return false;
+            }
 
             record.IsVerified = true;
-            await _db.SaveChangesAsync();
+            await _db.SaveChangesAsync().ConfigureAwait(false);
             return true;
         }
 
@@ -99,7 +106,7 @@ namespace MVP_Core.Controllers.Api
             if (expired.Any())
             {
                 _db.EmailVerifications.RemoveRange(expired);
-                await _db.SaveChangesAsync();
+                await _db.SaveChangesAsync().ConfigureAwait(false);
             }
         }
 
@@ -111,13 +118,13 @@ namespace MVP_Core.Controllers.Api
             try
             {
                 var smtp = _config.GetSection("SMTP");
-                var host = smtp["Host"];
-                var port = int.Parse(smtp["Port"] ?? "587");
-                var user = smtp["Username"];
-                var pass = smtp["Password"];
-                var from = smtp["FromEmail_NoReply"];
-                var name = smtp["FromName"];
-                var enableSsl = bool.Parse(smtp["UseSSL"] ?? "true");
+                string? host = smtp["Host"];
+                int port = int.Parse(smtp["Port"] ?? "587");
+                string? user = smtp["Username"];
+                string? pass = smtp["Password"];
+                string? from = smtp["FromEmail"];
+                string? name = smtp["FromName"];
+                bool enableSsl = bool.Parse(smtp["UseSSL"] ?? "true");
 
                 var message = new MailMessage
                 {
@@ -135,7 +142,7 @@ namespace MVP_Core.Controllers.Api
                     EnableSsl = enableSsl
                 };
 
-                await client.SendMailAsync(message);
+                await client.SendMailAsync(message).ConfigureAwait(false);
                 return true;
             }
             catch (Exception ex)
@@ -150,8 +157,19 @@ namespace MVP_Core.Controllers.Api
         /// </summary>
         private string GenerateCode()
         {
-            var random = new Random();
-            return random.Next(100000, 999999).ToString();
+            byte[] bytes = new byte[4];
+            RandomNumberGenerator.Fill(bytes);
+            int value = BitConverter.ToInt32(bytes, 0) & 0x7FFFFFFF; // Ensure non-negative
+            return (value % 900000 + 100000).ToString("D6");
+        }
+
+        private static bool SecureEquals(string a, string b)
+        {
+            if (a.Length != b.Length) return false;
+            int result = 0;
+            for (int i = 0; i < a.Length; i++)
+                result |= a[i] ^ b[i];
+            return result == 0;
         }
     }
 }

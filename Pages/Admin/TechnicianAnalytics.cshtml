@@ -1,0 +1,372 @@
+@page
+@model MVP_Core.Pages.Admin.TechnicianAnalyticsModel
+@{
+    ViewData["Title"] = "Technician Analytics";
+    Layout = "/Pages/Shared/_Layout.cshtml";
+}
+<h2 class="mb-4">Technician Analytics Dashboard</h2>
+<form method="get" class="row g-3 mb-4 align-items-end">
+    <div class="col-md-4">
+        <label class="form-label">Select Technicians (up to 3)</label>
+        <select name="techIds" class="form-select" multiple size="3">
+            @foreach (var tech in Model.Technicians)
+            {
+                <option value="@tech.Id">@tech.FullName@if (Model.SelectedTechIds.Contains(tech.Id)) { <text> selected</text> }</option>
+            }
+        </select>
+        <small class="text-muted">Hold Ctrl/Cmd to select multiple</small>
+    </div>
+    <div class="col-md-3">
+        <label class="form-label">Start Date</label>
+        <input type="date" name="start" class="form-control" value="@Model.StartDate.ToString("yyyy-MM-dd")" />
+    </div>
+    <div class="col-md-3">
+        <label class="form-label">End Date</label>
+        <input type="date" name="end" class="form-control" value="@Model.EndDate.ToString("yyyy-MM-dd")" />
+    </div>
+    <div class="col-md-2">
+        <button type="submit" class="btn btn-primary w-100">Update</button>
+    </div>
+</form>
+<div class="row mb-4">
+    @foreach (var techId in Model.SelectedTechIds)
+    {
+        var kpi = Model.Analytics[techId];
+        var tech = Model.Technicians.FirstOrDefault(t => t.Id == techId);
+        <div class="col-md-3 mb-3">
+            <div class="card text-center">
+                <div class="card-header bg-info text-white">@tech?.FullName</div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="h5">@kpi.CloseRateTrends.LastOrDefault()?.CloseRate.ToString("P0") ?? "-"</div>
+                            <div class="small text-muted">Close Rate</div>
+                        </div>
+                        <div class="col-6">
+                            <div class="h5">@kpi.EtaSuccessRate.ToString("P0")</div>
+                            <div class="small text-muted">ETA Success</div>
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-6">
+                            <div class="h5">@kpi.AverageDelayMinutes.ToString("F1")</div>
+                            <div class="small text-muted">Avg Delay (min)</div>
+                        </div>
+                        <div class="col-6">
+                            <div class="h5">@kpi.CallbackTrends.Sum(x => x.CallbackCount)</div>
+                            <div class="small text-muted">Callbacks</div>
+                        </div>
+                    </div>
+                    <!-- Risk Status Card -->
+                    <div class="mt-3">
+                        <div class="card border-@((kpi.IsAtRisk ? "danger" : "success"))">
+                            <div class="card-header p-2">
+                                <span class="badge bg-@((kpi.IsAtRisk ? "danger" : "success"))">
+                                    @if (kpi.IsAtRisk) { <text>At Risk</text>; } else { <text>Safe</text>; }
+                                </span>
+                            </div>
+                            <div class="card-body p-2">
+                                <div class="mb-1">
+                                    <strong>Forecast (7d/30d):</strong><br />
+                                    <span class="me-2 @(kpi.CloseRateForecast7d < 0.8 ? "text-danger fw-bold" : "")">Close Rate: @kpi.CloseRateForecast7d.ToString("P0")</span>
+                                    <span class="me-2 @(kpi.CloseRateForecast30d < 0.8 ? "text-danger fw-bold" : "")">(@kpi.CloseRateForecast30d.ToString("P0"))</span><br />
+                                    <span class="me-2 @(kpi.CallbackRateForecast7d > 0.1 ? "text-danger fw-bold" : "")">Callback Rate: @kpi.CallbackRateForecast7d.ToString("P1")</span>
+                                    <span class="me-2 @(kpi.CallbackRateForecast30d > 0.1 ? "text-danger fw-bold" : "")">(@kpi.CallbackRateForecast30d.ToString("P1"))</span>
+                                </div>
+                                @if (kpi.IsAtRisk)
+                                {
+                                    <div class="alert alert-danger p-2 mt-2 mb-0">
+                                        <strong>? At Risk:</strong>
+                                        <ul class="mb-0">
+                                            @foreach (var flag in kpi.RiskFlags)
+                                            {
+                                                <li>@flag</li>
+                                            }
+                                        </ul>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    <!-- End Risk Status Card -->
+                </div>
+                <div class="card-footer">
+                    <button class="btn btn-outline-secondary btn-sm export-csv-btn" data-techid="@techId">Export CSV</button>
+                    <button class="btn btn-outline-primary btn-sm export-pdf-btn" data-techid="@techId">Export PDF</button>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+<div class="row mb-4">
+    <div class="col-12">
+        <canvas id="closeRateChart" height="120"></canvas>
+    </div>
+</div>
+<div class="row mb-4">
+    <div class="col-12">
+        <canvas id="callbackChart" height="120"></canvas>
+    </div>
+</div>
+<div class="row mb-4">
+    <div class="col-12">
+        <canvas id="etaChart" height="120"></canvas>
+    </div>
+</div>
+@if (Model.SelectedTechIds.Count > 1)
+{
+    <h4>Comparison Table</h4>
+    <div class="table-responsive mb-4">
+        <table class="table table-bordered text-center">
+            <thead class="table-light">
+                <tr>
+                    <th>Technician</th>
+                    <th>Close Rate</th>
+                    <th>ETA Success</th>
+                    <th>Avg Delay (min)</th>
+                    <th>Callbacks</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var techId in Model.SelectedTechIds)
+                {
+                    var kpi = Model.Analytics[techId];
+                    var tech = Model.Technicians.FirstOrDefault(t => t.Id == techId);
+                    <tr>
+                        <td>@tech?.FullName</td>
+                        <td>@(kpi.CloseRateTrends.LastOrDefault()?.CloseRate.ToString("P0") ?? "-")</td>
+                        <td>@kpi.EtaSuccessRate.ToString("P0")</td>
+                        <td>@kpi.AverageDelayMinutes.ToString("F1")</td>
+                        <td>@kpi.CallbackTrends.Sum(x => x.CallbackCount)</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <div class="mb-3">
+        <button class="btn btn-outline-secondary export-csv-btn" data-multitech="true">Export Comparison CSV</button>
+        <button class="btn btn-outline-primary export-pdf-btn" data-multitech="true">Export Comparison PDF</button>
+    </div>
+}
+<!-- HR Notes Modal -->
+<div class="modal fade" id="hrNotesModal" tabindex="-1" aria-labelledby="hrNotesModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="hrNotesModalLabel">Export Report</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div id="comparisonNote" class="alert alert-info d-none">Comparison report will be generated for selected technicians.</div>
+        <div class="mb-3">
+          <label for="hrNotesTextarea" class="form-label">HR Notes (optional)</label>
+          <textarea class="form-control" id="hrNotesTextarea" rows="3"></textarea>
+        </div>
+        <div class="d-flex justify-content-center">
+          <div class="spinner-border text-primary d-none" id="exportSpinner" role="status"><span class="visually-hidden">Exporting...</span></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="cancelExportBtn">Cancel</button>
+        <button type="button" class="btn btn-primary" id="confirmExportBtn">Export</button>
+      </div>
+    </div>
+  </div>
+</div>
+@section Scripts {
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
+<script>
+const analytics = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Analytics));
+const techs = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.SelectedTechIds));
+const techNames = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Technicians.ToDictionary(t => t.Id, t => t.FullName)));
+let exportType = null;
+let exportTechIds = [];
+let isMultiTech = false;
+function renderCloseRateChart() {
+    const ctx = document.getElementById('closeRateChart').getContext('2d');
+    if (window.closeRateChart) window.closeRateChart.destroy();
+    const datasets = techs.map((id, idx) => {
+        const data = analytics[id].CloseRateTrends.map(x => ({ x: `${x.Year}-${x.Month.toString().padStart(2,'0')}`, y: x.CloseRate }));
+        return {
+            label: techNames[id],
+            data: data,
+            borderColor: ['#0d6efd','#dc3545','#198754'][idx % 3],
+            backgroundColor: 'rgba(0,0,0,0)',
+            tension: 0.2
+        };
+    });
+    window.closeRateChart = new Chart(ctx, {
+        type: 'line',
+        data: { datasets },
+        options: {
+            plugins: { title: { display: true, text: 'Monthly Close Rate' } },
+            parsing: false,
+            scales: { x: { type: 'category', title: { display: true, text: 'Month' } }, y: { min: 0, max: 1, ticks: { callback: v => (v*100).toFixed(0)+'%' } } }
+        }
+    });
+}
+function renderCallbackChart() {
+    const ctx = document.getElementById('callbackChart').getContext('2d');
+    if (window.callbackChart) window.callbackChart.destroy();
+    const datasets = techs.map((id, idx) => {
+        const data = analytics[id].CallbackTrends.map(x => ({ x: x.Date.split('T')[0], y: x.CallbackCount }));
+        return {
+            label: techNames[id],
+            data: data,
+            borderColor: ['#0d6efd','#dc3545','#198754'][idx % 3],
+            backgroundColor: ['#0d6efd33','#dc354533','#19875433'][idx % 3],
+            type: 'bar'
+        };
+    });
+    window.callbackChart = new Chart(ctx, {
+        type: 'bar',
+        data: { datasets },
+        options: {
+            plugins: { title: { display: true, text: 'Callback Trend' } },
+            parsing: false,
+            scales: { x: { type: 'category', title: { display: true, text: 'Date' } }, y: { beginAtZero: true } }
+        }
+    });
+}
+function renderEtaChart() {
+    const ctx = document.getElementById('etaChart').getContext('2d');
+    if (window.etaChart) window.etaChart.destroy();
+    const datasets = techs.map((id, idx) => {
+        return [
+            {
+                label: techNames[id] + ' ETA Success',
+                data: [analytics[id].EtaSuccessRate],
+                backgroundColor: ['#0d6efd','#dc3545','#198754'][idx % 3],
+                type: 'bar',
+                order: 1
+            },
+            {
+                label: techNames[id] + ' Avg Delay',
+                data: [analytics[id].AverageDelayMinutes],
+                borderColor: ['#0d6efd','#dc3545','#198754'][idx % 3],
+                backgroundColor: 'rgba(0,0,0,0)',
+                type: 'line',
+                yAxisID: 'y1',
+                order: 2
+            }
+        ];
+    }).flat();
+    window.etaChart = new Chart(ctx, {
+        data: { labels: techs.map(id => techNames[id]), datasets },
+        options: {
+            plugins: { title: { display: true, text: 'ETA Success vs Avg Delay' } },
+            scales: {
+                y: { beginAtZero: true, max: 1, position: 'left', title: { display: true, text: 'ETA Success %' }, ticks: { callback: v => (v*100).toFixed(0)+'%' } },
+                y1: { beginAtZero: true, position: 'right', title: { display: true, text: 'Avg Delay (min)' }, grid: { drawOnChartArea: false } }
+            }
+        }
+    });
+}
+document.addEventListener('DOMContentLoaded', function () {
+    renderCloseRateChart();
+    renderCallbackChart();
+    renderEtaChart();
+    // SignalR for live analytics updates
+    const analyticsConnection = new signalR.HubConnectionBuilder().withUrl('/requesthub').build();
+    analyticsConnection.on('technicianAnalyticsUpdated', function () {
+        location.reload();
+    });
+    analyticsConnection.start().catch(function (err) { console.error(err.toString()); });
+
+    // Export button logic
+    document.querySelectorAll('.export-pdf-btn, .export-csv-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            exportType = btn.classList.contains('export-pdf-btn') ? 'pdf' : 'csv';
+            isMultiTech = btn.dataset.multitech === 'true';
+            if (isMultiTech) {
+                exportTechIds = techs;
+                document.getElementById('comparisonNote').classList.remove('d-none');
+            } else {
+                exportTechIds = [btn.dataset.techid];
+                document.getElementById('comparisonNote').classList.add('d-none');
+            }
+            document.getElementById('hrNotesTextarea').value = '';
+            var modal = new bootstrap.Modal(document.getElementById('hrNotesModal'));
+            modal.show();
+        });
+    });
+    document.getElementById('confirmExportBtn').addEventListener('click', function() {
+        doExport();
+    });
+});
+function doExport() {
+    // Disable export button, show spinner
+    document.getElementById('confirmExportBtn').disabled = true;
+    document.getElementById('exportSpinner').classList.remove('d-none');
+    // Collect chart images
+    const closeRateImg = document.getElementById('closeRateChart').toDataURL('image/png').split(',')[1];
+    const callbackImg = document.getElementById('callbackChart').toDataURL('image/png').split(',')[1];
+    const etaImg = document.getElementById('etaChart').toDataURL('image/png').split(',')[1];
+    const notes = document.getElementById('hrNotesTextarea').value;
+    if (exportType === 'pdf') {
+        if (isMultiTech) {
+            // POST to /api/technician/export-comparison-pdf
+            const formData = new FormData();
+            formData.append('techIds', exportTechIds.join(','));
+            formData.append('notes', notes);
+            formData.append('chartBase64s', closeRateImg);
+            formData.append('chartBase64s', callbackImg);
+            formData.append('chartBase64s', etaImg);
+            fetch('/api/technician/export-comparison-pdf', {
+                method: 'POST',
+                body: formData
+            })
+            .then(resp => resp.blob())
+            .then(blob => downloadBlob(blob, 'technician_comparison_report.pdf'))
+            .finally(resetExportModal);
+        } else {
+            // POST to /api/technician/{id}/export-pdf
+            const formData = new FormData();
+            formData.append('notes', notes);
+            formData.append('chartBase64', closeRateImg); // Only one chart for single tech
+            fetch(`/api/technician/${exportTechIds[0]}/export-pdf`, {
+                method: 'POST',
+                body: formData
+            })
+            .then(resp => resp.blob())
+            .then(blob => downloadBlob(blob, `technician_${exportTechIds[0]}_report.pdf`))
+            .finally(resetExportModal);
+        }
+    } else if (exportType === 'csv') {
+        // POST to /api/technician/export-csv
+        const formData = new FormData();
+        formData.append('techIds', exportTechIds.join(','));
+        fetch('/api/technician/export-csv', {
+            method: 'POST',
+            body: formData
+        })
+        .then(resp => resp.blob())
+        .then(blob => downloadBlob(blob, isMultiTech ? 'technician_comparison_analytics.csv' : `technician_${exportTechIds[0]}_analytics.csv`))
+        .finally(resetExportModal);
+    }
+}
+function downloadBlob(blob, filename) {
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => {
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+    }, 100);
+}
+function resetExportModal() {
+    document.getElementById('confirmExportBtn').disabled = false;
+    document.getElementById('exportSpinner').classList.add('d-none');
+    var modalEl = document.getElementById('hrNotesModal');
+    var modal = bootstrap.Modal.getInstance(modalEl);
+    if (modal) modal.hide();
+}
+</script>
+}
+<style>
+.card-header.bg-info { background: #0d6efd !important; }
+</style>

@@ -1,5 +1,3 @@
-using Microsoft.AspNetCore.Mvc.RazorPages;
-
 namespace MVP_Core.Pages.Legal
 {
     public class LicenseModel : PageModel

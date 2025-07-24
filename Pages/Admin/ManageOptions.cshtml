@@ -1,0 +1,70 @@
+@page
+@model MVP_Core.Pages.Admin.ManageOptionsModel
+@{
+    ViewData["Title"] = "Manage Question Options";
+    Layout = "~/Pages/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container mt-5">
+    <h2 class="mb-4">?? Manage Options for Question ID @Model.QuestionId</h2>
+
+    @if (TempData["Message"] != null)
+    {
+        <div class="alert alert-success">@TempData["Message"]</div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
+
+    <form method="post" asp-page-handler="Add" class="mb-4">
+        <div class="row g-2 align-items-end">
+            <div class="col-md-5">
+                <label asp-for="NewOption.OptionText" class="form-label">Option Text</label>
+                <input asp-for="NewOption.OptionText" class="form-control" required />
+            </div>
+            <div class="col-md-4">
+                <label asp-for="NewOption.OptionValue" class="form-label">Option Value</label>
+                <input asp-for="NewOption.OptionValue" class="form-control" />
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-success">? Add Option</button>
+            </div>
+        </div>
+    </form>
+
+    @if (Model.Options != null && Model.Options.Any())
+    {
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Text</th>
+                    <th>Value</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var opt in Model.Options)
+                {
+                    <tr>
+                        <td>@opt.Id</td>
+                        <td>@opt.OptionText</td>
+                        <td>@opt.OptionValue</td>
+                        <td>
+                            <form method="post" asp-page-handler="Delete" class="d-inline">
+                                <input type="hidden" name="optionId" value="@opt.Id" />
+                                <button type="submit" class="btn btn-danger btn-sm">??? Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <div class="alert alert-warning">No options found for this question.</div>
+    }
+    <a href="/Admin/EditQuestion?id=@Model.QuestionId" class="btn btn-secondary mt-3">Back to Question</a>
+</div>

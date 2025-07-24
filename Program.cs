@@ -1,152 +1,143 @@
-﻿// ------------------------
-// Program.cs
-// ------------------------
-
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Diagnostics;
-using Microsoft.EntityFrameworkCore;
-using MVP_Core.Data;
-using MVP_Core.Data.Seeders;
-using MVP_Core.Services;
-using MVP_Core.Services.Email;
 using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using MVP_Core.Controllers.Api;
+using MVP_Core.Services.Email;
+using MVP_Core.Services; // Only use this for AuditLogger and BackupReminderService
+using Wangkanai.Detection;
+using MVP_Core.Middleware;
+using MVP_Core.Helpers;
 
-internal class Program
-{
-    private static void Main(string[] args)
+var builder = WebApplication.CreateBuilder(args);
+
+builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+    ?? throw new InvalidOperationException("Connection string 'DefaultConnection' is missing.");
+
+// Add services
+builder.Services.AddControllersWithViews()
+    .AddJsonOptions(options =>
     {
-        var builder = WebApplication.CreateBuilder(args);
+        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
+        options.JsonSerializerOptions.WriteIndented = true;
+    });
 
-        // 🔧 Load Configuration
-        builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+builder.Services.AddRazorPages()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
+    });
 
-        var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
-            ?? throw new InvalidOperationException("Connection string 'DefaultConnection' is missing.");
+builder.Services.AddServerSideBlazor();
+builder.Services.AddSignalR();
 
-        Console.WriteLine("\u2705 Using Local Development Connection String");
+builder.Services.AddScoped<ISeoService, SeoService>();
+builder.Services.AddScoped<ContentService>();
+builder.Services.AddScoped<EmailService>();
+builder.Services.AddScoped<QuestionService>();
+builder.Services.AddScoped<BackgroundImageService>();
+builder.Services.AddScoped<SmsService>();
+builder.Services.AddScoped<ProfileReviewService>();
+builder.Services.AddScoped<AuditLogger>();
+builder.Services.AddScoped<EmailVerificationService>();
+builder.Services.AddHostedService<BackupReminderService>();
+builder.Services.AddHostedService<MVP_Core.Services.SlaEscalationService>();
+builder.Services.AddScoped<ITechnicianService, TechnicianService>();
+builder.Services.AddScoped<MVP_Core.Services.IDeviceResolver, MVP_Core.Services.DeviceResolver>();
+builder.Services.AddScoped<MVP_Core.Services.INotificationService, MVP_Core.Services.NotificationService>();
+builder.Services.AddScoped<MVP_Core.Services.TechnicianProfileService>();
+builder.Services.AddScoped<MVP_Core.Services.Reports.TechnicianReportService>();
+builder.Services.AddScoped<ITechnicianProfileService, TechnicianProfileService>();
 
-        // 🧱 MVC & Razor
-        builder.Services.AddControllersWithViews()
-            .AddJsonOptions(options =>
-            {
-                options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
-                options.JsonSerializerOptions.WriteIndented = true;
-            });
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer(connectionString));
 
-        builder.Services.AddRazorPages()
-            .AddJsonOptions(options =>
-            {
-                options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
-            });
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<SessionTracker>();
 
-        // ⚡ Blazor + SignalR
-        builder.Services.AddServerSideBlazor();
-        builder.Services.AddSignalR();
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(20);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+    options.Cookie.SameSite = SameSiteMode.Strict;
+});
 
-        // 🧩 Application Services (Scoped DI)
-        builder.Services.AddScoped<ISeoService, SeoService>();
-        builder.Services.AddScoped<SeoService>(); // 👈 Register concrete type
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/Login";
+        options.AccessDeniedPath = "/AccessDenied";
+        options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
+        options.SlidingExpiration = true;
+    });
 
-        builder.Services.AddScoped<ContentService>();
-        builder.Services.AddScoped<EmailService>();
-        builder.Services.AddScoped<QuestionService>();
-        builder.Services.AddScoped<BackgroundImageService>();
-        builder.Services.AddScoped<SmsService>();
-        builder.Services.AddScoped<ProfileReviewService>();
-        builder.Services.AddScoped<MVP_Core.Services.AuditLogger>();
+builder.Services.AddAuthorizationBuilder()
+    .AddPolicy("AdminPolicy", policy => policy.RequireRole("Admin"));
 
-        builder.Services.AddHostedService<MVP_Core.Services.BackupReminderService>();
+builder.Logging.ClearProviders();
+builder.Logging.AddSimpleConsole(options =>
+{
+    options.IncludeScopes = true;
+    options.TimestampFormat = "[yyyy-MM-dd HH:mm:ss] ";
+    options.SingleLine = false;
+});
+builder.Logging.AddDebug();
 
-        // 🗃️ EF Core DbContext
-        builder.Services.AddDbContext<ApplicationDbContext>(options =>
-            options.UseSqlServer(connectionString));
+var app = builder.Build();
 
-        // 🛎️ Session Setup
-        builder.Services.AddSession(options =>
-        {
-            options.IdleTimeout = TimeSpan.FromMinutes(20);
-            options.Cookie.HttpOnly = true;
-            options.Cookie.IsEssential = true;
-            options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-            options.Cookie.SameSite = SameSiteMode.Strict;
-        });
+builder.Services.Configure<MVP_Core.Services.Config.LoadBalancingConfig>(
+    builder.Configuration.GetSection("LoadBalancing"));
 
-        // 🔐 Authentication
-        builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-            .AddCookie(options =>
-            {
-                options.LoginPath = "/Login";
-                options.AccessDeniedPath = "/AccessDenied";
-                options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
-                options.SlidingExpiration = true;
-            });
+if (!app.Environment.IsDevelopment())
+{
+    app.UseExceptionHandler("/Error");
+    app.UseHsts();
+}
+else
+{
+    app.UseDeveloperExceptionPage();
+}
 
-        builder.Services.AddAuthorization(options =>
-        {
-            options.AddPolicy("AdminPolicy", policy => policy.RequireRole("Admin"));
-        });
+app.UseDetection();
+app.UseSecurityHeaders();
 
-        // 📋 Logging
-        builder.Logging.ClearProviders();
-        builder.Logging.AddSimpleConsole(options =>
-        {
-            options.IncludeScopes = true;
-            options.TimestampFormat = "[yyyy-MM-dd HH:mm:ss] ";
-            options.SingleLine = false;
-        });
-        builder.Logging.AddDebug();
+app.UseHttpsRedirection();
+app.UseStaticFiles();
+app.UseSession();
+app.UseRouting();
+app.UseAuthentication();
+app.UseAuthorization();
+app.UseStatusCodePagesWithReExecute("/Error");
 
-        var app = builder.Build();
+app.MapRazorPages();
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}");
+app.MapBlazorHub();
+app.MapHub<MVP_Core.Hubs.RequestHub>("/hubs/requests");
 
-        // 🌐 Global Error Handling
-        if (!app.Environment.IsDevelopment())
-        {
-            app.UseExceptionHandler("/Error");
-            app.UseHsts();
-        }
-        else
-        {
-            app.UseDeveloperExceptionPage();
-        }
+// DB Seeding
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    db.Database.Migrate();
+    MVP_Core.Data.Seeders.DatabaseSeeder.Seed(db);
+    MVP_Core.Data.Seeders.PagesSeeder.Seed(db);
 
-        // 🛡️ Basic Security Headers
-        app.Use(async (context, next) =>
-        {
-            context.Response.Headers.Append("X-Content-Type-Options", "nosniff");
-            context.Response.Headers.Append("X-Frame-Options", "DENY");
-            context.Response.Headers.Append("Content-Security-Policy", "default-src 'self'; script-src 'self';");
-            await next();
-        });
-
-        // 🚦 Middleware Pipeline
-        app.UseHttpsRedirection();
-        app.UseStaticFiles();
-        app.UseSession();
-        app.UseRouting();
-        app.UseAuthentication();
-        app.UseAuthorization();
-        app.UseStatusCodePagesWithReExecute("/Error");
-
-        // 📍 Endpoint Mapping
-        app.MapRazorPages();
-        app.MapControllerRoute(
-            name: "default",
-            pattern: "{controller=Home}/{action=Index}/{id?}");
-        app.MapBlazorHub();
-        app.MapFallbackToPage("/_Host");
-
-        // 🌱 Initial Database Seeding
-        using (var scope = app.Services.CreateScope())
-        {
-            var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-            db.Database.Migrate();
-            DatabaseSeeder.Seed(db);
-            PagesSeeder.Seed(db);
-
-            var imagePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "assets", "MSA-Atlanta.jpg");
-            ImageSeeder.SeedBackgroundImage(db, imagePath);
-        }
-
-        app.Run();
+    try
+    {
+        string imagePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "assets", "MSA-Atlanta.jpg");
+        MVP_Core.Data.Seeders.ImageSeeder.SeedBackgroundImage(db, imagePath);
+        var logger = scope.ServiceProvider.GetRequiredService<ILoggerFactory>().CreateLogger("Startup");
+        logger.LogInformation("Background image seeded successfully.");
+    }
+    catch (Exception ex)
+    {
+        var logger = scope.ServiceProvider.GetRequiredService<ILoggerFactory>().CreateLogger("Startup");
+        logger.LogError(ex, "Error seeding background image.");
     }
 }
+
+app.Run();

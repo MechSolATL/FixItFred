@@ -1,8 +1,3 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.Extensions.Logging;
-using System;
-
 namespace MVP_Core.Pages
 {
     public class BlockedModel : PageModel
@@ -19,7 +14,7 @@ namespace MVP_Core.Pages
 
         public IActionResult OnGet()
         {
-            _logger.LogWarning("🚫 Blocked user accessed /Blocked page. IP: {IP}", HttpContext.Connection.RemoteIpAddress);
+            _logger.LogWarning("?? Blocked user accessed /Blocked page. IP: {IP}", HttpContext.Connection.RemoteIpAddress);
 
             HttpContext.Response.StatusCode = 403; // Forbidden
 

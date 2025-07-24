@@ -1,5 +1,3 @@
-﻿using System.ComponentModel.DataAnnotations;
-
 namespace MVP_Core.Data.Models
 {
     public class Page
@@ -8,7 +6,7 @@ namespace MVP_Core.Data.Models
 
         [Required]
         [MaxLength(255)]
-        public string UrlPath { get; set; } = string.Empty; // 🛠️ Correct name for the path like "/services/plumbing"
+        public string UrlPath { get; set; } = string.Empty; // ??? Correct name for the path like "/services/plumbing"
 
         public bool IsPublic { get; set; } = true;
 

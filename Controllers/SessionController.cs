@@ -1,6 +1,3 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System.ComponentModel.DataAnnotations;
-
 namespace MVP_Core.Controllers
 {
     [ApiController]
@@ -16,7 +13,7 @@ namespace MVP_Core.Controllers
                 return BadRequest(ModelState);
             }
 
-            var sessionKey = $"Answer_{model.QuestionId}";
+            string sessionKey = $"Answer_{model.QuestionId}";
             HttpContext.Session.SetString(sessionKey, model.Answer ?? string.Empty);
 
             return Ok();
@@ -25,9 +22,9 @@ namespace MVP_Core.Controllers
         [HttpGet("load-answers")]
         public IActionResult LoadAnswers()
         {
-            var savedAnswers = new Dictionary<string, string>();
+            Dictionary<string, string> savedAnswers = [];
 
-            foreach (var key in HttpContext.Session.Keys)
+            foreach (string key in HttpContext.Session.Keys)
             {
                 if (key.StartsWith("Answer_"))
                 {

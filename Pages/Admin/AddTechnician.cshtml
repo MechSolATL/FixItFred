@@ -1,0 +1,24 @@
+@page
+@model MVP_Core.Pages.Admin.AddTechnicianModel
+@{
+    ViewData["Title"] = "Add Technician";
+    Layout = "/Pages/Shared/_Layout.cshtml";
+}
+
+<h2>Add New Technician</h2>
+
+<form method="post">
+    <div class="mb-3">
+        <label asp-for="Technician.FullName" class="form-label"></label>
+        <input asp-for="Technician.FullName" class="form-control" />
+        <span asp-validation-for="Technician.FullName" class="text-danger"></span>
+    </div>
+
+    <div class="form-check">
+        <input asp-for="Technician.IsActive" class="form-check-input" />
+        <label asp-for="Technician.IsActive" class="form-check-label"></label>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Add Technician</button>
+    <a asp-page="/Admin/Technicians" class="btn btn-secondary">Cancel</a>
+</form>

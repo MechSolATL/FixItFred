@@ -1,0 +1,29 @@
+@page
+@model MVP_Core.Pages.Admin.BlazorAdmin.Components.EscalationModalModel
+<div class="modal fade" tabindex="-1" id="escalationModal" aria-labelledby="escalationModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="escalationModalLabel">Escalate Job</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post">
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="escalationReason" class="form-label">Reason/Note</label>
+                    <textarea id="escalationReason" name="EscalationNote" class="form-control" rows="3">@Model.EscalationNote</textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn btn-warning">Escalate</button>
+            </div>
+            </form>
+        </div>
+    </div>
+</div>
+@section Scripts {
+<script>
+// JS to show/hide modal as needed
+</script>
+}

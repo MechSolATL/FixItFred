@@ -1,10 +1,3 @@
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Data;
-using MVP_Core.Data.Models;
-using System.ComponentModel.DataAnnotations;
-using Microsoft.EntityFrameworkCore;
-
 namespace MVP_Core.Pages.Admin
 {
     public class ProfileReviewModel : PageModel
@@ -40,8 +33,14 @@ namespace MVP_Core.Pages.Admin
 
         public async Task<IActionResult> OnGetAsync()
         {
-            var username = User.Identity?.Name;
-            var adminUser = await _dbContext.AdminUsers.FirstOrDefaultAsync(u => u.Username == username);
+            string? username = User?.Identity?.Name;
+
+            if (string.IsNullOrWhiteSpace(username))
+            {
+                return RedirectToPage("/AccessDenied");
+            }
+
+            AdminUser? adminUser = await _dbContext.AdminUsers.FirstOrDefaultAsync(u => u.Username == username);
 
             if (adminUser == null)
             {
@@ -50,6 +49,7 @@ namespace MVP_Core.Pages.Admin
 
             Username = adminUser.Username;
             Email = adminUser.Email;
+            PhoneNumber = adminUser.PhoneNumber ?? string.Empty;
 
             return Page();
         }
@@ -61,8 +61,14 @@ namespace MVP_Core.Pages.Admin
                 return Page();
             }
 
-            var username = User.Identity?.Name;
-            var adminUser = await _dbContext.AdminUsers.FirstOrDefaultAsync(u => u.Username == username);
+            string? username = User?.Identity?.Name;
+
+            if (string.IsNullOrWhiteSpace(username))
+            {
+                return RedirectToPage("/AccessDenied");
+            }
+
+            AdminUser? adminUser = await _dbContext.AdminUsers.FirstOrDefaultAsync(u => u.Username == username);
 
             if (adminUser == null)
             {
@@ -70,7 +76,9 @@ namespace MVP_Core.Pages.Admin
             }
 
             adminUser.LastProfileReviewDate = DateTime.UtcNow;
-            await _dbContext.SaveChangesAsync();
+            adminUser.ReviewNotes = ReviewNotes;
+
+            _ = await _dbContext.SaveChangesAsync();
 
             return RedirectToPage("/Admin/Index");
         }

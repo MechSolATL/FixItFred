@@ -1,7 +1,3 @@
-﻿using MVP_Core.Data;
-using MVP_Core.Data.Models;
-using Microsoft.EntityFrameworkCore;
-
 namespace MVP_Core.Middleware
 {
     public class ThreatFirewallMiddleware
@@ -15,8 +11,8 @@ namespace MVP_Core.Middleware
 
         public async Task Invoke(HttpContext context, ApplicationDbContext dbContext)
         {
-            var ipAddress = context.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
-            var userAgent = context.Request.Headers["User-Agent"].ToString() ?? "Unknown";
+            string ipAddress = context.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
+            string userAgent = context.Request.Headers["User-Agent"].ToString() ?? "Unknown";
 
             // Skip localhost during dev
             if (ipAddress.StartsWith("127.") || ipAddress == "::1")
@@ -25,7 +21,7 @@ namespace MVP_Core.Middleware
                 return;
             }
 
-            var threat = await dbContext.ThreatBlocks
+            ThreatBlock? threat = await dbContext.ThreatBlocks
                 .FirstOrDefaultAsync(t => t.IpAddress == ipAddress && t.UserAgent == userAgent);
 
             if (threat != null)
@@ -55,8 +51,8 @@ namespace MVP_Core.Middleware
 
         private async Task RegisterStrike(ApplicationDbContext dbContext, string ipAddress, string userAgent)
         {
-            var now = DateTime.UtcNow;
-            var threat = await dbContext.ThreatBlocks
+            DateTime now = DateTime.UtcNow;
+            ThreatBlock? threat = await dbContext.ThreatBlocks
                 .FirstOrDefaultAsync(t => t.IpAddress == ipAddress && t.UserAgent == userAgent);
 
             if (threat == null)
@@ -71,7 +67,7 @@ namespace MVP_Core.Middleware
                     IsPermanentlyBlocked = false,
                     BanLiftTime = now.AddHours(1) // First strike penalty
                 };
-                dbContext.ThreatBlocks.Add(threat);
+                _ = dbContext.ThreatBlocks.Add(threat);
             }
             else
             {
@@ -79,14 +75,20 @@ namespace MVP_Core.Middleware
                 threat.LastDetectedAt = now;
 
                 if (threat.StrikeCount == 2)
+                {
                     threat.BanLiftTime = now.AddHours(12);
+                }
                 else if (threat.StrikeCount == 3)
+                {
                     threat.BanLiftTime = now.AddHours(24);
+                }
                 else if (threat.StrikeCount >= 4)
+                {
                     threat.IsPermanentlyBlocked = true;
+                }
             }
 
-            await dbContext.SaveChangesAsync();
+            _ = dbContext.SaveChanges();
         }
     }
 }

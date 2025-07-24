@@ -1,8 +1,4 @@
-﻿using MVP_Core.Data;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Net.Http.Headers;
-using System;
 
 namespace MVP_Core.Controllers
 {
@@ -24,8 +20,8 @@ namespace MVP_Core.Controllers
         {
             try
             {
-                var image = await _context.BackgroundImages
-                    .OrderByDescending(b => b.UploadedAt)
+                BackgroundImage? image = await _context.BackgroundImages
+                    .OrderByDescending(static b => b.UploadedAt)
                     .FirstOrDefaultAsync();
 
                 if (image == null || image.ImageData == null)

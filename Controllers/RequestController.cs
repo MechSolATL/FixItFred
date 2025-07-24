@@ -1,5 +1,3 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using MVP_Core.Data.Models;
 using MVP_Core.Services.Email;
 
 namespace MVP_Core.Controllers
@@ -25,7 +23,7 @@ namespace MVP_Core.Controllers
             }
 
             // Save the service request
-            var requestId = await _serviceRequestService.CreateServiceRequestAsync(
+            _ = _serviceRequestService.CreateServiceRequest(
                 model.CustomerName,
                 model.Email,
                 model.Phone,

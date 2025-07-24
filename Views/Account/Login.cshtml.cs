@@ -1,7 +1,4 @@
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-
-namespace MVP_Core.wwwroot.Account
+namespace MVP_Core.Views.Account
 {
     public class LoginModel : PageModel
     {

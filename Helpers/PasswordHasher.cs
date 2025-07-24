@@ -1,4 +1,4 @@
-﻿using System.Security.Cryptography;
+using System.Security.Cryptography;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 
 namespace MVP_Core.Helpers
@@ -21,14 +21,16 @@ namespace MVP_Core.Helpers
 
         public static bool VerifyHashedPassword(string hashedPasswordWithSalt, string providedPassword)
         {
-            var parts = hashedPasswordWithSalt.Split('.');
+            string[] parts = hashedPasswordWithSalt.Split('.');
             if (parts.Length != 2)
+            {
                 return false;
+            }
 
-            var salt = Convert.FromBase64String(parts[0]);
-            var storedHash = parts[1];
+            byte[] salt = Convert.FromBase64String(parts[0]);
+            string storedHash = parts[1];
 
-            var hashOfProvided = Convert.ToBase64String(KeyDerivation.Pbkdf2(
+            string hashOfProvided = Convert.ToBase64String(KeyDerivation.Pbkdf2(
                 password: providedPassword,
                 salt: salt,
                 prf: KeyDerivationPrf.HMACSHA256,

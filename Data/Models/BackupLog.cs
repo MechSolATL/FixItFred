@@ -1,7 +1,4 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
-
-namespace MVP_Core.Models
+namespace MVP_Core.Data.Models
 {
     public class BackupLog
     {

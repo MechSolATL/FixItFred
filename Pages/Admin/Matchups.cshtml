@@ -1,0 +1,70 @@
+@page
+@model MVP_Core.Pages.Admin.MatchupsModel
+@{
+    ViewData["Title"] = "Heat Pump Matchups";
+}
+
+<h2 class="text-xl font-semibold mb-4">Heat Pump Matchups</h2>
+
+@if (TempData["Message"] != null)
+{
+    <div class="alert-success mb-4 px-4 py-2 rounded shadow">
+        @TempData["Message"]
+    </div>
+}
+
+<form method="get" class="mb-4 flex gap-4 items-end">
+    <div>
+        <label for="SelectedBrand">Brand:</label>
+        <select asp-for="SelectedBrand" asp-items="Model.Brands" class="form-select border rounded p-2">
+            <option value="">-- All Brands --</option>
+        </select>
+    </div>
+    <div>
+        <label for="SelectedSystemType">System Type:</label>
+        <select asp-for="SelectedSystemType" asp-items="Model.SystemTypes" class="form-select border rounded p-2">
+            <option value="">-- All Types --</option>
+        </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Filter</button>
+</form>
+
+@if (Model.FilteredMatchups.Any())
+{
+    <table class="table-auto w-full border border-gray-300">
+        <thead class="bg-gray-100">
+            <tr>
+                <th class="p-2 border">Brand</th>
+                <th class="p-2 border">System Type</th>
+                <th class="p-2 border">A-Coil</th>
+                <th class="p-2 border">Furnace</th>
+                <th class="p-2 border">ODU</th>
+                <th class="p-2 border">AHRI</th>
+                <th class="p-2 border">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var m in Model.FilteredMatchups)
+            {
+                <tr>
+                    <td class="border px-2 py-1">@m.Brand</td>
+                    <td class="border px-2 py-1">@m.SystemType</td>
+                    <td class="border px-2 py-1">@m.ACoilModel</td>
+                    <td class="border px-2 py-1">@m.FurnaceModel</td>
+                    <td class="border px-2 py-1">@m.OutdoorUnitModel</td>
+                    <td class="border px-2 py-1">@m.AHRICode</td>
+                    <td class="border px-2 py-1">
+                        <a asp-page="/Admin/EditMatchup" asp-route-id="@m.Id" class="btn btn-primary btn-sm mr-2">Edit</a>
+                        <form method="post" asp-page-handler="Delete" asp-route-id="@m.Id" class="inline-block" onsubmit="return confirm('Delete this entry?');">
+                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <div class="alert-warning mt-4">No matchups found for selected filters.</div>
+}

@@ -1,7 +1,3 @@
-﻿using MVP_Core.Data;
-using MVP_Core.Data.Models;
-using Microsoft.EntityFrameworkCore;
-
 namespace MVP_Core.Services
 {
     public class BackgroundImageService
@@ -16,7 +12,7 @@ namespace MVP_Core.Services
         public async Task<BackgroundImage?> GetLatestBackgroundImageAsync()
         {
             return await _context.BackgroundImages
-                .OrderByDescending(b => b.UploadedAt)
+                .OrderByDescending(static b => b.UploadedAt)
                 .FirstOrDefaultAsync();
         }
     }

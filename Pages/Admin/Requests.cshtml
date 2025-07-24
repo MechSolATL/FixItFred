@@ -1,0 +1,29 @@
+@page
+@model MVP_Core.Pages.Admin.RequestsModel
+
+@{
+    ViewData["Title"] = "Admin - Service Requests";
+    Layout = "/Pages/Shared/_Layout.cshtml";
+}
+
+<h2>All User Responses</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Question</th>
+            <th>Answer</th>
+            <th>Submitted At</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var response in Model.Responses)
+        {
+            <tr>
+                <td>@response.Question?.Text</td>
+                <td>@response.Response</td>
+                <td>@response.CreatedAt.ToString("g")</td>
+            </tr>
+        }
+    </tbody>
+</table>

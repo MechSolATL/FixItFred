@@ -1,9 +1,13 @@
-﻿@page
+@page
 @model MVP_Core.Pages.Profile.ProfileReviewModel
+@inject MVP_Core.Services.ISeoService SeoService
 @{
-    ViewData["Title"] = "Profile Review – Service Atlanta";
+    ViewData["Title"] = "Profile Review � Service Atlanta";
     Layout = "/Pages/Shared/_Layout.cshtml";
 }
+<head>
+    @await Html.PartialAsync("/Pages/Shared/_SEOHead.cshtml")
+</head>
 
 <div class="container mt-5">
     <h1 class="text-center mb-4" role="heading" aria-level="1">Profile Setup</h1>

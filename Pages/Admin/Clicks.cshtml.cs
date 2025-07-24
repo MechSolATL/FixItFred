@@ -1,8 +1,3 @@
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Data;
-using MVP_Core.Data.Models;
-using Microsoft.EntityFrameworkCore;
-
 namespace MVP_Core.Pages.Admin
 {
     public class ClicksModel : PageModel
@@ -19,7 +14,7 @@ namespace MVP_Core.Pages.Admin
         public async Task OnGetAsync()
         {
             ClickLogs = await _dbContext.PageVisits
-                .OrderByDescending(x => x.VisitTimestamp)
+                .OrderByDescending(static x => x.VisitTimestamp)
                 .Take(500)
                 .ToListAsync();
         }

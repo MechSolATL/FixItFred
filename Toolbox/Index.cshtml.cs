@@ -1,5 +1,4 @@
-using Microsoft.AspNetCore.Mvc.RazorPages;
- namespace MVP_Core.Toolbox
+namespace MVP_Core.Toolbox
 
 {
     public class IndexModel : PageModel

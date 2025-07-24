@@ -1,6 +1,3 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
-
 namespace MVP_Core.Data.Models
 {
     public class AdminUser
@@ -19,5 +16,11 @@ namespace MVP_Core.Data.Models
         public string? Role { get; set; }
 
         public DateTime? LastProfileReviewDate { get; set; }
+
+        [Phone]
+        public string? PhoneNumber { get; set; }
+
+        [StringLength(500)]
+        public string? ReviewNotes { get; set; }
     }
 }

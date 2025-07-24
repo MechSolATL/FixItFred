@@ -1,0 +1,39 @@
+@page
+@model MVP_Core.Pages.Admin.TechniciansModel
+@{
+    ViewData["Title"] = "Technician Management";
+    Layout = "/Pages/Shared/_Layout.cshtml";
+}
+
+<h2>Technicians</h2>
+
+<a asp-page="/Admin/AddTechnician" class="btn btn-success mb-3">Add Technician</a>
+
+<table class="table table-striped table-hover">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Status</th>
+            <th>Assigned Jobs</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var tech in Model.Technicians)
+        {
+            <tr class="@(tech.IsActive ? "" : "table-secondary")">
+                <td>@tech.FullName</td>
+                <td>
+                    <span class="badge @(tech.IsActive ? "bg-success" : "bg-danger")">
+                        @(tech.IsActive ? "Active" : "Inactive")
+                    </span>
+                </td>
+                <td>@tech.AssignedJobsCount</td>
+                <td>
+                    <a asp-page="/Admin/EditTechnician" asp-route-id="@tech.Id" class="btn btn-sm btn-primary">Edit</a>
+                    <a asp-page="/Admin/DeleteTechnician" asp-route-id="@tech.Id" class="btn btn-sm btn-danger">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

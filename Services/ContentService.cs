@@ -1,4 +1,4 @@
-﻿namespace MVP_Core.Services
+namespace MVP_Core.Services
 {
     public class ContentService
     {

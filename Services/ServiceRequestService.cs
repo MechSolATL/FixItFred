@@ -1,7 +1,3 @@
-﻿using MVP_Core.Data;
-using MVP_Core.Data.Models;
-using Microsoft.EntityFrameworkCore;
-
 namespace MVP_Core.Services
 {
     public class ServiceRequestService
@@ -16,7 +12,7 @@ namespace MVP_Core.Services
         /// <summary>
         /// Creates a new service request and returns its unique ID.
         /// </summary>
-        public async Task<int> CreateServiceRequestAsync(
+        public int CreateServiceRequest(
             string customerName,
             string email,
             string? phone,
@@ -29,15 +25,21 @@ namespace MVP_Core.Services
         )
         {
             if (string.IsNullOrWhiteSpace(customerName))
+            {
                 throw new ArgumentException("Customer name is required.", nameof(customerName));
+            }
 
             if (string.IsNullOrWhiteSpace(email))
+            {
                 throw new ArgumentException("Email is required.", nameof(email));
+            }
 
             if (string.IsNullOrWhiteSpace(serviceType))
+            {
                 throw new ArgumentException("Service type is required.", nameof(serviceType));
+            }
 
-            var request = new ServiceRequest
+            ServiceRequest request = new()
             {
                 CustomerName = customerName.Trim(),
                 Email = email.Trim(),
@@ -52,8 +54,8 @@ namespace MVP_Core.Services
                 Status = "Pending"
             };
 
-            _context.ServiceRequests.Add(request);
-            await _context.SaveChangesAsync();
+            _ = _context.ServiceRequests.Add(request);
+            _ = _context.SaveChanges();
 
             return request.Id;
         }

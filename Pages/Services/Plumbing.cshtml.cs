@@ -1,91 +1,109 @@
-﻿// =========================
-// File: Pages/Services/Plumbing.cshtml.cs
-// =========================
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using MVP_Core.Data;
 using MVP_Core.Data.Models;
-using MVP_Core.Helpers;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Http;
-using System.Linq;
+using MVP_Core.Services;
 using System.Threading.Tasks;
-using System;
-using MVP_Core.Models;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace MVP_Core.Pages.Services
 {
+    [ValidateAntiForgeryToken]
     public class PlumbingModel : PageModel
     {
+        private readonly QuestionService _questionService;
+        private readonly ISeoService _seoService;
         private readonly ApplicationDbContext _dbContext;
+        private readonly SessionTracker _session;
+        private readonly IDeviceResolver _deviceResolver;
 
-        public PlumbingModel(ApplicationDbContext dbContext)
+        public PlumbingModel(QuestionService questionService, ISeoService seoService, ApplicationDbContext dbContext, SessionTracker session, IDeviceResolver deviceResolver)
         {
+            _questionService = questionService;
+            _seoService = seoService;
             _dbContext = dbContext;
+            _session = session;
+            _deviceResolver = deviceResolver;
         }
 
         public Question? CurrentQuestion { get; set; }
-
         [BindProperty] public string UserAnswer { get; set; } = string.Empty;
         [BindProperty] public string Message { get; set; } = string.Empty;
-        [BindProperty] public bool IsSuccess { get; set; } = false;
+        [BindProperty] public bool IsSuccess { get; set; }
+        public List<string> CarouselImages { get; set; } = new();
+        public string? MarketingText { get; set; }
+        public int CurrentStep { get; set; }
+        public int TotalQuestions { get; set; }
+        public string ProgressPercent => TotalQuestions > 0 ? $"{CurrentStep * 100 / TotalQuestions}%" : "0%";
+        public string? FirstName => _session.CustomerName?.Split(' ').FirstOrDefault();
+        public bool IsVerified => _session.IsVerified;
+        public string VerifiedEmail => _session.CustomerEmail;
 
         private const string SessionKey = "ServiceRequest";
         private const string SessionStartKey = "ServiceRequestStart";
 
-        public int CurrentStep { get; set; } = 0;
-        public int TotalQuestions { get; set; } = 0;
-        public string ProgressPercent => TotalQuestions > 0 ? $"{CurrentStep * 100 / TotalQuestions}%" : "0%";
-
-        public string? FirstName => HttpContext.Session.GetObject<ServiceRequestSession>(SessionKey)?.CustomerName?.Split(' ').FirstOrDefault();
-
-        public bool IsVerified { get; set; } = false;
-        public string VerifiedEmail { get; set; } = string.Empty;
-
         public async Task<IActionResult> OnGetAsync()
         {
-            // 🛡️ Email Verification Check
-            IsVerified = HttpContext.Session.GetString("IsEmailVerified") == "true";
-            VerifiedEmail = HttpContext.Session.GetString("VerifiedEmail") ?? string.Empty;
-
             if (!IsVerified)
             {
                 Message = "Please verify your email before proceeding.";
                 return Page();
             }
 
-            // ✅ Inject SEO Metadata from DB
-            var seo = await _dbContext.SEOs.FirstOrDefaultAsync(s => s.PageName == "Plumbing");
-            if (seo != null)
-            {
-                ViewData["Title"] = seo.Title;
-                ViewData["MetaDescription"] = seo.MetaDescription;
-                ViewData["Keywords"] = seo.Keywords;
-                ViewData["Robots"] = "index, follow";
-            }
+            // SEO
+            var seo = await _seoService.GetSeoByPageNameAsync("Services/Plumbing");
+            ViewData["Title"] = seo?.Title ?? "Plumbing Service Request";
+            ViewData["MetaDescription"] = seo?.MetaDescription ?? "";
+            ViewData["Keywords"] = seo?.Keywords ?? "";
+            ViewData["Robots"] = seo?.Robots ?? "index, follow";
+            ViewData["DeviceType"] = _deviceResolver.GetDeviceType(HttpContext);
 
-            var session = HttpContext.Session.GetObject<ServiceRequestSession>(SessionKey) ?? new ServiceRequestSession { ServiceType = "Plumbing" };
+            // Content
+            CarouselImages = await _dbContext.Contents
+                .Where(c => c.PageName == "Services/Plumbing" && c.Section.StartsWith("Carousel"))
+                .OrderBy(c => c.Section)
+                .Select(c => c.ContentText)
+                .ToListAsync();
+            MarketingText = await _dbContext.Contents
+                .Where(c => c.PageName == "Services/Plumbing" && c.Section == "MarketingText")
+                .Select(c => c.ContentText)
+                .FirstOrDefaultAsync();
+
+            // Session Setup
+            var session = HttpContext.Session.GetObject<ServiceRequestSession>(SessionKey)
+                ?? new ServiceRequestSession { ServiceType = "Plumbing" };
             HttpContext.Session.SetObject(SessionKey, session);
 
             if (IsSessionExpired())
             {
                 TempData["Expired"] = true;
-                HttpContext.Session.Clear();
+                _session.ClearAll();
                 return RedirectToPage("/Services/Plumbing");
             }
 
-            var answeredIds = session.Answers.Keys.ToList();
+            var answeredIds = session.Answers?.Keys.ToList() ?? new List<int>();
 
             if (string.IsNullOrWhiteSpace(session.CustomerName))
             {
-                CurrentQuestion = new Question { Text = "👋 Hi there! What is your full name?", InputType = "text" };
+                CurrentQuestion = new Question
+                {
+                    Id = -1,
+                    Text = "What is your full name?",
+                    InputType = "text"
+                };
                 SetProgress(1, 2 + await GetTotalDynamicQuestions());
                 return Page();
             }
 
             if (string.IsNullOrWhiteSpace(session.Address))
             {
-                CurrentQuestion = new Question { Text = $"🏡 Nice to meet you {FirstName}! What's the service address?", InputType = "text" };
+                CurrentQuestion = new Question
+                {
+                    Id = -2,
+                    Text = $"Nice to meet you {FirstName}! What's the service address?",
+                    InputType = "text"
+                };
                 SetProgress(2, 2 + await GetTotalDynamicQuestions());
                 return Page();
             }
@@ -94,7 +112,8 @@ namespace MVP_Core.Pages.Services
                 .Include(q => q.Options)
                 .Where(q => q.ServiceType == "Plumbing")
                 .Where(q => q.ParentQuestionId == null ||
-                    (session.Answers.ContainsKey(q.ParentQuestionId.Value) && session.Answers[q.ParentQuestionId.Value].Answer == q.ExpectedAnswer))
+                            (session.Answers != null && session.Answers.ContainsKey(q.ParentQuestionId.Value) &&
+                             session.Answers[q.ParentQuestionId.Value].Answer == q.ExpectedAnswer))
                 .Where(q => !answeredIds.Contains(q.Id))
                 .OrderBy(q => q.Id)
                 .FirstOrDefaultAsync();
@@ -108,11 +127,9 @@ namespace MVP_Core.Pages.Services
             return Page();
         }
 
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> OnPostNextAsync()
         {
             var session = HttpContext.Session.GetObject<ServiceRequestSession>(SessionKey);
-
             if (session == null)
             {
                 TempData["Expired"] = true;
@@ -121,34 +138,34 @@ namespace MVP_Core.Pages.Services
 
             if (!ModelState.IsValid || string.IsNullOrWhiteSpace(UserAnswer) || UserAnswer.Trim().Length > 500)
             {
-                Message = "⚠️ Please provide a valid answer (max 500 characters).";
+                Message = "Please provide a valid answer (max 500 characters).";
                 return await OnGetAsync();
             }
 
-            var cleanAnswer = UserAnswer.Trim();
-
-            if (string.IsNullOrWhiteSpace(session.CustomerName))
+            string cleanAnswer = UserAnswer.Trim();
+            if (Request.Form.ContainsKey("questionId") && int.TryParse(Request.Form["questionId"], out int qid))
             {
-                session.CustomerName = cleanAnswer;
-            }
-            else if (string.IsNullOrWhiteSpace(session.Address))
-            {
-                session.Address = cleanAnswer;
-            }
-            else if (Request.Form.ContainsKey("questionId") && int.TryParse(Request.Form["questionId"], out var questionId))
-            {
-                session.Answers[questionId] = (cleanAnswer, DateTime.UtcNow);
+                if (qid == -1)
+                {
+                    session.CustomerName = cleanAnswer;
+                }
+                else if (qid == -2)
+                {
+                    session.Address = cleanAnswer;
+                }
+                else
+                {
+                    session.Answers[qid] = (cleanAnswer, DateTime.UtcNow);
+                }
             }
 
             HttpContext.Session.SetObject(SessionKey, session);
             return RedirectToPage();
         }
 
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> OnPostBackAsync()
+        public IActionResult OnPostBack()
         {
             var session = HttpContext.Session.GetObject<ServiceRequestSession>(SessionKey);
-
             if (session == null)
             {
                 TempData["Expired"] = true;
@@ -157,8 +174,7 @@ namespace MVP_Core.Pages.Services
 
             if (session.Answers.Any())
             {
-                var lastKey = session.Answers.Keys.Last();
-                session.Answers.Remove(lastKey);
+                _ = session.Answers.Remove(session.Answers.Keys.Last());
             }
             else if (!string.IsNullOrWhiteSpace(session.Address))
             {
@@ -181,16 +197,13 @@ namespace MVP_Core.Pages.Services
 
         private async Task<int> GetTotalDynamicQuestions()
         {
-            return await _dbContext.Questions.Where(q => q.ServiceType == "Plumbing").CountAsync();
+            return await _dbContext.Questions.CountAsync(q => q.ServiceType == "Plumbing");
         }
 
         private bool IsSessionExpired()
         {
-            var sessionStartString = HttpContext.Session.GetString(SessionStartKey);
-            if (!DateTime.TryParse(sessionStartString, out var sessionStart))
-                return true;
-
-            return (DateTime.UtcNow - sessionStart).TotalMinutes > 20;
+            string? sessionStartString = HttpContext.Session.GetString(SessionStartKey);
+            return !DateTime.TryParse(sessionStartString, out DateTime sessionStart) || (DateTime.UtcNow - sessionStart).TotalMinutes > 20;
         }
     }
 }

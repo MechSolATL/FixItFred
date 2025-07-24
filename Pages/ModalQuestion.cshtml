@@ -1,0 +1,68 @@
+@model MVP_Core.Data.Models.QuestionModalViewModel
+
+<div class="modal fade show d-block" tabindex="-1" role="dialog" style="background-color: rgba(0,0,0,0.5);">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content shadow">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">Service Request – @Model.ServiceType</h5>
+                <button type="button" class="btn-close" aria-label="Close" onclick="closeModal()"></button>
+            </div>
+
+            <div class="modal-body">
+                <form method="post" asp-page-handler="Post" asp-route-service="@Model.ServiceType" id="modalForm">
+                    <input type="hidden" asp-for="CurrentQuestion.Id" />
+                    <input type="hidden" asp-for="ServiceType" />
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">@Model.CurrentQuestion?.Text ?? "Missing question..."</label>
+
+                        @switch (Model.CurrentQuestion?.InputType?.ToLowerInvariant())
+                        {
+                            case "dropdown":
+                                <select class="form-select" asp-for="CurrentAnswer">
+                                    <option value="">--Select--</option>
+                                    @foreach (var option in Model.CurrentQuestion.Options ?? new List<MVP_Core.Data.Models.QuestionOption>())
+                                    {
+                                        <option value="@option.OptionText" selected="@(Model.CurrentAnswer == option.OptionText)">
+                                            @option.OptionText
+                                        </option>
+                                    }
+                                </select>
+                                break;
+
+                            case "textarea":
+                                <textarea class="form-control" rows="4" asp-for="CurrentAnswer">@Model.CurrentAnswer</textarea>
+                                break;
+
+                            default:
+                                <input type="text" class="form-control" asp-for="CurrentAnswer" value="@Model.CurrentAnswer" />
+                                break;
+                        }
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <form method="post" asp-page-handler="Back" asp-route-service="@Model.ServiceType">
+                            <input type="hidden" name="CurrentQuestion.Id" value="@Model.CurrentQuestion?.Id ?? 0" />
+                            <button type="submit" class="btn btn-outline-secondary">? Back</button>
+                        </form>
+
+                        <button type="submit" class="btn btn-success">Next ?</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="modal-footer d-flex justify-content-between align-items-center">
+                <small class="text-muted">Step @Model.StepNumber of @Model.TotalSteps</small>
+                <form method="post" asp-page-handler="Reset">
+                    <button class="btn btn-sm btn-danger" type="submit">Start Over</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function closeModal() {
+        document.getElementById("modalHost").innerHTML = "";
+    }
+</script>

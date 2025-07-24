@@ -1,0 +1,66 @@
+@page
+@model MVP_Core.Pages.SubmitModel
+@inject MVP_Core.Services.ISeoService SeoService
+@{
+    ViewData["Title"] = "Review & Submit Service Request";
+    Layout = "/Pages/Shared/_Layout.cshtml";
+}
+
+<head>
+    @await Html.PartialAsync("/Pages/Shared/_SEOHead.cshtml")
+</head>
+
+<h2 class="mt-4 mb-3">Review Your Service Request</h2>
+
+@if (Model.SessionData == null)
+{
+    <div class="alert alert-danger">Session expired or no request data found. Please <a href="/Services/Plumbing">start again</a>.</div>
+}
+else
+{
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <strong>Contact Information</strong>
+        </div>
+        <div class="card-body">
+            <dl class="row mb-0">
+                <dt class="col-sm-3">Name</dt>
+                <dd class="col-sm-9">@Model.SessionData.CustomerName</dd>
+                <dt class="col-sm-3">Email</dt>
+                <dd class="col-sm-9">@Model.SessionData.Email</dd>
+                <dt class="col-sm-3">Phone</dt>
+                <dd class="col-sm-9">@Model.SessionData.PhoneNumber</dd>
+                <dt class="col-sm-3">Address</dt>
+                <dd class="col-sm-9">@Model.SessionData.Address</dd>
+            </dl>
+        </div>
+    </div>
+    <div class="card mb-4">
+        <div class="card-header bg-secondary text-white">
+            <strong>Service Details</strong>
+        </div>
+        <div class="card-body">
+            <ul class="list-group">
+                @foreach (var answer in Model.SessionData.Answers)
+                {
+                    <li class="list-group-item">
+                        <strong>Question ID @answer.Key:</strong> @answer.Value.Answer
+                        <span class="text-muted small float-end">@answer.Value.AnsweredAt.ToString("g")</span>
+                    </li>
+                }
+            </ul>
+        </div>
+    </div>
+    <form method="post">
+        <div class="mb-3">
+            <div class="h-captcha" data-sitekey="111aae8c-e434-4ac6-ad28-1e580f5c728a"></div>
+            <input type="hidden" id="h-captcha-token" name="HCaptchaToken" />
+        </div>
+        <button type="submit" class="btn btn-success btn-lg">Submit Service Request</button>
+        <a href="/Services/Plumbing" class="btn btn-link">Back to Edit</a>
+    </form>
+}
+
+@section Scripts {
+    <script src="https://hcaptcha.com/1/api.js" async defer></script>
+}

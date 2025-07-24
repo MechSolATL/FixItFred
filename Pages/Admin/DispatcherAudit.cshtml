@@ -1,0 +1,40 @@
+@page
+@using MVP_Core.Models.Admin
+@inject MVP_Core.Services.Admin.DispatcherService DispatcherService
+@{
+    ViewData["Title"] = "Dispatcher Command Log";
+    var auditLog = DispatcherService.GetAuditLog();
+}
+<h2 class="mb-4">Dispatcher Command Log</h2>
+@if (auditLog == null || !auditLog.Any())
+{
+    <div class="alert alert-info">No actions have been logged.</div>
+}
+else
+{
+    <table class="table table-bordered table-hover">
+        <thead class="table-light">
+            <tr>
+                <th>Date</th>
+                <th>Action Type</th>
+                <th>Request ID</th>
+                <th>Technician</th>
+                <th>Performed By</th>
+                <th>Notes</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var entry in auditLog)
+        {
+            <tr>
+                <td>@entry.Timestamp.ToString("g")</td>
+                <td>@entry.ActionType</td>
+                <td>@entry.RequestId</td>
+                <td>@(entry.TechnicianId?.ToString() ?? "-")</td>
+                <td>@entry.PerformedBy</td>
+                <td>@entry.Notes</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}

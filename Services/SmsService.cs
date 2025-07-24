@@ -1,6 +1,5 @@
-﻿using Twilio;
+using Twilio;
 using Twilio.Rest.Api.V2010.Account;
-using Microsoft.Extensions.Configuration;
 
 namespace MVP_Core.Services
 {
@@ -37,8 +36,8 @@ namespace MVP_Core.Services
             {
                 TwilioClient.Init(_accountSid, _authToken);
 
-                var message = await MessageResource.CreateAsync(
-                    body: $"🔐 Your Service-Atlanta verification code is: {code}",
+                MessageResource message = await MessageResource.CreateAsync(
+                    body: $"?? Your Service-Atlanta verification code is: {code}",
                     from: new Twilio.Types.PhoneNumber(_fromPhone),
                     to: new Twilio.Types.PhoneNumber(phoneNumber)
                 );
@@ -46,6 +45,9 @@ namespace MVP_Core.Services
                 return message.ErrorCode == null;
             }
             catch (Exception ex)
+            {
+                Console.WriteLine($"SMS error: {ex.Message}");
+            }
             {
                 // Optional: log ex with ILogger for audit
                 return false;

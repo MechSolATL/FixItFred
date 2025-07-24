@@ -1,0 +1,11 @@
+@* _SEOHead.cshtml: Injects SEO metadata into the <head> section. *@
+@{
+    var title = ViewData["Title"] as string ?? "Service Atlanta";
+    var metaDescription = ViewData["MetaDescription"] as string ?? "Your trusted pros for Plumbing, HVAC, and Water Filtration.";
+    var keywords = ViewData["Keywords"] as string ?? "plumbing, HVAC, heating, air conditioning, water filtration";
+    var robots = ViewData["Robots"] as string ?? "index, follow";
+}
+<title>@title</title>
+<meta name="description" content="@metaDescription" />
+<meta name="keywords" content="@keywords" />
+<meta name="robots" content="@robots" />

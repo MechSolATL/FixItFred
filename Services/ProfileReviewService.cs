@@ -1,5 +1,4 @@
-﻿using MVP_Core.Data;
-using MVP_Core.Data.Models;
+// ? File: E:\source\MVP-Core\Services\ProfileReviewService.cs
 
 namespace MVP_Core.Services
 {
@@ -12,24 +11,30 @@ namespace MVP_Core.Services
             _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
         }
 
-        public async Task SaveProfileReviewAsync(ProfileReviewModel profileReviewData)
+        public void SaveProfileReview(ProfileReview profileReviewData)
         {
             if (profileReviewData == null)
-                throw new ArgumentNullException(nameof(profileReviewData));
-
-            var profileEntity = new ProfileReview
             {
-                Username = profileReviewData.Username,
-                Email = profileReviewData.Email,
-                PhoneNumber = profileReviewData.PhoneNumber,
-                VerificationCode = profileReviewData.VerificationCode,
-                ReviewNotes = profileReviewData.ReviewNotes,
-                CreatedAt = DateTime.UtcNow,
-                SubmittedAt = DateTime.UtcNow
-            };
+                throw new ArgumentNullException(nameof(profileReviewData));
+            }
 
-            _dbContext.ProfileReviews.Add(profileEntity);
-            await _dbContext.SaveChangesAsync();
+            profileReviewData.SubmittedAt = DateTime.UtcNow;
+
+            _ = _dbContext.ProfileReviews.Add(profileReviewData);
+            _ = _dbContext.SaveChanges();
+        }
+
+        public List<ProfileReview> GetAll()
+        {
+            return _dbContext.ProfileReviews
+                .OrderByDescending(static p => p.CreatedAt)
+                .ToList();
+        }
+
+        public ProfileReview? GetById(int id)
+        {
+            return _dbContext.ProfileReviews
+                .FirstOrDefault(p => p.Id == id);
         }
     }
 }

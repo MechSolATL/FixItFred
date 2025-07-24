@@ -1,6 +1,3 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
-
 namespace MVP_Core.Data.Models
 {
     public class Question
@@ -60,6 +57,7 @@ namespace MVP_Core.Data.Models
         /// <summary>
         /// If true, this question is global and reused across services.
         /// </summary>
+        /// [NotMapped] // EF will skip this property during migrations
         public bool IsGlobal { get; set; } = false;
 
         /// <summary>

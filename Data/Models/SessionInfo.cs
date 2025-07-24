@@ -1,4 +1,4 @@
-﻿namespace MVP_Core.Data.Models
+namespace MVP_Core.Data.Models
 {
     public class SessionInfo
     {

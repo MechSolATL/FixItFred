@@ -1,11 +1,6 @@
-﻿// ===============================
-// 📂 File: Data/Seeders/ImageSeeder.cs
 // ===============================
-
-using System;
-using System.IO;
-using MVP_Core.Data;
-using MVP_Core.Data.Models;
+// ?? File: Data/Seeders/ImageSeeder.cs
+// ===============================
 
 namespace MVP_Core.Data.Seeders
 {
@@ -17,20 +12,20 @@ namespace MVP_Core.Data.Seeders
             {
                 if (File.Exists(imagePath))
                 {
-                    var imageBytes = File.ReadAllBytes(imagePath);
+                    byte[] imageBytes = File.ReadAllBytes(imagePath);
 
-                    var backgroundImage = new BackgroundImage
+                    BackgroundImage backgroundImage = new()
                     {
                         ImageData = imageBytes,
                         ContentType = "image/jpeg"
                     };
 
-                    dbContext.BackgroundImages.Add(backgroundImage);
-                    dbContext.SaveChanges();
+                    _ = dbContext.BackgroundImages.Add(backgroundImage);
+                    _ = dbContext.SaveChanges();
                 }
                 else
                 {
-                    Console.WriteLine($"⚠️ Image file not found at: {imagePath}");
+                    Console.WriteLine($"?? Image file not found at: {imagePath}");
                 }
             }
         }

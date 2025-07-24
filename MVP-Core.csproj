@@ -1,19 +1,22 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>MVP_Core</RootNamespace>
+    <UserSecretsId>service-atlanta-mvp-core-2025</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Pages\Index.cshtml.cs" />
+    <!-- Exclude legacy or duplicate files -->
+    <Compile Remove="Data\Models\_SEO.cs" />
     <Compile Remove="Pages\Shared\MainLayout.cshtml.cs" />
+    <Compile Remove="Pages\Shared\_Layout.cshtml.cs" />
+    <Compile Remove="Data\Models\Seo\SeoMeta.cs" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Remove="Pages\Index.cshtml" />
     <Content Remove="Pages\Shared\MainLayout.cshtml" />
   </ItemGroup>
 
@@ -27,32 +30,47 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- Package references: EF Core, Logging, Config, SendGrid, Twilio -->
+    <PackageReference Include="EPPlus" Version="8.0.8" />
+    <PackageReference Include="GoogleApi" Version="5.8.6" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.5" />
     <PackageReference Include="Microsoft.AspNetCore.Session" Version="2.3.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.4" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.4">
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="9.0.7" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.6" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.6">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.4" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.4">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.0.6" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.6" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.6">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.4" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.4" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.4" />
-    <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.4" />
-    <PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.4" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="9.0.4" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.5" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.5" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.7" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.5" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.7" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="9.0.5" />
+    <PackageReference Include="QuestPDF" Version="2025.7.0" />
     <PackageReference Include="SendGrid" Version="9.29.3" />
-    <PackageReference Include="Serilog" Version="4.2.0" />
+    <PackageReference Include="Serilog" Version="4.3.0" />
     <PackageReference Include="Serilog.Extensions.Logging.File" Version="3.0.0" />
-    <PackageReference Include="Twilio" Version="7.10.0" />
+    <PackageReference Include="Twilio" Version="7.11.1" />
+    <PackageReference Include="Wangkanai.Detection" Version="8.15.0" />
+    <PackageReference Include="xunit" Version="2.4.2" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Data\Services\" />
     <Folder Include="wwwroot\assets\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include=".git\hooks\pre-push" />
+    <None Include=".git\hooks\pre-push.sample" />
+    <None Include="Pages\Shared\_Layout.cshtml.cs" />
+  </ItemGroup>
+
 </Project>
+

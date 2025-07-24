@@ -1,0 +1,112 @@
+@* Tablet Layout for Service Atlanta *@
+@{
+    Layout = null;
+    var deviceType = Context.Items["DeviceType"]?.ToString() ?? "Unknown";
+    var isTablet = deviceType == "Tablet";
+    ViewData["Title"] ??= "Service Atlanta";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewData["Title"] - Service Atlanta</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="@ViewData["MetaDescription"]" />
+    <meta name="keywords" content="@ViewData["Keywords"]" />
+    <meta name="robots" content="@ViewData["Robots"]" />
+
+    <!-- ??? Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
+
+    <!-- ?? Styles -->
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f4f4f4;
+            padding-top: 70px;
+        }
+
+        header {
+            background-color: #004080;
+            color: white;
+            padding: 15px 25px;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 999;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .tablet-nav a {
+            margin-right: 20px;
+            color: white;
+            text-decoration: none;
+            font-size: 1rem;
+        }
+
+            .tablet-nav a:hover {
+                text-decoration: underline;
+            }
+
+        .content-wrapper {
+            padding: 30px;
+        }
+
+        footer {
+            background-color: #222;
+            color: #ccc;
+            font-size: 10pt;
+            text-align: center;
+            padding: 15px;
+        }
+    </style>
+</head>
+<body>
+    <!-- ?? Header -->
+    <header role="banner" aria-label="Tablet Header">
+        <div class="d-flex justify-content-between align-items-center">
+            <span class="fw-bold fs-5">Service Atlanta</span>
+            <nav class="tablet-nav" role="navigation" aria-label="Tablet Menu">
+                <a href="/Index">Home</a>
+                <a href="/Services/Plumbing">Plumbing</a>
+                <a href="/Verify">Verify</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- ?? Page Body -->
+    <main role="main">
+        <div class="content-wrapper">
+            @RenderBody()
+        </div>
+    </main>
+
+    <!-- ?? Footer -->
+    <footer role="contentinfo">
+        &copy; 1997–2025 <strong>Virtual Concepts</strong> for
+        <a href="https://service-atlanta.com" target="_blank" style="color: #aaa;">service-atlanta.com</a><br />
+        <a href="/Privacy" style="color: #aaa;">Privacy</a> |
+        <a href="/Legal/Terms" style="color: #aaa;">Terms</a>
+    </footer>
+
+    <!-- ?? Scripts -->
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+
+    <!-- ?? Anti-Inspect Protection -->
+    <script>
+        document.addEventListener('contextmenu', e => e.preventDefault());
+        document.addEventListener('keydown', e => {
+            if ((e.ctrlKey && ['u', 's', 'p'].includes(e.key.toLowerCase())) ||
+                e.key === 'F12' ||
+                (e.ctrlKey && e.shiftKey && ['i'].includes(e.key.toLowerCase()))) {
+                e.preventDefault();
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,141 @@
+@*
+    Layout: Mobile View for Service Atlanta
+    Features: SEO, Accessibility, Click Tracking, Mobile Nav
+*@
+@{
+    Layout = null;
+    var deviceType = Context.Items["DeviceType"]?.ToString() ?? "Unknown";
+    var isMobile = deviceType == "Mobile";
+    ViewData["Title"] ??= "Service Atlanta";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewData["Title"] - Service Atlanta</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="@ViewData["MetaDescription"]" />
+    <meta name="keywords" content="@ViewData["Keywords"]" />
+    <meta name="robots" content="@ViewData["Robots"]" />
+
+    <!-- ??? Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
+
+    <!-- ?? Styles -->
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8f9fa;
+            padding-top: 60px;
+        }
+
+        header {
+            background-color: #003366;
+            color: white;
+            padding: 10px 20px;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 999;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .mobile-nav a {
+            display: inline-block;
+            margin: 0 8px;
+            color: #ffffff;
+            font-size: 0.85rem;
+            text-decoration: none;
+        }
+
+            .mobile-nav a:hover {
+                text-decoration: underline;
+            }
+
+        .content-wrapper {
+            padding: 20px;
+        }
+
+        footer {
+            background-color: #222;
+            color: #ccc;
+            font-size: 10pt;
+            text-align: center;
+            padding: 15px;
+        }
+    </style>
+</head>
+<body>
+    <!-- ?? Header -->
+    <header role="banner" aria-label="Mobile Header">
+        <div class="d-flex justify-content-between align-items-center">
+            <span class="navbar-brand">Service Atlanta</span>
+            <nav class="mobile-nav" role="navigation" aria-label="Mobile menu">
+                <a href="/Index">Home</a>
+                <a href="/Services/Plumbing">Plumbing</a>
+                <a href="/Verify">Verify</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- ?? Main -->
+    <main role="main">
+        <div class="content-wrapper">
+            @RenderBody()
+        </div>
+    </main>
+
+    <!-- ?? Footer -->
+    <footer role="contentinfo">
+        &copy; 1997–2025 <strong>Virtual Concepts</strong> for
+        <a href="https://service-atlanta.com" target="_blank" style="color: #aaa;">service-atlanta.com</a><br />
+        <a href="/Privacy" style="color: #aaa;">Privacy</a> |
+        <a href="/Legal/Terms" style="color: #aaa;">Terms</a>
+    </footer>
+
+    <!-- ?? Scripts -->
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+
+    <!-- ?? Anti-Inspect -->
+    <script>
+        document.addEventListener('contextmenu', e => e.preventDefault());
+        document.addEventListener('keydown', e => {
+            if (
+                (e.ctrlKey && ['u','s','p'].includes(e.key.toLowerCase())) ||
+                (e.ctrlKey && e.shiftKey && ['i'].includes(e.key.toLowerCase())) ||
+                e.key === 'F12'
+            ) {
+                e.preventDefault();
+            }
+        });
+    </script>
+
+    <!-- ??? Click Tracking -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            document.body.addEventListener('click', e => {
+                const el = e.target.closest('button, a, input[type="submit"], input[type="button"]');
+                if (!el) return;
+                const clicked = el.innerText?.trim() || el.getAttribute('aria-label') || el.getAttribute('alt');
+                if (clicked?.length > 1) {
+                    fetch('/api/click-log', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ clickText: clicked, pageName: window.location.pathname })
+                    }).catch(err => console.warn("Tracking error:", err));
+                }
+            });
+        });
+    </script>
+</body>
+</html>

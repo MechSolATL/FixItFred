@@ -1,4 +1,3 @@
-﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -11,9 +10,9 @@ namespace MVP_Core.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.CreateTable(
+            _ = migrationBuilder.CreateTable(
                 name: "PageVisitLogs",
-                columns: table => new
+                columns: static table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
@@ -24,14 +23,14 @@ namespace MVP_Core.Migrations
                     StatusCode = table.Column<int>(type: "int", nullable: true),
                     VisitTimeUtc = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
-                constraints: table =>
+                constraints: static table =>
                 {
-                    table.PrimaryKey("PK_PageVisitLogs", x => x.Id);
+                    _ = table.PrimaryKey("PK_PageVisitLogs", static x => x.Id);
                 });
 
-            migrationBuilder.CreateTable(
+            _ = migrationBuilder.CreateTable(
                 name: "PageVisits",
-                columns: table => new
+                columns: static table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
@@ -40,19 +39,19 @@ namespace MVP_Core.Migrations
                     VisitTimestamp = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UserClick = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
-                constraints: table =>
+                constraints: static table =>
                 {
-                    table.PrimaryKey("PK_PageVisits", x => x.Id);
+                    _ = table.PrimaryKey("PK_PageVisits", static x => x.Id);
                 });
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
+            _ = migrationBuilder.DropTable(
                 name: "PageVisitLogs");
 
-            migrationBuilder.DropTable(
+            _ = migrationBuilder.DropTable(
                 name: "PageVisits");
         }
     }

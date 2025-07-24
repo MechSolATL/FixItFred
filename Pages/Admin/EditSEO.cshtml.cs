@@ -1,32 +1,48 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using MVP_Core.Data.Models;
+using MVP_Core.Services;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Data;
-using MVP_Core.Data.Models;
+using System.Threading.Tasks;
 
 namespace MVP_Core.Pages.Admin
 {
+    [Authorize(Policy = "AdminPolicy")]
+    [ValidateAntiForgeryToken]
     public class EditSEOModel : PageModel
     {
         private readonly ApplicationDbContext _dbContext;
+        private readonly ISeoService _seoService;
+        private readonly SessionTracker _session;
+        private readonly IDeviceResolver _deviceResolver;
 
-        public EditSEOModel(ApplicationDbContext dbContext)
+        public EditSEOModel(ApplicationDbContext dbContext, ISeoService seoService, SessionTracker session, IDeviceResolver deviceResolver)
         {
             _dbContext = dbContext;
+            _seoService = seoService;
+            _session = session;
+            _deviceResolver = deviceResolver;
         }
 
         [BindProperty]
-        public SEO SEO { get; set; } = new SEO();
+        public SeoMeta SeoMeta { get; set; } = new SeoMeta();
 
-        public IActionResult OnGet(int id)
+        public async Task<IActionResult> OnGetAsync(int id)
         {
-            SEO = _dbContext.SEOs.FirstOrDefault(seo => seo.Id == id);
+            ViewData["Title"] = "Edit SEO";
+            var meta = await _seoService.GetSeoByPageNameAsync("EditSEO");
+            ViewData["MetaDescription"] = meta?.MetaDescription;
+            ViewData["Keywords"] = meta?.Keywords;
+            ViewData["Robots"] = meta?.Robots;
+            ViewData["DeviceType"] = _deviceResolver.GetDeviceType(HttpContext);
 
-            if (SEO == null)
+            SeoMeta? found = _dbContext.SEOs.FirstOrDefault(s => s.Id == id);
+            if (found == null)
             {
-                TempData["Error"] = "SEO entry not found.";
+                TempData["Error"] = "SeoMeta entry not found.";
                 return RedirectToPage("/Admin/ManageSEO");
             }
-
+            SeoMeta = found;
             return Page();
         }
 
@@ -36,24 +52,19 @@ namespace MVP_Core.Pages.Admin
             {
                 return Page();
             }
-
-            var existingSEO = await _dbContext.SEOs.FindAsync(SEO.Id);
-
-            if (existingSEO == null)
+            SeoMeta? existing = await _dbContext.SEOs.FindAsync(SeoMeta.Id);
+            if (existing == null)
             {
-                TempData["Error"] = "SEO entry not found.";
+                TempData["Error"] = "SeoMeta entry not found.";
                 return RedirectToPage("/Admin/ManageSEO");
             }
-
-            // Update fields
-            existingSEO.Title = SEO.Title;
-            existingSEO.MetaDescription = SEO.MetaDescription;
-            existingSEO.Keywords = SEO.Keywords;
-            existingSEO.RobotsMeta = SEO.RobotsMeta;
-
-            await _dbContext.SaveChangesAsync();
-
-            TempData["Message"] = "✅ SEO entry updated successfully!";
+            existing.Title = SeoMeta.Title;
+            existing.MetaDescription = SeoMeta.MetaDescription;
+            existing.Keywords = SeoMeta.Keywords;
+            existing.Robots = SeoMeta.Robots;
+            existing.PageName = SeoMeta.PageName;
+            _ = await _dbContext.SaveChangesAsync();
+            TempData["Message"] = "✅ SeoMeta entry updated successfully!";
             return RedirectToPage("/Admin/ManageSEO");
         }
     }

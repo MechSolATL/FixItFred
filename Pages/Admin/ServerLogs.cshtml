@@ -1,4 +1,4 @@
-﻿@page
+@page
 @model MVP_Core.Pages.Admin.ServerLogsModel
 
 @{
@@ -6,7 +6,7 @@
     Layout = "~/Pages/Shared/_Layout.cshtml";
 }
 
-<h1 class="mt-4">🛡️ Server Logs & Page Visits</h1>
+<h1 class="mt-4">??? Server Logs & Page Visits</h1>
 
 @if (Model.Logs.Any())
 {
@@ -40,28 +40,28 @@
 
     <hr class="my-5" />
 
-    <h2 class="mb-4">📈 Traffic Insights (Last 1000 Visits)</h2>
+    <h2 class="mb-4">?? Traffic Insights (Last 1000 Visits)</h2>
     <div class="chart-container" style="max-width:800px; margin:auto;">
         <canvas id="pageViewsChart"></canvas>
     </div>
 
     <hr class="my-5" />
 
-    <h2 class="mb-4">🧠 Browser Usage Breakdown</h2>
+    <h2 class="mb-4">?? Browser Usage Breakdown</h2>
     <div class="chart-container" style="max-width:800px; margin:auto;">
         <canvas id="browserUsageChart"></canvas>
     </div>
 
     <hr class="my-5" />
 
-    <h2 class="mb-4">🌎 Referrer Sources</h2>
+    <h2 class="mb-4">?? Referrer Sources</h2>
     <div class="chart-container" style="max-width:800px; margin:auto;">
         <canvas id="referrerChart"></canvas>
     </div>
 
     <hr class="my-5" />
 
-    <h2 class="mb-4 text-danger">🚨 Threat Monitor</h2>
+    <h2 class="mb-4 text-danger">?? Threat Monitor</h2>
 
     @if (Model.Threats.Any())
     {
@@ -83,8 +83,8 @@
                             <td>@threat.IpAddress</td>
                             <td>@threat.TotalHits</td>
                             <td>@threat.ErrorCount</td>
-                            <td>@(threat.IsSuspiciousReferrer ? "⚠️ Yes" : "✅ No")</td>
-                            <td>@(threat.IsBotDetected ? "🤖 Yes" : "✅ No")</td>
+                            <td>@(threat.IsSuspiciousReferrer ? "?? Yes" : "? No")</td>
+                            <td>@(threat.IsBotDetected ? "?? Yes" : "? No")</td>
                         </tr>
                     }
                 </tbody>
@@ -94,14 +94,14 @@
     else
     {
         <div class="alert alert-success">
-            ✅ No suspicious activity detected!
+            ? No suspicious activity detected!
         </div>
     }
 }
 else
 {
     <div class="alert alert-warning mt-4">
-        🚨 No logs found yet. Your site hasn't had visitors or logging middleware isn't recording.
+        ?? No logs found yet. Your site hasn't had visitors or logging middleware isn't recording.
     </div>
 }
 

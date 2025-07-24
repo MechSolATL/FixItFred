@@ -1,0 +1,65 @@
+@page
+@model MVP_Core.Pages.Admin.ManageQuestionsModel
+@{
+    ViewData["Title"] = "Manage Intake Questions";
+    Layout = "~/Pages/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container mt-5">
+    <h2 class="mb-4 text-primary">?? Manage Intake Questions</h2>
+
+    <a href="/Admin/EditQuestion" class="btn btn-success mb-3">? Add New Question</a>
+
+    @if (Model.Questions != null && Model.Questions.Any())
+    {
+        <table class="table table-hover table-bordered">
+            <thead class="thead-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Service Type</th>
+                    <th>Text</th>
+                    <th>Input Type</th>
+                    <th>Options</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var q in Model.Questions)
+                {
+                    <tr>
+                        <td>@q.Id</td>
+                        <td>@q.ServiceType</td>
+                        <td>@q.Text</td>
+                        <td>@q.InputType</td>
+                        <td>
+                            @if (q.Options != null && q.Options.Any())
+                            {
+                                <span class="badge bg-info">@q.Options.Count option(s)</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">None</span>
+                            }
+                        </td>
+                        <td>
+                            <a href="/Admin/EditQuestion?id=@q.Id" class="btn btn-sm btn-primary">Edit</a>
+                            <a href="/Admin/ManageOptions?questionId=@q.Id" class="btn btn-sm btn-secondary">Options</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <div class="alert alert-warning">
+            ?? No questions found.
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        console.log("?? Manage Questions Page Loaded.");
+    </script>
+}

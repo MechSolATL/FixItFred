@@ -1,10 +1,5 @@
 // MVP_Core/Pages/Admin/ServerLogsModel.cs
 
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Data;
-using MVP_Core.Data.Models;
-using MVP_Core.Helpers;
-using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 
 namespace MVP_Core.Pages.Admin
@@ -13,11 +8,11 @@ namespace MVP_Core.Pages.Admin
     {
         private readonly ApplicationDbContext _dbContext;
 
-        public List<PageVisitLog> Logs { get; set; } = new();
+        public List<PageVisitLog> Logs { get; set; } = [];
         public string PageViewSummary { get; set; } = "{}";
         public string BrowserSummary { get; set; } = "{}";
         public string ReferrerSummary { get; set; } = "{}";
-        public List<ThreatDetectionResult> Threats { get; set; } = new();
+        public List<ThreatDetectionResult> Threats { get; set; } = [];
 
         private const int MaxLogs = 1000; // Future: move to appsettings.json
 
@@ -29,7 +24,7 @@ namespace MVP_Core.Pages.Admin
         public async Task OnGetAsync()
         {
             Logs = await _dbContext.PageVisitLogs
-                .OrderByDescending(l => l.VisitTimestamp)
+                .OrderByDescending(static l => l.VisitTimestamp)
                 .Take(MaxLogs)
                 .AsNoTracking()
                 .ToListAsync();
@@ -47,17 +42,17 @@ namespace MVP_Core.Pages.Admin
     {
         public static List<ThreatDetectionResult> AnalyzeThreats(List<PageVisitLog> logs)
         {
-            var threats = new List<ThreatDetectionResult>();
+            List<ThreatDetectionResult> threats = [];
 
-            var ipGroups = logs.GroupBy(l => l.IpAddress ?? "Unknown");
+            IEnumerable<IGrouping<string, PageVisitLog>> ipGroups = logs.GroupBy(static l => l.IpAddress ?? "Unknown");
 
-            foreach (var group in ipGroups)
+            foreach (IGrouping<string, PageVisitLog> group in ipGroups)
             {
-                var ip = group.Key;
-                var count = group.Count();
-                var errors = group.Count(l => l.ResponseStatusCode == 403 || l.ResponseStatusCode == 500);
-                var suspiciousReferrer = group.Any(l => string.IsNullOrEmpty(l.Referrer) || l.Referrer.Contains("xyz") || l.Referrer.Contains("abc"));
-                var botUserAgent = group.Any(l => (l.UserAgent ?? "").ToLower().Contains("bot") || (l.UserAgent ?? "").ToLower().Contains("curl") || (l.UserAgent ?? "").ToLower().Contains("python"));
+                string ip = group.Key;
+                int count = group.Count();
+                int errors = group.Count(static l => l.ResponseStatusCode == 403 || l.ResponseStatusCode == 500);
+                bool suspiciousReferrer = group.Any(static l => string.IsNullOrEmpty(l.Referrer) || l.Referrer.Contains("xyz") || l.Referrer.Contains("abc"));
+                bool botUserAgent = group.Any(static l => (l.UserAgent ?? "").ToLower().Contains("bot") || (l.UserAgent ?? "").ToLower().Contains("curl") || (l.UserAgent ?? "").ToLower().Contains("python"));
 
                 if (count >= 20 || errors >= 10 || suspiciousReferrer || botUserAgent)
                 {
@@ -78,61 +73,57 @@ namespace MVP_Core.Pages.Admin
         public static object GeneratePageViewSummary(List<PageVisitLog> logs)
         {
             var pageGroups = logs
-                .GroupBy(l => l.PageUrl ?? "Unknown")
-                .Select(g => new { Page = g.Key, Count = g.Count() })
-                .OrderByDescending(g => g.Count)
+                .GroupBy(static l => l.PageUrl ?? "Unknown")
+                .Select(static g => new { Page = g.Key, Count = g.Count() })
+                .OrderByDescending(static g => g.Count)
                 .ToList();
 
             return new
             {
-                labels = pageGroups.Select(g => g.Page).ToList(),
-                values = pageGroups.Select(g => g.Count).ToList()
+                labels = pageGroups.Select(static g => g.Page).ToList(),
+                values = pageGroups.Select(static g => g.Count).ToList()
             };
         }
 
         public static object GenerateBrowserSummary(List<PageVisitLog> logs)
         {
             var browserGroups = logs
-                .GroupBy(l => ParseBrowser(l.UserAgent ?? "Unknown"))
-                .Select(g => new { Browser = g.Key, Count = g.Count() })
-                .OrderByDescending(g => g.Count)
+                .GroupBy(static l => ParseBrowser(l.UserAgent ?? "Unknown"))
+                .Select(static g => new { Browser = g.Key, Count = g.Count() })
+                .OrderByDescending(static g => g.Count)
                 .ToList();
 
             return new
             {
-                labels = browserGroups.Select(g => g.Browser).ToList(),
-                values = browserGroups.Select(g => g.Count).ToList()
+                labels = browserGroups.Select(static g => g.Browser).ToList(),
+                values = browserGroups.Select(static g => g.Count).ToList()
             };
         }
 
         public static object GenerateReferrerSummary(List<PageVisitLog> logs)
         {
             var referrerGroups = logs
-                .GroupBy(l => string.IsNullOrEmpty(l.Referrer) ? "Direct/Unknown" : l.Referrer)
-                .Select(g => new { Referrer = g.Key, Count = g.Count() })
-                .OrderByDescending(g => g.Count)
+                .GroupBy(static l => string.IsNullOrEmpty(l.Referrer) ? "Direct/Unknown" : l.Referrer)
+                .Select(static g => new { Referrer = g.Key, Count = g.Count() })
+                .OrderByDescending(static g => g.Count)
                 .ToList();
 
             return new
             {
-                labels = referrerGroups.Select(g => g.Referrer).ToList(),
-                values = referrerGroups.Select(g => g.Count).ToList()
+                labels = referrerGroups.Select(static g => g.Referrer).ToList(),
+                values = referrerGroups.Select(static g => g.Count).ToList()
             };
         }
 
         private static string ParseBrowser(string userAgent)
         {
-            if (userAgent.Contains("Chrome") && !userAgent.Contains("Edge"))
-                return "Chrome";
-            if (userAgent.Contains("Safari") && !userAgent.Contains("Chrome"))
-                return "Safari";
-            if (userAgent.Contains("Firefox"))
-                return "Firefox";
-            if (userAgent.Contains("Edge"))
-                return "Edge";
-            if (userAgent.Contains("Opera") || userAgent.Contains("OPR"))
-                return "Opera";
-            return "Other";
+            return userAgent.Contains("Chrome") && !userAgent.Contains("Edge")
+                ? "Chrome"
+                : userAgent.Contains("Safari") && !userAgent.Contains("Chrome")
+                ? "Safari"
+                : userAgent.Contains("Firefox")
+                ? "Firefox"
+                : userAgent.Contains("Edge") ? "Edge" : userAgent.Contains("Opera") || userAgent.Contains("OPR") ? "Opera" : "Other";
         }
     }
 

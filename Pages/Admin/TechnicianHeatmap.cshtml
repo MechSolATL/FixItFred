@@ -1,0 +1,97 @@
+@page
+@model MVP_Core.Pages.Admin.TechnicianHeatmapModel
+@{
+    Layout = "/Pages/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Technician Performance Heatmap";
+}
+@* SEO Head *@
+<partial name="/Pages/Shared/_SEOHead.cshtml" />
+<h2 class="mb-4">Technician Performance Heatmap</h2>
+<form method="get" class="row g-3 mb-4 align-items-end" id="heatmapForm">
+    <div class="col-md-4">
+        <label class="form-label">Select Technician(s) (up to 3)</label>
+        <select name="techIds" class="form-select" multiple size="3" id="techSelect">
+            @foreach (var tech in Model.Technicians)
+            {
+                var isSelected = Model.TechnicianIds.Contains(int.Parse(tech.Value)) ? "selected" : null;
+                <option value="@tech.Value" selected="@isSelected">@tech.Text</option>
+            }
+        </select>
+        <small class="text-muted">Hold Ctrl/Cmd to select multiple</small>
+    </div>
+    <div class="col-md-3">
+        <label class="form-label">Start Date</label>
+        <input type="date" name="start" class="form-control" value="@Model.Start.ToString("yyyy-MM-dd")" />
+    </div>
+    <div class="col-md-3">
+        <label class="form-label">End Date</label>
+        <input type="date" name="end" class="form-control" value="@Model.End.ToString("yyyy-MM-dd")" />
+    </div>
+    <div class="col-md-2">
+        <button type="submit" class="btn btn-primary w-100">Load Heatmap</button>
+    </div>
+</form>
+<div class="mb-3">
+    <label class="form-label me-2">Metric:</label>
+    <select id="metricSelect" class="form-select d-inline-block w-auto">
+        <option value="Jobs">Jobs</option>
+        <option value="Delays">Delays</option>
+        <option value="Callbacks">Callbacks</option>
+    </select>
+</div>
+<div id="heatmap-multi-container">
+    <!-- Heatmaps will be rendered here by JS -->
+</div>
+<div id="heatmap-legend" class="mt-2 small text-muted"></div>
+@section Scripts {
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="/js/tech-heatmap.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    function getSelectedTechs() {
+        return Array.from(document.getElementById('techSelect').selectedOptions).map(o => o.value);
+    }
+    function getMetric() {
+        return document.getElementById('metricSelect').value;
+    }
+    function getStartEnd() {
+        return [document.querySelector('input[name="start"]').value, document.querySelector('input[name="end"]').value];
+    }
+    function loadAllHeatmaps() {
+        const techIds = getSelectedTechs();
+        const [start, end] = getStartEnd();
+        const metric = getMetric();
+        const container = document.getElementById('heatmap-multi-container');
+        container.innerHTML = '';
+        techIds.slice(0, 3).forEach((id, idx) => {
+            const div = document.createElement('div');
+            div.className = 'mb-4';
+            div.id = 'heatmap-container-' + id;
+            container.appendChild(div);
+            loadHeatmap(id, start, end, metric, div.id);
+        });
+    }
+    document.getElementById('heatmapForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+        loadAllHeatmaps();
+    });
+    document.getElementById('metricSelect').addEventListener('change', function () {
+        loadAllHeatmaps();
+    });
+    // Initial load
+    loadAllHeatmaps();
+    // SignalR hooks (optional, wire-ready)
+    if (window.signalR) {
+        const connection = new signalR.HubConnectionBuilder().withUrl('/requesthub').build();
+        connection.on('kanbanUpdated', loadAllHeatmaps);
+        connection.on('technicianProfileUpdated', loadAllHeatmaps);
+        connection.start().catch(function (err) { console.error(err.toString()); });
+    }
+});
+</script>
+}
+<style>
+.heatmap-grid { display: grid; grid-template-columns: repeat(24, 1fr); border: 1px solid #ccc; }
+.heatmap-cell { width: 100%; height: 28px; border: 1px solid #eee; text-align: center; font-size: 0.85em; cursor: pointer; }
+.heatmap-label { font-size: 0.9em; text-align: right; padding-right: 4px; }
+</style>

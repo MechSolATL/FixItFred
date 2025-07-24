@@ -1,10 +1,9 @@
-﻿using System;
-
 namespace MVP_Core.Data.Models
 {
     /// <summary>
     /// Stores email verification codes and status for users.
     /// </summary>
+    [Index(nameof(Email))]
     public class EmailVerification
     {
         public int Id { get; set; }

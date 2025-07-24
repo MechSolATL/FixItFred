@@ -1,13 +1,15 @@
-﻿@page
+@page "/Admin/EditSEO"
 @model MVP_Core.Pages.Admin.EditSEOModel
-
+@inject MVP_Core.Services.ISeoService SeoService
 @{
-    ViewData["Title"] = "Edit SEO";
-    Layout = "~/Pages/Shared/_AdminLayout.cshtml";
+    Layout = "/Pages/Shared/_AdminLayout.cshtml";
 }
+<head>
+    @await Html.PartialAsync("/Pages/Shared/_SEOHead.cshtml")
+</head>
 
 <div class="container mt-5">
-    <h2 class="mb-4">🛠️ Edit SEO Entry</h2>
+    <h2 class="mb-4">Edit SEO Entry</h2>
 
     @if (TempData["Message"] != null)
     {
@@ -23,43 +25,43 @@
     }
 
     <form method="post" class="needs-validation" novalidate>
-        <input type="hidden" asp-for="SEO.Id" />
+        <input type="hidden" asp-for="SeoMeta.Id" />
 
         <div class="form-group mb-3">
-            <label asp-for="SEO.PageName" class="form-label">Page Name</label>
-            <input asp-for="SEO.PageName" class="form-control" readonly />
+            <label asp-for="SeoMeta.PageName" class="form-label">Page Name</label>
+            <input asp-for="SeoMeta.PageName" class="form-control" readonly />
         </div>
 
         <div class="form-group mb-3">
-            <label asp-for="SEO.Title" class="form-label">Title</label>
-            <input asp-for="SEO.Title" class="form-control" />
-            <span asp-validation-for="SEO.Title" class="text-danger small"></span>
+            <label asp-for="SeoMeta.Title" class="form-label">Title</label>
+            <input asp-for="SeoMeta.Title" class="form-control" />
+            <span asp-validation-for="SeoMeta.Title" class="text-danger small"></span>
         </div>
 
         <div class="form-group mb-3">
-            <label asp-for="SEO.MetaDescription" class="form-label">Meta Description</label>
-            <textarea asp-for="SEO.MetaDescription" class="form-control" rows="3"></textarea>
-            <span asp-validation-for="SEO.MetaDescription" class="text-danger small"></span>
+            <label asp-for="SeoMeta.MetaDescription" class="form-label">Meta Description</label>
+            <textarea asp-for="SeoMeta.MetaDescription" class="form-control" rows="3"></textarea>
+            <span asp-validation-for="SeoMeta.MetaDescription" class="text-danger small"></span>
         </div>
 
         <div class="form-group mb-3">
-            <label asp-for="SEO.Keywords" class="form-label">Keywords</label>
-            <textarea asp-for="SEO.Keywords" class="form-control" rows="2"></textarea>
-            <span asp-validation-for="SEO.Keywords" class="text-danger small"></span>
+            <label asp-for="SeoMeta.Keywords" class="form-label">Keywords</label>
+            <textarea asp-for="SeoMeta.Keywords" class="form-control" rows="2"></textarea>
+            <span asp-validation-for="SeoMeta.Keywords" class="text-danger small"></span>
         </div>
 
         <div class="form-group mb-4">
-            <label asp-for="SEO.RobotsMeta" class="form-label">Robots Meta</label>
-            <input asp-for="SEO.RobotsMeta" class="form-control" />
-            <span asp-validation-for="SEO.RobotsMeta" class="text-danger small"></span>
+            <label asp-for="SeoMeta.Robots" class="form-label">Robots Meta</label>
+            <input asp-for="SeoMeta.Robots" class="form-control" />
+            <span asp-validation-for="SeoMeta.Robots" class="text-danger small"></span>
         </div>
 
         <div class="d-flex align-items-center">
             <button type="submit" class="btn btn-success me-2">
-                💾 Save Changes
+                Save Changes
             </button>
             <a asp-page="/Admin/ManageSEO" class="btn btn-secondary">
-                ↩️ Cancel
+                Cancel
             </a>
         </div>
     </form>

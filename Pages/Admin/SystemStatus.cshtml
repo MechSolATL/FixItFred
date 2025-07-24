@@ -1,0 +1,44 @@
+@page
+@model MVP_Core.Pages.Admin.SystemStatusModel
+@{
+    ViewData["Title"] = "System Status";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+}
+
+@section SEO {
+    <meta name="description" content="@Model.MetaDescription" />
+    <meta name="keywords" content="@Model.Keywords" />
+    <meta name="robots" content="@Model.Robots" />
+}
+
+<h1 class="text-3xl font-bold mb-4">System & Application Status</h1>
+
+<div class="status-container">
+    <div class="status-summary">
+        <h2 class="text-xl font-semibold">All Systems Operational</h2>
+        <p class="text-gray-600">Last Updated: @Model.LastUpdated.ToString("f")</p>
+    </div>
+
+    <div class="status-list mt-4">
+        @foreach (var system in Model.SystemComponents)
+        {
+            <div class="status-item flex justify-between items-center p-3 border-b">
+                <span>@system.Name</span>
+                <span class="text-sm font-medium @(system.IsOperational ? "text-green-600" : "text-red-600")">
+                    @(system.IsOperational ? "Operational" : "Outage")
+                </span>
+            </div>
+        }
+    </div>
+</div>
+
+<style>
+    .status-container {
+        max-width: 800px;
+        margin: 0 auto;
+        background-color: #f9f9f9;
+        padding: 2rem;
+        border-radius: 10px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+</style>

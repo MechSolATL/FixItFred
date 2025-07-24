@@ -1,4 +1,3 @@
-﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -11,7 +10,7 @@ namespace MVP_Core.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "Status",
                 table: "ServiceRequests",
                 type: "nvarchar(50)",
@@ -20,7 +19,7 @@ namespace MVP_Core.Migrations
                 oldClrType: typeof(string),
                 oldType: "nvarchar(max)");
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "SessionId",
                 table: "ServiceRequests",
                 type: "nvarchar(100)",
@@ -30,7 +29,7 @@ namespace MVP_Core.Migrations
                 oldType: "nvarchar(max)",
                 oldNullable: true);
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "ServiceType",
                 table: "ServiceRequests",
                 type: "nvarchar(100)",
@@ -39,7 +38,7 @@ namespace MVP_Core.Migrations
                 oldClrType: typeof(string),
                 oldType: "nvarchar(max)");
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "ServiceSubtype",
                 table: "ServiceRequests",
                 type: "nvarchar(100)",
@@ -49,7 +48,7 @@ namespace MVP_Core.Migrations
                 oldType: "nvarchar(max)",
                 oldNullable: true);
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "Phone",
                 table: "ServiceRequests",
                 type: "nvarchar(20)",
@@ -59,7 +58,7 @@ namespace MVP_Core.Migrations
                 oldType: "nvarchar(max)",
                 oldNullable: true);
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "Notes",
                 table: "ServiceRequests",
                 type: "nvarchar(2000)",
@@ -69,7 +68,7 @@ namespace MVP_Core.Migrations
                 oldType: "nvarchar(max)",
                 oldNullable: true);
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "Email",
                 table: "ServiceRequests",
                 type: "nvarchar(150)",
@@ -78,7 +77,7 @@ namespace MVP_Core.Migrations
                 oldClrType: typeof(string),
                 oldType: "nvarchar(max)");
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "Details",
                 table: "ServiceRequests",
                 type: "nvarchar(2000)",
@@ -87,7 +86,7 @@ namespace MVP_Core.Migrations
                 oldClrType: typeof(string),
                 oldType: "nvarchar(max)");
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "CustomerName",
                 table: "ServiceRequests",
                 type: "nvarchar(100)",
@@ -96,7 +95,7 @@ namespace MVP_Core.Migrations
                 oldClrType: typeof(string),
                 oldType: "nvarchar(max)");
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "AssignedTo",
                 table: "ServiceRequests",
                 type: "nvarchar(100)",
@@ -106,7 +105,7 @@ namespace MVP_Core.Migrations
                 oldType: "nvarchar(max)",
                 oldNullable: true);
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "Address",
                 table: "ServiceRequests",
                 type: "nvarchar(250)",
@@ -116,7 +115,7 @@ namespace MVP_Core.Migrations
                 oldType: "nvarchar(max)",
                 oldNullable: true);
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "Status",
                 table: "BackupLogs",
                 type: "nvarchar(20)",
@@ -126,7 +125,7 @@ namespace MVP_Core.Migrations
                 oldType: "nvarchar(50)",
                 oldMaxLength: 50);
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "Message",
                 table: "BackupLogs",
                 type: "nvarchar(4000)",
@@ -137,14 +136,14 @@ namespace MVP_Core.Migrations
                 oldMaxLength: 1000,
                 oldNullable: true);
 
-            migrationBuilder.AddColumn<int>(
+            _ = migrationBuilder.AddColumn<int>(
                 name: "BackupSizeMB",
                 table: "BackupLogs",
                 type: "int",
                 nullable: false,
                 defaultValue: 0);
 
-            migrationBuilder.AddColumn<string>(
+            _ = migrationBuilder.AddColumn<string>(
                 name: "BackupType",
                 table: "BackupLogs",
                 type: "nvarchar(20)",
@@ -152,23 +151,23 @@ namespace MVP_Core.Migrations
                 nullable: false,
                 defaultValue: "");
 
-            migrationBuilder.AddColumn<int>(
+            _ = migrationBuilder.AddColumn<int>(
                 name: "DurationSeconds",
                 table: "BackupLogs",
                 type: "int",
                 nullable: false,
                 defaultValue: 0);
 
-            migrationBuilder.AddColumn<string>(
+            _ = migrationBuilder.AddColumn<string>(
                 name: "SourceServer",
                 table: "BackupLogs",
                 type: "nvarchar(100)",
                 maxLength: 100,
                 nullable: true);
 
-            migrationBuilder.CreateTable(
+            _ = migrationBuilder.CreateTable(
                 name: "PageVisits",
-                columns: table => new
+                columns: static table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
@@ -177,35 +176,35 @@ namespace MVP_Core.Migrations
                     VisitTimestamp = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UserClick = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
-                constraints: table =>
+                constraints: static table =>
                 {
-                    table.PrimaryKey("PK_PageVisits", x => x.Id);
+                    _ = table.PrimaryKey("PK_PageVisits", static x => x.Id);
                 });
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
+            _ = migrationBuilder.DropTable(
                 name: "PageVisits");
 
-            migrationBuilder.DropColumn(
+            _ = migrationBuilder.DropColumn(
                 name: "BackupSizeMB",
                 table: "BackupLogs");
 
-            migrationBuilder.DropColumn(
+            _ = migrationBuilder.DropColumn(
                 name: "BackupType",
                 table: "BackupLogs");
 
-            migrationBuilder.DropColumn(
+            _ = migrationBuilder.DropColumn(
                 name: "DurationSeconds",
                 table: "BackupLogs");
 
-            migrationBuilder.DropColumn(
+            _ = migrationBuilder.DropColumn(
                 name: "SourceServer",
                 table: "BackupLogs");
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "Status",
                 table: "ServiceRequests",
                 type: "nvarchar(max)",
@@ -214,7 +213,7 @@ namespace MVP_Core.Migrations
                 oldType: "nvarchar(50)",
                 oldMaxLength: 50);
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "SessionId",
                 table: "ServiceRequests",
                 type: "nvarchar(max)",
@@ -224,7 +223,7 @@ namespace MVP_Core.Migrations
                 oldMaxLength: 100,
                 oldNullable: true);
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "ServiceType",
                 table: "ServiceRequests",
                 type: "nvarchar(max)",
@@ -233,7 +232,7 @@ namespace MVP_Core.Migrations
                 oldType: "nvarchar(100)",
                 oldMaxLength: 100);
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "ServiceSubtype",
                 table: "ServiceRequests",
                 type: "nvarchar(max)",
@@ -243,7 +242,7 @@ namespace MVP_Core.Migrations
                 oldMaxLength: 100,
                 oldNullable: true);
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "Phone",
                 table: "ServiceRequests",
                 type: "nvarchar(max)",
@@ -253,7 +252,7 @@ namespace MVP_Core.Migrations
                 oldMaxLength: 20,
                 oldNullable: true);
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "Notes",
                 table: "ServiceRequests",
                 type: "nvarchar(max)",
@@ -263,7 +262,7 @@ namespace MVP_Core.Migrations
                 oldMaxLength: 2000,
                 oldNullable: true);
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "Email",
                 table: "ServiceRequests",
                 type: "nvarchar(max)",
@@ -272,7 +271,7 @@ namespace MVP_Core.Migrations
                 oldType: "nvarchar(150)",
                 oldMaxLength: 150);
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "Details",
                 table: "ServiceRequests",
                 type: "nvarchar(max)",
@@ -281,7 +280,7 @@ namespace MVP_Core.Migrations
                 oldType: "nvarchar(2000)",
                 oldMaxLength: 2000);
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "CustomerName",
                 table: "ServiceRequests",
                 type: "nvarchar(max)",
@@ -290,7 +289,7 @@ namespace MVP_Core.Migrations
                 oldType: "nvarchar(100)",
                 oldMaxLength: 100);
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "AssignedTo",
                 table: "ServiceRequests",
                 type: "nvarchar(max)",
@@ -300,7 +299,7 @@ namespace MVP_Core.Migrations
                 oldMaxLength: 100,
                 oldNullable: true);
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "Address",
                 table: "ServiceRequests",
                 type: "nvarchar(max)",
@@ -310,7 +309,7 @@ namespace MVP_Core.Migrations
                 oldMaxLength: 250,
                 oldNullable: true);
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "Status",
                 table: "BackupLogs",
                 type: "nvarchar(50)",
@@ -320,7 +319,7 @@ namespace MVP_Core.Migrations
                 oldType: "nvarchar(20)",
                 oldMaxLength: 20);
 
-            migrationBuilder.AlterColumn<string>(
+            _ = migrationBuilder.AlterColumn<string>(
                 name: "Message",
                 table: "BackupLogs",
                 type: "nvarchar(1000)",

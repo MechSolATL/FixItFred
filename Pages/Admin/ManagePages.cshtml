@@ -1,11 +1,11 @@
-﻿@page
+@page
 @model MVP_Core.Pages.Admin.ManagePagesModel
 @{
     ViewData["Title"] = "Manage Pages";
-    Layout = "~/Pages/Shared/_Layout.cshtml"; // ✅ Recommended to specify layout if shared
+    Layout = "~/Pages/Shared/_Layout.cshtml"; // ? Recommended to specify layout if shared
 }
 
-<h1 class="mt-4">🗂️ Manage Pages</h1>
+<h1 class="mt-4">??? Manage Pages</h1>
 
 @if (!string.IsNullOrEmpty(Model.Message))
 {
@@ -33,7 +33,7 @@
                     <tr>
                         <td>@item.UrlPath</td>
                         <td class="text-center">
-                            @(item.IsPublic ? "✅ Yes" : "❌ No")
+                            @(item.IsPublic ? "? Yes" : "? No")
                         </td>
                         <td>@item.CreatedAt.ToString("yyyy-MM-dd HH:mm")</td>
                         <td class="text-center">
@@ -53,6 +53,6 @@
 else
 {
     <div class="alert alert-info mt-4">
-        📭 No pages available to manage yet.
+        ?? No pages available to manage yet.
     </div>
 }

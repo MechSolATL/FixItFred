@@ -1,0 +1,22 @@
+@{
+    var deviceType = Context.Items["DeviceType"]?.ToString() ?? "Unknown";
+}
+
+@if (deviceType == "Mobile")
+{
+    <div class="alert alert-info text-center mt-3 shadow-sm" role="alert">
+        ?? You’re using a mobile device. Tap-friendly layout enabled.
+    </div>
+}
+else if (deviceType == "Tablet")
+{
+    <div class="alert alert-warning text-center mt-3 shadow-sm" role="alert">
+        ?? Tablet detected — optimized touch experience.
+    </div>
+}
+else if (deviceType == "Desktop")
+{
+    <div class="alert alert-secondary text-center mt-3 shadow-sm" role="alert">
+        ?? Desktop mode — full layout with extended features.
+    </div>
+}

@@ -1,11 +1,11 @@
-﻿@page
+@page
 @model MVP_Core.Pages.Admin.ThreatsModel
 @{
     ViewData["Title"] = "Threat Dashboard";
     Layout = "~/Pages/Shared/_Layout.cshtml";
 }
 
-<h1 class="mt-4">🛡️ Threat Fortress - Active Threats</h1>
+<h1 class="mt-4">??? Threat Fortress - Active Threats</h1>
 
 @if (Model.Threats.Any())
 {
@@ -33,15 +33,15 @@
                         <td>
                             @if (threat.IsPermanentlyBlocked)
                             {
-                                <span class="badge bg-danger">Permanent 🔥</span>
+                                <span class="badge bg-danger">Permanent ??</span>
                             }
                             else if (threat.BanLiftTime.HasValue && threat.BanLiftTime > DateTime.UtcNow)
                             {
-                                <span class="badge bg-warning text-dark">Temp Ban ⏳</span>
+                                <span class="badge bg-warning text-dark">Temp Ban ?</span>
                             }
                             else
                             {
-                                <span class="badge bg-success">Unblocked ✅</span>
+                                <span class="badge bg-success">Unblocked ?</span>
                             }
                         </td>
                         <td>@threat.FirstDetectedAt.ToString("yyyy-MM-dd HH:mm")</td>
@@ -56,14 +56,14 @@
         <div class="d-flex justify-content-center mt-4">
             @if (Model.Threats.HasPreviousPage)
             {
-                <a class="btn btn-outline-primary mx-1" asp-page="./Threats" asp-route-PageIndex="@(Model.Threats.PageIndex - 1)">⬅️ Previous</a>
+                <a class="btn btn-outline-primary mx-1" asp-page="./Threats" asp-route-PageIndex="@(Model.Threats.PageIndex - 1)">?? Previous</a>
             }
 
             <span class="align-self-center mx-2">Page @Model.Threats.PageIndex of @Model.Threats.TotalPages</span>
 
             @if (Model.Threats.HasNextPage)
             {
-                <a class="btn btn-outline-primary mx-1" asp-page="./Threats" asp-route-PageIndex="@(Model.Threats.PageIndex + 1)">Next ➡️</a>
+                <a class="btn btn-outline-primary mx-1" asp-page="./Threats" asp-route-PageIndex="@(Model.Threats.PageIndex + 1)">Next ??</a>
             }
         </div>
     </div>
@@ -71,6 +71,6 @@
 else
 {
     <div class="alert alert-success mt-4">
-        🎯 Fortress is quiet. No threats detected yet.
+        ?? Fortress is quiet. No threats detected yet.
     </div>
 }

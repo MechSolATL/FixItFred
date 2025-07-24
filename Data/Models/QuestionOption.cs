@@ -1,4 +1,3 @@
-﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
@@ -24,7 +23,7 @@ namespace MVP_Core.Data.Models
         public string? OptionValue { get; set; }
 
         /// <summary>
-        /// Optional score or diagnostic weight — used for intelligent form analysis.
+        /// Optional score or diagnostic weight � used for intelligent form analysis.
         /// </summary>
         public int? ScoreWeight { get; set; }
 

@@ -1,4 +1,4 @@
-ï»¿using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -10,14 +10,16 @@ namespace MVP_Core.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<bool>(
-                name: "IsGlobal",
-                table: "Questions",
-                type: "bit",
-                nullable: false,
-                defaultValue: false);
+            // COMMENTED OUT: Already exists in database — causes SQL error
+            // migrationBuilder.AddColumn<bool>(
+            //     name: "IsGlobal",
+            //     table: "Questions",
+            //     type: "bit",
+            //     nullable: false,
+            //     defaultValue: false);
 
-            migrationBuilder.AddColumn<int>(
+            // ? This one can still be applied
+            _ = migrationBuilder.AddColumn<int>(
                 name: "ScoreWeight",
                 table: "QuestionOptions",
                 type: "int",
@@ -27,11 +29,12 @@ namespace MVP_Core.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "IsGlobal",
-                table: "Questions");
+            // COMMENTED OUT: Avoid dropping column that already exists manually
+            // migrationBuilder.DropColumn(
+            //     name: "IsGlobal",
+            //     table: "Questions");
 
-            migrationBuilder.DropColumn(
+            _ = migrationBuilder.DropColumn(
                 name: "ScoreWeight",
                 table: "QuestionOptions");
         }

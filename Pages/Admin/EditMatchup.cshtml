@@ -1,0 +1,86 @@
+@page "{id:int}"
+@model MVP_Core.Pages.Admin.EditMatchupModel
+@{
+    ViewData["Title"] = "Edit Matchup";
+    Layout = "/Pages/Shared/_Layout.cshtml";
+}
+
+<h2 class="text-2xl font-semibold mb-4">Edit Heat Pump Matchup</h2>
+
+@if (TempData["Message"] != null)
+{
+    <div class="alert-success">@TempData["Message"]</div>
+}
+
+<form method="post">
+    <input type="hidden" asp-for="Matchup.Id" />
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+        <div>
+            <label asp-for="Matchup.Brand" class="block font-semibold">Brand</label>
+            <input asp-for="Matchup.Brand" class="input" />
+            <span asp-validation-for="Matchup.Brand" class="text-danger"></span>
+        </div>
+
+        <div>
+            <label asp-for="Matchup.SystemType" class="block font-semibold">System Type</label>
+            <input asp-for="Matchup.SystemType" class="input" />
+            <span asp-validation-for="Matchup.SystemType" class="text-danger"></span>
+        </div>
+
+        <div>
+            <label asp-for="Matchup.ACoilModel" class="block font-semibold">A-Coil Model</label>
+            <input asp-for="Matchup.ACoilModel" class="input" />
+        </div>
+
+        <div>
+            <label asp-for="Matchup.ACoilTonnage" class="block font-semibold">A-Coil Tonnage</label>
+            <input asp-for="Matchup.ACoilTonnage" class="input" />
+        </div>
+
+        <div>
+            <label asp-for="Matchup.OutdoorUnitModel" class="block font-semibold">Outdoor Unit Model</label>
+            <input asp-for="Matchup.OutdoorUnitModel" class="input" />
+        </div>
+
+        <div>
+            <label asp-for="Matchup.OutdoorUnitTonnage" class="block font-semibold">ODU Tonnage</label>
+            <input asp-for="Matchup.OutdoorUnitTonnage" class="input" />
+        </div>
+
+        <div>
+            <label asp-for="Matchup.FurnaceModel" class="block font-semibold">Furnace Model</label>
+            <input asp-for="Matchup.FurnaceModel" class="input" />
+        </div>
+
+        <div>
+            <label asp-for="Matchup.FurnaceBTU" class="block font-semibold">Furnace BTU</label>
+            <input asp-for="Matchup.FurnaceBTU" class="input" />
+        </div>
+
+        <div>
+            <label asp-for="Matchup.SEERRating" class="block font-semibold">SEER Rating</label>
+            <input asp-for="Matchup.SEERRating" class="input" />
+        </div>
+
+        <div>
+            <label asp-for="Matchup.AHRICode" class="block font-semibold">AHRI Code</label>
+            <input asp-for="Matchup.AHRICode" class="input" />
+        </div>
+
+        <div class="md:col-span-2">
+            <label asp-for="Matchup.Notes" class="block font-semibold">Notes</label>
+            <textarea asp-for="Matchup.Notes" rows="4" class="input"></textarea>
+        </div>
+    </div>
+
+    <div class="mt-6 flex items-center gap-4">
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+        <a asp-page="Matchups" class="btn btn-danger">Cancel</a>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,38 @@
+@page
+@model MVP_Core.Pages.ReviewModel
+@inject MVP_Core.Services.ISeoService SeoService
+
+@{
+    Layout = "/Pages/Shared/_Layout.cshtml";
+}
+
+<head>
+    @await Html.PartialAsync("/Pages/Shared/_SEOHead.cshtml")
+</head>
+
+<h2 class="mt-4">Review Your Service Request</h2>
+
+@if (Model.Answers?.Any() == true)
+{
+    <div class="list-group my-4">
+        @foreach (var pair in Model.Answers)
+        {
+            <div class="list-group-item">
+                <strong>@pair.QuestionText</strong><br />
+                <span>@pair.AnswerText</span>
+            </div>
+        }
+    </div>
+
+    <form method="post" asp-page-handler="Submit">
+        @Html.AntiForgeryToken()
+        <button type="submit" class="btn btn-success">Submit Request</button>
+    </form>
+}
+else
+{
+    <div class="alert alert-warning">
+        No answers found in your session. Please start a new request.
+    </div>
+    <a href="/" class="btn btn-primary">Start Over</a>
+}

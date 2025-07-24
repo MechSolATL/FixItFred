@@ -1,7 +1,4 @@
-﻿// Generated for Service-Atlanta.com - Service Request Dashboard
-
-using System;
-using System.ComponentModel.DataAnnotations;
+// Generated for Service-Atlanta.com - Service Request Dashboard
 
 namespace MVP_Core.Data.Models
 {

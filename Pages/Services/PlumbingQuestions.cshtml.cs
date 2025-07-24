@@ -1,12 +1,4 @@
 // MVP_Core/Pages/Services/PlumbingQuestions.cshtml.cs
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Data;
-using MVP_Core.Data.Models;
-using MVP_Core.Data.Models.ViewModels;
-using MVP_Core.Services;
-using Microsoft.EntityFrameworkCore;
-
 namespace MVP_Core.Pages.Services
 {
     public class PlumbingQuestionsModel : PageModel
@@ -16,8 +8,8 @@ namespace MVP_Core.Pages.Services
         public PlumbingQuestionsModel(ApplicationDbContext dbContext)
         {
             _dbContext = dbContext;
-            Questions = new List<QuestionWithOptionsModel>();
-            UserAnswers = new Dictionary<int, string>();
+            Questions = [];
+            UserAnswers = [];
         }
 
         public List<QuestionWithOptionsModel> Questions { get; set; }
@@ -29,9 +21,9 @@ namespace MVP_Core.Pages.Services
         {
             // Load questions for Plumbing service
             Questions = await _dbContext.Questions
-                .Where(q => q.ServiceType == "Plumbing" && q.ParentQuestionId == null)
-                .Include(q => q.Options)
-                .Select(q => new QuestionWithOptionsModel
+                .Where(static q => q.ServiceType == "Plumbing" && q.ParentQuestionId == null)
+                .Include(static q => q.Options)
+                .Select(static q => new QuestionWithOptionsModel
                 {
                     Id = q.Id,
                     ServiceType = q.ServiceType,
@@ -50,7 +42,7 @@ namespace MVP_Core.Pages.Services
             return Page();
         }
 
-        public async Task<IActionResult> OnPostAsync()
+        public IActionResult OnPost()
         {
             if (!ModelState.IsValid || UserAnswers.Count == 0)
             {
@@ -58,12 +50,12 @@ namespace MVP_Core.Pages.Services
                 return RedirectToPage("/Services/PlumbingQuestions");
             }
 
-            var sessionId = HttpContext.Session.Id;
-            var now = DateTime.UtcNow;
+            string sessionId = HttpContext.Session.Id;
+            DateTime now = DateTime.UtcNow;
 
-            foreach (var answer in UserAnswers)
+            foreach (KeyValuePair<int, string> answer in UserAnswers)
             {
-                var userResponse = new UserResponse
+                UserResponse userResponse = new()
                 {
                     SessionID = sessionId,
                     QuestionId = answer.Key,
@@ -71,10 +63,10 @@ namespace MVP_Core.Pages.Services
                     ServiceType = "Plumbing",
                     CreatedAt = now
                 };
-                _dbContext.UserResponses.Add(userResponse);
+                _ = _dbContext.UserResponses.Add(userResponse);
             }
 
-            await _dbContext.SaveChangesAsync();
+            _ = _dbContext.SaveChanges();
 
             return RedirectToPage("/Services/ThankYou", new { service = "Plumbing" });
         }
