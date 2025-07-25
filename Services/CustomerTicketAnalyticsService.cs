@@ -1,0 +1,47 @@
+// Sprint 46.2 – Customer Ticket Analytics Backend
+using MVP_Core.Data;
+using System;
+using System.Linq;
+
+namespace MVP_Core.Services
+{
+    // Sprint 46.2 – Customer Ticket Analytics Backend
+    public class CustomerTicketAnalyticsService
+    {
+        private readonly ApplicationDbContext _db;
+        public CustomerTicketAnalyticsService(ApplicationDbContext db)
+        {
+            _db = db;
+        }
+
+        // Sprint 46.2 – Get total ticket count for a customer
+        public int GetTicketCountForCustomer(int customerId)
+        {
+            return _db.ServiceRequests.Count(r => r.Email != null && _db.Customers.Any(c => c.Id == customerId && c.Email == r.Email));
+        }
+
+        // Sprint 46.2 – Get average response time (in minutes) for a customer
+        public double GetAverageResponseTime(int customerId)
+        {
+            // No FirstResponseAt in ServiceRequest, so use FirstViewedAt as proxy
+            var customer = _db.Customers.FirstOrDefault(c => c.Id == customerId);
+            if (customer == null || string.IsNullOrEmpty(customer.Email)) return 0;
+            var requests = _db.ServiceRequests.Where(r => r.Email == customer.Email && r.RequestedAt != null && r.FirstViewedAt != null).ToList();
+            if (!requests.Any()) return 0;
+            return requests.Average(r => (r.FirstViewedAt.Value - r.RequestedAt).TotalMinutes);
+        }
+
+        // Sprint 46.2 – Get satisfaction rating trend (last 10 tickets, most recent first)
+        public int[] GetSatisfactionRatingTrend(int customerId)
+        {
+            var customer = _db.Customers.FirstOrDefault(c => c.Id == customerId);
+            if (customer == null || string.IsNullOrEmpty(customer.Email)) return new int[0];
+            return _db.ServiceRequests
+                .Where(r => r.Email == customer.Email && r.SatisfactionScore.HasValue)
+                .OrderByDescending(r => r.RequestedAt)
+                .Take(10)
+                .Select(r => r.SatisfactionScore.Value)
+                .ToArray();
+        }
+    }
+}
