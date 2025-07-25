@@ -4,6 +4,10 @@
     ViewData["Title"] = "Customer Dashboard";
 }
 
+<!-- Sprint 46.3 – Dashboard Analytics -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <h2>My Tickets</h2>
 <table class="table table-striped">
     <thead>
@@ -43,3 +47,96 @@
     <p>Average Satisfaction: <b>@Model.AverageSatisfaction.ToString("0.0")</b> / 5</p>
     <p>Total Tickets: <b>@Model.Tickets.Count</b></p>
 </div>
+
+<!-- Sprint 46.3 – Dashboard Analytics: Satisfaction Heatmap -->
+<div class="mt-5">
+    <h4>Satisfaction Heatmap (Last 30 Tickets)</h4>
+    <canvas id="satisfactionHeatmap" height="60"></canvas>
+</div>
+
+<!-- Sprint 46.3 – Dashboard Analytics: Service Type Breakdown -->
+<div class="mt-5">
+    <h4>Service Type Breakdown</h4>
+    <canvas id="serviceTypeChart" height="60"></canvas>
+</div>
+
+<!-- Sprint 46.3 – Dashboard Analytics: Ticket Resolution Chart -->
+<div class="mt-5">
+    <h4>Ticket Resolution</h4>
+    <canvas id="resolutionChart" height="60"></canvas>
+</div>
+
+@section Scripts {
+<script>
+    // Sprint 46.3 – Dashboard Analytics: Satisfaction Heatmap
+    const satisfactionData = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.Tickets.OrderByDescending(t => t.RequestedAt).Take(30).Select(t => t.SatisfactionScore ?? 0).ToArray()));
+    const ctxHeatmap = document.getElementById('satisfactionHeatmap').getContext('2d');
+    new Chart(ctxHeatmap, {
+        type: 'bar',
+        data: {
+            labels: Array.from({length: satisfactionData.length}, (_, i) => `#${i+1}`),
+            datasets: [{
+                label: 'Satisfaction',
+                data: satisfactionData,
+                backgroundColor: satisfactionData.map(v => v >= 4 ? '#4caf50' : v >= 2 ? '#ffc107' : '#f44336'),
+            }]
+        },
+        options: {
+            plugins: { legend: { display: false } },
+            scales: { y: { min: 0, max: 5 } }
+        }
+    });
+
+    // Sprint 46.3 – Dashboard Analytics: Service Type Breakdown
+    const serviceTypeCounts = {};
+    @foreach (var t in Model.Tickets) {
+        <text>serviceTypeCounts['@t.ServiceType'] = (serviceTypeCounts['@t.ServiceType'] || 0) + 1;</text>
+    }
+    const serviceTypeLabels = Object.keys(serviceTypeCounts);
+    const serviceTypeData = Object.values(serviceTypeCounts);
+    const ctxServiceType = document.getElementById('serviceTypeChart').getContext('2d');
+    new Chart(ctxServiceType, {
+        type: 'pie',
+        data: {
+            labels: serviceTypeLabels,
+            datasets: [{
+                data: serviceTypeData,
+                backgroundColor: ['#2196f3', '#4caf50', '#ff9800', '#9c27b0', '#f44336', '#ffc107']
+            }]
+        },
+        options: { plugins: { legend: { position: 'bottom' } } }
+    });
+
+    // Sprint 46.3 – Dashboard Analytics: Ticket Resolution Chart
+    const openCount = @Model.Tickets.Count(t => t.Status != "Complete" && t.Status != "Cancelled");
+    const closedCount = @Model.Tickets.Count(t => t.Status == "Complete" || t.Status == "Cancelled");
+    const avgResolution = (() => {
+        const closed = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.Tickets.Where(t => t.ClosedAt != null).Select(t => (t.ClosedAt.Value - t.RequestedAt).TotalHours)));
+        if (closed.length === 0) return 0;
+        return (closed.reduce((a, b) => a + b, 0) / closed.length).toFixed(1);
+    })();
+    const ctxResolution = document.getElementById('resolutionChart').getContext('2d');
+    new Chart(ctxResolution, {
+        type: 'doughnut',
+        data: {
+            labels: ['Open', 'Closed'],
+            datasets: [{
+                data: [openCount, closedCount],
+                backgroundColor: ['#ff9800', '#4caf50']
+            }]
+        },
+        options: {
+            plugins: {
+                legend: { position: 'bottom' },
+                tooltip: {
+                    callbacks: {
+                        afterBody: function() {
+                            return 'Avg. Resolution: ' + avgResolution + ' hrs';
+                        }
+                    }
+                }
+            }
+        }
+    });
+</script>
+}

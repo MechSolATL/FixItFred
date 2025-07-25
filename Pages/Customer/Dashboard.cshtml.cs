@@ -5,6 +5,7 @@ using MVP_Core.Services; // Sprint 46.2 – Customer Ticket Analytics Backend
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Linq;
+using System;
 
 namespace MVP_Core.Pages.Customer
 {
@@ -24,6 +25,12 @@ namespace MVP_Core.Pages.Customer
         public int TicketCount { get; set; }
         public double AverageResponseTime { get; set; }
         public int[] SatisfactionTrend { get; set; } = new int[0];
+        // Sprint 46.3 – Dashboard Analytics
+        public Dictionary<string, int> ServiceTypeCounts { get; set; } = new();
+        public int OpenCount { get; set; }
+        public int ClosedCount { get; set; }
+        public double AvgResolutionHours { get; set; }
+        public int[] SatisfactionHeatmap { get; set; } = new int[0];
 
         public void OnGet()
         {
@@ -49,6 +56,22 @@ namespace MVP_Core.Pages.Customer
                 AverageResponseTime = 0;
                 SatisfactionTrend = new int[0];
             }
+
+            // Sprint 46.3 – Dashboard Analytics: Service Type Breakdown
+            ServiceTypeCounts = Tickets.GroupBy(t => t.ServiceType)
+                .ToDictionary(g => g.Key, g => g.Count());
+
+            // Sprint 46.3 – Dashboard Analytics: Ticket Resolution Chart
+            OpenCount = Tickets.Count(t => t.Status != "Complete" && t.Status != "Cancelled");
+            ClosedCount = Tickets.Count(t => t.Status == "Complete" || t.Status == "Cancelled");
+            var closedTickets = Tickets.Where(t => t.ClosedAt != null).ToList();
+            if (closedTickets.Any())
+                AvgResolutionHours = closedTickets.Average(t => (t.ClosedAt.Value - t.RequestedAt).TotalHours);
+            else
+                AvgResolutionHours = 0;
+
+            // Sprint 46.3 – Dashboard Analytics: Satisfaction Heatmap
+            SatisfactionHeatmap = Tickets.OrderByDescending(t => t.RequestedAt).Take(30).Select(t => t.SatisfactionScore ?? 0).ToArray();
         }
 
         public string GetStatusClass(string status)
