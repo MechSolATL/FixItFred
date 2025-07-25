@@ -1,0 +1,145 @@
+@page
+// FixItFred Patch Log — Sprint 26.4D
+// [2025-07-25T00:00:00Z] — Added polling timer for live technician status/ETA refresh (SignalR-ready stub).
+@model MVP_Core.Pages.Admin.SchedulerQueueModel
+@using MVP_Core.Models.Dispatch
+@inject MVP_Core.Services.NotificationDispatchEngine DispatchEngine
+@{
+    Layout = "/Pages/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Scheduler Queue";
+    var sortBy = Request.Query["sortBy"].ToString();
+    var filterStatus = Request.Query["filterStatus"].ToString();
+    var filteredQueue = Model.Queue;
+    if (!string.IsNullOrEmpty(filterStatus))
+        filteredQueue = filteredQueue.Where(q => q.TechnicianStatus == filterStatus).ToList();
+    if (sortBy == "eta")
+        filteredQueue = filteredQueue.OrderBy(q => q.EstimatedArrival ?? DateTime.MaxValue).ToList();
+    else if (sortBy == "tech")
+        filteredQueue = filteredQueue.OrderBy(q => q.AssignedTechnicianName ?? "").ToList();
+}
+<head>
+    @await Html.PartialAsync("/Pages/Shared/_SEOHead.cshtml")
+</head>
+<div class="container-fluid px-2 px-md-4 mt-4">
+    <h2 class="mb-4 text-primary">Scheduler Queue</h2>
+    <partial name="_ValidationSummary" />
+    @if (TempData["SystemMessages"] != null)
+    {
+        ViewData["AlertType"] = "info";
+        ViewData["AlertMessage"] = TempData["SystemMessages"];
+        <partial name="_Alert" />
+    }
+    <form method="get" class="row g-2 mb-3 align-items-end">
+        <div class="col-md-3">
+            <label class="form-label">Sort By</label>
+            <select name="sortBy" class="form-select" onchange="this.form.submit()">
+                @if (string.IsNullOrEmpty(sortBy)) {
+                    <option value="" selected>Default</option>
+                } else {
+                    <option value="">Default</option>
+                }
+                @if (sortBy == "eta") {
+                    <option value="eta" selected>ETA</option>
+                } else {
+                    <option value="eta">ETA</option>
+                }
+                @if (sortBy == "tech") {
+                    <option value="tech" selected>Technician Name</option>
+                } else {
+                    <option value="tech">Technician Name</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">Filter Status</label>
+            <select name="filterStatus" class="form-select" onchange="this.form.submit()">
+                @if (string.IsNullOrEmpty(filterStatus)) {
+                    <option value="" selected>All</option>
+                } else {
+                    <option value="">All</option>
+                }
+                @if (filterStatus == "Available") {
+                    <option value="Available" selected>Available</option>
+                } else {
+                    <option value="Available">Available</option>
+                }
+                @if (filterStatus == "Busy") {
+                    <option value="Busy" selected>Busy</option>
+                } else {
+                    <option value="Busy">Busy</option>
+                }
+                @if (filterStatus == "Unavailable") {
+                    <option value="Unavailable" selected>Unavailable</option>
+                } else {
+                    <option value="Unavailable">Unavailable</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-3">
+            <button type="submit" class="btn btn-outline-secondary">Apply</button>
+        </div>
+    </form>
+    <form method="post" asp-page-handler="Reannotate" class="mb-3">
+        <button type="submit" class="btn btn-warning">
+            <i class="bi bi-arrow-repeat"></i> Re-annotate Technician Status & ETA
+        </button>
+    </form>
+    @if (filteredQueue != null && filteredQueue.Any())
+    {
+        <div class="table-responsive">
+            <table class="table table-hover table-bordered align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Technician Name</th>
+                        <th>Status</th>
+                        <th>Service Request</th>
+                        <th>Scheduled For</th>
+                        <th>ETA</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in filteredQueue)
+                    {
+                        <tr>
+                            <td>@item.AssignedTechnicianName ?? $"ID: {item.TechnicianId}"</td>
+                            <td><span class="badge @(item.TechnicianStatus == "Available" ? "bg-success" : item.TechnicianStatus == "Busy" ? "bg-warning text-dark" : "bg-secondary")">@item.TechnicianStatus</span></td>
+                            <td>@item.ServiceRequestId</td>
+                            <td>@item.ScheduledFor.ToLocalTime().ToString("g")</td>
+                            <td>
+                                @if (item.EstimatedArrival.HasValue)
+                                {
+                                    <span class="fw-bold">@item.EstimatedArrival.Value.ToLocalTime().ToString("t")</span>
+                                    <span class="small text-muted">(@((item.EstimatedArrival.Value - DateTime.UtcNow).TotalMinutes.ToString("0")) min)</span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">N/A</span>
+                                }
+                            </td>
+                            <td>
+                                <form method="post" asp-page-handler="Notify" style="display:inline;">
+                                    <input type="hidden" name="technicianId" value="@item.TechnicianId" />
+                                    <input type="hidden" name="serviceRequestId" value="@item.ServiceRequestId" />
+                                    <button type="submit" class="btn btn-sm btn-success">Notify</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-warning">No scheduled requests in queue.</div>
+    }
+</div>
+@section Scripts {
+    <script>
+        // Polling timer for live technician status/ETA refresh (SignalR-ready stub)
+        setInterval(function() {
+            document.querySelector('form[asp-page-handler="Reannotate"]')?.submit();
+        }, 30000); // 30s interval
+    </script>
+}
