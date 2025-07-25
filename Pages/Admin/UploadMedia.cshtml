@@ -1,0 +1,52 @@
+@page
+@using MVP_Core.Data.Models
+@using MVP_Core.Models.Admin
+@inject MVP_Core.Services.MediaUploadService MediaService
+@inject MVP_Core.Services.Admin.DispatcherService DispatcherService
+@model MVP_Core.Pages.Admin.UploadMediaModel
+@{
+    // Sprint 23: Admin/dispatcher media upload page
+    ViewData["Title"] = "Upload Media";
+    var techList = DispatcherService.GetAllTechnicianHeartbeats() ?? new List<TechnicianStatusDto>();
+    var jobList = new List<ServiceRequest>(); // TODO: Query jobs for dropdown
+    string status = TempData["MediaStatus"] as string ?? "";
+    var safeNotesOrTags = Model?.NotesOrTags ?? string.Empty;
+}
+<h2 class="mb-4">?? Upload Media</h2>
+<form method="post" enctype="multipart/form-data">
+    <div class="mb-3">
+        <label class="form-label">Technician</label>
+        <select name="TechnicianId" class="form-select" required>
+            <option value="">Select technician...</option>
+            @foreach (var tech in techList)
+            {
+                <option value="@tech.TechnicianId">@tech.Name</option>
+            }
+        </select>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Job Request</label>
+        <select name="RequestId" class="form-select" required>
+            <option value="">Select job...</option>
+            @foreach (var job in jobList)
+            {
+                <option value="@job.Id">#@job.Id - @job.ServiceType</option>
+            }
+        </select>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">File</label>
+        <input type="file" name="MediaFile" class="form-control" accept=".jpg,.jpeg,.png,.gif,.pdf,.mp4" required />
+        <small class="text-muted">Accepted: jpg, jpeg, png, gif, pdf, mp4. Max 10MB.</small>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Notes/Tags (optional)</label>
+        <input type="text" name="NotesOrTags" class="form-control" maxlength="500" value="@safeNotesOrTags" />
+    </div>
+    <button type="submit" class="btn btn-primary">Upload</button>
+</form>
+@if (!string.IsNullOrEmpty(status))
+{
+    <div class="alert alert-info mt-3">@status</div>
+}
+<!-- Co-Pilot: This page allows admin/dispatcher to upload media for a job. Validates file type/size. Only allowed roles. -->

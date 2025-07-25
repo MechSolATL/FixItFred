@@ -1,0 +1,69 @@
+@page
+@using MVP_Core.Data.Models
+@inject MVP_Core.Services.MediaUploadService MediaService
+@{
+    // Sprint 23: Media vault for viewing uploaded files
+    ViewData["Title"] = "Media Vault";
+    int techId = 0;
+    int.TryParse(Request.Query["techId"], out techId);
+    int requestId = 0;
+    int.TryParse(Request.Query["requestId"], out requestId);
+    string filterType = (Request.Query["type"].ToString() == "" ? "" : Request.Query["type"].ToString());
+    List<TechnicianMedia> mediaList = requestId > 0 ? MediaService.GetMediaForRequest(requestId) : (techId > 0 ? MediaService.GetMediaForTechnician(techId) : new List<TechnicianMedia>());
+    if (!string.IsNullOrEmpty(filterType))
+        mediaList = mediaList.Where(m => m.FileType == filterType).ToList();
+}
+<h2 class="mb-4">?? Media Vault</h2>
+@if (mediaList == null || !mediaList.Any())
+{
+    <div class="alert alert-info">No media found for this technician or request.</div>
+}
+else
+{
+    <div class="mb-3">
+        <label>Filter by type:</label>
+        <select onchange="location.href='?requestId=@requestId&type='+this.value" class="form-select w-auto d-inline-block">
+            <option value="">All</option>
+            <option value="Image">Image</option>
+            <option value="PDF">PDF</option>
+            <option value="Video">Video</option>
+        </select>
+    </div>
+    @foreach (var group in mediaList.GroupBy(m => m.UploadedAt.Date))
+    {
+        <h5 class="mt-4">@group.Key.ToShortDateString()</h5>
+        <div class="row">
+        @foreach (var media in group)
+        {
+            <div class="col-md-3 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="mb-2">
+                            @if (media.FileType == "Image")
+                            {
+                                <img src="/media/@media.RequestId/@media.FileName" class="img-fluid" alt="Media" />
+                            }
+                            else if (media.FileType == "PDF")
+                            {
+                                <a href="/media/@media.RequestId/@media.FileName" target="_blank">?? PDF</a>
+                            }
+                            else if (media.FileType == "Video")
+                            {
+                                <video src="/media/@media.RequestId/@media.FileName" controls width="100%"></video>
+                            }
+                            else
+                            {
+                                <a href="/media/@media.RequestId/@media.FileName" target="_blank">Download</a>
+                            }
+                        </div>
+                        <div><strong>Uploaded By:</strong> @media.UploadedBy</div>
+                        <div><strong>Notes/Tags:</strong> @media.NotesOrTags</div>
+                        <button class="btn btn-sm btn-danger mt-2" disabled title="Delete (stub)">?? Delete</button>
+                    </div>
+                </div>
+            </div>
+        }
+        </div>
+    }
+}
+<!-- Co-Pilot: This page lists media for a technician or request, grouped by date, with type filter and preview. Only allowed roles. Delete is stubbed. -->

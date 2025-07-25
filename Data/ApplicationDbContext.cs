@@ -56,6 +56,9 @@ namespace MVP_Core.Data
         public DbSet<TechnicianSkill> TechnicianSkills { get; set; } = null!;
         public DbSet<TechnicianSkillMap> TechnicianSkillMaps { get; set; } = null!;
         public DbSet<TechnicianLoadLog> TechnicianLoadLogs { get; set; } = null!;
+        public DbSet<TechnicianMessage> TechnicianMessages { get; set; } = null!; // Sprint 21: Messaging model
+        public DbSet<TechnicianFeedback> TechnicianFeedbacks { get; set; } = null!; // Sprint 22: Technician rating/feedback
+        public DbSet<TechnicianMedia> TechnicianMedias { get; set; } = null!; // Sprint 23: Media uploads
 
         #endregion
 

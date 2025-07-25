@@ -1,453 +1,449 @@
 @page
+@using System.Linq
+@using MVP_Core.Models.Admin
+@using MVP_Core.Data.Models
 @model MVP_Core.Pages.Admin.DispatcherModel
 @{
     ViewData["Title"] = "Dispatcher Kanban";
     Layout = "/Pages/Shared/_Layout.cshtml";
     var statuses = new[] { "Unassigned", "Assigned", "En Route", "Complete" };
     var activeTab = Request.Query["tab"].ToString() ?? "Unassigned";
-    var filteredRequests = ViewData["RequestDetails"] as List<MVP_Core.Services.Admin.RequestSummaryDto> ?? new List<MVP_Core.Services.Admin.RequestSummaryDto>();
-    var techList = ViewData["TechnicianList"] as List<string> ?? new List<string>();
-    var broadcast = DispatcherService.GetActiveBroadcast();
-    var techHeartbeats = DispatcherService.GetAllTechnicianHeartbeats();
+    var filteredRequests = Model.DispatcherRequests ?? new List<RequestSummaryDto>();
+    var techList = Model.TechnicianStatuses?.Select(t => t.Name).ToList() ?? new List<string>();
+    var broadcast = Model.Notifications?.FirstOrDefault(n => n.Type == "Broadcast");
+    var techHeartbeats = Model.TechnicianStatuses ?? new List<TechnicianStatusDto>();
+    var stats = Model.DispatcherStats;
 }
-<div class="container-fluid mt-4">
-    <h2 class="mb-4">?? Dispatcher Kanban Board</h2>
-    @* --- Broadcast Banner --- *@
-    @if (broadcast != null && broadcast.IsActive)
-    {
-        <div class="alert alert-danger text-center" role="alert">
-            ?? @broadcast.Message
-            @if (broadcast.ExpiresAt.HasValue)
-            {
-                <span class="ms-2 small text-muted">(Expires @broadcast.ExpiresAt.Value.ToLocalTime():t)</span>
-            }
-        </div>
-    }
-    @* --- End Broadcast Banner --- *@
-    @* --- Dispatcher Metrics Overlay --- *@
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card shadow-sm mb-3">
-                <div class="card-body py-3 px-4">
-                    @if (ViewData["DispatcherStats"] is MVP_Core.Models.Admin.DispatcherStatsDto stats)
-                    {
-                        <div class="row text-center">
-                            <div class="col-md-2 col-6 mb-2">
-                                <span class="fw-bold">Total Active Requests</span><br />
-                                <span class="display-6 text-primary">@stats.TotalActiveRequests</span>
-                            </div>
-                            <div class="col-md-2 col-6 mb-2">
-                                <span class="fw-bold">Techs In Transit</span><br />
-                                <span class="display-6 text-info">@stats.TechsInTransit</span>
-                            </div>
-                            <div class="col-md-2 col-6 mb-2">
-                                <span class="fw-bold">Follow-Ups Flagged</span><br />
-                                <span class="display-6 text-warning">@stats.FollowUps</span>
-                            </div>
-                            <div class="col-md-2 col-6 mb-2">
-                                <span class="fw-bold">Delayed Jobs</span><br />
-                                <span class="display-6 text-danger">@stats.Delays</span>
-                            </div>
-                            <div class="col-md-3 col-12 mb-2">
-                                <span class="fw-bold">Top Service Type Today</span><br />
-                                <span class="display-6 text-success">@stats.TopServiceType</span>
-                            </div>
-                            <div class="col-md-1 col-12 mb-2">
-                                <span class="fw-bold">ZIP Heatmap</span><br />
-                                <span class="badge bg-secondary">Preview</span>
-                            </div>
-                        </div>
-                    }
-                    else
-                    {
-                        <div class="alert alert-info mb-0">No job data available.</div>
-                    }
-                </div>
-            </div>
-        </div>
+@* --- Broadcast Banner --- *@
+@if (broadcast != null)
+{
+    <div class="alert alert-danger text-center" role="alert">
+        ?? @broadcast.Message
+        @if (broadcast.ExpiresAt.HasValue)
+        {
+            <span class="ms-2 small text-muted">(Expires @broadcast.ExpiresAt.Value.ToLocalTime():t)</span>
+        }
     </div>
-    @* --- End Dispatcher Metrics Overlay --- *@
-    @* --- Smart Dispatcher Filter Panel --- *@
-    <form method="post" asp-page-handler="ApplyFilters" class="mb-4">
-        <div class="row g-2 align-items-end">
-            <div class="col-md-2">
-                <label class="form-label">Service Type</label>
-                <select name="ServiceType" class="form-select">
-                    <option value="">All</option>
-                    <option value="Plumbing">Plumbing</option>
-                    <option value="Heating">Heating</option>
-                </select>
-            </div>
-            <div class="col-md-2">
-                <label class="form-label">Technician</label>
-                <select name="Technician" class="form-select">
-                    <option value="">All</option>
-                    <option value="Alice Smith">Alice Smith</option>
-                    <option value="Bob Jones">Bob Jones</option>
-                    <option value="Carlos Lee">Carlos Lee</option>
-                    <option value="Dana Patel">Dana Patel</option>
-                    <option value="Evan Kim">Evan Kim</option>
-                </select>
-            </div>
-            <div class="col-md-2">
-                <label class="form-label">Status</label>
-                <select name="Status" class="form-select">
-                    <option value="">All</option>
-                    <option value="Open">Open</option>
-                    <option value="Assigned">Assigned</option>
-                    <option value="Delayed">Delayed</option>
-                    <option value="Follow-up">Follow-up</option>
-                </select>
-            </div>
-            <div class="col-md-2">
-                <label class="form-label">Sort By</label>
-                <select name="SortBy" class="form-select">
-                    <option value="">Default</option>
-                    <option value="Oldest">Oldest First</option>
-                    <option value="MostDelayed">Most Delayed</option>
-                    <option value="ZIP">ZIP</option>
-                </select>
-            </div>
-            <div class="col-md-2">
-                <button class="btn btn-primary mt-2">Apply Filters</button>
-            </div>
-        </div>
-    </form>
-    @* --- End Smart Dispatcher Filter Panel --- *@
-
-    @* --- Filtered Request Panel --- *@
-    @if (filteredRequests.Any())
-    {
-        <div class="row mb-4">
-            <div class="col-12">
-                <h4>Filtered Requests</h4>
-                @if (!filteredRequests.Any())
+}
+@* --- Dispatcher Metrics Overlay --- *@
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card shadow-sm mb-3">
+            <div class="card-body py-3 px-4">
+                @if (stats != null)
                 {
-                    <div class="alert alert-warning">No matching requests.</div>
+                    <div class="row text-center">
+                        <div class="col-md-2 col-6 mb-2">
+                            <span class="fw-bold">Total Active Requests</span><br />
+                            <span class="display-6 text-primary">@stats.TotalActiveRequests</span>
+                        </div>
+                        <div class="col-md-2 col-6 mb-2">
+                            <span class="fw-bold">Techs In Transit</span><br />
+                            <span class="display-6 text-info">@stats.TechsInTransit</span>
+                        </div>
+                        <div class="col-md-2 col-6 mb-2">
+                            <span class="fw-bold">Follow-Ups Flagged</span><br />
+                            <span class="display-6 text-warning">@stats.FollowUps</span>
+                        </div>
+                        <div class="col-md-2 col-6 mb-2">
+                            <span class="fw-bold">Delayed Jobs</span><br />
+                            <span class="display-6 text-danger">@stats.Delays</span>
+                        </div>
+                        <div class="col-md-3 col-12 mb-2">
+                            <span class="fw-bold">Top Service Type Today</span><br />
+                            <span class="display-6 text-success">@stats.TopServiceType</span>
+                        </div>
+                        <div class="col-md-1 col-12 mb-2">
+                            <span class="fw-bold">ZIP Heatmap</span><br />
+                            <span class="badge bg-secondary">Preview</span>
+                        </div>
+                    </div>
                 }
                 else
                 {
-                    <table class="table table-bordered table-hover">
-                        <thead class="table-light">
-                            <tr>
-                                <th>ID</th>
-                                <th>Service Type</th>
-                                <th>Technician</th>
-                                <th>Status</th>
-                                <th>Priority</th>
-                                <th>ZIP</th>
-                                <th>Delay (min)</th>
-                                <th>Reassign</th>
-                                <th>Emergency</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        @foreach (var req in filteredRequests)
-                        {
-                            var emergencyClass = req.IsEmergency ? "border border-danger" : "";
-                            <tr class="@emergencyClass">
-                                <td>@req.Id @if (req.IsEmergency) { <span title="Emergency" class="text-danger fw-bold">??</span> }</td>
-                                <td>@req.ServiceType</td>
-                                <td>@req.Technician</td>
-                                <td>@req.Status</td>
-                                <td>@req.Priority</td>
-                                <td>@req.Zip</td>
-                                <td>@req.DelayMinutes</td>
-                                <td>
-                                    @if (User.IsInRole("Dispatcher") || User.IsInRole("Supervisor")) {
-                                    <form method="post" asp-page-handler="ReassignTech" style="display:inline;">
-                                        <input type="hidden" name="requestId" value="@req.Id" />
-                                        @{
-                                            var skillTagMasterList = new[] { "Plumbing", "Air Conditioning", "Heating", "Water Filtration", "Trainee", "Mentor" };
-                                            string requiredSkill = req.ServiceType ?? "";
-                                            string jobZip = req.Zip ?? "";
-                                            var suggestedTechs = DispatcherService.GetSuggestedTechsBySkill(requiredSkill, jobZip);
-                                        }
-                                        <select name="newTechnicianId" class="form-select form-select-sm d-inline-block w-auto me-1">
-                                            @if (suggestedTechs != null && suggestedTechs.Any())
-                                            {
-                                                @foreach (var tech in suggestedTechs)
-                                                {
-                                                    <option value="@tech.TechnicianId">@tech.Name</option>
-                                                }
-                                            }
-                                            else
-                                            {
-                                                <option disabled>No matching techs — show all</option>
-                                                @foreach (var tech in techHeartbeats)
-                                                {
-                                                    <option value="@tech.TechnicianId">@tech.Name</option>
-                                                }
-                                            }
-                                        </select>
-                                        <button type="submit" class="btn btn-outline-primary btn-sm">Reassign</button>
-                                    </form>
-                                    }
-                                </td>
-                                <td>
-                                    @if (User.IsInRole("Supervisor")) {
-                                    <form method="post" asp-page-handler="FlagEmergency" style="display:inline;">
-                                        <input type="hidden" name="requestId" value="@req.Id" />
-                                        <button type="submit" class="btn btn-danger btn-sm">?? Emergency</button>
-                                    </form>
-                                    }
-                                </td>
-                                <td>
-                                    <a href="/Admin/DispatcherHistory?requestId=@req.Id" class="btn btn-outline-info btn-sm">View Timeline</a>
-                                </td>
-                            </tr>
-                        }
-                        </tbody>
-                    </table>
+                    <div class="alert alert-info mb-0">No job data available.</div>
                 }
             </div>
         </div>
-    }
-    @* --- End Filtered Request Panel --- *@
-    <div class="row mb-3">
-        <div class="col-md-9">
-            <form method="get" class="mb-0">
-                <div class="row g-2 align-items-end">
-                    <div class="col-md-2">
-                        <label class="form-label">SLA Filter</label>
-                        <select name="SlaFilter" class="form-select" onchange="this.form.submit()">
-                            @if (string.IsNullOrEmpty(Model.SlaFilter)) {
-                                <option value="" selected>All Jobs</option>
-                            } else {
-                                <option value="">All Jobs</option>
-                            }
-                            @if (Model.SlaFilter == "overdue") {
-                                <option value="overdue" selected>Overdue</option>
-                            } else {
-                                <option value="overdue">Overdue</option>
-                            }
-                            @if (Model.SlaFilter == "today") {
-                                <option value="today" selected>Due Today</option>
-                            } else {
-                                <option value="today">Due Today</option>
-                            }
-                        </select>
-                    </div>
-                    <div class="col-md-3">
-                        <label for="serviceType" class="form-label">Service Type</label>
-                        <select id="serviceType" name="FilterServiceType" class="form-select" onchange="this.form.submit()">
-                            @if (string.IsNullOrEmpty(Model.FilterServiceType)) {
-                                <option value="" selected>All</option>
-                            } else {
-                                <option value="">All</option>
-                            }
-                            @foreach (var type in Model.ServiceTypes)
-                            {
-                                if (Model.FilterServiceType == type) {
-                                    <option value="@type" selected>@type</option>
-                                } else {
-                                    <option value="@type">@type</option>
-                                }
-                            }
-                        </select>
-                    </div>
-                    <div class="col-md-3">
-                        <label for="since" class="form-label">Submitted Since</label>
-                        <input type="date" id="since" name="FilterSinceString" class="form-control" value="@Model.FilterSinceString" onchange="this.form.submit()" />
-                    </div>
-                    <div class="col-md-3">
-                        <label for="sortBy" class="form-label">Sort By</label>
-                        <select id="sortBy" name="SortBy" class="form-select" onchange="this.form.submit()">
-                            @if (Model.SortBy == "priority") {
-                                <option value="priority" selected>Priority</option>
-                            } else {
-                                <option value="priority">Priority</option>
-                            }
-                            @if (Model.SortBy == "service") {
-                                <option value="service" selected>Service Type</option>
-                            } else {
-                                <option value="service">Service Type</option>
-                            }
-                            @if (Model.SortBy == "time") {
-                                <option value="time" selected>Submission Time</option>
-                            } else {
-                                <option value="time">Submission Time</option>
-                            }
-                        </select>
-                    </div>
-                </div>
-            </form>
-        </div>
-        <div class="col-md-3">
-            <div class="card border-danger sla-alerts-panel mb-3">
-                <div class="card-header bg-danger text-white py-2 px-3"><strong>Escalated Jobs</strong></div>
-                <div class="card-body p-2">
-                    <ul class="list-unstyled mb-0" id="escalated-jobs-list">
-                        @foreach (var job in Model.Requests.Where(r => r.IsEscalated).OrderByDescending(r => r.EscalatedAt))
-                        {
-                            <li class="mb-1"><span class="badge bg-danger">Escalated</span> <span class="ms-1">#@job.Id @job.CustomerName</span></li>
-                        }
-                    </ul>
-                </div>
-            </div>
-            <div class="card border-warning sla-alerts-panel">
-                <div class="card-header bg-warning text-dark py-2 px-3"><strong>Upcoming SLA Alerts</strong></div>
-                <div class="card-body p-2">
-                    <ul class="list-unstyled mb-0" id="sla-alerts-list">
-                        @foreach (var job in Model.Requests.Where(r => r.DueDate.HasValue && r.DueDate.Value > DateTime.UtcNow && (r.DueDate.Value - DateTime.UtcNow).TotalHours < 2).OrderBy(r => r.DueDate))
-                        {
-                            if (job.DueDate.HasValue)
-                            {
-                                <li class="mb-1"><span class="badge bg-warning text-dark">Due @job.DueDate.Value.ToLocalTime():t</span> <span class="ms-1">#@job.Id @job.CustomerName</span></li>
-                            }
-                        }
-                    </ul>
-                </div>
-            </div>
-        </div>
     </div>
-    <div class="mb-5" id="kanban-analytics">
-        <h4>Kanban Analytics</h4>
-        <div class="row g-3">
-            <div class="col-md-4">
-                <canvas id="kanbanStatusChart" height="180"></canvas>
-            </div>
-            <div class="col-md-4">
-                <canvas id="kanbanPriorityChart" height="180"></canvas>
-            </div>
-            <div class="col-md-4">
-                <div class="card p-3">
-                    <h6 class="mb-2">Job Stats</h6>
-                    <ul class="list-unstyled mb-0">
-                        <li><strong>Total:</strong> <span id="stat-total">@Model.Requests.Count</span></li>
-                        <li><strong>Unassigned:</strong> <span id="stat-unassigned">@Model.Requests.Count(r => (Model.TechnicianStatuses.TryGetValue(r.Id, out var s) ? s : "Unassigned") == "Unassigned")</span></li>
-                        <li><strong>Assigned:</strong> <span id="stat-assigned">@Model.Requests.Count(r => (Model.TechnicianStatuses.TryGetValue(r.Id, out var s) ? s : "Unassigned") == "Assigned")</span></li>
-                        <li><strong>En Route:</strong> <span id="stat-enroute">@Model.Requests.Count(r => (Model.TechnicianStatuses.TryGetValue(r.Id, out var s) ? s : "Unassigned") == "En Route")</span></li>
-                        <li><strong>Complete:</strong> <span id="stat-complete">@Model.Requests.Count(r => (Model.TechnicianStatuses.TryGetValue(r.Id, out var s) ? s : "Unassigned") == "Complete")</span></li>
-                        <li><strong>High Priority:</strong> <span id="stat-high">@Model.Requests.Count(r => r.Priority == "High")</span></li>
-                        <li><strong>Normal Priority:</strong> <span id="stat-normal">@Model.Requests.Count(r => r.Priority == "Normal")</span></li>
-                        <li><strong>Low Priority:</strong> <span id="stat-low">@Model.Requests.Count(r => r.Priority == "Low")</span></li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </div>
-    <ul class="nav nav-tabs mb-3" id="kanbanTabs">
-        @foreach (var status in statuses)
-        {
-            <li class="nav-item">
-                <a class="nav-link @(activeTab == status ? "active" : "")" href="?tab=@status">@status</a>
-            </li>
-        }
-    </ul>
-    <form id="reorderForm" method="post" asp-page-handler="Reorder" style="display:none;">
-        <input type="hidden" name="OrderJson" id="orderJson" />
-    </form>
-    @await Html.PartialAsync("_TechnicianLoadPanel", Model.TechnicianLoads)
-    <div class="row kanban-board" id="kanbanBoard">
-        @foreach (var status in statuses)
-        {
-            <div class="col kanban-column">
-                <div class="kanban-column-header bg-light p-2 mb-2 border rounded"><strong>@status</strong></div>
-                <div class="kanban-cards" id="kanban-@status" data-status="@status" style="min-height: 200px;">
-                    @foreach (var req in Model.Requests.Where(r => (Model.TechnicianStatuses.TryGetValue(r.Id, out var s) ? s : "Unassigned") == status))
-                    {
-                        <div data-request-id="@req.Id">
-                            @await Html.PartialAsync("_JobCard", req)
-                            @if (string.IsNullOrEmpty(req.AssignedTechnicianId?.ToString()) && status == "Unassigned")
-                            {
-                                if (Model.SuggestedTech.ContainsKey(req.Id))
-                                {
-                                    var suggestion = Model.SuggestedTech[req.Id];
-                                    <div class="suggested-tech mt-2">
-                                        <strong>Suggested:</strong> @suggestion.TechName 
-                                        (<span class="text-muted">@suggestion.Confidence %</span>)
-                                    </div>
-                                }
-                                <form method="post" asp-page-handler="AutoAssign" asp-route-requestId="@req.Id" class="mt-1">
-                                    <button class="btn btn-warning btn-sm">Auto Assign</button>
-                                    @Html.AntiForgeryToken()
-                                </form>
-                            }
-                        </div>
-                    }
-                </div>
-            </div>
-        }
-    </div>
-    @if (Model.Requests != null && !Model.Requests.Any())
-    {
-        <div class="alert alert-info mt-4">No service requests found for the selected filters.</div>
-    }
-    <hr class="my-5" />
-    <h4>Kanban Job Movement History</h4>
-    <form method="get" class="row g-2 mb-3 align-items-end">
+</div>
+@* --- Smart Dispatcher Filter Panel --- *@
+<form method="post" asp-page-handler="ApplyFilters" class="mb-4">
+    <div class="row g-2 align-items-end">
         <div class="col-md-2">
-            <label class="form-label">From Status</label>
-            <select name="HistoryFromStatus" class="form-select" onchange="this.form.submit()">
+            <label class="form-label">Service Type</label>
+            <select name="ServiceType" class="form-select">
                 <option value="">All</option>
-                @foreach (var s in statuses) {
-                    if (Model.HistoryFromStatus == s) {
-                        <option value="@s" selected>@s</option>
-                    } else {
-                        <option value="@s">@s</option>
-                    }
-                }
+                <option value="Plumbing">Plumbing</option>
+                <option value="Heating">Heating</option>
             </select>
         </div>
         <div class="col-md-2">
-            <label class="form-label">To Status</label>
-            <select name="HistoryToStatus" class="form-select" onchange="this.form.submit()">
+            <label class="form-label">Technician</label>
+            <select name="Technician" class="form-select">
                 <option value="">All</option>
-                @foreach (var s in statuses) {
-                    if (Model.HistoryToStatus == s) {
-                        <option value="@s" selected>@s</option>
-                    } else {
-                        <option value="@s">@s</option>
-                    }
-                }
-            </select>
-        </div>
-        <div class="col-md-2">
-            <label class="form-label">User</label>
-            <input type="text" name="HistoryUser" class="form-control" value="@Model.HistoryUser" placeholder="User..." onchange="this.form.submit()" />
-        </div>
-        <div class="col-md-2">
-            <label class="form-label">From Date</label>
-            <input type="date" name="HistoryFromDate" class="form-control" value="@Model.HistoryFromDateString" onchange="this.form.submit()" />
-        </div>
-        <div class="col-md-2">
-            <label class="form-label">To Date</label>
-            <input type="date" name="HistoryToDate" class="form-control" value="@Model.HistoryToDateString" onchange="this.form.submit()" />
-        </div>
-        <div class="col-md-2 text-end">
-            <button type="submit" name="export" value="csv" class="btn btn-outline-secondary me-2">Export CSV</button>
-            <button type="submit" name="export" value="excel" class="btn btn-outline-success">Export Excel</button>
-        </div>
-    </form>
-    <div class="table-responsive">
-        <table class="table table-sm table-bordered align-middle">
-            <thead class="table-light">
-                <tr>
-                    <th>Time</th>
-                    <th>Job ID</th>
-                    <th>From</th>
-                    <th>To</th>
-                    <th>To Index</th>
-                    <th>User</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var log in Model.KanbanHistory)
+                @foreach (var tech in techList)
                 {
+                    <option value="@tech">@tech</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">Status</label>
+            <select name="Status" class="form-select">
+                <option value="">All</option>
+                <option value="Open">Open</option>
+                <option value="Assigned">Assigned</option>
+                <option value="Delayed">Delayed</option>
+                <option value="Follow-up">Follow-up</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">Sort By</label>
+            <select name="SortBy" class="form-select">
+                <option value="">Default</option>
+                <option value="Oldest">Oldest First</option>
+                <option value="MostDelayed">Most Delayed</option>
+                <option value="ZIP">ZIP</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <button class="btn btn-primary mt-2">Apply Filters</button>
+        </div>
+    </div>
+</form>
+@* --- Filtered Request Panel --- *@
+@if (filteredRequests.Any())
+{
+    <div class="row mb-4">
+        <div class="col-12">
+            <h4>Filtered Requests</h4>
+            <table class="table table-bordered table-hover">
+                <thead class="table-light">
                     <tr>
-                        <td>@log.ChangedAt.ToLocalTime().ToString("g")</td>
-                        <td>@log.ServiceRequestId</td>
-                        <td>@log.FromStatus</td>
-                        <td>@log.ToStatus</td>
-                        <td>@log.ToIndex</td>
-                        <td>@log.ChangedBy</td>
+                        <th>ID</th>
+                        <th>Service Type</th>
+                        <th>Technician</th>
+                        <th>Status</th>
+                        <th>Priority</th>
+                        <th>ZIP</th>
+                        <th>Delay (min)</th>
+                        <th>Reassign</th>
+                        <th>Emergency</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @foreach (var req in filteredRequests)
+                {
+                    var emergencyClass = req.IsEmergency ? "border border-danger" : "";
+                    <tr class="@emergencyClass">
+                        <td>@req.Id @if (req.IsEmergency) { <span title="Emergency" class="text-danger fw-bold">??</span> }</td>
+                        <td>@req.ServiceType</td>
+                        <td>@req.Technician</td>
+                        <td>@req.Status</td>
+                        <td>@req.Priority</td>
+                        <td>@req.Zip</td>
+                        <td>@req.DelayMinutes</td>
+                        <td>
+                            @if (User.IsInRole("Dispatcher") || User.IsInRole("Supervisor")) {
+                            <form method="post" asp-page-handler="ReassignTech" style="display:inline;">
+                                <input type="hidden" name="requestId" value="@req.Id" />
+                                @{
+                                    var skillTagMasterList = new[] { "Plumbing", "Air Conditioning", "Heating", "Water Filtration", "Trainee", "Mentor" };
+                                    string requiredSkill = req.ServiceType ?? "";
+                                    string jobZip = req.Zip ?? "";
+                                    var suggestedTechs = Model.TechnicianStatuses.Where(t => t.Status == requiredSkill && t.Name != null).ToList();
+                                }
+                                <select name="newTechnicianId" class="form-select form-select-sm d-inline-block w-auto me-1">
+                                    @if (suggestedTechs != null && suggestedTechs.Any())
+                                    {
+                                        @foreach (var tech in suggestedTechs)
+                                        {
+                                            <option value="@tech.TechnicianId">@tech.Name</option>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <option disabled>No matching techs — show all</option>
+                                        @foreach (var tech in Model.TechnicianStatuses)
+                                        {
+                                            <option value="@tech.TechnicianId">@tech.Name</option>
+                                        }
+                                    }
+                                </select>
+                                <button type="submit" class="btn btn-outline-primary btn-sm">Reassign</button>
+                            </form>
+                            }
+                        </td>
+                        <td>
+                            @if (User.IsInRole("Supervisor")) {
+                            <form method="post" asp-page-handler="FlagEmergency" style="display:inline;">
+                                <input type="hidden" name="requestId" value="@req.Id" />
+                                <button type="submit" class="btn btn-danger btn-sm">?? Emergency</button>
+                            </form>
+                            }
+                        </td>
+                        <td>
+                            <a href="/Admin/RequestMessages?requestId=@req.Id" class="btn btn-outline-secondary btn-sm">?? Messages</a>
+                            <a href="/Admin/DispatcherHistory?requestId=@req.Id" class="btn btn-outline-info btn-sm">View Timeline</a>
+                            <a href="/Admin/UploadMedia?requestId=@req.Id" class="btn btn-outline-primary btn-sm">?? Upload Media</a>
+                            <a href="/Admin/ViewMedia?requestId=@req.Id" class="btn btn-outline-secondary btn-sm">?? View Media Vault</a>
+                        </td>
                     </tr>
                 }
-            </tbody>
-        </table>
+                </tbody>
+            </table>
+        </div>
     </div>
+}
+@* --- End Filtered Request Panel --- *@
+<div class="row mb-3">
+    <div class="col-md-9">
+        <form method="get" class="mb-0">
+            <div class="row g-2 align-items-end">
+                <div class="col-md-2">
+                    <label class="form-label">SLA Filter</label>
+                    <select name="SlaFilter" class="form-select" onchange="this.form.submit()">
+                        @if (string.IsNullOrEmpty(Model.SlaFilter)) {
+                            <option value="" selected>All Jobs</option>
+                        } else {
+                            <option value="">All Jobs</option>
+                        }
+                        @if (Model.SlaFilter == "overdue") {
+                            <option value="overdue" selected>Overdue</option>
+                        } else {
+                            <option value="overdue">Overdue</option>
+                        }
+                        @if (Model.SlaFilter == "today") {
+                            <option value="today" selected>Due Today</option>
+                        } else {
+                            <option value="today">Due Today</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="serviceType" class="form-label">Service Type</label>
+                    <select id="serviceType" name="FilterServiceType" class="form-select" onchange="this.form.submit()">
+                        @if (string.IsNullOrEmpty(Model.FilterServiceType)) {
+                            <option value="" selected>All</option>
+                        } else {
+                            <option value="">All</option>
+                        }
+                        @foreach (var type in Model.ServiceTypes)
+                        {
+                            if (Model.FilterServiceType == type) {
+                                <option value="@type" selected>@type</option>
+                            } else {
+                                <option value="@type">@type</option>
+                            }
+                        }
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="since" class="form-label">Submitted Since</label>
+                    <input type="date" id="since" name="FilterSinceString" class="form-control" value="@Model.FilterSinceString" onchange="this.form.submit()" />
+                </div>
+                <div class="col-md-3">
+                    <label for="sortBy" class="form-label">Sort By</label>
+                    <select id="sortBy" name="SortBy" class="form-select" onchange="this.form.submit()">
+                        @if (Model.SortBy == "priority") {
+                            <option value="priority" selected>Priority</option>
+                        } else {
+                            <option value="priority">Priority</option>
+                        }
+                        @if (Model.SortBy == "service") {
+                            <option value="service" selected>Service Type</option>
+                        } else {
+                            <option value="service">Service Type</option>
+                        }
+                        @if (Model.SortBy == "time") {
+                            <option value="time" selected>Submission Time</option>
+                        } else {
+                            <option value="time">Submission Time</option>
+                        }
+                    </select>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-danger sla-alerts-panel mb-3">
+            <div class="card-header bg-danger text-white py-2 px-3"><strong>Escalated Jobs</strong></div>
+            <div class="card-body p-2">
+                <ul class="list-unstyled mb-0" id="escalated-jobs-list">
+                    @foreach (var job in (Model.Requests?.AsEnumerable().Where(r => r.IsEscalated).OrderByDescending(r => r.EscalatedAt) ?? Enumerable.Empty<ServiceRequest>()))
+                    {
+                        <li class="mb-1"><span class="badge bg-danger">Escalated</span> <span class="ms-1">#@job.Id @job.CustomerName</span></li>
+                    }
+                </ul>
+            </div>
+        </div>
+        <div class="card border-warning sla-alerts-panel">
+            <div class="card-header bg-warning text-dark py-2 px-3"><strong>Upcoming SLA Alerts</strong></div>
+            <div class="card-body p-2">
+                <ul class="list-unstyled mb-0" id="sla-alerts-list">
+                    @foreach (var job in (Model.Requests?.AsEnumerable().Where(r => r.DueDate.HasValue && r.DueDate.Value > DateTime.UtcNow && (r.DueDate.Value - DateTime.UtcNow).TotalHours < 2).OrderBy(r => r.DueDate) ?? Enumerable.Empty<ServiceRequest>()))
+                    {
+                        if (job.DueDate.HasValue)
+                        {
+                            <li class="mb-1"><span class="badge bg-warning text-dark">Due @job.DueDate.Value.ToLocalTime():t</span> <span class="ms-1">#@job.Id @job.CustomerName</span></li>
+                        }
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="mb-5" id="kanban-analytics">
+    <h4>Kanban Analytics</h4>
+    <div class="row g-3">
+        <div class="col-md-4">
+            <canvas id="kanbanStatusChart" height="180"></canvas>
+        </div>
+        <div class="col-md-4">
+            <canvas id="kanbanPriorityChart" height="180"></canvas>
+        </div>
+        <div class="col-md-4">
+            <div class="card p-3">
+                <h6 class="mb-2">Job Stats</h6>
+                <ul class="list-unstyled mb-0">
+                    <li><strong>Total:</strong> <span id="stat-total">@Model.Requests.Count</span></li>
+                    <li><strong>Unassigned:</strong> <span id="stat-unassigned">@Model.Requests.Count(r => (Model.TechnicianStatuses.FirstOrDefault(ts => ts.TechnicianId == r.AssignedTechnicianId)?.Status ?? "Unassigned") == "Unassigned")</span></li>
+                    <li><strong>Assigned:</strong> <span id="stat-assigned">@Model.Requests.Count(r => (Model.TechnicianStatuses.FirstOrDefault(ts => ts.TechnicianId == r.AssignedTechnicianId)?.Status ?? "Unassigned") == "Assigned")</span></li>
+                    <li><strong>En Route:</strong> <span id="stat-enroute">@Model.Requests.Count(r => (Model.TechnicianStatuses.FirstOrDefault(ts => ts.TechnicianId == r.AssignedTechnicianId)?.Status ?? "Unassigned") == "En Route")</span></li>
+                    <li><strong>Complete:</strong> <span id="stat-complete">@Model.Requests.Count(r => (Model.TechnicianStatuses.FirstOrDefault(ts => ts.TechnicianId == r.AssignedTechnicianId)?.Status ?? "Unassigned") == "Complete")</span></li>
+                    <li><strong>High Priority:</strong> <span id="stat-high">@Model.Requests.Count(r => r.Priority == "High")</span></li>
+                    <li><strong>Normal Priority:</strong> <span id="stat-normal">@Model.Requests.Count(r => r.Priority == "Normal")</span></li>
+                    <li><strong>Low Priority:</strong> <span id="stat-low">@Model.Requests.Count(r => r.Priority == "Low")</span></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<ul class="nav nav-tabs mb-3" id="kanbanTabs">
+    @foreach (var status in statuses)
+    {
+        <li class="nav-item">
+            <a class="nav-link @(activeTab == status ? "active" : "")" href="?tab=@status">@status</a>
+        </li>
+    }
+</ul>
+<form id="reorderForm" method="post" asp-page-handler="Reorder" style="display:none;">
+    <input type="hidden" name="OrderJson" id="orderJson" />
+</form>
+@await Html.PartialAsync("_TechnicianLoadPanel", Model.TechnicianLoads)
+@* --- Kanban Board --- *@
+<div class="row kanban-board" id="kanbanBoard">
+    @foreach (var status in statuses)
+    {
+        <div class="col kanban-column">
+            <div class="kanban-column-header bg-light p-2 mb-2 border rounded"><strong>@status</strong></div>
+            <div class="kanban-cards" id="kanban-@status" data-status="@status" style="min-height: 200px;">
+                @foreach (var req in Model.Requests.AsEnumerable().Where((Func<ServiceRequest, bool>)(r => {
+                    var s = Model.TechnicianStatuses?.FirstOrDefault(ts => ts.TechnicianId == r.AssignedTechnicianId)?.Status ?? "Unassigned";
+                    return s == status;
+                })))
+                {
+                    <div data-request-id="@req.Id">
+                        @await Html.PartialAsync("_JobCard", req)
+                        @if (string.IsNullOrEmpty(req.AssignedTechnicianId?.ToString()) && status == "Unassigned")
+                        {
+                            if (Model.SuggestedTech.ContainsKey(req.Id))
+                            {
+                                var suggestion = Model.SuggestedTech[req.Id];
+                                <div class="suggested-tech mt-2">
+                                    <strong>Suggested:</strong> @suggestion.TechName 
+                                    (<span class="text-muted">@suggestion.Confidence %</span>)
+                                </div>
+                            }
+                            <form method="post" asp-page-handler="AutoAssign" asp-route-requestId="@req.Id" class="mt-1">
+                                <button class="btn btn-warning btn-sm">Auto Assign</button>
+                                @Html.AntiForgeryToken()
+                            </form>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>
+@if (Model.Requests != null && !Model.Requests.Any())
+{
+    <div class="alert alert-info mt-4">No service requests found for the selected filters.</div>
+}
+<hr class="my-5" />
+<h4>Kanban Job Movement History</h4>
+<form method="get" class="row g-2 mb-3 align-items-end">
+    <div class="col-md-2">
+        <label class="form-label">From Status</label>
+        <select name="HistoryFromStatus" class="form-select" onchange="this.form.submit()">
+            <option value="">All</option>
+            @foreach (var s in statuses) {
+                if (Model.HistoryFromStatus == s) {
+                    <option value="@s" selected>@s</option>
+                } else {
+                    <option value="@s">@s</option>
+                }
+            }
+        </select>
+    </div>
+    <div class="col-md-2">
+        <label class="form-label">To Status</label>
+        <select name="HistoryToStatus" class="form-select" onchange="this.form.submit()">
+            <option value="">All</option>
+            @foreach (var s in statuses) {
+                if (Model.HistoryToStatus == s) {
+                    <option value="@s" selected>@s</option>
+                } else {
+                    <option value="@s">@s</option>
+                }
+            }
+        </select>
+    </div>
+    <div class="col-md-2">
+        <label class="form-label">User</label>
+        <input type="text" name="HistoryUser" class="form-control" value="@Model.HistoryUser" placeholder="User..." onchange="this.form.submit()" />
+    </div>
+    <div class="col-md-2">
+        <label class="form-label">From Date</label>
+        <input type="date" name="HistoryFromDate" class="form-control" value="@Model.HistoryFromDateString" onchange="this.form.submit()" />
+    </div>
+    <div class="col-md-2">
+        <label class="form-label">To Date</label>
+        <input type="date" name="HistoryToDate" class="form-control" value="@Model.HistoryToDateString" onchange="this.form.submit()" />
+    </div>
+    <div class="col-md-2 text-end">
+        <button type="submit" name="export" value="csv" class="btn btn-outline-secondary me-2">Export CSV</button>
+        <button type="submit" name="export" value="excel" class="btn btn-outline-success">Export Excel</button>
+    </div>
+</form>
+<div class="table-responsive">
+    <table class="table table-sm table-bordered align-middle">
+        <thead class="table-light">
+            <tr>
+                <th>Time</th>
+                <th>Job ID</th>
+                <th>From</th>
+                <th>To</th>
+                <th>To Index</th>
+                <th>User</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var log in Model.KanbanHistory)
+            {
+                <tr>
+                    <td>@log.ChangedAt.ToLocalTime().ToString("g")</td>
+                    <td>@log.ServiceRequestId</td>
+                    <td>@log.FromStatus</td>
+                    <td>@log.ToStatus</td>
+                    <td>@log.ToIndex</td>
+                    <td>@log.ChangedBy</td>
+                </tr>
+            }
+        </tbody>
+    </table>
 </div>
 @await Html.PartialAsync("DispatcherMapModal")
 @await Html.PartialAsync("EscalationModal")

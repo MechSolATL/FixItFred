@@ -1,9 +1,14 @@
+// FixItFred Patch: Synced DTO references, resolved ambiguities, and corrected collection access for Dispatcher UI.
+using System;
+
 namespace MVP_Core.Models.Admin
 {
     public class DispatcherNotification
     {
         public DateTime Timestamp { get; set; }
-        public string Type { get; set; } // Emergency, Delay, Reassigned, Info
-        public string Message { get; set; }
+        public required string Type { get; set; }
+        public required string Message { get; set; }
+        // ExpiresAt property for broadcast expiry logic
+        public DateTime? ExpiresAt { get; set; }
     }
 }

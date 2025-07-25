@@ -1,10 +1,11 @@
 @page
 @using MVP_Core.Models.Admin
 @inject MVP_Core.Services.Admin.DispatcherService DispatcherService
+@inject MVP_Core.Services.TechnicianFeedbackService FeedbackService
+@model MVP_Core.Pages.Admin.TechnicianProfileModel
 @{
-    int techId = 0;
-    int.TryParse(Request.Query["techId"], out techId);
-    var profile = DispatcherService.GetTechnicianProfile(techId);
+    int techId = Model.TechId;
+    var profile = Model.Profile;
     ViewData["Title"] = "Technician Profile";
 }
 <h2 class="mb-4">Technician Profile</h2>
@@ -77,6 +78,32 @@ else
                 <button type="submit" class="btn btn-outline-primary">Add Tag</button>
             </div>
         </form>
+    </div>
+    <div class="mb-4">
+        <h5>Feedback & Ratings</h5>
+        @{
+            double avg = Model.AvgFeedback;
+            var reviews = Model.RecentReviews;
+        }
+        @if (avg > 0)
+        {
+            <div class="mb-2"><strong>Score:</strong> <span class="badge bg-success">@avg</span></div>
+            <ul class="list-group mb-2">
+            @foreach (var fb in reviews)
+            {
+                <li class="list-group-item">@fb.Rating ? — @fb.Notes</li>
+            }
+            </ul>
+        }
+        else
+        {
+            <div class="alert alert-info">No feedback yet.</div>
+        }
+        <a href="/Admin/SubmitFeedback?techId=@profile.TechnicianId" class="btn btn-outline-warning">? Submit Feedback</a>
+    </div>
+    <div class="mb-4">
+        <a href="/Admin/UploadMedia?techId=@profile.TechnicianId" class="btn btn-outline-primary me-2">?? Upload Media</a>
+        <a href="/Admin/ViewMedia?techId=@profile.TechnicianId" class="btn btn-outline-secondary">?? View Media Vault</a>
     </div>
 }
 

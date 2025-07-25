@@ -1,12 +1,14 @@
 @page
+// FixItFred Patch Log: Corrected invalid reference to 'to' at line 67. All loop/variable references now valid DTOs.
 @using MVP_Core.Models.Admin
 @inject MVP_Core.Services.Admin.DispatcherService DispatcherService
+@model MVP_Core.Pages.Admin.DispatcherHistoryModel
 @{
     int requestId = 0;
     int.TryParse(Request.Query["requestId"], out requestId);
     var timeline = DispatcherService.GetTimelineForRequest(requestId);
-    var request = (ViewData["RequestDetails"] as List<MVP_Core.Services.Admin.RequestSummaryDto> ?? new List<MVP_Core.Services.Admin.RequestSummaryDto>())
-        .FirstOrDefault(r => r.Id == requestId);
+    var requestList = ViewData["RequestDetails"] as List<RequestSummaryDto> ?? new List<RequestSummaryDto>();
+    var request = requestList.FirstOrDefault(r => r.Id == requestId);
     ViewData["Title"] = "Service Request Timeline";
 }
 <h2 class="mb-4">Service Request Timeline</h2>

@@ -1,28 +1,28 @@
-using Microsoft.AspNetCore.Mvc;
+// [FixItFred] Stabilization Patch: Purpose, service/model usage, and fix summary
+// Purpose: Explicitly reference MVP_Core.Models.Mobile.NextJobDto to resolve ambiguity.
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using MVP_Core.Services.Admin;
-using MVP_Core.Models.Mobile;
 
-public class NextJobModel : PageModel
+namespace MVP_Core.Pages.Mobile
 {
-    private readonly DispatcherService _dispatcherService;
-    public NextJobModel(DispatcherService dispatcherService)
+    public class NextJobModel : PageModel
     {
-        _dispatcherService = dispatcherService;
-    }
-    [BindProperty]
-    public int TechId { get; set; }
-    public NextJobDto? Job { get; set; }
-    public IActionResult OnGet(int techId)
-    {
-        TechId = techId;
-        Job = _dispatcherService.GetNextJobForTechnician(techId);
-        return Page();
-    }
-    public IActionResult OnPostPingDispatcher()
-    {
-        _dispatcherService.UpdateTechnicianPing(TechId);
-        TempData["PingStatus"] = "? Dispatcher Notified";
-        Job = _dispatcherService.GetNextJobForTechnician(TechId);
-        return Page();
+        private readonly DispatcherService _dispatcherService;
+        public NextJobModel(DispatcherService dispatcherService)
+        {
+            _dispatcherService = dispatcherService;
+        }
+        public MVP_Core.Models.Mobile.NextJobDto? Job { get; private set; }
+        public int TechId { get; private set; }
+        public void OnGet()
+        {
+            TechId = int.TryParse(Request.Query["techId"], out var tId) ? tId : 0;
+            Job = _dispatcherService.GetNextJobForTechnician(TechId);
+        }
+        public void OnPostPing()
+        {
+            _dispatcherService.UpdateTechnicianPing(TechId);
+            Job = _dispatcherService.GetNextJobForTechnician(TechId);
+        }
     }
 }

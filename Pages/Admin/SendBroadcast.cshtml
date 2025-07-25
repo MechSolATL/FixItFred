@@ -1,41 +1,17 @@
 @page
 @using MVP_Core.Models.Admin
-@inject MVP_Core.Services.Admin.DispatcherService DispatcherService
+@model MVP_Core.Pages.Admin.SendBroadcastModel
 @{
     ViewData["Title"] = "Send Broadcast Alert";
-    string message = "";
-    string expires = "";
-    if (IsPost)
-    {
-        message = Request.Form["Message"];
-        expires = Request.Form["ExpiresAt"];
-        DateTime? expiresAt = null;
-        if (DateTime.TryParse(expires, out var dt)) expiresAt = dt;
-        if (!string.IsNullOrWhiteSpace(message))
-        {
-            DispatcherService.AddBroadcast(new DispatcherBroadcast
-            {
-                Message = message,
-                IssuedAt = DateTime.UtcNow,
-                IssuedBy = User?.Identity?.Name ?? "system",
-                ExpiresAt = expiresAt
-            });
-            ViewData["Success"] = "Broadcast sent.";
-        }
-        else
-        {
-            ViewData["Error"] = "Message is required.";
-        }
-    }
 }
 <h2 class="mb-4">Send Broadcast Alert</h2>
-@if (ViewData["Success"] != null)
+@if (Model.SuccessMessage != null)
 {
-    <div class="alert alert-success">@ViewData["Success"]</div>
+    <div class="alert alert-success">@Model.SuccessMessage</div>
 }
-@if (ViewData["Error"] != null)
+@if (Model.ErrorMessage != null)
 {
-    <div class="alert alert-danger">@ViewData["Error"]</div>
+    <div class="alert alert-danger">@Model.ErrorMessage</div>
 }
 <form method="post" class="mb-4">
     <div class="mb-3">

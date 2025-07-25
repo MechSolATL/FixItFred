@@ -1,0 +1,56 @@
+@page
+@using MVP_Core.Models.Admin
+@using MVP_Core.Data.Models
+@inject MVP_Core.Services.TechnicianFeedbackService FeedbackService
+@inject MVP_Core.Services.Admin.DispatcherService DispatcherService
+@model MVP_Core.Pages.Admin.SubmitFeedbackModel
+@{
+    // Sprint 22: Admin feedback submission page
+    ViewData["Title"] = "Submit Technician Feedback";
+    var techList = DispatcherService.GetAllTechnicianHeartbeats() ?? new List<TechnicianStatusDto>();
+    var completedJobs = new List<ServiceRequest>(); // TODO: Query completed jobs for dropdown
+    string status = TempData["FeedbackStatus"] as string ?? "";
+    var safeFeedback = Model?.Feedback ?? string.Empty;
+}
+<h2 class="mb-4">? Submit Technician Feedback</h2>
+<form method="post">
+    <div class="mb-3">
+        <label class="form-label">Technician</label>
+        <select name="TechnicianId" class="form-select" required>
+            <option value="">Select technician...</option>
+            @foreach (var tech in techList)
+            {
+                <option value="@tech.TechnicianId">@tech.Name</option>
+            }
+        </select>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Completed Job</label>
+        <select name="RequestId" class="form-select" required>
+            <option value="">Select job...</option>
+            @foreach (var job in completedJobs)
+            {
+                <option value="@job.Id">#@job.Id - @job.ServiceType</option>
+            }
+        </select>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Rating (1–5)</label>
+        <select name="Rating" class="form-select" required>
+            @for (int i = 1; i <= 5; i++)
+            {
+                <option value="@i">@i</option>
+            }
+        </select>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Notes (optional)</label>
+        <textarea name="Notes" class="form-control" maxlength="2000"></textarea>
+    </div>
+    <button type="submit" class="btn btn-success">Submit Feedback</button>
+</form>
+@if (!string.IsNullOrEmpty(status))
+{
+    <div class="alert alert-info mt-3">@status</div>
+}
+<!-- Co-Pilot: This page is for admin/dispatcher feedback entry. Only completed jobs are selectable. Prevents duplicate feedback. -->

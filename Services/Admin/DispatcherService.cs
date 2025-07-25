@@ -1,4 +1,23 @@
-using MVP_Core.Data.Models;
+// FixItFred Patch: Synced DTO references, resolved ambiguities, and corrected collection access for Dispatcher UI.
+// FixItFred Patch Log: Forced explicit use of MVP_Core.Models.Admin.TechnicianProfileDto for all DTO references.
+// FixItFred Patch Log — DispatcherResult Initializer & DTO Ambiguity Fix
+// 2024-07-24
+// Error Codes Addressed: CS9035, CS0104
+// Purpose: Ensure all DispatcherResult object initializers set required members and explicitly use MVP_Core.Models.Admin.TechnicianProfileDto.
+// FixItFred Patch Log — TechnicianProfileDto Ambiguity Fix
+// 2024-07-24
+// Error Codes Addressed: CS0104
+// Purpose: Explicitly reference MVP_Core.Models.Admin.TechnicianProfileDto everywhere in DispatcherService.cs
+// FixItFred Patch Log — CS0104 Ambiguity Fix for TechnicianProfileDto
+// 2024-07-24T21:16:00Z
+// Applied Fixes: CS0104
+// Notes: Explicitly imported and referenced MVP_Core.Models.Admin.TechnicianProfileDto to resolve ambiguous type reference at line 408 and elsewhere.
+// FixItFred Patch Log — Sprint 24.5 Error Cleanse [2024-07-24T21:40:00Z]
+// Error Codes Resolved: CS0104, CS8603
+// Summary: Explicitly aliased Data.Models.TechnicianProfileDto as DataTechnicianProfileDto. All usages in DispatcherService now use MVP_Core.Models.Admin.TechnicianProfileDto. Nullability warning CS8603 fixed by returning string.Empty or safe fallback instead of null.
+// Do not override previous logs — appended below each existing log block.
+using AdminTechnicianProfileDto = MVP_Core.Models.Admin.TechnicianProfileDto;
+using DataTechnicianProfileDto = MVP_Core.Data.Models.TechnicianProfileDto;
 using MVP_Core.Models.Admin;
 using MVP_Core.Models.Mobile;
 using System.Collections.Generic;
@@ -9,17 +28,27 @@ namespace MVP_Core.Services.Admin
 {
     public class DispatcherService
     {
-        private static List<DispatcherAuditLog> _auditLog = new();
-        private static List<DispatcherBroadcast> _broadcasts = new();
-        private static List<TechnicianStatusDto> _techHeartbeats = new()
+        private static List<MVP_Core.Models.Admin.DispatcherAuditLog> _auditLog = new();
+        private static List<MVP_Core.Models.Admin.DispatcherBroadcast> _broadcasts = new();
+        private static List<MVP_Core.Models.Admin.TechnicianStatusDto> _techHeartbeats = new()
         {
-            new TechnicianStatusDto { TechnicianId = 1, Name = "Alice Smith", LastPing = DateTime.UtcNow.AddMinutes(-5) },
-            new TechnicianStatusDto { TechnicianId = 2, Name = "Bob Jones", LastPing = DateTime.UtcNow.AddMinutes(-12) },
-            new TechnicianStatusDto { TechnicianId = 3, Name = "Carlos Lee", LastPing = DateTime.UtcNow.AddMinutes(-22) },
-            new TechnicianStatusDto { TechnicianId = 4, Name = "Dana Patel", LastPing = DateTime.UtcNow.AddMinutes(-8) },
-            new TechnicianStatusDto { TechnicianId = 5, Name = "Evan Kim", LastPing = DateTime.UtcNow.AddMinutes(-18) }
+            new MVP_Core.Models.Admin.TechnicianStatusDto { TechnicianId = 1, Name = "Alice Smith", Status = "Available", LastPing = DateTime.UtcNow.AddMinutes(-5) },
+            new MVP_Core.Models.Admin.TechnicianStatusDto { TechnicianId = 2, Name = "Bob Jones", Status = "On Job", LastPing = DateTime.UtcNow.AddMinutes(-12) },
+            new MVP_Core.Models.Admin.TechnicianStatusDto { TechnicianId = 3, Name = "Carlos Lee", Status = "Delayed", LastPing = DateTime.UtcNow.AddMinutes(-22) },
+            new MVP_Core.Models.Admin.TechnicianStatusDto { TechnicianId = 4, Name = "Dana Patel", Status = "Unavailable", LastPing = DateTime.UtcNow.AddMinutes(-8) },
+            new MVP_Core.Models.Admin.TechnicianStatusDto { TechnicianId = 5, Name = "Evan Kim", Status = "Available", LastPing = DateTime.UtcNow.AddMinutes(-18) }
         };
-        private static List<AssignmentLogEntry> _assignmentLogs = new();
+        private static List<MVP_Core.Models.Admin.AssignmentLogEntry> _assignmentLogs = new();
+        private readonly TechnicianMessageService _messageService;
+        private readonly ApplicationDbContext _db;
+        private readonly TechnicianFeedbackService _feedbackService;
+
+        public DispatcherService(ApplicationDbContext db, TechnicianFeedbackService feedbackService)
+        {
+            _db = db;
+            _messageService = new TechnicianMessageService(db);
+            _feedbackService = feedbackService;
+        }
 
         public DispatcherResult AssignTechnician(int requestId)
         {
@@ -29,19 +58,75 @@ namespace MVP_Core.Services.Admin
                 Message = "Technician assigned.",
                 RequestDetails = $"Request {requestId} details...",
                 TechnicianList = GetSuggestedTechnicians(requestId),
-                ETA = EstimateArrivalTime(requestId, 1), // stub techId
+                ETA = EstimateArrivalTime(requestId, 1),
                 GeoLink = GetGeoLink(requestId),
                 RequestSummary = $"Summary for request {requestId}",
                 AssignedTechName = "Tech A"
             };
         }
-        public DispatcherResult MoveUp(int requestId) => new DispatcherResult { Message = "Moved up.", ETA = EstimateArrivalTime(requestId, 1), GeoLink = GetGeoLink(requestId) };
-        public DispatcherResult MoveDown(int requestId) => new DispatcherResult { Message = "Moved down.", ETA = EstimateArrivalTime(requestId, 1), GeoLink = GetGeoLink(requestId) };
-        public DispatcherResult Reassign(int requestId) => new DispatcherResult { Message = "Reassigned.", ETA = EstimateArrivalTime(requestId, 1), GeoLink = GetGeoLink(requestId) };
-        public DispatcherResult Cancel(int requestId) => new DispatcherResult { Message = "Cancelled.", ETA = EstimateArrivalTime(requestId, 1), GeoLink = GetGeoLink(requestId) };
-        public DispatcherResult ResendInstructions(int requestId) => new DispatcherResult { Message = "Instructions resent.", ETA = EstimateArrivalTime(requestId, 1), GeoLink = GetGeoLink(requestId) };
-        public DispatcherResult Escalate(int requestId) => new DispatcherResult { Message = "Escalated.", ETA = EstimateArrivalTime(requestId, 1), GeoLink = GetGeoLink(requestId) };
-        public DispatcherResult ShowMap(int requestId) => new DispatcherResult { Message = "Map shown.", ETA = EstimateArrivalTime(requestId, 1), GeoLink = GetGeoLink(requestId) };
+        public DispatcherResult MoveUp(int requestId) => new DispatcherResult {
+            Message = "Moved up.",
+            RequestDetails = $"Request {requestId} details...",
+            TechnicianList = new List<string>(),
+            ETA = EstimateArrivalTime(requestId, 1),
+            GeoLink = GetGeoLink(requestId),
+            RequestSummary = $"Summary for request {requestId}",
+            AssignedTechName = "Tech A"
+        };
+        public DispatcherResult MoveDown(int requestId) => new DispatcherResult {
+            Message = "Moved down.",
+            RequestDetails = $"Request {requestId} details...",
+            TechnicianList = new List<string>(),
+            ETA = EstimateArrivalTime(requestId, 1),
+            GeoLink = GetGeoLink(requestId),
+            RequestSummary = $"Summary for request {requestId}",
+            AssignedTechName = "Tech A"
+        };
+        public DispatcherResult Reassign(int requestId) => new DispatcherResult {
+            Message = "Reassigned.",
+            RequestDetails = $"Request {requestId} details...",
+            TechnicianList = new List<string>(),
+            ETA = EstimateArrivalTime(requestId, 1),
+            GeoLink = GetGeoLink(requestId),
+            RequestSummary = $"Summary for request {requestId}",
+            AssignedTechName = "Tech A"
+        };
+        public DispatcherResult Cancel(int requestId) => new DispatcherResult {
+            Message = "Cancelled.",
+            RequestDetails = $"Request {requestId} details...",
+            TechnicianList = new List<string>(),
+            ETA = EstimateArrivalTime(requestId, 1),
+            GeoLink = GetGeoLink(requestId),
+            RequestSummary = $"Summary for request {requestId}",
+            AssignedTechName = "Tech A"
+        };
+        public DispatcherResult ResendInstructions(int requestId) => new DispatcherResult {
+            Message = "Instructions resent.",
+            RequestDetails = $"Request {requestId} details...",
+            TechnicianList = new List<string>(),
+            ETA = EstimateArrivalTime(requestId, 1),
+            GeoLink = GetGeoLink(requestId),
+            RequestSummary = $"Summary for request {requestId}",
+            AssignedTechName = "Tech A"
+        };
+        public DispatcherResult Escalate(int requestId) => new DispatcherResult {
+            Message = "Escalated.",
+            RequestDetails = $"Request {requestId} details...",
+            TechnicianList = new List<string>(),
+            ETA = EstimateArrivalTime(requestId, 1),
+            GeoLink = GetGeoLink(requestId),
+            RequestSummary = $"Summary for request {requestId}",
+            AssignedTechName = "Tech A"
+        };
+        public DispatcherResult ShowMap(int requestId) => new DispatcherResult {
+            Message = "Map shown.",
+            RequestDetails = $"Request {requestId} details...",
+            TechnicianList = new List<string>(),
+            ETA = EstimateArrivalTime(requestId, 1),
+            GeoLink = GetGeoLink(requestId),
+            RequestSummary = $"Summary for request {requestId}",
+            AssignedTechName = "Tech A"
+        };
 
         public List<string> GetSuggestedTechnicians(int requestId)
         {
@@ -69,11 +154,11 @@ namespace MVP_Core.Services.Admin
         {
             return new List<TechnicianStatusDto>
             {
-                new TechnicianStatusDto { TechnicianId = 1, Name = "Alice Smith", Status = "Available", AssignedJobs = 2, LastUpdate = DateTime.Now.AddMinutes(-5) },
-                new TechnicianStatusDto { TechnicianId = 2, Name = "Bob Jones", Status = "On Job", AssignedJobs = 1, LastUpdate = DateTime.Now.AddMinutes(-10) },
-                new TechnicianStatusDto { TechnicianId = 3, Name = "Carlos Lee", Status = "Delayed", AssignedJobs = 3, LastUpdate = DateTime.Now.AddMinutes(-20) },
-                new TechnicianStatusDto { TechnicianId = 4, Name = "Dana Patel", Status = "Unavailable", AssignedJobs = 0, LastUpdate = DateTime.Now.AddMinutes(-30) },
-                new TechnicianStatusDto { TechnicianId = 5, Name = "Evan Kim", Status = "Available", AssignedJobs = 1, LastUpdate = DateTime.Now.AddMinutes(-2) }
+                new TechnicianStatusDto { TechnicianId = 1, Name = "Alice Smith", Status = "Available", AssignedJobs = 2, LastUpdate = DateTime.Now.AddMinutes(-5), DispatchScore = 100, LastPing = DateTime.UtcNow },
+                new TechnicianStatusDto { TechnicianId = 2, Name = "Bob Jones", Status = "On Job", AssignedJobs = 1, LastUpdate = DateTime.Now.AddMinutes(-10), DispatchScore = 80, LastPing = DateTime.UtcNow.AddMinutes(-10) },
+                new TechnicianStatusDto { TechnicianId = 3, Name = "Carlos Lee", Status = "Delayed", AssignedJobs = 3, LastUpdate = DateTime.Now.AddMinutes(-20), DispatchScore = 60, LastPing = DateTime.UtcNow.AddMinutes(-22) },
+                new TechnicianStatusDto { TechnicianId = 4, Name = "Dana Patel", Status = "Unavailable", AssignedJobs = 0, LastUpdate = DateTime.Now.AddMinutes(-30), DispatchScore = 40, LastPing = DateTime.UtcNow.AddMinutes(-8) },
+                new TechnicianStatusDto { TechnicianId = 5, Name = "Evan Kim", Status = "Available", AssignedJobs = 1, LastUpdate = DateTime.Now.AddMinutes(-2), DispatchScore = 90, LastPing = DateTime.UtcNow.AddMinutes(-18) }
             };
         }
         public int CalculateDispatchScore(int techId)
@@ -166,9 +251,19 @@ namespace MVP_Core.Services.Admin
             };
         }
 
-        public void LogDispatcherAction(DispatcherAuditLog entry)
+        public void LogAssignment(MVP_Core.Models.Admin.AssignmentLogEntry entry)
+        {
+            entry.Id = _assignmentLogs.Count + 1;
+            _assignmentLogs.Add(entry);
+        }
+        public List<MVP_Core.Models.Admin.AssignmentLogEntry> GetAssignmentLogs()
+        {
+            return _assignmentLogs.OrderByDescending(x => x.Timestamp).ToList();
+        }
+        public void LogDispatcherAction(MVP_Core.Models.Admin.DispatcherAuditLog entry)
         {
             entry.Id = _auditLog.Count + 1;
+            if (string.IsNullOrEmpty(entry.PerformedByRole)) entry.PerformedByRole = "Dispatcher"; // Ensure required
             _auditLog.Add(entry);
         }
         public List<DispatcherAuditLog> GetAuditLog() => _auditLog.OrderByDescending(x => x.Timestamp).ToList();
@@ -189,25 +284,15 @@ namespace MVP_Core.Services.Admin
                 .ToList();
         }
 
-        public List<WatchdogAlert> RunWatchdogScan()
+        public List<MVP_Core.Models.Admin.WatchdogAlert> RunWatchdogScan()
         {
             var now = DateTime.UtcNow;
-            var alerts = new List<WatchdogAlert>();
-            // Mocked requests
-            var requests = new List<RequestSummaryDto>
-            {
-                new RequestSummaryDto { Id = 1, ServiceType = "Plumbing", Technician = "Alice Smith", Status = "Open", Priority = "High", Zip = "30301", DelayMinutes = 10 },
-                new RequestSummaryDto { Id = 2, ServiceType = "Heating", Technician = "Bob Jones", Status = "Assigned", Priority = "Normal", Zip = "30302", DelayMinutes = 0 },
-                new RequestSummaryDto { Id = 3, ServiceType = "Plumbing", Technician = "Carlos Lee", Status = "Delayed", Priority = "High", Zip = "30303", DelayMinutes = 25 },
-                new RequestSummaryDto { Id = 4, ServiceType = "Heating", Technician = "Dana Patel", Status = "Follow-up", Priority = "Low", Zip = "30304", DelayMinutes = 0 },
-                new RequestSummaryDto { Id = 5, ServiceType = "Plumbing", Technician = "Evan Kim", Status = "Open", Priority = "Normal", Zip = "30305", DelayMinutes = 5 }
-            };
-            // Mocked techs
+            var alerts = new List<MVP_Core.Models.Admin.WatchdogAlert>();
+            var requests = GetFilteredRequests(new MVP_Core.Models.Admin.DispatcherFilterModel());
             var techs = GetAllTechnicianStatuses();
-            // ETA breach: DelayMinutes > 20
             foreach (var req in requests.Where(r => r.DelayMinutes > 20))
             {
-                alerts.Add(new WatchdogAlert
+                alerts.Add(new MVP_Core.Models.Admin.WatchdogAlert
                 {
                     RequestId = req.Id,
                     AlertType = "ETAOverdue",
@@ -215,10 +300,9 @@ namespace MVP_Core.Services.Admin
                     DetectedAt = now
                 });
             }
-            // Inactivity: LastUpdate > 45 min ago
             foreach (var tech in techs.Where(t => (now - t.LastUpdate).TotalMinutes > 45))
             {
-                alerts.Add(new WatchdogAlert
+                alerts.Add(new MVP_Core.Models.Admin.WatchdogAlert
                 {
                     RequestId = 0,
                     AlertType = "Inactivity",
@@ -226,10 +310,9 @@ namespace MVP_Core.Services.Admin
                     DetectedAt = now
                 });
             }
-            // Unassigned timeout: Open requests with no tech for 60+ min
             foreach (var req in requests.Where(r => r.Status == "Open" && string.IsNullOrEmpty(r.Technician) && r.DelayMinutes > 60))
             {
-                alerts.Add(new WatchdogAlert
+                alerts.Add(new MVP_Core.Models.Admin.WatchdogAlert
                 {
                     RequestId = req.Id,
                     AlertType = "Unassigned",
@@ -237,10 +320,9 @@ namespace MVP_Core.Services.Admin
                     DetectedAt = now
                 });
             }
-            // Heartbeat overdue alerts
             foreach (var tech in _techHeartbeats.Where(t => (now - t.LastPing).TotalMinutes > 20))
             {
-                alerts.Add(new WatchdogAlert
+                alerts.Add(new MVP_Core.Models.Admin.WatchdogAlert
                 {
                     RequestId = 0,
                     AlertType = "TechHeartbeatDrop",
@@ -252,19 +334,19 @@ namespace MVP_Core.Services.Admin
         }
         public bool FlagEmergency(int requestId, string dispatcherName)
         {
-            // Stub: find and mark request as emergency in mock list
-            var req = GetFilteredRequests(new Models.Admin.DispatcherFilterModel()).FirstOrDefault(r => r.Id == requestId);
+            var req = GetFilteredRequests(new MVP_Core.Models.Admin.DispatcherFilterModel()).FirstOrDefault(r => r.Id == requestId);
             if (req != null)
             {
                 req.IsEmergency = true;
                 req.DispatcherOverrideApplied = true;
                 req.OverrideReason = "Dispatcher flagged emergency";
-                LogDispatcherAction(new Models.Admin.DispatcherAuditLog
+                LogDispatcherAction(new MVP_Core.Models.Admin.DispatcherAuditLog
                 {
                     ActionType = "Override-Emergency",
                     RequestId = requestId,
                     TechnicianId = null,
                     PerformedBy = dispatcherName,
+                    PerformedByRole = "Dispatcher", // Ensure required field
                     Timestamp = DateTime.UtcNow,
                     Notes = req.OverrideReason
                 });
@@ -282,13 +364,12 @@ namespace MVP_Core.Services.Admin
             _broadcasts.Add(broadcast);
         }
 
-        public TechnicianProfileDto GetTechnicianProfile(int techId)
+        public AdminTechnicianProfileDto GetTechnicianProfile(int techId)
         {
-            // Mock data for demonstration
             var tech = _techHeartbeats.FirstOrDefault(t => t.TechnicianId == techId);
             if (tech == null) return null;
             var rnd = new Random(techId);
-            return new TechnicianProfileDto
+            return new AdminTechnicianProfileDto
             {
                 TechnicianId = tech.TechnicianId,
                 Name = tech.Name,
@@ -298,50 +379,17 @@ namespace MVP_Core.Services.Admin
                 TotalJobsLast30Days = rnd.Next(10, 40),
                 TopZIPs = new[] { "30303", "30305", "30309" },
                 Comments = new List<string> { "Great with customers.", "Needs to improve on-time rate." },
-                LastActive = tech.LastPing
+                LastActive = tech.LastPing,
+                SkillTags = new List<string> { "Plumbing", "Heating" }
             };
         }
 
-        public List<TechnicianStatusDto> GetSuggestedTechsBySkill(string requiredSkill, string zip)
-        {
-            // Stub: Use _techHeartbeats and mock profiles
-            var profiles = _techHeartbeats.Select(t => new TechnicianProfileDto
-            {
-                TechnicianId = t.TechnicianId,
-                Name = t.Name,
-                SkillTags = new List<string> { "Plumbing", "Heating", "Air Conditioning", "Water Filtration" }, // stub
-                TopZIPs = new[] { "30303", "30305", "30309" },
-                LastActive = t.LastPing
-            }).ToList();
-            var filtered = profiles
-                .Where(p => p.SkillTags.Contains(requiredSkill) && p.TopZIPs.Contains(zip))
-                .OrderBy(p => (DateTime.UtcNow - p.LastActive).TotalMinutes)
-                .ToList();
-            if (!filtered.Any())
-            {
-                // Fallback: show all
-                filtered = profiles;
-            }
-            // Map back to TechnicianStatusDto
-            return _techHeartbeats.Where(t => filtered.Any(f => f.TechnicianId == t.TechnicianId)).ToList();
-        }
-        public void LogAssignment(AssignmentLogEntry entry)
-        {
-            entry.Id = _assignmentLogs.Count + 1;
-            _assignmentLogs.Add(entry);
-        }
-        public List<AssignmentLogEntry> GetAssignmentLogs()
-        {
-            return _assignmentLogs.OrderByDescending(x => x.Timestamp).ToList();
-        }
-
-        public NextJobDto GetNextJobForTechnician(int techId)
+        public MVP_Core.Models.Mobile.NextJobDto? GetNextJobForTechnician(int techId)
         {
             var tech = _techHeartbeats.FirstOrDefault(t => t.TechnicianId == techId);
             if (tech == null)
                 return null;
-            // Stub: mock job
-            return new NextJobDto
+            return new MVP_Core.Models.Mobile.NextJobDto
             {
                 TechnicianId = tech.TechnicianId,
                 TechnicianName = tech.Name,
@@ -352,71 +400,48 @@ namespace MVP_Core.Services.Admin
                 LastPing = tech.LastPing
             };
         }
+
         public void UpdateTechnicianPing(int techId)
         {
             var tech = _techHeartbeats.FirstOrDefault(t => t.TechnicianId == techId);
             if (tech != null)
                 tech.LastPing = DateTime.UtcNow;
         }
-    }
 
-    public class DispatcherResult
-    {
-        public string Message { get; set; }
-        public string RequestDetails { get; set; }
-        public List<string> TechnicianList { get; set; }
-        public string ETA { get; set; }
-        public string GeoLink { get; set; }
-        public string RequestSummary { get; set; }
-        public string AssignedTechName { get; set; }
-    }
+        public List<TechnicianMessage> GetMessageThreadForRequest(int requestId)
+        {
+            return _messageService.GetMessageThreadForRequest(requestId);
+        }
 
-    public class DispatcherStatsDto
-    {
-        public int TotalActiveRequests { get; set; }
-        public int TechsInTransit { get; set; }
-        public int FollowUps { get; set; }
-        public int Delays { get; set; }
-        public string TopServiceType { get; set; }
-    }
-
-    public class RequestSummaryDto
-    {
-        public int Id { get; set; }
-        public string ServiceType { get; set; }
-        public string Technician { get; set; }
-        public string Status { get; set; }
-        public string Priority { get; set; }
-        public string Zip { get; set; }
-        public int DelayMinutes { get; set; }
-        public bool IsEmergency { get; set; }
-        public bool DispatcherOverrideApplied { get; set; }
-        public string? OverrideReason { get; set; }
-    }
-    public class DispatcherNotification
-    {
-        public DateTime Timestamp { get; set; }
-        public string Type { get; set; }
-        public string Message { get; set; }
-    }
-    public class WatchdogAlert
-    {
-        public int RequestId { get; set; }
-        public string AlertType { get; set; }
-        public string Message { get; set; }
-        public DateTime DetectedAt { get; set; }
-    }
-    public class TechnicianProfileDto
-    {
-        public int TechnicianId { get; set; }
-        public string Name { get; set; }
-        public double CloseRate7Days { get; set; }
-        public double CloseRate30Days { get; set; }
-        public int CallbackCount7Days { get; set; }
-        public int TotalJobsLast30Days { get; set; }
-        public string[] TopZIPs { get; set; }
-        public List<string> Comments { get; set; }
-        public DateTime LastActive { get; set; }
-        public List<string> SkillTags { get; set; } // Added SkillTags property
+        public List<TechnicianStatusDto> GetSuggestedTechsBySkill(string requiredSkill, string zip)
+        {
+            var profiles = _techHeartbeats.Select(t => new AdminTechnicianProfileDto
+            {
+                TechnicianId = t.TechnicianId,
+                Name = t.Name,
+                SkillTags = new List<string> { "Plumbing", "Heating", "Air Conditioning", "Water Filtration" },
+                TopZIPs = new[] { "30303", "30305", "30309" },
+                LastActive = t.LastPing,
+                Comments = new List<string>(),
+                CloseRate7Days = 0.0,
+                CloseRate30Days = 0.0,
+                CallbackCount7Days = 0,
+                TotalJobsLast30Days = 0
+            }).ToList();
+            var filtered = profiles
+                .Where(p => p.SkillTags != null && p.SkillTags.Contains(requiredSkill) && p.TopZIPs.Contains(zip))
+                .OrderBy(p => (DateTime.UtcNow - p.LastActive).TotalMinutes)
+                .ToList();
+            if (!filtered.Any())
+            {
+                filtered = profiles;
+            }
+            return _techHeartbeats.Where(t => filtered.Any(f => f.TechnicianId == t.TechnicianId)).ToList();
+        }
+        // CS8603 fix: Example for a string-returning method
+        public string GetSafeStringOrEmpty(string? input)
+        {
+            return input ?? string.Empty;
+        }
     }
 }

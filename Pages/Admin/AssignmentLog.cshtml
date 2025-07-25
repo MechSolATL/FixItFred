@@ -1,11 +1,16 @@
 @page
+// FixItFred Patch Log — Sprint 24.6 Final Error Sweep [2024-07-24T21:50:00Z]
+// Resolved: CS0019, CS8600, CS8604
+// Summary: Replaced ?? with ToString() for Razor StringValues and added null guards for logs, techFilter, dateFilter, AssignmentEntries, and string.Join.
+// Do not override previous logs — appended below each existing log block.
 @using MVP_Core.Models.Admin
 @inject MVP_Core.Services.Admin.DispatcherService DispatcherService
+@model MVP_Core.Pages.Admin.AssignmentLogModel
 @{
     ViewData["Title"] = "Assignment Log";
-    var logs = DispatcherService.GetAssignmentLogs();
-    string techFilter = Request.Query["techId"];
-    string dateFilter = Request.Query["date"];
+    var logs = DispatcherService.GetAssignmentLogs() ?? new List<AssignmentLogEntry>();
+    string techFilter = (Request.Query["techId"].ToString() == "" ? "" : Request.Query["techId"].ToString());
+    string dateFilter = (Request.Query["date"].ToString() == "" ? "" : Request.Query["date"].ToString());
     if (!string.IsNullOrEmpty(techFilter))
     {
         if (int.TryParse(techFilter, out var techId))
@@ -16,6 +21,8 @@
         if (DateTime.TryParse(dateFilter, out var dt))
             logs = logs.Where(l => l.Timestamp.Date == dt.Date).ToList();
     }
+    var safeValues = Model.AssignmentEntries?.Select(e => e?.TechnicianName ?? string.Empty) ?? Enumerable.Empty<string>();
+    var joinedNames = string.Join(", ", safeValues ?? new List<string>());
 }
 <h2 class="mb-4">Assignment Log</h2>
 <form method="get" class="mb-3 row g-2 align-items-end">
