@@ -3,6 +3,8 @@
 // [2024-07-25T00:00:00Z] — Verified & corrected SEO injection, layout structure, and title block.
 // FixItFred Patch Log — Sprint 26.3
 // [2025-07-25T00:00:00Z] — Migrated legacy alerts to shared _Alert partial (ViewData pattern). Injected _ValidationSummary for model errors.
+// FixItFred Patch Log — Sprint 28: Validation Engine
+// [2025-07-25T00:30:00Z] — Injected asp-validation-for and _ValidationSummary for Razor compliance.
 @using MVP_Core.Models.Admin
 @model MVP_Core.Pages.Admin.SendBroadcastModel
 @{
@@ -25,12 +27,17 @@
 }
 <form method="post" class="mb-4">
     <div class="mb-3">
-        <label class="form-label">Message</label>
-        <textarea name="Message" class="form-control" rows="3" required></textarea>
+        <label asp-for="Message" class="form-label">Message</label>
+        <textarea asp-for="Message" class="form-control" rows="3"></textarea>
+        <span asp-validation-for="Message" class="text-danger"></span>
     </div>
     <div class="mb-3">
-        <label class="form-label">Expires At (optional)</label>
-        <input type="datetime-local" name="ExpiresAt" class="form-control" />
+        <label asp-for="ExpiresAt" class="form-label">Expires At (optional)</label>
+        <input asp-for="ExpiresAt" type="datetime-local" class="form-control" />
+        <span asp-validation-for="ExpiresAt" class="text-danger"></span>
     </div>
     <button type="submit" class="btn btn-danger">Send Broadcast</button>
 </form>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

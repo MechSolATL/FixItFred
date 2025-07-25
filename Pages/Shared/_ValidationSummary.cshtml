@@ -1,0 +1,13 @@
+@* FixItFred Patch Log — Sprint 26: Step 2A *@
+@* [2024-07-25T00:20:00Z] — Centralized validation summary migrated from legacy Razor blocks. *@
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-danger" role="alert">
+        <ul>
+            @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+            {
+                <li>@error.ErrorMessage</li>
+            }
+        </ul>
+    </div>
+}

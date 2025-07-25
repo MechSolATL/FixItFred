@@ -117,6 +117,7 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}");
 app.MapBlazorHub();
 app.MapHub<MVP_Core.Hubs.RequestHub>("/hubs/requests");
+app.MapHub<MVP_Core.Hubs.ETAHub>("/etahub");
 
 // DB Seeding
 using (var scope = app.Services.CreateScope())

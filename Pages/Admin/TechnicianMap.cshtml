@@ -1,0 +1,38 @@
+@page
+// FixItFred Patch Log — Sprint 27
+// [2024-07-25T00:00:00Z] — Technician Tracker Map View scaffolded. Leaflet.js injected for real-time technician geolocation.
+@model MVP_Core.Pages.Admin.TechnicianMapModel
+@using MVP_Core.Models.Admin
+@inject MVP_Core.Services.Admin.DispatcherService DispatcherService
+@{
+    Layout = "/Pages/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Technician Tracker Map";
+    var techs = Model.Technicians;
+}
+<head>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    @await Html.PartialAsync("/Pages/Shared/_SEOHead.cshtml")
+</head>
+<div class="container-fluid px-2 px-md-4 mt-4">
+    <h2 class="mb-4 text-primary">Technician Tracker Map</h2>
+    <div id="technician-map" style="height: 600px; width: 100%;"></div>
+</div>
+@section Scripts {
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        var map = L.map('technician-map').setView([33.7490, -84.3880], 12); // Atlanta default
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '© OpenStreetMap'
+        }).addTo(map);
+        var technicians = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(techs));
+        technicians.forEach(function(tech) {
+            if (tech.Latitude && tech.Longitude) {
+                var marker = L.marker([tech.Latitude, tech.Longitude]).addTo(map);
+                marker.bindPopup(`<b>${tech.Name}</b><br>Status: ${tech.Status}<br>Jobs: ${tech.AssignedJobs}`);
+            }
+        });
+        // Polling stub for live updates
+        setInterval(function() { location.reload(); }, 30000);
+    </script>
+}

@@ -1,4 +1,6 @@
 @page
+// FixItFred Patch Log — Sprint 28B UI Polish
+// [2025-07-25T00:00:00Z] — Bootstrap consistency, loading spinner, tooltips, validation summary cleanup.
 @model MVP_Core.Pages.Services.HeatingModel
 @inject MVP_Core.Services.ISeoService SeoService
 @{
@@ -7,8 +9,21 @@
 <head>
     @await Html.PartialAsync("/Pages/Shared/_SEOHead.cshtml")
 </head>
-
 <section class="container mt-5">
     <h1>Heating Page</h1>
     <p>This page was auto-generated based on the database entries and confirmed structure.</p>
+    <form method="post" class="mt-4">
+        <partial name="_ValidationSummary" />
+        <div class="mb-3">
+            <label asp-for="UserAnswer" class="form-label">Your Answer</label>
+            <input asp-for="UserAnswer" class="form-control" required />
+            <span asp-validation-for="UserAnswer" class="text-danger"></span>
+            <span class="form-text text-muted">Describe your heating issue or request.</span>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+        <partial name="_LoadingSpinner" />
+    </form>
 </section>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

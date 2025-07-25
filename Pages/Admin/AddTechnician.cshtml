@@ -1,17 +1,10 @@
 @page
-// FixItFred Patch Log — Sprint 25
-// [2024-07-25T00:00:00Z] — Verified & corrected Razor structure and SEO injection.
+// FixItFred Patch Log — Sprint 28: Validation Engine
+// [2024-07-25T00:30:00Z] — Injected asp-validation-for and _ValidationSummary for Razor compliance.
 @model MVP_Core.Pages.Admin.AddTechnicianModel
 @{
     ViewData["Title"] = "Add Technician";
     Layout = "/Pages/Shared/_Layout.cshtml";
-    /*
-    @inject ISEOService SEO
-    <title>@SEO.Title</title>
-    <meta name="description" content="@SEO.MetaDescription" />
-    <meta name="keywords" content="@SEO.Keywords" />
-    <meta name="robots" content="@SEO.Robots" />
-    */
 }
 
 <h2>Add New Technician</h2>
@@ -21,14 +14,19 @@
     <div class="mb-3">
         <label asp-for="Technician.FullName" class="form-label"></label>
         <input asp-for="Technician.FullName" class="form-control" />
-        <!-- Legacy validation migrated to partial -->
+        <span asp-validation-for="Technician.FullName" class="text-danger"></span>
     </div>
 
     <div class="form-check">
         <input asp-for="Technician.IsActive" class="form-check-input" />
         <label asp-for="Technician.IsActive" class="form-check-label"></label>
+        <span asp-validation-for="Technician.IsActive" class="text-danger"></span>
     </div>
 
     <button type="submit" class="btn btn-primary">Add Technician</button>
     <a asp-page="/Admin/Technicians" class="btn btn-secondary">Cancel</a>
 </form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

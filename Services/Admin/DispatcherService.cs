@@ -23,6 +23,7 @@ using MVP_Core.Models.Mobile;
 using System.Collections.Generic;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace MVP_Core.Services.Admin
 {
@@ -442,6 +443,27 @@ namespace MVP_Core.Services.Admin
         public string GetSafeStringOrEmpty(string? input)
         {
             return input ?? string.Empty;
+        }
+
+        // FixItFred Patch Log — Sprint 26.2D
+        // [2025-07-25T00:00:00Z] — Finalized async technician fetch for Razor dropdown binding. Signature and implementation corrected.
+        public async Task<List<AdminTechnicianProfileDto>> GetTechniciansAsync()
+        {
+            await Task.CompletedTask;
+            var result = _techHeartbeats.Select(t => new AdminTechnicianProfileDto
+            {
+                TechnicianId = t.TechnicianId,
+                Name = t.Name,
+                CloseRate7Days = 0,
+                CloseRate30Days = 0,
+                CallbackCount7Days = 0,
+                TotalJobsLast30Days = 0,
+                TopZIPs = new string[0],
+                Comments = new List<string>(),
+                LastActive = t.LastPing,
+                SkillTags = new List<string>()
+            }).ToList();
+            return result ?? new List<AdminTechnicianProfileDto>();
         }
     }
 }

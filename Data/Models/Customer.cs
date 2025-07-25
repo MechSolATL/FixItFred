@@ -6,13 +6,13 @@ namespace MVP_Core.Data.Models
         public int Id { get; set; }
 
         [Required]
-        [MaxLength(100)]
-        public string FullName { get; set; } = string.Empty;
+        [StringLength(100)]
+        public string Name { get; set; } = string.Empty;
 
-        [MaxLength(100)]
+        [EmailAddress]
         public string? Email { get; set; }
 
-        [MaxLength(20)]
+        [Phone]
         public string? Phone { get; set; }
 
         [MaxLength(200)]

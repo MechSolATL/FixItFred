@@ -1,14 +1,56 @@
 @page
+// FixItFred Patch Log — Sprint 29A: ETA SignalR Integration
+// [2025-07-25T00:00:00Z] — Injected SignalR JS client, ETA region, and live update logic.
 @model MVP_Core.Pages.Services.WaterFiltrationModel
 @inject MVP_Core.Services.ISeoService SeoService
 @{
     Layout = "/Pages/Shared/_Layout.cshtml";
+    // Example: expose TechnicianId or RequestId for JS tracking
+    var technicianId = Model.TechnicianId;
+    var requestId = Model.RequestId;
 }
 <head>
     @await Html.PartialAsync("/Pages/Shared/_SEOHead.cshtml")
 </head>
-
 <section class="container mt-5">
     <h1>WaterFiltration Page</h1>
     <p>This page was auto-generated based on the database entries and confirmed structure.</p>
+    <div id="eta-region" class="alert alert-info mb-3" style="display:none;">
+        <strong>Technician ETA:</strong> <span id="eta-value">--</span>
+    </div>
+    <form method="post" class="mt-4">
+        <partial name="_ValidationSummary" />
+        <div class="mb-3">
+            <label asp-for="UserAnswer" class="form-label">Your Answer</label>
+            <input asp-for="UserAnswer" class="form-control" required />
+            <span asp-validation-for="UserAnswer" class="text-danger"></span>
+            <span class="form-text text-muted">Please describe your water filtration issue in detail.</span>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+        <partial name="_LoadingSpinner" />
+    </form>
 </section>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
+    <script>
+        // FixItFred Patch Log — Sprint 29A: ETA SignalR JS Client
+        // [2025-07-25T00:00:00Z] — Connect to ETAHub and update ETA region on ETA push
+        const technicianId = '@technicianId';
+        const requestId = '@requestId';
+        const etaRegion = document.getElementById('eta-region');
+        const etaValue = document.getElementById('eta-value');
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl('/etahub')
+            .build();
+        connection.on('ReceiveETA', function (incomingTechId, eta) {
+            if (incomingTechId == technicianId) {
+                etaRegion.style.display = 'block';
+                etaValue.textContent = eta;
+            }
+        });
+        connection.start().catch(function (err) {
+            console.error('SignalR connection error:', err);
+        });
+    </script>
+}

@@ -1,4 +1,6 @@
 @page
+// FixItFred Patch Log — Sprint 28 Razor Validation
+// [2025-07-25T00:00:00Z] — Injected asp-validation-for for all form fields and ensured _ValidationSummary is present.
 @using MVP_Core.Data.Models // Corrected ServiceRequest namespace
 @using MVP_Core.Data.Models.ViewModels
 @inject MVP_Core.Services.TechnicianFeedbackService FeedbackService
@@ -12,31 +14,35 @@
 <partial name="_ValidationSummary" />
 <form method="post">
     <div class="mb-3">
-        <label class="form-label">Technician</label>
+        <label asp-for="TechnicianDropdownViewModel.SelectedTechnicianId" class="form-label">Technician</label>
         <partial name="_TechnicianDropdown" model="Model.TechnicianDropdownViewModel" />
+        <span asp-validation-for="TechnicianDropdownViewModel.SelectedTechnicianId" class="text-danger"></span>
     </div>
     <div class="mb-3">
-        <label class="form-label">Completed Job</label>
-        <select name="RequestId" class="form-select" required>
+        <label asp-for="RequestId" class="form-label">Completed Job</label>
+        <select asp-for="RequestId" class="form-select" required>
             <option value="">Select job...</option>
             @foreach (var job in Model.CompletedJobs ?? new List<ServiceRequest>())
             {
                 <option value="@job.Id">#@job.Id - @job.ServiceType</option>
             }
         </select>
+        <span asp-validation-for="RequestId" class="text-danger"></span>
     </div>
     <div class="mb-3">
-        <label class="form-label">Rating (1–5)</label>
-        <select name="Rating" class="form-select" required>
+        <label asp-for="Rating" class="form-label">Rating (1–5)</label>
+        <select asp-for="Rating" class="form-select" required>
             @for (int i = 1; i <= 5; i++)
             {
                 <option value="@i">@i</option>
             }
         </select>
+        <span asp-validation-for="Rating" class="text-danger"></span>
     </div>
     <div class="mb-3">
-        <label class="form-label">Notes (optional)</label>
-        <textarea name="Notes" class="form-control" maxlength="2000"></textarea>
+        <label asp-for="Notes" class="form-label">Notes (optional)</label>
+        <textarea asp-for="Notes" class="form-control" maxlength="2000"></textarea>
+        <span asp-validation-for="Notes" class="text-danger"></span>
     </div>
     <button type="submit" class="btn btn-success">Submit Feedback</button>
 </form>
@@ -45,4 +51,7 @@
     ViewData["AlertType"] = "info";
     ViewData["AlertMessage"] = status;
     <partial name="_Alert" />
+}
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
 }

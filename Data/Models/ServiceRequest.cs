@@ -9,29 +9,36 @@ namespace MVP_Core.Data.Models
         public int Id { get; set; }
 
         [Required]
-        [MaxLength(100)]
+        [StringLength(100)]
         public string CustomerName { get; set; } = string.Empty;
 
         [Required]
-        [EmailAddress]
-        [MaxLength(150)]
-        public string Email { get; set; } = string.Empty;
-
-        [Phone]
-        [MaxLength(20)]
-        public string? Phone { get; set; }
-
-        [MaxLength(250)]
-        public string? Address { get; set; }
-
-        [Required]
-        [MaxLength(100)]
+        [StringLength(100)]
         public string ServiceType { get; set; } = string.Empty;
 
-        [MaxLength(100)]
-        public string? ServiceSubtype { get; set; }
+        [Required]
+        [StringLength(10)]
+        public string Zip { get; set; } = string.Empty;
 
         [Required]
+        public DateTime RequestedAt { get; set; }
+
+        public int? AssignedTechnicianId { get; set; }
+
+        public string Status { get; set; } = string.Empty;
+
+        public string Priority { get; set; } = "Normal";
+
+        public int DelayMinutes { get; set; }
+
+        public bool IsEmergency { get; set; }
+
+        public bool IsEscalated { get; set; }
+
+        public DateTime? DueDate { get; set; }
+
+        public DateTime? EscalatedAt { get; set; }
+
         [MaxLength(2000)]
         public string Details { get; set; } = string.Empty;
 
@@ -44,37 +51,39 @@ namespace MVP_Core.Data.Models
         [MaxLength(100)]
         public string? AssignedTo { get; set; }
 
-        public int? AssignedTechnicianId { get; set; } // <-- Added for Blazor binding
-
-        [Required]
-        [MaxLength(50)]
-        public string Status { get; set; } = "Pending";
-
-        public bool IsUrgent { get; set; } = false;
-        public bool NeedsFollowUp { get; set; } = false;
-
         [MaxLength(2000)]
         public string? Notes { get; set; }
 
         [MaxLength(100)]
         public string? SessionId { get; set; }
 
-        // Priority: Low, Normal, High
-        [MaxLength(20)]
-        public string Priority { get; set; } = "Normal";
+        public bool IsUrgent { get; set; } = false;
 
-        // ? FIXED: Strongly typed one-to-many relationship
+        public bool NeedsFollowUp { get; set; } = false;
+
+        // FIXED: Strongly typed one-to-many relationship
         public List<UserResponse> Responses { get; set; } = [];
-
-        // SLA/Deadline
-        public DateTime? DueDate { get; set; } // Nullable due date for SLA
-
-        public DateTime? EscalatedAt { get; set; } // Set when SLA escalation occurs
-
-        public bool IsEscalated { get; set; } = false;
 
         [MaxLength(200)]
         public string? RequiredSkills { get; set; } // New property for required skills
+
+        [Required]
+        [EmailAddress]
+        [MaxLength(100)]
+        public string Email { get; set; } = string.Empty;
+
+        [Required]
+        [Phone]
+        [MaxLength(20)]
+        public string Phone { get; set; } = string.Empty;
+
+        [Required]
+        [StringLength(250)]
+        public string Address { get; set; } = string.Empty;
+
+        [Required]
+        [MaxLength(100)]
+        public string ServiceSubtype { get; set; } = string.Empty;
     }
 
     public class SlaSetting

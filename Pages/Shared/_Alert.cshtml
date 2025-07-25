@@ -1,0 +1,18 @@
+@* FixItFred Patch Log — Sprint 26: Step 2A *@
+@* [2024-07-25T00:20:00Z] — Centralized alert component migrated from legacy Razor blocks. *@
+@{
+    var type = ViewData["AlertType"]?.ToString() ?? "info";
+    var message = ViewData["AlertMessage"]?.ToString() ?? "";
+    var css = type switch {
+        "success" => "alert alert-success",
+        "error" => "alert alert-danger",
+        "warning" => "alert alert-warning",
+        _ => "alert alert-info"
+    };
+}
+@if (!string.IsNullOrEmpty(message))
+{
+    <div class="@css" role="alert">
+        @message
+    </div>
+}

@@ -24,11 +24,22 @@ namespace MVP_Core.Services
             _dispatcherService = dispatcherService;
         }
 
-        public IReadOnlyList<ScheduleQueue> GetQueue() => _queue;
-        public IReadOnlyList<ScheduleHistory> GetHistory() => _history;
-        public IReadOnlyList<NotificationsSent> GetNotifications() => _notifications;
-
-        public void Enqueue(int technicianId, int serviceRequestId, DateTime scheduledFor)
+        public IReadOnlyList<ScheduleQueue> GetQueue(string? regionId = null)
+        {
+            if (string.IsNullOrEmpty(regionId)) return _queue;
+            return _queue.Where(q => q.RegionId == regionId).ToList();
+        }
+        public IReadOnlyList<ScheduleHistory> GetHistory(string? regionId = null)
+        {
+            if (string.IsNullOrEmpty(regionId)) return _history;
+            return _history.Where(h => h.RegionId == regionId).ToList();
+        }
+        public IReadOnlyList<NotificationsSent> GetNotifications(string? regionId = null)
+        {
+            if (string.IsNullOrEmpty(regionId)) return _notifications;
+            return _notifications.Where(n => n.RegionId == regionId).ToList();
+        }
+        public void Enqueue(int technicianId, int serviceRequestId, DateTime scheduledFor, string? regionId = null)
         {
             var entry = new ScheduleQueue
             {
@@ -36,7 +47,8 @@ namespace MVP_Core.Services
                 ServiceRequestId = serviceRequestId,
                 ScheduledFor = scheduledFor,
                 Status = "Pending",
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.UtcNow,
+                RegionId = regionId
             };
             _queue.Add(entry);
             _history.Add(new ScheduleHistory
@@ -44,11 +56,11 @@ namespace MVP_Core.Services
                 ScheduleQueueId = entry.Id,
                 Action = "Enqueued",
                 Timestamp = DateTime.UtcNow,
-                Notes = $"Technician {technicianId} scheduled for request {serviceRequestId}"
+                Notes = $"Technician {technicianId} scheduled for request {serviceRequestId}",
+                RegionId = regionId
             });
         }
-
-        public void MarkAsNotified(int technicianId, int serviceRequestId, string notificationType, string message)
+        public void MarkAsNotified(int technicianId, int serviceRequestId, string notificationType, string message, string? regionId = null)
         {
             _notifications.Add(new NotificationsSent
             {
@@ -56,9 +68,10 @@ namespace MVP_Core.Services
                 ServiceRequestId = serviceRequestId,
                 NotificationType = notificationType,
                 SentAt = DateTime.UtcNow,
-                Message = message
+                Message = message,
+                RegionId = regionId
             });
-            var entry = _queue.FirstOrDefault(q => q.TechnicianId == technicianId && q.ServiceRequestId == serviceRequestId);
+            var entry = _queue.FirstOrDefault(q => q.TechnicianId == technicianId && q.ServiceRequestId == serviceRequestId && q.RegionId == regionId);
             if (entry != null)
             {
                 entry.Status = "Notified";
@@ -67,7 +80,8 @@ namespace MVP_Core.Services
                     ScheduleQueueId = entry.Id,
                     Action = "Notified",
                     Timestamp = DateTime.UtcNow,
-                    Notes = message
+                    Notes = message,
+                    RegionId = regionId
                 });
             }
         }

@@ -1,0 +1,11 @@
+@* FixItFred Patch R26.2A — TechnicianDropdown.cshtml bound to TechnicianDropdownViewModel *@
+@* [2024-07-25T00:00:00Z] — Razor partial updated for model compliance and binding integrity — Nova *@
+@model MVP_Core.Data.Models.ViewModels.TechnicianDropdownViewModel
+<select asp-for="SelectedTechnicianId" class="form-control">
+    <option value="">-- Select Technician --</option>
+    @foreach (var tech in Model.Technicians ?? Enumerable.Empty<MVP_Core.Models.Admin.TechnicianProfileDto>())
+    {
+        <option value="@tech.TechnicianId">@tech.Name</option>
+    }
+</select>
+<span asp-validation-for="SelectedTechnicianId" class="text-danger"></span>

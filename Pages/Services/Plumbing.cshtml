@@ -1,4 +1,6 @@
 @page
+// FixItFred Patch Log — Sprint 28B UI Polish
+// [2025-07-25T00:00:00Z] — Bootstrap consistency, loading spinner, tooltips, validation summary cleanup.
 @model MVP_Core.Pages.Services.PlumbingModel
 @inject MVP_Core.Services.ISeoService SeoService
 @{
@@ -92,6 +94,7 @@ else if (!string.IsNullOrEmpty(Model?.Message))
 @if (Model?.IsVerified == true && Model.CurrentQuestion != null)
 {
     <form method="post" asp-page-handler="Next" class="space-y-4" aria-label="Plumbing Question Form">
+        <partial name="_ValidationSummary" />
         @Html.AntiForgeryToken()
 
         <div>
@@ -101,30 +104,35 @@ else if (!string.IsNullOrEmpty(Model?.Message))
 
             @if (Model.CurrentQuestion.InputType == "dropdown" && Model.CurrentQuestion.Options != null)
             {
-                <select asp-for="UserAnswer" class="border rounded px-4 py-2 w-full" required>
+                <select asp-for="UserAnswer" class="form-control" required>
                     <option value="">-- Select --</option>
                     @foreach (var option in Model.CurrentQuestion.Options)
                     {
                         <option value="@option.OptionText">@option.OptionText</option>
                     }
                 </select>
+                <span asp-validation-for="UserAnswer" class="text-danger"></span>
+                <span class="form-text text-muted">Select the most accurate option for your plumbing issue.</span>
             }
             else if (Model.CurrentQuestion.InputType == "textarea")
             {
-                <textarea asp-for="UserAnswer" rows="4" class="border rounded px-4 py-2 w-full" maxlength="500" required></textarea>
+                <textarea asp-for="UserAnswer" rows="4" class="form-control" maxlength="500" required></textarea>
+                <span asp-validation-for="UserAnswer" class="text-danger"></span>
+                <span class="form-text text-muted">Describe your plumbing issue in detail.</span>
             }
             else
             {
-                <input type="text" asp-for="UserAnswer" class="border rounded px-4 py-2 w-full" maxlength="500" required />
+                <input type="text" asp-for="UserAnswer" class="form-control" maxlength="500" required />
+                <span asp-validation-for="UserAnswer" class="text-danger"></span>
+                <span class="form-text text-muted">Enter details about your plumbing problem.</span>
             }
         </div>
 
         <input type="hidden" name="questionId" value="@Model.CurrentQuestion.Id" />
 
         <div class="flex justify-between mt-6">
-            <button type="submit" class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded shadow" aria-label="Next Question">
-                ?? Next
-            </button>
+            <button type="submit" class="btn btn-primary">?? Next</button>
+            <partial name="_LoadingSpinner" />
         </div>
     </form>
 
@@ -132,9 +140,7 @@ else if (!string.IsNullOrEmpty(Model?.Message))
     {
         <form method="post" asp-page-handler="Back" class="inline-block mt-4">
             @Html.AntiForgeryToken()
-            <button type="submit" class="px-6 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded shadow" aria-label="Go Back">
-                ?? Back
-            </button>
+            <button type="submit" class="btn btn-secondary">?? Back</button>
         </form>
     }
 }
@@ -149,4 +155,8 @@ else if (Model?.IsVerified == true && Model.CurrentQuestion == null)
             Review and Submit ??
         </a>
     </div>
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
 }

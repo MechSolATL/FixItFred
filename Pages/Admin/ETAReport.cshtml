@@ -1,0 +1,63 @@
+@page
+// FixItFred Patch Log — Sprint 26.4E
+// [2025-07-25T00:00:00Z] — Admin ETA Report view scaffolded for ETA accuracy review.
+@model MVP_Core.Pages.Admin.ETAReportModel
+@using MVP_Core.Models.Dispatch
+@inject MVP_Core.Services.NotificationDispatchEngine DispatchEngine
+@{
+    Layout = "/Pages/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "ETA Accuracy Report";
+    var etaHistory = Model.ETAHistory;
+}
+<head>
+    @await Html.PartialAsync("/Pages/Shared/_SEOHead.cshtml")
+</head>
+<div class="container-fluid px-2 px-md-4 mt-4">
+    <h2 class="mb-4 text-primary">ETA Accuracy Report</h2>
+    <partial name="_ValidationSummary" />
+    @if (TempData["SystemMessages"] != null)
+    {
+        ViewData["AlertType"] = "info";
+        ViewData["AlertMessage"] = TempData["SystemMessages"];
+        <partial name="_Alert" />
+    }
+    @if (etaHistory != null && etaHistory.Any())
+    {
+        <div class="table-responsive">
+            <table class="table table-hover table-bordered align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Technician</th>
+                        <th>Service Request</th>
+                        <th>Predicted ETA</th>
+                        <th>Actual Arrival</th>
+                        <th>Delta (min)</th>
+                        <th>Timestamp</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var entry in etaHistory)
+                    {
+                        <tr>
+                            <td>@entry.TechnicianName</td>
+                            <td>@entry.ServiceRequestId</td>
+                            <td>@entry.PredictedETA.ToLocalTime().ToString("g")</td>
+                            <td>@entry.ActualArrival?.ToLocalTime().ToString("g") ?? "N/A"</td>
+                            <td>@(entry.ActualArrival.HasValue ? (entry.ActualArrival.Value - entry.PredictedETA).TotalMinutes.ToString("0") : "-")</td>
+                            <td>@entry.Timestamp.ToLocalTime().ToString("g")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-warning">No ETA history records found.</div>
+    }
+</div>
+@section Scripts {
+    <script>
+        // Optional: Add admin JS for ETA report actions
+    </script>
+}

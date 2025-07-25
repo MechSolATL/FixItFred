@@ -23,6 +23,8 @@ namespace MVP_Core.Pages.Services
             _deviceResolver = deviceResolver;
         }
 
+        public string UserAnswer { get; set; } = string.Empty;
+
         public async Task OnGetAsync()
         {
             var seo = await _seoService.GetSeoByPageNameAsync("Services/Heating");

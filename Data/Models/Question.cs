@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace MVP_Core.Data.Models
 {
     public class Question
@@ -12,17 +14,22 @@ namespace MVP_Core.Data.Models
         /// <summary>
         /// Which service this question applies to (Plumbing, Heating, etc). Use "Global" for reusable ones.
         /// </summary>
+        [Required]
+        [StringLength(100)]
         public string ServiceType { get; set; } = string.Empty;
 
         /// <summary>
         /// The actual question shown to the user.
         /// </summary>
+        [Required]
+        [StringLength(200)]
         public string Text { get; set; } = string.Empty;
 
         /// <summary>
         /// Input type expected ("text", "textarea", "dropdown").
         /// </summary>
-        public string InputType { get; set; } = "text";
+        [Required]
+        public string InputType { get; set; } = string.Empty;
 
         /// <summary>
         /// Whether this question is mandatory for form submission.

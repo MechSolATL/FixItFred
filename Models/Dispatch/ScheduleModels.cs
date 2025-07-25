@@ -1,3 +1,5 @@
+// FixItFred Patch Log — Sprint 27 SaaS Modularization
+// [2024-07-25T00:00:00Z] — Added RegionId for multi-region/tenant support.
 // FixItFred Patch Log — Sprint 26.4
 // [2025-07-25T00:00:00Z] — Scheduler/dispatch models scaffolded for queue, history, and notifications.
 using System;
@@ -19,6 +21,7 @@ namespace MVP_Core.Models.Dispatch
         public DateTime? EstimatedArrival { get; set; }
         public string? ServiceZone { get; set; } // For travel time stub
         public string? ZipCode { get; set; } // For travel time stub
+        public string? RegionId { get; set; } // SaaS/white-label region/tenant context
     }
 
     public class ScheduleHistory
@@ -28,6 +31,7 @@ namespace MVP_Core.Models.Dispatch
         public string Action { get; set; } = string.Empty;
         public DateTime Timestamp { get; set; } = DateTime.UtcNow;
         public string? Notes { get; set; }
+        public string? RegionId { get; set; } // SaaS/white-label region/tenant context
     }
 
     public class NotificationsSent
@@ -38,5 +42,6 @@ namespace MVP_Core.Models.Dispatch
         public string NotificationType { get; set; } = string.Empty;
         public DateTime SentAt { get; set; } = DateTime.UtcNow;
         public string? Message { get; set; }
+        public string? RegionId { get; set; } // SaaS/white-label region/tenant context
     }
 }

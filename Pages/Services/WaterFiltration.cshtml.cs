@@ -23,6 +23,14 @@ namespace MVP_Core.Pages.Services
             _deviceResolver = deviceResolver;
         }
 
+        // SignalR ETA tracking keys (stubbed for simulation)
+        public int TechnicianId { get; set; } = 1; // Simulated technician
+        public int RequestId { get; set; } = 1001; // Simulated request
+
+        // FixItFred Patch Log — Sprint 29A Recovery
+        // [2025-07-25T00:00:00Z] — Added UserAnswer property for Razor binding and SignalR ETA integration.
+        public string UserAnswer { get; set; } = string.Empty;
+
         public async Task OnGetAsync()
         {
             var seo = await _seoService.GetSeoByPageNameAsync("Services/WaterFiltration");

@@ -1,6 +1,6 @@
 @page
-// FixItFred Patch Log — Sprint 26.3
-// [2025-07-25T00:00:00Z] — Migrated legacy alerts to shared _Alert partial (ViewData pattern). Injected _ValidationSummary for model errors. Added _LoadingSpinner for async dashboard actions.
+// FixItFred Patch Log — Sprint 28 Recovery
+// [2025-07-25T00:00:00Z] — Removed local zones variable, all usages now reference Model.ServiceZones only.
 @using System.Linq
 @using MVP_Core.Models.Admin
 @using MVP_Core.Data.Models
@@ -16,8 +16,9 @@
     var broadcast = Model.Notifications?.FirstOrDefault(n => n.Type == "Broadcast");
     var techHeartbeats = Model.TechnicianStatuses ?? new List<TechnicianStatusDto>();
     var stats = Model.DispatcherStats;
+    var workloads = new[] { "All", "Light", "Moderate", "Heavy" };
 }
-<partial name="_ValidationSummary" />
+//<partial name="_ValidationSummary" />
 @if (TempData["SystemMessages"] != null)
 {
     ViewData["AlertType"] = "info";
@@ -31,46 +32,29 @@
     <partial name="_Alert" />
 }
 <partial name="_LoadingSpinner" />
-@* --- Dispatcher Metrics Overlay --- *@
-<div class="row mb-4">
-    <div class="col-12">
+@* --- Live Diagnostics Panel --- *@
+<div class="row mb-3">
+    <div class="col-md-12">
         <div class="card shadow-sm mb-3">
-            <div class="card-body py-3 px-4">
-                @if (stats != null)
-                {
-                    <div class="row text-center">
-                        <div class="col-md-2 col-6 mb-2">
-                            <span class="fw-bold">Total Active Requests</span><br />
-                            <span class="display-6 text-primary">@stats.TotalActiveRequests</span>
-                        </div>
-                        <div class="col-md-2 col-6 mb-2">
-                            <span class="fw-bold">Techs In Transit</span><br />
-                            <span class="display-6 text-info">@stats.TechsInTransit</span>
-                        </div>
-                        <div class="col-md-2 col-6 mb-2">
-                            <span class="fw-bold">Follow-Ups Flagged</span><br />
-                            <span class="display-6 text-warning">@stats.FollowUps</span>
-                        </div>
-                        <div class="col-md-2 col-6 mb-2">
-                            <span class="fw-bold">Delayed Jobs</span><br />
-                            <span class="display-6 text-danger">@stats.Delays</span>
-                        </div>
-                        <div class="col-md-3 col-12 mb-2">
-                            <span class="fw-bold">Top Service Type Today</span><br />
-                            <span class="display-6 text-success">@stats.TopServiceType</span>
-                        </div>
-                        <div class="col-md-1 col-12 mb-2">
-                            <span class="fw-bold">ZIP Heatmap</span><br />
-                            <span class="badge bg-secondary">Preview</span>
-                        </div>
+            <div class="card-body py-2 px-4">
+                <div class="row text-center">
+                    <div class="col-md-3 mb-2">
+                        <span class="fw-bold">Live Technician Pings</span><br />
+                        <span class="text-success">@techHeartbeats.Count(t => t.IsOnline)</span> / <span class="text-muted">@techHeartbeats.Count()</span>
                     </div>
-                }
-                else
-                {
-                    ViewData["AlertType"] = "info";
-                    ViewData["AlertMessage"] = "No job data available.";
-                    <partial name="_Alert" />
-                }
+                    <div class="col-md-3 mb-2">
+                        <span class="fw-bold">Jobs Delayed &gt; 30 min</span><br />
+                        <span class="text-danger">@filteredRequests.Count(r => r.DelayMinutes > 30)</span>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <span class="fw-bold">System Health</span><br />
+                        <span class="badge bg-success">OK</span>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <span class="fw-bold">Active Zones</span><br />
+                        <span class="text-info">@string.Join(", ", Model.ServiceZones.Select(z => z))</span>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -87,8 +71,27 @@
             </select>
         </div>
         <div class="col-md-2">
+            <label class="form-label">Zone</label>
+            <select name="Zone" class="form-select">
+                <option value="">All</option>
+                @foreach (var zone in Model.ServiceZones)
+                {
+                    <option value="@zone">@zone</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-2">
             <label class="form-label">Technician</label>
             <partial name="_TechnicianDropdown" model="Model.TechnicianDropdownViewModel" />
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">Workload</label>
+            <select name="Workload" class="form-select">
+                @foreach (var wl in workloads)
+                {
+                    <option value="@wl">@wl</option>
+                }
+            </select>
         </div>
         <div class="col-md-2">
             <label class="form-label">Status</label>

@@ -2,6 +2,12 @@
 // 2024-07-24T21:16:00Z
 // Applied Fixes: CS1998
 // Notes: Inserted await Task.CompletedTask in async methods without awaits for compliance.
+// FixItFred Patch Log — Sprint 26.2D
+// [2025-07-25T00:00:00Z] — Final async Razor binding for TechnicianDropdownViewModel. CS0118/CS1061 resolved.
+// FixItFred Patch Log — Sprint 28 Recovery Patch
+// [2024-07-25T00:40:00Z] — Added ServiceZones property for zone filtering in dispatcher UI.
+// FixItFred Patch Log — Sprint 28
+// [2025-07-25T00:00:00Z] — ServiceZones property exposed and Razor reference corrected for Dispatcher view.
 using MVP_Core.Models.Admin;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -23,6 +29,7 @@ using MVP_Core.Services.Config;
 using MVP_Core.Services.Admin;
 using System.Threading.Tasks;
 using DispatcherAuditLog = MVP_Core.Models.Admin.DispatcherAuditLog;
+using MVP_Core.Data.Models.ViewModels;
 
 namespace MVP_Core.Pages.Admin
 {
@@ -108,7 +115,7 @@ namespace MVP_Core.Pages.Admin
             }
         }
 
-        public async Task OnGetAsync()
+        public async Task<IActionResult> OnGetAsync()
         {
             DispatcherRequests = _dispatcherService.GetFilteredRequests(new DispatcherFilterModel());
             TechnicianStatuses = _dispatcherService.GetAllTechnicianStatuses();
@@ -150,7 +157,7 @@ namespace MVP_Core.Pages.Admin
                 Response.ContentType = "text/csv";
                 Response.Body.WriteAsync(bytes, 0, bytes.Length).Wait();
                 Response.Body.Close();
-                return;
+                return new EmptyResult();
             }
             if (export == "excel")
             {
@@ -179,13 +186,20 @@ namespace MVP_Core.Pages.Admin
                 Response.ContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
                 Response.Body.WriteAsync(bytes, 0, bytes.Length).Wait();
                 Response.Body.Close();
-                return;
+                return new EmptyResult();
             }
 
             var loadService = new LoadBalancingService(_db, _lbConfig);
             TechnicianLoads = _db.Technicians.ToList();
             LoadSuggestedTech();
-            await Task.CompletedTask;
+            TechnicianDropdownViewModel = new TechnicianDropdownViewModel
+            {
+                Technicians = await _dispatcherService.GetTechniciansAsync(),
+                SelectedTechnicianId = null
+            };
+            ServiceZones.Clear();
+            ServiceZones.AddRange(new[] { "North", "South", "East", "West" }); // Patch: populate zones for UI
+            return Page();
         }
 
         public string GetStatusBadgeClass(string status) => status switch
@@ -485,5 +499,8 @@ namespace MVP_Core.Pages.Admin
             });
             return Page();
         }
+
+        public List<string> ServiceZones { get; set; } = new();
+        public MVP_Core.Data.Models.ViewModels.TechnicianDropdownViewModel TechnicianDropdownViewModel { get; set; } = new MVP_Core.Data.Models.ViewModels.TechnicianDropdownViewModel();
     }
 }

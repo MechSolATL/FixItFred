@@ -19,5 +19,7 @@ namespace MVP_Core.Models.Admin
         // Added for Razor compatibility
         public string TechnicianName => Name;
         public int? AssignedTechnicianId { get; set; }
+        public double? Latitude { get; set; }
+        public double? Longitude { get; set; }
     }
 }
