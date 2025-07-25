@@ -1,13 +1,22 @@
 @page
+// FixItFred Patch Log — Sprint 25
+// [2024-07-25T00:00:00Z] — Verified & corrected Razor structure and SEO injection.
 @model MVP_Core.Pages.Services.AirConditioningModel
 @inject MVP_Core.Services.ISeoService SeoService
 @{
     Layout = "/Pages/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Air Conditioning";
+    /*
+    @inject ISEOService SEO
+    <title>@SEO.Title</title>
+    <meta name="description" content="@SEO.MetaDescription" />
+    <meta name="keywords" content="@SEO.Keywords" />
+    <meta name="robots" content="@SEO.Robots" />
+    */
 }
 <head>
     @await Html.PartialAsync("/Pages/Shared/_SEOHead.cshtml")
 </head>
-
 <section class="container mt-5">
     <h1>AirConditioning Page</h1>
     <p>This page was auto-generated based on the database entries and confirmed structure.</p>

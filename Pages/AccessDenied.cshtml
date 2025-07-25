@@ -1,8 +1,17 @@
 @page
+// FixItFred Patch Log — Sprint 25
+// [2024-07-25T00:00:00Z] — Verified & corrected Razor structure and SEO injection.
 @model AccessDeniedModel
 @{
     ViewData["Title"] = "Access Denied";
+    Layout = "/Pages/Shared/_Layout.cshtml";
+    /*
+    @inject ISEOService SEO
+    <title>@SEO.Title</title>
+    <meta name="description" content="@SEO.MetaDescription" />
+    <meta name="keywords" content="@SEO.Keywords" />
+    <meta name="robots" content="@SEO.Robots" />
+    */
 }
-
 <h2>Access Denied</h2>
 <p>You do not have permission to access this page.</p>

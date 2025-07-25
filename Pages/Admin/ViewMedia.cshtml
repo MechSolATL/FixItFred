@@ -41,23 +41,23 @@ else
                         <div class="mb-2">
                             @if (media.FileType == "Image")
                             {
-                                <img src="/media/@media.RequestId/@media.FileName" class="img-fluid" alt="Media" />
+                                <img src="/media/@(string.IsNullOrEmpty(media.RequestId.ToString()) ? "fallback" : media.RequestId.ToString())/@(string.IsNullOrEmpty(media.FileName) ? "fallback" : media.FileName)" class="img-fluid" alt="Media" />
                             }
                             else if (media.FileType == "PDF")
                             {
-                                <a href="/media/@media.RequestId/@media.FileName" target="_blank">?? PDF</a>
+                                <a href="/media/@(string.IsNullOrEmpty(media.RequestId.ToString()) ? "fallback" : media.RequestId.ToString())/@(string.IsNullOrEmpty(media.FileName) ? "fallback" : media.FileName)" target="_blank">?? PDF</a>
                             }
                             else if (media.FileType == "Video")
                             {
-                                <video src="/media/@media.RequestId/@media.FileName" controls width="100%"></video>
+                                <video src="/media/@(string.IsNullOrEmpty(media.RequestId.ToString()) ? "fallback" : media.RequestId.ToString())/@(string.IsNullOrEmpty(media.FileName) ? "fallback" : media.FileName)" controls width="100%"></video>
                             }
                             else
                             {
-                                <a href="/media/@media.RequestId/@media.FileName" target="_blank">Download</a>
+                                <a href="/media/@(string.IsNullOrEmpty(media.RequestId.ToString()) ? "fallback" : media.RequestId.ToString())/@(string.IsNullOrEmpty(media.FileName) ? "fallback" : media.FileName)" target="_blank">Download</a>
                             }
                         </div>
-                        <div><strong>Uploaded By:</strong> @media.UploadedBy</div>
-                        <div><strong>Notes/Tags:</strong> @media.NotesOrTags</div>
+                        <div><strong>Uploaded By:</strong> @(string.IsNullOrEmpty(media.UploadedBy) ? "fallback" : media.UploadedBy)</div>
+                        <div><strong>Notes/Tags:</strong> @(string.IsNullOrEmpty(media.NotesOrTags) ? "fallback" : media.NotesOrTags)</div>
                         <button class="btn btn-sm btn-danger mt-2" disabled title="Delete (stub)">?? Delete</button>
                     </div>
                 </div>

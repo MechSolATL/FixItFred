@@ -153,7 +153,7 @@
                                     var skillTagMasterList = new[] { "Plumbing", "Air Conditioning", "Heating", "Water Filtration", "Trainee", "Mentor" };
                                     string requiredSkill = req.ServiceType ?? "";
                                     string jobZip = req.Zip ?? "";
-                                    var suggestedTechs = Model.TechnicianStatuses.Where(t => t.Status == requiredSkill && t.Name != null).ToList();
+                                    var suggestedTechs = Model.TechnicianStatuses.AsEnumerable().Where(t => t.Status == requiredSkill && t.Name != null).ToList();
                                 }
                                 <select name="newTechnicianId" class="form-select form-select-sm d-inline-block w-auto me-1">
                                     @if (suggestedTechs != null && suggestedTechs.Any())

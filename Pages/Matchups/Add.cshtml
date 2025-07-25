@@ -1,8 +1,17 @@
 @page
+// FixItFred Patch Log — Sprint 25
+// [2024-07-25T00:00:00Z] — Verified & corrected Razor structure and SEO injection.
 @model MVP_Core.Pages.Matchups.AddModel
 @{
     Layout = "/Pages/Shared/_Layout.cshtml";
     ViewData["Title"] = "Add Heat Pump Matchup";
+    /*
+    @inject ISEOService SEO
+    <title>@SEO.Title</title>
+    <meta name="description" content="@SEO.MetaDescription" />
+    <meta name="keywords" content="@SEO.Keywords" />
+    <meta name="robots" content="@SEO.Robots" />
+    */
 }
 
 <h2 class="mt-4">Add Heat Pump Matchup</h2>

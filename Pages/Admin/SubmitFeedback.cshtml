@@ -5,12 +5,11 @@
 @inject MVP_Core.Services.Admin.DispatcherService DispatcherService
 @model MVP_Core.Pages.Admin.SubmitFeedbackModel
 @{
-    // Sprint 22: Admin feedback submission page
     ViewData["Title"] = "Submit Technician Feedback";
-    var techList = DispatcherService.GetAllTechnicianHeartbeats() ?? new List<TechnicianStatusDto>();
-    var completedJobs = new List<ServiceRequest>(); // TODO: Query completed jobs for dropdown
+    var techList = DispatcherService.GetAllTechnicianHeartbeats();
+    var completedJobs = new List<ServiceRequest>();
     string status = TempData["FeedbackStatus"] as string ?? "";
-    var safeFeedback = Model?.Feedback ?? string.Empty;
+    var safeTechList = techList != null && techList.Any() ? techList : new List<TechnicianStatusDto>();
 }
 <h2 class="mb-4">? Submit Technician Feedback</h2>
 <form method="post">
@@ -18,7 +17,7 @@
         <label class="form-label">Technician</label>
         <select name="TechnicianId" class="form-select" required>
             <option value="">Select technician...</option>
-            @foreach (var tech in techList)
+            @foreach (var tech in safeTechList)
             {
                 <option value="@tech.TechnicianId">@tech.Name</option>
             }
@@ -53,4 +52,3 @@
 {
     <div class="alert alert-info mt-3">@status</div>
 }
-<!-- Co-Pilot: This page is for admin/dispatcher feedback entry. Only completed jobs are selectable. Prevents duplicate feedback. -->
