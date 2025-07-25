@@ -1,0 +1,98 @@
+@page
+@model MVP_Core.Pages.Admin.SatisfactionTrendsModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    ViewData["Title"] = "Satisfaction Trends";
+}
+<!-- Sprint 43 – Satisfaction Analytics -->
+<h2>Satisfaction Trends</h2>
+<div class="card mb-3">
+    <div class="card-body">
+        <form method="get" class="row g-2 align-items-end">
+            <div class="col-md-2">
+                <label class="form-label">Technician</label>
+                <input type="text" name="Technician" class="form-control" value="@Model.Technician" placeholder="Name or ID..." />
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Service Type</label>
+                <input type="text" name="ServiceType" class="form-control" value="@Model.ServiceType" placeholder="Type..." />
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Outcome</label>
+                <input type="text" name="Outcome" class="form-control" value="@Model.Outcome" placeholder="Status..." />
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Group By</label>
+                <select name="GroupBy" class="form-select">
+                    <option value="Technician" selected="@(Model.GroupBy=="Technician"?"selected":null)">Technician</option>
+                    <option value="ServiceType" selected="@(Model.GroupBy=="ServiceType"?"selected":null)">Service Type</option>
+                    <option value="Outcome" selected="@(Model.GroupBy=="Outcome"?"selected":null)">Ticket Outcome</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Start</label>
+                <input type="date" name="Start" class="form-control" value="@(Model.Start?.ToString("yyyy-MM-dd"))" />
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">End</label>
+                <input type="date" name="End" class="form-control" value="@(Model.End?.ToString("yyyy-MM-dd"))" />
+            </div>
+            <div class="col-md-2 d-grid">
+                <button type="submit" class="btn btn-primary mt-2">Filter</button>
+            </div>
+            <div class="col-md-2 d-grid">
+                <a asp-page-handler="Export" class="btn btn-outline-success mt-2">Export CSV</a>
+            </div>
+        </form>
+    </div>
+</div>
+<div class="mb-4">
+    <canvas id="satisfactionChart" height="80"></canvas>
+</div>
+<table class="table table-bordered table-hover">
+    <thead class="table-light">
+        <tr>
+            <th>@Model.GroupBy</th>
+            <th>Average Score</th>
+            <th>Count</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var row in Model.Analytics)
+    {
+        <tr>
+            <td>@row.GroupKey</td>
+            <td>@row.AverageScore.ToString("0.00")</td>
+            <td>@row.Count</td>
+        </tr>
+    }
+    </tbody>
+</table>
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        async function loadChart() {
+            const resp = await fetch('?handler=ChartData');
+            const data = await resp.json();
+            const ctx = document.getElementById('satisfactionChart').getContext('2d');
+            const chart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.map(x => x.groupKey),
+                    datasets: [{
+                        label: 'Avg Satisfaction',
+                        data: data.map(x => x.averageScore),
+                        backgroundColor: 'rgba(54, 162, 235, 0.6)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { min: 0, max: 5 } }
+                }
+            });
+        }
+        loadChart();
+    </script>
+}
+<!-- End Sprint 43 – Satisfaction Analytics -->

@@ -28,7 +28,8 @@ namespace MVP_Core.Pages.Admin
         public void OnGet()
         {
             TechId = int.TryParse(Request.Query["techId"], out var tId) ? tId : 0;
-            Profile = _dispatcherService.GetTechnicianProfile(TechId);
+            // FixItFred — Sprint 44.4 Await Fix (GetTechnicianProfile)
+            Profile = _dispatcherService.GetTechnicianProfile(TechId).GetAwaiter().GetResult();
             AvgFeedback = _feedbackService.CalculateAverageRating(TechId);
             RecentReviews = _feedbackService.GetFeedbackForTechnician(TechId).Take(3).ToList();
         }

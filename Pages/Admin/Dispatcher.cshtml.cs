@@ -393,7 +393,8 @@ namespace MVP_Core.Pages.Admin
                 TempData["SystemMessages"] = "Reassignment failed — check technician availability.";
                 return Page();
             }
-            bool success = _dispatcherService.ReassignTechnician(requestId, newTechnicianId);
+            // FixItFred — Sprint 44.5 Type Match
+            bool success = _dispatcherService.ReassignTechnician(requestId, newTechnicianId).GetAwaiter().GetResult();
             TempData["SystemMessages"] = success ? "Technician reassigned successfully." : "Reassignment failed — check technician availability.";
             var log = new DispatcherAuditLog
             {
@@ -405,7 +406,7 @@ namespace MVP_Core.Pages.Admin
                 Timestamp = DateTime.UtcNow,
                 Notes = success ? "Technician reassigned." : "Failed reassignment."
             };
-            // FixItFred — Sprint 40.4 Final LogDispatcherAction Patch
+            // FixItFred ? Sprint 40.4 Final LogDispatcherAction Patch
             _dispatcherService.LogDispatcherAction($"[Audit] {log.Timestamp:u} | {log.ActionType} | {log.TechnicianId} | {log.Notes}");
             _auditLogger.LogAsync(User?.Identity?.Name ?? "unknown", "DispatcherReassign", HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown", $"RequestId={requestId};NewTechId={newTechnicianId}");
             return Page();

@@ -2,17 +2,19 @@
 @using MVP_Core.Models.Admin
 @inject MVP_Core.Services.Admin.DispatcherService DispatcherService
 @{
+    // FixItFred — Sprint 44 Razor Async Patch
     int requestId = 0;
     int.TryParse(Request.Query["requestId"], out requestId);
-    var timeline = DispatcherService.GetReplayTimeline(requestId);
-    ViewData["Title"] = $"Action Replay — Request #{requestId}";
+    var timelineTask = DispatcherService.GetReplayTimeline(requestId);
+    var timeline = timelineTask.GetAwaiter().GetResult();
+    ViewData["Title"] = $"Action Replay – Request #{requestId}";
     int step = 0;
     int.TryParse(Request.Query["step"], out step);
     if (step < 0) step = 0;
     if (timeline != null && step >= timeline.Count) step = timeline.Count - 1;
     var entry = (timeline != null && timeline.Count > 0 && step < timeline.Count) ? timeline[step] : null;
 }
-<h2 class="mb-4">Action Replay — Request #@requestId</h2>
+<h2 class="mb-4">Action Replay – Request #@requestId</h2>
 @if (requestId == 0)
 {
     <div class="alert alert-danger">Invalid request ID</div>

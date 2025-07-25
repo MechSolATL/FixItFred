@@ -14,7 +14,9 @@
     <meta name="keywords" content="@SEO.Keywords" />
     <meta name="robots" content="@SEO.Robots" />
     */
-    var logs = DispatcherService.GetAssignmentLogs() ?? new List<AssignmentLogEntry>();
+    int requestId = 0;
+    int.TryParse(Request.Query["requestId"], out requestId);
+    var logs = DispatcherService.GetAssignmentLogs(requestId).GetAwaiter().GetResult() ?? new List<AssignmentLogEntry>();
     string techFilter = (Request.Query["techId"].ToString() == "" ? "" : Request.Query["techId"].ToString());
     string dateFilter = (Request.Query["date"].ToString() == "" ? "" : Request.Query["date"].ToString());
     if (!string.IsNullOrEmpty(techFilter))

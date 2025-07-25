@@ -6,7 +6,7 @@
 @{
     int requestId = 0;
     int.TryParse(Request.Query["requestId"], out requestId);
-    var timeline = DispatcherService.GetTimelineForRequest(requestId);
+    var timeline = DispatcherService.GetTimelineForRequest(requestId).GetAwaiter().GetResult();
     var requestList = ViewData["RequestDetails"] as List<RequestSummaryDto> ?? new List<RequestSummaryDto>();
     var request = requestList.FirstOrDefault(r => r.Id == requestId);
     ViewData["Title"] = "Service Request Timeline";
@@ -55,7 +55,8 @@ else
                     {
                         <div class="ms-4 small text-secondary">@entry.Notes</div>
                     }
-                    <a href="/Admin/DispatcherReplay?requestId=@entry.RequestId" class="btn btn-outline-info btn-sm mt-2">? Replay This Job</a>
+                    <!-- FixItFred — Sprint 44.4 Razor Sync Fix (KanbanHistoryLog) -->
+                    <a href="/Admin/DispatcherReplay?requestId=@entry.ServiceRequestId" class="btn btn-outline-info btn-sm mt-2">? Replay This Job</a>
                 </li>
             }
         </ul>

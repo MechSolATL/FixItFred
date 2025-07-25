@@ -1,0 +1,46 @@
+@page
+@model MVP_Core.Pages.Admin.DigestPreviewModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    ViewData["Title"] = "Digest Preview";
+}
+<!-- Sprint 44 – Message Export + Digest -->
+<h2>Notification Digest Preview</h2>
+@if (Model.Digest == null)
+{
+    <div class="alert alert-warning">No digest data available.</div>
+}
+else
+{
+    <div class="mb-3">
+        <h4>Unread Threads</h4>
+        <ul>
+            @foreach (var thread in Model.Digest.UnreadThreads)
+            {
+                <li>Request #@thread.RequestId: @thread.Subject (@thread.UnreadCount unread)</li>
+            }
+        </ul>
+    </div>
+    <div class="mb-3">
+        <h4>Overdue Tickets</h4>
+        <ul>
+            @foreach (var ticket in Model.Digest.OverdueTickets)
+            {
+                <li>Request #@ticket.RequestId: @ticket.Subject (Overdue by @ticket.OverdueMinutes min)</li>
+            }
+        </ul>
+    </div>
+    <div class="mb-3">
+        <h4>Recent Satisfaction Scores</h4>
+        <ul>
+            @foreach (var score in Model.Digest.RecentSatisfactionScores)
+            {
+                <li>Request #@score.RequestId: @score.Score/5 (@score.Submitter)</li>
+            }
+        </ul>
+    </div>
+    <div class="mb-3">
+        <h4>Digest Email Preview</h4>
+        <div class="border p-3 bg-light">@Html.Raw(Model.Digest.HtmlBody)</div>
+    </div>
+}
