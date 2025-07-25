@@ -71,6 +71,8 @@ namespace MVP_Core.Data
         // Sprint 35 - Technician Reward Scoring System
         public DbSet<TechnicianScoreEntry> TechnicianScoreEntries { get; set; } = null!;
         public DbSet<TechnicianDeviceRegistration> TechnicianDeviceRegistrations { get; set; } = null!;
+        // FixItFred — Sprint 46.1 Build Stabilization
+        public DbSet<MVP_Core.Data.Models.JobMessageEntry> JobMessages { get; set; } = null!;
 
         #endregion
 
@@ -112,6 +114,7 @@ namespace MVP_Core.Data
             // Sprint 35 - Technician Reward Scoring System
             _ = modelBuilder.Entity<TechnicianScoreEntry>().ToTable("TechnicianScoreEntries");
             _ = modelBuilder.Entity<TechnicianDeviceRegistration>().ToTable("TechnicianDeviceRegistrations");
+            _ = modelBuilder.Entity<JobMessageEntry>().ToTable("JobMessages");
         }
 
         #endregion

@@ -12,11 +12,13 @@
 // [2024-07-25T00:30:00Z] — TechnicianDropdownViewModel property and population for Razor partial injection.
 // FixItFred Patch Log — Sprint 29A Recovery
 // [2025-07-25T00:00:00Z] — Added RequestId, Rating, and Notes properties for feedback form binding.
+// FixItFred — Sprint 46.1 Build Correction + Compliance
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using MVP_Core.Data.Models; // Corrected ServiceRequest namespace
 using MVP_Core.Data.Models.ViewModels;
 using MVP_Core.Services.Admin; // Import DispatcherService
+using MVP_Core.Models.Admin;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -52,22 +54,10 @@ namespace MVP_Core.Pages.Admin
 
             // Populate technician dropdown
             var heartbeats = _dispatcherService.GetAllTechnicianHeartbeats();
-            var techProfiles = heartbeats.Select(h => new MVP_Core.Models.Admin.TechnicianProfileDto
-            {
-                TechnicianId = h.TechnicianId,
-                Name = h.Name,
-                CloseRate7Days = 0,
-                CloseRate30Days = 0,
-                CallbackCount7Days = 0,
-                TotalJobsLast30Days = 0,
-                TopZIPs = new string[0],
-                Comments = new List<string>(),
-                LastActive = h.LastPing,
-                SkillTags = new List<string>()
-            }).ToList();
+            // FixItFred — Sprint 46.1 Build Correction + Compliance: Use TechnicianStatusDto directly
             TechnicianDropdownViewModel = new TechnicianDropdownViewModel
             {
-                Technicians = techProfiles,
+                Technicians = heartbeats,
                 SelectedTechnicianId = null // or set from query/context
             };
 

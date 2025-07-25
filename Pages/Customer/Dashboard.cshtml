@@ -1,0 +1,45 @@
+@page
+@model MVP_Core.Pages.Customer.DashboardModel
+@{
+    ViewData["Title"] = "Customer Dashboard";
+}
+
+<h2>My Tickets</h2>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Ticket #</th>
+            <th>Service Type</th>
+            <th>Status</th>
+            <th>Requested</th>
+            <th>Satisfaction</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var ticket in Model.Tickets)
+    {
+        <tr>
+            <td>@ticket.Id</td>
+            <td>@ticket.ServiceType</td>
+            <td><span class="badge bg-@Model.GetStatusClass(ticket.Status)">@ticket.Status</span></td>
+            <td>@ticket.RequestedAt.ToString("g")</td>
+            <td>
+                @if (ticket.SatisfactionScore.HasValue)
+                {
+                    <span class="text-success">@ticket.SatisfactionScore.Value/5</span>
+                }
+                else
+                {
+                    <span class="text-muted">N/A</span>
+                }
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+
+<div class="mt-4">
+    <h4>Satisfaction Summary</h4>
+    <p>Average Satisfaction: <b>@Model.AverageSatisfaction.ToString("0.0")</b> / 5</p>
+    <p>Total Tickets: <b>@Model.Tickets.Count</b></p>
+</div>

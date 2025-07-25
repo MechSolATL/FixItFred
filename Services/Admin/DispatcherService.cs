@@ -506,5 +506,73 @@ namespace MVP_Core.Services.Admin
             // Stub implementation for build clearance
             return true;
         }
+
+        // FixItFred — Sprint 46.1 Build Stabilization
+        public Task<object> GetDispatchAuditStatsAsync()
+        {
+            // Stub: Return empty stats object
+            return Task.FromResult<object>(new { });
+        }
+
+        // FixItFred — Sprint 46.1 Build Stabilization
+        public void AddBroadcast(DispatcherBroadcast broadcast)
+        {
+            if (broadcast == null) return;
+            _broadcasts.Add(broadcast);
+        }
+
+        // FixItFred — Sprint 46.1 Build Stabilization
+        public Task<List<MVP_Core.DTOs.Reports.SatisfactionAnalyticsDto>> GetSatisfactionAnalyticsAsync(
+            DateTime? start = null,
+            DateTime? end = null,
+            string? technician = null,
+            string? serviceType = null,
+            string? outcome = null,
+            string groupBy = "Technician")
+        {
+            // Stub: Return empty analytics list
+            return Task.FromResult(new List<MVP_Core.DTOs.Reports.SatisfactionAnalyticsDto>());
+        }
+
+        // FixItFred — Sprint 46.1 Build Stabilization
+        public List<DispatcherNotification> GetNotifications()
+        {
+            // Stub: Return empty notification list
+            return new List<DispatcherNotification>();
+        }
+
+        // FixItFred — Sprint 46.1 Build Stabilization
+        public List<WatchdogAlert> RunWatchdogScan()
+        {
+            // Stub: Return empty watchdog alert list
+            return new List<WatchdogAlert>();
+        }
+
+        // FixItFred — Sprint 46.1 Build Stabilization
+        public Task<List<TechnicianStatusDto>> GetTechniciansAsync()
+        {
+            // Always return List<TechnicianStatusDto>
+            return Task.FromResult(GetAllTechnicianStatuses());
+        }
+
+        // FixItFred — Sprint 46.1 Build Stabilization
+        public Task<List<MVP_Core.DTOs.Reports.SlaTrendDto>> GetSlaTrendsAsync(DateTime? start = null, DateTime? end = null, string? technician = null, string? serviceType = null, string? outcome = null, string groupBy = "Technician")
+        {
+            // Stub: Return empty SLA trend list
+            return Task.FromResult(new List<MVP_Core.DTOs.Reports.SlaTrendDto>());
+        }
+
+        // FixItFred — Sprint 46.1 Build Stabilization
+        public object GetNextJobForTechnician(int technicianId)
+        {
+            // Stub: Return null or mock job
+            return null;
+        }
+
+        // FixItFred — Sprint 46.1 Build Stabilization
+        public void UpdateTechnicianPing(int technicianId)
+        {
+            // Stub: No-op
+        }
     }
 }

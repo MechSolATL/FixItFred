@@ -2,6 +2,7 @@
 // Purpose: Explicitly reference MVP_Core.Models.Mobile.NextJobDto to resolve ambiguity.
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using MVP_Core.Services.Admin;
+using MVP_Core.Models.Mobile;
 
 namespace MVP_Core.Pages.Mobile
 {
@@ -12,17 +13,19 @@ namespace MVP_Core.Pages.Mobile
         {
             _dispatcherService = dispatcherService;
         }
-        public MVP_Core.Models.Mobile.NextJobDto? Job { get; private set; }
+        public NextJobDto? Job { get; private set; }
         public int TechId { get; private set; }
         public void OnGet()
         {
             TechId = int.TryParse(Request.Query["techId"], out var tId) ? tId : 0;
-            Job = _dispatcherService.GetNextJobForTechnician(TechId);
+            // FixItFred — Sprint 46.1 Build Correction + Compliance: Explicit cast for NextJobDto
+            Job = (NextJobDto?)_dispatcherService.GetNextJobForTechnician(TechId);
         }
         public void OnPostPing()
         {
             _dispatcherService.UpdateTechnicianPing(TechId);
-            Job = _dispatcherService.GetNextJobForTechnician(TechId);
+            // FixItFred — Sprint 46.1 Build Correction + Compliance: Explicit cast for NextJobDto
+            Job = (NextJobDto?)_dispatcherService.GetNextJobForTechnician(TechId);
         }
     }
 }

@@ -24,8 +24,8 @@ namespace MVP_Core.Services
             {
                 TechnicianId = technicianId,
                 RequestId = requestId,
-                SenderType = senderType,
-                MessageBody = messageBody,
+                Type = senderType,
+                Message = messageBody,
                 Timestamp = DateTime.UtcNow,
                 ReadFlag = false
             };

@@ -385,30 +385,30 @@ namespace MVP_Core.Pages.Admin
             _dispatcherService.LogDispatcherAction($"[Audit] {log.Timestamp:u} | {log.ActionType} | {log.TechnicianId} | {log.Notes}");
             return RedirectToPage();
         }
-        public IActionResult OnPostReassignTech(int requestId, int newTechnicianId)
+        public IActionResult OnPostReassignTech(int requestId, object newTechnicianId)
         {
             var role = User.IsInRole("Supervisor") ? "Supervisor" : "Dispatcher";
-            if (requestId <= 0 || newTechnicianId <= 0)
+            if (requestId <= 0 || newTechnicianId == null)
             {
                 TempData["SystemMessages"] = "Reassignment failed — check technician availability.";
                 return Page();
             }
-            // FixItFred — Sprint 44.5 Type Match
-            bool success = _dispatcherService.ReassignTechnician(requestId, newTechnicianId).GetAwaiter().GetResult();
+            // FixItFred – Sprint 46.1 Final Build Cleanup: Ensure int argument
+            int techId = newTechnicianId is int i ? i : Convert.ToInt32(newTechnicianId);
+            bool success = _dispatcherService.ReassignTechnician(requestId, techId).GetAwaiter().GetResult();
             TempData["SystemMessages"] = success ? "Technician reassigned successfully." : "Reassignment failed — check technician availability.";
             var log = new DispatcherAuditLog
             {
                 ActionType = "Reassign",
                 RequestId = requestId,
-                TechnicianId = newTechnicianId,
+                TechnicianId = techId,
                 PerformedBy = User?.Identity?.Name ?? "system",
                 PerformedByRole = role,
                 Timestamp = DateTime.UtcNow,
                 Notes = success ? "Technician reassigned." : "Failed reassignment."
             };
-            // FixItFred ? Sprint 40.4 Final LogDispatcherAction Patch
             _dispatcherService.LogDispatcherAction($"[Audit] {log.Timestamp:u} | {log.ActionType} | {log.TechnicianId} | {log.Notes}");
-            _auditLogger.LogAsync(User?.Identity?.Name ?? "unknown", "DispatcherReassign", HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown", $"RequestId={requestId};NewTechId={newTechnicianId}");
+            _auditLogger.LogAsync(User?.Identity?.Name ?? "unknown", "DispatcherReassign", HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown", $"RequestId={requestId};NewTechId={techId}");
             return Page();
         }
         public async Task<IActionResult> OnPostReassignTechAsync(int requestId, int newTechnicianId)
@@ -561,8 +561,16 @@ namespace MVP_Core.Pages.Admin
         {
             if (OverrideJobId > 0 && !string.IsNullOrEmpty(OverrideNewZone))
             {
-                bool success = _dispatcherService.OverrideJobZone(OverrideJobId, OverrideNewZone);
-                TempData["SystemMessages"] = success ? "Job zone updated." : "Failed to update job zone.";
+                // Try to parse OverrideNewZone as int
+                if (int.TryParse(OverrideNewZone, out int newZoneId))
+                {
+                    bool success = _dispatcherService.OverrideJobZone(OverrideJobId, newZoneId);
+                    TempData["SystemMessages"] = success ? "Job zone updated." : "Failed to update job zone.";
+                }
+                else
+                {
+                    TempData["SystemMessages"] = "Invalid zone ID.";
+                }
             }
             return RedirectToPage();
         }

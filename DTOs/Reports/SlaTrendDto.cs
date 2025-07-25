@@ -1,8 +1,6 @@
-using System;
-
-namespace MVP_Core.Models.Admin
+// FixItFred — Sprint 46.1 Build Stabilization
+namespace MVP_Core.DTOs.Reports
 {
-    // Sprint 41 - Historical SLA Trend DTO
     public class SlaTrendDto
     {
         public string GroupKey { get; set; } = string.Empty;
