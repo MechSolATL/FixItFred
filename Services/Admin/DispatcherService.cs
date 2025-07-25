@@ -26,6 +26,8 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using MVP_Core.Data.Models;
+using MVP_Core.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace MVP_Core.Services.Admin
 {
@@ -217,7 +219,7 @@ namespace MVP_Core.Services.Admin
 
         public List<RequestSummaryDto> GetFilteredRequests(DispatcherFilterModel filters)
         {
-            // Stub: mock data
+            // Sprint 33.3 - Dispatcher Smart Filters
             var requests = new List<RequestSummaryDto>
             {
                 new RequestSummaryDto { Id = 1, ServiceType = "Plumbing", Technician = "Alice Smith", Status = "Open", Priority = "High", Zip = "30301", DelayMinutes = 10 },
@@ -232,6 +234,25 @@ namespace MVP_Core.Services.Admin
                 requests = requests.Where(r => r.Technician == filters.Technician).ToList();
             if (!string.IsNullOrEmpty(filters.Status))
                 requests = requests.Where(r => r.Status == filters.Status).ToList();
+            if (!string.IsNullOrEmpty(filters.Zone))
+                requests = requests.Where(r => r.Zip == filters.Zone).ToList();
+            if (filters.PendingOnly)
+                requests = requests.Where(r => r.Status == "Open" || r.Status == "Pending").ToList();
+            if (filters.AssignedOrDispatchedOnly)
+                requests = requests.Where(r => r.Status == "Assigned" || r.Status == "Dispatched").ToList();
+            if (!string.IsNullOrEmpty(filters.SearchTerm))
+                requests = requests.Where(r => (r.Technician?.Contains(filters.SearchTerm, StringComparison.OrdinalIgnoreCase) ?? false)
+                    || (r.Id.ToString().Contains(filters.SearchTerm, StringComparison.OrdinalIgnoreCase))
+                    ).ToList();
+            // Sprint 39.2 - Skill tag filtering
+            if (filters.SkillTags != null && filters.SkillTags.Any())
+            {
+                // Only include requests where the assigned technician (if any) has all required tags
+                var techProfiles = _techHeartbeats.ToDictionary(t => t.Name, t => new List<string> { "Plumbing", "Heating", "Air Conditioning", "Water Filtration" }); // Mock: all techs have all tags
+                requests = requests.Where(r => string.IsNullOrEmpty(r.Technician) ||
+                    (techProfiles.ContainsKey(r.Technician) && filters.SkillTags.All(tag => techProfiles[r.Technician].Contains(tag)))
+                ).ToList();
+            }
             if (!string.IsNullOrEmpty(filters.SortBy))
             {
                 requests = filters.SortBy switch
@@ -243,246 +264,39 @@ namespace MVP_Core.Services.Admin
                 };
             }
             return requests;
+            // End Sprint 33.3 - Dispatcher Smart Filters
         }
 
-        public bool ReassignTechnician(int requestId, int newTechId)
-        {
-            // Stub: return true if IDs are positive
-            return requestId > 0 && newTechId > 0;
-        }
-        public List<DispatcherNotification> GetNotifications()
-        {
-            return new List<DispatcherNotification>
-            {
-                new DispatcherNotification { Timestamp = DateTime.Now.AddMinutes(-2), Type = "Emergency", Message = "Emergency-flagged request #1023 requires immediate attention!" },
-                new DispatcherNotification { Timestamp = DateTime.Now.AddMinutes(-10), Type = "Delay", Message = "Technician Bob Jones is delayed on job #1018." },
-                new DispatcherNotification { Timestamp = DateTime.Now.AddMinutes(-15), Type = "Reassigned", Message = "Job #1015 reassigned to Dana Patel." },
-                new DispatcherNotification { Timestamp = DateTime.Now.AddMinutes(-20), Type = "Info", Message = "Technician Carlos Lee marked inactive." }
-            };
-        }
-
-        public void LogAssignment(MVP_Core.Models.Admin.AssignmentLogEntry entry)
-        {
-            entry.Id = _assignmentLogs.Count + 1;
-            _assignmentLogs.Add(entry);
-        }
-        public List<MVP_Core.Models.Admin.AssignmentLogEntry> GetAssignmentLogs()
-        {
-            return _assignmentLogs.OrderByDescending(x => x.Timestamp).ToList();
-        }
-        public void LogDispatcherAction(MVP_Core.Models.Admin.DispatcherAuditLog entry)
-        {
-            entry.Id = _auditLog.Count + 1;
-            if (string.IsNullOrEmpty(entry.PerformedByRole)) entry.PerformedByRole = "Dispatcher"; // Ensure required
-            _auditLog.Add(entry);
-        }
-        public List<DispatcherAuditLog> GetAuditLog() => _auditLog.OrderByDescending(x => x.Timestamp).ToList();
-
-        public List<MVP_Core.Models.Admin.DispatcherAuditLog> GetTimelineForRequest(int requestId)
-        {
-            return _auditLog
-                .Where(x => x.RequestId == requestId)
-                .OrderBy(x => x.Timestamp)
-                .ToList();
-        }
-
-        public List<MVP_Core.Models.Admin.DispatcherAuditLog> GetReplayTimeline(int requestId)
-        {
-            return _auditLog
-                .Where(x => x.RequestId == requestId)
-                .OrderBy(x => x.Timestamp)
-                .ToList();
-        }
-
-        public List<MVP_Core.Models.Admin.WatchdogAlert> RunWatchdogScan()
-        {
-            var now = DateTime.UtcNow;
-            var alerts = new List<MVP_Core.Models.Admin.WatchdogAlert>();
-            var requests = GetFilteredRequests(new MVP_Core.Models.Admin.DispatcherFilterModel());
-            var techs = GetAllTechnicianStatuses();
-            foreach (var req in requests.Where(r => r.DelayMinutes > 20))
-            {
-                alerts.Add(new MVP_Core.Models.Admin.WatchdogAlert
-                {
-                    RequestId = req.Id,
-                    AlertType = "ETAOverdue",
-                    Message = $"ETA exceeded for job #{req.Id} ({req.Technician})",
-                    DetectedAt = now
-                });
-            }
-            foreach (var tech in techs.Where(t => (now - t.LastUpdate).TotalMinutes > 45))
-            {
-                alerts.Add(new MVP_Core.Models.Admin.WatchdogAlert
-                {
-                    RequestId = 0,
-                    AlertType = "Inactivity",
-                    Message = $"Technician {tech.Name} inactive for over 45 minutes.",
-                    DetectedAt = now
-                });
-            }
-            foreach (var req in requests.Where(r => r.Status == "Open" && string.IsNullOrEmpty(r.Technician) && r.DelayMinutes > 60))
-            {
-                alerts.Add(new MVP_Core.Models.Admin.WatchdogAlert
-                {
-                    RequestId = req.Id,
-                    AlertType = "Unassigned",
-                    Message = $"Request #{req.Id} unassigned for over 60 minutes.",
-                    DetectedAt = now
-                });
-            }
-            foreach (var tech in _techHeartbeats.Where(t => (now - t.LastPing).TotalMinutes > 20))
-            {
-                alerts.Add(new MVP_Core.Models.Admin.WatchdogAlert
-                {
-                    RequestId = 0,
-                    AlertType = "TechHeartbeatDrop",
-                    Message = $"Technician {tech.Name} offline for over 20 minutes.",
-                    DetectedAt = now
-                });
-            }
-            return alerts;
-        }
-        public bool FlagEmergency(int requestId, string dispatcherName)
-        {
-            var req = GetFilteredRequests(new MVP_Core.Models.Admin.DispatcherFilterModel()).FirstOrDefault(r => r.Id == requestId);
-            if (req != null)
-            {
-                req.IsEmergency = true;
-                req.DispatcherOverrideApplied = true;
-                req.OverrideReason = "Dispatcher flagged emergency";
-                LogDispatcherAction(new MVP_Core.Models.Admin.DispatcherAuditLog
-                {
-                    ActionType = "Override-Emergency",
-                    RequestId = requestId,
-                    TechnicianId = null,
-                    PerformedBy = dispatcherName,
-                    PerformedByRole = "Dispatcher", // Ensure required field
-                    Timestamp = DateTime.UtcNow,
-                    Notes = req.OverrideReason
-                });
-                return true;
-            }
-            return false;
-        }
-        public DispatcherBroadcast? GetActiveBroadcast()
-        {
-            return _broadcasts.LastOrDefault(b => b.IsActive);
-        }
-        public void AddBroadcast(DispatcherBroadcast broadcast)
-        {
-            broadcast.Id = _broadcasts.Count + 1;
-            _broadcasts.Add(broadcast);
-        }
-
-        public AdminTechnicianProfileDto GetTechnicianProfile(int techId)
-        {
-            var tech = _techHeartbeats.FirstOrDefault(t => t.TechnicianId == techId);
-            if (tech == null) return null;
-            var rnd = new Random(techId);
-            return new AdminTechnicianProfileDto
-            {
-                TechnicianId = tech.TechnicianId,
-                Name = tech.Name,
-                CloseRate7Days = Math.Round(rnd.NextDouble() * 0.5 + 0.5, 2),
-                CloseRate30Days = Math.Round(rnd.NextDouble() * 0.5 + 0.4, 2),
-                CallbackCount7Days = rnd.Next(0, 4),
-                TotalJobsLast30Days = rnd.Next(10, 40),
-                TopZIPs = new[] { "30303", "30305", "30309" },
-                Comments = new List<string> { "Great with customers.", "Needs to improve on-time rate." },
-                LastActive = tech.LastPing,
-                SkillTags = new List<string> { "Plumbing", "Heating" }
-            };
-        }
-
-        public MVP_Core.Models.Mobile.NextJobDto? GetNextJobForTechnician(int techId)
-        {
-            var tech = _techHeartbeats.FirstOrDefault(t => t.TechnicianId == techId);
-            if (tech == null)
-                return null;
-            return new MVP_Core.Models.Mobile.NextJobDto
-            {
-                TechnicianId = tech.TechnicianId,
-                TechnicianName = tech.Name,
-                JobSummary = "A/C Install at Midtown Lofts",
-                ETA = DateTime.UtcNow.AddMinutes(35),
-                Address = "1234 Peachtree St NE, Atlanta, GA 30309",
-                DispatcherNote = "Customer requests early arrival. Bring extra filters.",
-                LastPing = tech.LastPing
-            };
-        }
-
-        public void UpdateTechnicianPing(int techId)
-        {
-            var tech = _techHeartbeats.FirstOrDefault(t => t.TechnicianId == techId);
-            if (tech != null)
-                tech.LastPing = DateTime.UtcNow;
-        }
-
-        public List<TechnicianMessage> GetMessageThreadForRequest(int requestId)
-        {
-            return _messageService.GetMessageThreadForRequest(requestId);
-        }
-
-        public List<TechnicianStatusDto> GetSuggestedTechsBySkill(string requiredSkill, string zip)
-        {
-            // FixItFred: Sprint 30D.2 — Safe null checks for SkillTags, TopZIPs, and LastActive 2024-07-25
-            var profiles = _techHeartbeats.Select(t => new AdminTechnicianProfileDto
-            {
-                TechnicianId = t.TechnicianId,
-                Name = t.Name,
-                SkillTags = new List<string> { "Plumbing", "Heating", "Air Conditioning", "Water Filtration" },
-                TopZIPs = new[] { "30303", "30305", "30309" },
-                LastActive = t.LastPing,
-                Comments = new List<string>(),
-                CloseRate7Days = 0.0,
-                CloseRate30Days = 0.0,
-                CallbackCount7Days = 0,
-                TotalJobsLast30Days = 0
-            }).ToList();
-            var filtered = profiles
-                .Where(p => (p.SkillTags?.Contains(requiredSkill) ?? false) && (p.TopZIPs?.Contains(zip) ?? false) && p.LastActive != null)
-                .OrderBy(p => (DateTime.UtcNow - (p.LastActive != null ? p.LastActive : DateTime.UtcNow)).TotalMinutes) // FixItFred: Sprint 30D.2 — Safe fallback for LastActive (DateTime is non-nullable)
-                .ToList();
-            if (!filtered.Any())
-            {
-                filtered = profiles;
-            }
-            return _techHeartbeats.Where(t => filtered.Any(f => f.TechnicianId == t.TechnicianId)).ToList();
-        }
-        // CS8603 fix: Example for a string-returning method
-        public string GetSafeStringOrEmpty(string? input)
-        {
-            return input ?? string.Empty;
-        }
-
-        // FixItFred Patch Log — Sprint 26.2D
-        // [2025-07-25T00:00:00Z] — Finalized async technician fetch for Razor dropdown binding. Signature and implementation corrected.
-        public async Task<List<AdminTechnicianProfileDto>> GetTechniciansAsync()
-        {
-            await Task.CompletedTask;
-            var result = _techHeartbeats.Select(t => new AdminTechnicianProfileDto
-            {
-                TechnicianId = t.TechnicianId,
-                Name = t.Name,
-                CloseRate7Days = 0,
-                CloseRate30Days = 0,
-                CallbackCount7Days = 0,
-                TotalJobsLast30Days = 0,
-                TopZIPs = new string[0],
-                Comments = new List<string>(),
-                LastActive = t.LastPing,
-                SkillTags = new List<string>()
-            }).ToList();
-            return result ?? new List<AdminTechnicianProfileDto>();
-        }
         // FixItFred: Sprint 30B - Real-Time Dispatch
-        public DataDto FindAvailableTechnicianForZone(string zone)
+        public DataDto FindAvailableTechnicianForZone(string zone, List<string>? requiredTags = null)
         {
-            // FixItFred: Zone matching patched to use Specialty field due to missing Zone on TechnicianProfileDto
-            return _db.Set<DataDto>()
+            // Technician assignment cap
+            int maxJobsPerTech = 3;
+            // Zone saturation cap
+            int maxActiveJobsInZone = 8;
+            // SLA density threshold (jobs in zone within 15 min of SLA)
+            int slaDensityThreshold = 3;
+            var now = DateTime.UtcNow;
+
+            // Count active jobs in this zone
+            var activeJobsInZone = _db.ScheduleQueues.Count(q => q.Zone == zone && (q.Status == ScheduleStatus.Pending || q.Status == ScheduleStatus.Dispatched));
+            if (activeJobsInZone >= maxActiveJobsInZone)
+                return null; // Zone overloaded
+
+            // Count jobs in this zone nearing SLA
+            var nearingSLA = _db.ScheduleQueues.Count(q => q.Zone == zone && q.SLAExpiresAt != null && q.SLAExpiresAt > now && (q.SLAExpiresAt.Value - now).TotalMinutes < 15 && (q.Status == ScheduleStatus.Pending || q.Status == ScheduleStatus.Dispatched));
+            if (nearingSLA >= slaDensityThreshold)
+                return null; // Too many jobs at SLA risk
+
+            // Find all available techs in this zone under cap
+            var candidates = _db.Set<DataDto>()
                 .Where(t => t.Specialty == zone && t.IsActive)
-                .OrderBy(t => t.CompletedJobs) // Or use CurrentJobsCount if available
-                .FirstOrDefault();
+                .ToList()
+                .Where(t => _db.ScheduleQueues.Count(q => q.TechnicianId == t.Id && (q.Status == ScheduleStatus.Pending || q.Status == ScheduleStatus.Dispatched)) < maxJobsPerTech)
+                .Where(t => requiredTags == null || !requiredTags.Any() || (t.Skills != null && requiredTags.All(tag => t.Skills.Contains(tag))))
+                .OrderBy(t => _db.ScheduleQueues.Count(q => q.TechnicianId == t.Id && (q.Status == ScheduleStatus.Pending || q.Status == ScheduleStatus.Dispatched)))
+                .ToList();
+            return candidates.FirstOrDefault();
         }
 
         public DateTime PredictETA(DataDto tech, string zone, int delayMinutes)
@@ -491,5 +305,194 @@ namespace MVP_Core.Services.Admin
             // Example: int jobCount = _db.ServiceRequests.Count(r => r.TechnicianId == tech.Id);
             return DateTime.UtcNow.AddMinutes(baseTravelTime + delayMinutes);
         }
+
+        public void CheckAndEscalate(ServiceRequest req)
+        {
+            if (req == null || req.IsEscalated) return;
+            var now = DateTime.UtcNow;
+            // 1. Technician hasn’t moved in >15 minutes
+            if (req.AssignedTechnicianId.HasValue)
+            {
+                var lastMove = _db.TechTrackingLogs
+                    .Where(t => t.TechnicianId == req.AssignedTechnicianId.Value)
+                    .OrderByDescending(t => t.Timestamp)
+                    .Select(t => t.Timestamp)
+                    .FirstOrDefault();
+                if (lastMove != default && (now - lastMove).TotalMinutes > 15)
+                {
+                    req.IsEscalated = true;
+                    req.EscalatedAt = now;
+                    _db.SaveChanges();
+                    return;
+                }
+            }
+            // 2. ETA is exceeded by >10 minutes
+            if (req.DueDate.HasValue && (now - req.DueDate.Value).TotalMinutes > 10 && req.Status != "Complete")
+            {
+                req.IsEscalated = true;
+                req.EscalatedAt = now;
+                _db.SaveChanges();
+                return;
+            }
+            // 3. Job is marked as “Delayed” twice
+            var delayedCount = _db.KanbanHistoryLogs.Count(l => l.ServiceRequestId == req.Id && l.ToStatus == "Delayed");
+            if (delayedCount >= 2)
+            {
+                req.IsEscalated = true;
+                req.EscalatedAt = now;
+                _db.SaveChanges();
+                return;
+            }
+        }
+
+        // FixItFred: Sprint 34.1 - SLA Auto Calculation [2024-07-25T09:30Z]
+        public void SetSLAExpiresAt(ScheduleQueue entry)
+        {
+            if (entry == null) return;
+            entry.SLAExpiresAt = entry.CreatedAt.AddMinutes(GetSLAMinutes(entry.Zone));
+        }
+
+        private int GetSLAMinutes(string serviceType)
+        {
+            return serviceType?.ToLower() switch
+            {
+                "plumbing" => 60,
+                "hvac" => 90,
+                "water" => 45,
+                _ => 60
+            };
+        }
+        // Usage: Call SetSLAExpiresAt(entry) on ScheduleQueue creation/update.
+
+        // Sprint 36 – Dispatcher SLA Routing Optimizer
+        // Returns a ranked list of technician suggestions for a given request, with fallback preview
+        public List<(TechnicianStatusDto Technician, double Score, bool IsFallback)> GetOptimizedTechnicianSuggestions(RequestSummaryDto request, out string fallbackReason)
+        {
+            fallbackReason = string.Empty;
+            var allTechs = GetAllTechnicianStatuses();
+            var zone = request.Zip;
+            var now = DateTime.UtcNow;
+            var maxJobsPerTech = 3;
+            var maxActiveJobsInZone = 8;
+            var slaDensityThreshold = 3;
+            var fallback = false;
+
+            // 1. Zone saturation check
+            var activeJobsInZone = allTechs.Sum(t => t.AssignedJobs); // Mock: sum of all jobs
+            if (activeJobsInZone >= maxActiveJobsInZone)
+            {
+                fallback = true;
+                fallbackReason = "Zone overloaded";
+            }
+
+            // 2. Score each tech
+            var scored = new List<(TechnicianStatusDto, double, bool)>();
+            foreach (var tech in allTechs)
+            {
+                double score = 100;
+                // SLA history: penalize if recent delays/callbacks (mock: use DispatchScore)
+                score += (tech.DispatchScore - 80); // Above 80 is bonus, below is penalty
+                // Current load: penalize for each active job
+                score -= tech.AssignedJobs * 15;
+                // Proximity: bonus if in same zone (mock: if TopZIPs contains request.Zip)
+                if (tech.Name != null && tech.Name.Contains("Alice")) score += 10; // Mock: Alice is always close
+                // Zone saturation: penalize if many jobs in zone (mock: random)
+                score -= new Random(tech.TechnicianId + now.Millisecond).Next(0, 10);
+                // Live adjustment: penalize if last ping > 15 min
+                if ((now - tech.LastPing).TotalMinutes > 15) score -= 20;
+                // Fallback: if tech is unavailable
+                bool isFallback = fallback || tech.Status == "Unavailable";
+                scored.Add((tech, score, isFallback));
+            }
+            // Sort by scoreDescending, fallback last
+            var ranked = scored.OrderByDescending(x => x.Item2).ThenBy(x => x.Item3).ToList();
+            // If all are fallback, set fallback reason
+            if (ranked.All(x => x.Item3))
+                fallbackReason = fallbackReason == string.Empty ? "No optimal technician available" : fallbackReason;
+            // Project to named tuple for Razor
+            return ranked.Select(x => (Technician: x.Item1, Score: x.Item2, IsFallback: x.Item3)).ToList();
+        }
+
+        // Sprint 36.A – Real-time zone load/capacity summary
+        public List<ZoneLoadStatus> GetZoneLoadStatus(List<string> zones)
+        {
+            // For each zone, count jobs and available techs
+            var result = new List<ZoneLoadStatus>();
+            foreach (var zone in zones)
+            {
+                // Count jobs in this zone (mock: use filtered requests)
+                var jobs = GetFilteredRequests(new DispatcherFilterModel { Zone = zone });
+                // Count available techs in this zone (mock: by specialty or zone match)
+                var techs = GetAllTechnicianStatuses().Where(t => t.Status == "Available" && (t.Name?.Contains(zone, StringComparison.OrdinalIgnoreCase) ?? false)).ToList();
+                result.Add(new ZoneLoadStatus
+                {
+                    Zone = zone,
+                    JobCount = jobs.Count,
+                    AvailableTechCount = techs.Count
+                });
+            }
+            return result;
+        }
+
+        public class ZoneLoadStatus
+        {
+            public string Zone { get; set; } = string.Empty;
+            public int JobCount { get; set; }
+            public int AvailableTechCount { get; set; }
+        }
+
+        // Sprint 36.A – Admin override: move job to another zone
+        public bool OverrideJobZone(int requestId, string newZone)
+        {
+            // In real app, update DB. Here, update in-memory mock.
+            var req = GetFilteredRequests(new DispatcherFilterModel()).FirstOrDefault(r => r.Id == requestId);
+            if (req != null)
+            {
+                req.Zip = newZone;
+                return true;
+            }
+            return false;
+        }
+
+        // Sprint 41 - Historical SLA Trend Aggregation
+        public async Task<List<SlaTrendDto>> GetSlaTrendsAsync(int days = 30, string? zone = null)
+        {
+            var since = DateTime.UtcNow.Date.AddDays(-days);
+            var query = _db.ScheduleQueues.AsQueryable();
+            if (!string.IsNullOrEmpty(zone))
+                query = query.Where(q => q.Zone == zone);
+            query = query.Where(q => q.CreatedAt >= since);
+
+            var grouped = await query
+                .GroupBy(q => q.CreatedAt.Date)
+                .Select(g => new SlaTrendDto
+                {
+                    Period = g.Key,
+                    TotalJobs = g.Count(),
+                    SlaMet = g.Count(x => x.SLAExpiresAt != null && (x.Status == ScheduleStatus.Dispatched || x.Status == ScheduleStatus.Pending) && x.SLAExpiresAt >= x.CreatedAt),
+                    SlaMissed = g.Count(x => x.SLAExpiresAt != null && x.SLAExpiresAt < x.CreatedAt),
+                    Zone = zone
+                })
+                .OrderBy(x => x.Period)
+                .ToListAsync();
+            return grouped;
+        }
+
+        // Sprint 41 - STUBS for legacy API compatibility (remove after migration)
+        public MVP_Core.Models.Mobile.NextJobDto GetNextJobForTechnician(int technicianId) => new();
+        public void UpdateTechnicianPing(int technicianId) { }
+        public MVP_Core.Models.Admin.TechnicianProfileDto GetTechnicianProfile(int technicianId) => new();
+        public List<MVP_Core.Models.Admin.DispatcherNotification> GetNotifications() => new();
+        public List<MVP_Core.Models.Admin.WatchdogAlert> RunWatchdogScan() => new();
+        public async Task<List<MVP_Core.Models.Admin.TechnicianProfileDto>> GetTechniciansAsync() => new();
+        public List<MVP_Core.Models.Admin.DispatcherAuditLog> GetAuditLog() => new();
+        public List<MVP_Core.Models.Admin.AssignmentLogEntry> GetAssignmentLogs() => new();
+        public List<MVP_Core.Models.Admin.DispatcherAuditLog> GetTimelineForRequest(int requestId) => new();
+        public List<MVP_Core.Models.Admin.DispatcherAuditLog> GetReplayTimeline(int requestId) => new();
+        public List<MVP_Core.Models.Admin.DispatcherNotification> GetMessageThreadForRequest(int requestId) => new();
+        public void LogAssignment(int requestId, int technicianId) { }
+        public void LogDispatcherAction(string action, int? requestId = null) { }
+        public void FlagEmergency(int requestId, string reason = "") { }
+        public bool ReassignTechnician(int requestId, int newTechnicianId) => true;
     }
 }

@@ -31,6 +31,8 @@ namespace MVP_Core.Data.Models
         public DateTime? EstimatedArrival { get; set; }
         public int ServiceRequestId { get; set; }
         public DateTime? ScheduledFor { get; set; }
+        // FixItFred: Sprint 34.1 — SLA Escalation
+        public DateTime? SLAExpiresAt { get; set; }
     }
 
     public class ScheduleHistory

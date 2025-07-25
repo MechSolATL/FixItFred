@@ -1,0 +1,14 @@
+@page
+@model MVP_Core.Pages.Admin.CalendarModel
+@{
+    ViewData["Title"] = "Calendar – Drag-to-Reschedule";
+    Layout = "/Pages/Shared/_Layout.cshtml";
+}
+<h2>Calendar – Drag-to-Reschedule</h2>
+<div class="alert alert-info">Drag jobs between technicians or days to reschedule. Changes update ETA/SLA live.</div>
+<div id="calendar-board" class="row">
+    <!-- Calendar grid will be rendered here by JS -->
+</div>
+<script src="https://cdn.jsdelivr.net/npm/interactjs/dist/interact.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
+<script src="/js/calendar.js"></script>

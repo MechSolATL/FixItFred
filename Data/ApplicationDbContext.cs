@@ -64,6 +64,12 @@ namespace MVP_Core.Data
         public DbSet<NotificationsSent> NotificationsSent { get; set; } = null!;
         public DbSet<ETAHistoryEntry> ETAHistoryEntries { get; set; } = null!;
         public DbSet<MVP_Core.Data.TechTrackingLog> TechTrackingLogs { get; set; } = null!; // Sprint 30E - Secure Technician GPS API
+        // Sprint 32.2 - Security + Audit Harden
+        public DbSet<MVP_Core.Data.Models.AuditLogEntry> AuditLogEntries { get; set; } = null!;
+        // Sprint 34.2 - SLA Escalation Log Model
+        public DbSet<EscalationLogEntry> EscalationLogs { get; set; } = null!;
+        // Sprint 35 - Technician Reward Scoring System
+        public DbSet<TechnicianScoreEntry> TechnicianScoreEntries { get; set; } = null!;
 
         #endregion
 
@@ -101,6 +107,9 @@ namespace MVP_Core.Data
             _ = modelBuilder.Entity<ScheduleQueue>().ToTable("ScheduleQueues");
             _ = modelBuilder.Entity<ScheduleHistory>().ToTable("ScheduleHistories");
             _ = modelBuilder.Entity<NotificationsSent>().ToTable("NotificationsSent");
+            _ = modelBuilder.Entity<EscalationLogEntry>().ToTable("EscalationLogs");
+            // Sprint 35 - Technician Reward Scoring System
+            _ = modelBuilder.Entity<TechnicianScoreEntry>().ToTable("TechnicianScoreEntries");
         }
 
         #endregion

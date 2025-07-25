@@ -15,6 +15,8 @@ namespace MVP_Core.Pages.Technician
         private readonly ApplicationDbContext _db;
         public int TechnicianId { get; set; }
         public List<ScheduleQueue> PendingJobs { get; set; } = new();
+        private const int MaxVisibleJobs = 1; // Sprint 40: Technician visibility cap
+
         public ScheduleQueueModel(ApplicationDbContext db) { _db = db; }
         public void OnGet()
         {
@@ -27,6 +29,7 @@ namespace MVP_Core.Pages.Technician
                     PendingJobs = _db.ScheduleQueues
                         .Where(q => q.TechnicianId == tid && q.Status == ScheduleStatus.Pending)
                         .OrderBy(q => q.EstimatedArrival)
+                        .Take(MaxVisibleJobs) // Sprint 40: Only show up to cap
                         .ToList();
                 }
             }

@@ -6,13 +6,22 @@
     string badgeClass = "bg-secondary";
     string badgeText = "No deadline";
     bool blink = false;
-    if (Model.Request.DueDate.HasValue)
+    bool escalationBorder = false;
+    DateTime? sla = Model.Request.SLAExpiresAt ?? Model.Request.DueDate;
+    if (sla.HasValue)
     {
-        var diff = Model.Request.DueDate.Value - now;
+        var diff = sla.Value - now;
         if (diff.TotalSeconds < 0)
         {
             badgeClass = "bg-danger text-white";
             badgeText = "Overdue";
+            blink = true;
+            escalationBorder = true;
+        }
+        else if (diff.TotalMinutes < 15)
+        {
+            badgeClass = "bg-warning text-dark";
+            badgeText = $"Due in {diff.Minutes}m";
             blink = true;
         }
         else if (diff.TotalHours < 4)
@@ -23,19 +32,44 @@
         else
         {
             badgeClass = "bg-success text-white";
-            badgeText = $"Due {Model.Request.DueDate.Value.ToLocalTime():g}";
+            badgeText = $"Due {sla.Value.ToLocalTime():g}";
         }
     }
     // Fix CS1977: Cast lambda explicitly for FirstOrDefault
     var techStatus = Model.TechnicianStatuses?.FirstOrDefault((Func<TechnicianStatusDto, bool>)(t => t.TechnicianId == Model.Request.TechnicianId));
+    // Sprint 35.2: Score badge logic
+    string scoreBadgeClass = "bg-secondary";
+    string scoreTooltip = "No score available.";
+    string scoreTier = "";
+    int? score = techStatus?.DispatchScore;
+    if (score.HasValue)
+    {
+        if (score >= 80) { scoreBadgeClass = "bg-success"; scoreTier = "Ready"; }
+        else if (score >= 50) { scoreBadgeClass = "bg-warning text-dark"; scoreTier = "At Capacity"; }
+        else { scoreBadgeClass = "bg-danger"; scoreTier = "Overloaded"; }
+        scoreTooltip = $"Score: {score} ({scoreTier})\n- ETA Met: +\n- SLA Hits: +\n- Feedback: +";
+    }
+    // Sprint 35.2: Capacity fade logic
+    bool fadeCard = (techStatus != null && techStatus.AssignedJobs >= 3);
 }
-<div class="job-card mb-3 p-3 border rounded shadow-sm">
+<div class="job-card mb-3 p-3 border rounded shadow-sm sla-indicator @(blink ? "sla-blink" : "") @(escalationBorder ? "escalation-border" : "") @(Model.Request.IsEscalated ? "border-danger escalation-border" : "") @(fadeCard ? "opacity-50" : "")">
     <div class="d-flex justify-content-between align-items-center mb-2">
         <div>
             <span class="badge @DispatcherModel.GetStatusBadgeClass(techStatus != null ? techStatus.Status : "Unassigned")">
                 @(techStatus != null ? techStatus.Status : "Unassigned")
             </span>
             <span class="ms-2">#@Model.Request.Id</span>
+            @if (Model.Request.IsEscalated)
+            {
+                <span class="ms-2 text-danger fw-bold" title="Escalation"><i class="fas fa-exclamation-triangle"></i> Escalation</span>
+            }
+            @* Sprint 35.2: Technician Score Badge *@
+            @if (techStatus != null)
+            {
+                <span class="badge @scoreBadgeClass ms-2" data-bs-toggle="tooltip" data-bs-placement="top" title="@scoreTooltip">
+                    <i class="fas fa-star"></i> @techStatus.DispatchScore
+                </span>
+            }
         </div>
         <div class="priority-controls">
             <form method="post" asp-page-handler="MoveUp" class="d-inline">
@@ -58,7 +92,7 @@
     </div>
     <div class="mb-2">
         <span class="badge @badgeClass @(blink ? "sla-blink" : "")" style="min-width:120px;">@badgeText</span>
-        @if (Model.Request.DueDate.HasValue)
+        @if (sla.HasValue)
         {
             <span class="text-muted small ms-2">(SLA)</span>
         }
@@ -94,20 +128,26 @@
             <input type="hidden" name="RequestId" value="@Model.Request.Id" />
             <button class="btn btn-sm btn-link text-danger" type="submit">Cancel</button>
         </form>
-        <form method="post" asp-page-handler="Escalate">
+        @* Sprint 34.2 - Escalation Override Modal: Escalate button triggers modal *@
+        <button type="button" class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#escalationOverrideModal" data-schedule-id="@Model.Request.Id">Escalate</button>
+        <form method="post" asp-page-handler="MarkDelayed">
             <input type="hidden" name="RequestId" value="@Model.Request.Id" />
-            <button class="btn btn-sm btn-warning" type="submit">Escalate</button>
+            <button class="btn btn-sm btn-outline-warning" type="submit">Mark as Delayed</button>
+        </form>
+        <form method="post" asp-page-handler="AutoReassign">
+            <input type="hidden" name="RequestId" value="@Model.Request.Id" />
+            <button class="btn btn-sm btn-outline-info" type="submit">Auto-Reassign</button>
         </form>
         <a class="btn btn-sm btn-link" href="/admin/customer/@Model.Request.Id">Profile</a>
     </div>
 </div>
-<style>
-.sla-blink {
-    animation: sla-blink 1s linear infinite;
+<script>
+// Sprint 35.2: Enable Bootstrap tooltips for score badge
+if (window.bootstrap) {
+    document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function (el) {
+        new bootstrap.Tooltip(el);
+    });
 }
-keyframes sla-blink {
-    0% { opacity: 1; }
-    50% { opacity: 0.3; }
-    100% { opacity: 1; }
-}
-</style>
+</script>
+@* FixItFred: CSS animation refactored for Razor compatibility. *@
+@* Removed inline <style> blocks for animation. All animation CSS is now in site.css *@

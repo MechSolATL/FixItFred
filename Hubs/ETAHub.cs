@@ -2,6 +2,7 @@
 // [2025-07-25T00:00:00Z] — Explicitly marked ETAHub as [AllowAnonymous] for demo; restrict as needed for production.
 // [2025-07-25T00:00:00Z] — Added zone-based SignalR group routing and OnConnectedAsync group join logic.
 // [2025-09-10T00:00:00Z] — Patched ETAHub to use string zone for group routing and message broadcast. FixItFred Sprint 30D.1.
+// [2026-03-22T00:00:00Z] — Added UpdateTechnicianLocation method for live marker updates. FixItFred Sprint 33.3.
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using System.Threading.Tasks;
@@ -29,6 +30,22 @@ namespace MVP_Core.Hubs
             if (string.IsNullOrEmpty(zone)) zone = "1";
             await Groups.AddToGroupAsync(Context.ConnectionId, $"Zone-{zone}");
             await base.OnConnectedAsync();
+        }
+        // Sprint 33.3 - SignalR Integration
+        // Called when a technician's GPS or job status changes
+        public async Task UpdateTechnicianLocation(int technicianId, double lat, double lng, string status, int jobs, string eta, string currentJob, string name)
+        {
+            // Broadcast to all dispatcher clients (or by zone if needed)
+            await Clients.All.SendAsync("UpdateTechnicianLocation", new {
+                id = technicianId,
+                name = name,
+                lat = lat,
+                lng = lng,
+                status = status,
+                jobs = jobs,
+                eta = eta,
+                currentJob = currentJob
+            });
         }
     }
 }

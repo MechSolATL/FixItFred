@@ -1,0 +1,38 @@
+@page
+@model MVP_Core.Pages.Admin.SlaTrendsModel
+@{
+    ViewData["Title"] = "SLA Trends Dashboard";
+}
+<h2>SLA Trends Dashboard</h2>
+<div id="sla-heatmap-container"></div>
+<div id="sla-alert-banner" style="display:none;" class="alert alert-danger mt-3"></div>
+@section Scripts {
+    <script src="/js/tech-heatmap.js"></script>
+    <script>
+        async function loadSlaTrends() {
+            const resp = await fetch('?handler=SlaTrends');
+            const data = await resp.json();
+            // Find max missed for alert
+            const maxMissed = Math.max(...data.map(x => x.slaMissed));
+            if (maxMissed > 3) {
+                document.getElementById('sla-alert-banner').style.display = '';
+                document.getElementById('sla-alert-banner').innerText = 'Alert: High SLA violations detected!';
+            }
+            // Adapt heatmap rendering for days
+            window.metricOverride = 'SLA';
+            renderSlaHeatmap(data, 'sla-heatmap-container');
+        }
+        function renderSlaHeatmap(data, containerId) {
+            // Simple day-based heatmap: color by compliance rate
+            let html = '<div class="d-flex flex-wrap">';
+            data.forEach(d => {
+                const rate = d.slaComplianceRate;
+                const color = `rgb(${255-Math.round(rate*200)},${Math.round(rate*200)},80)`;
+                html += `<div title='${d.period}: ${d.slaMet}/${d.totalJobs} met' style='width:36px;height:36px;margin:2px;background:${color};border:1px solid #ccc;text-align:center;'>${new Date(d.period).getDate()}</div>`;
+            });
+            html += '</div>';
+            document.getElementById(containerId).innerHTML = html;
+        }
+        loadSlaTrends();
+    </script>
+}

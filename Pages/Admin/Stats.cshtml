@@ -1,0 +1,77 @@
+@page
+@model MVP_Core.Pages.Admin.StatsModel
+@{
+    ViewData["Title"] = "Admin Dashboard Metrics";
+}
+<!-- Sprint 32.1 - Admin Metrics Reporting -->
+<h2>Admin Dashboard Metrics</h2>
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-header">Total Service Requests</div>
+            <div class="card-body">
+                <h3>@Model.TotalRequests</h3>
+                <div class="small text-muted">Pending: @Model.PendingCount | Dispatched: @Model.DispatchedCount | Cancelled: @Model.CancelledCount | Completed: @Model.CompletedCount</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-header">Technician Activity</div>
+            <div class="card-body">
+                <div>Active Today: <strong>@Model.ActiveTechsToday</strong></div>
+                <div>GPS Updated: <strong>@Model.GpsUpdatedToday</strong></div>
+                <div>Jobs Assigned: <strong>@Model.JobsAssignedToday</strong></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-header">Avg ETA Accuracy</div>
+            <div class="card-body">
+                <h3>@Model.AvgEtaAccuracy min</h3>
+                <div class="small text-muted">(Predicted vs. Actual)</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-header">SignalR Broadcasts (24h)</div>
+            <div class="card-body">
+                <h3 id="signalrCount">@Model.SignalRBroadcasts24h</h3>
+                <div class="small text-muted">Real-time updates</div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <h4>Weekly ScheduleQueue Volume</h4>
+        <canvas id="scheduleQueueChart" height="120"></canvas>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+// Sprint 32.1 - Admin Metrics Reporting
+const weekLabels = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.WeekLabels));
+const weekData = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.WeekCounts));
+const ctx = document.getElementById('scheduleQueueChart').getContext('2d');
+new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: weekLabels,
+        datasets: [{
+            label: 'ScheduleQueue Volume',
+            data: weekData,
+            backgroundColor: '#0d6efd'
+        }]
+    },
+    options: { plugins: { legend: { display: false } } }
+});
+// Real-time SignalR broadcast count update (optional, if endpoint exists)
+setInterval(function() {
+    fetch('/api/admin/signalr-broadcasts-24h').then(r => r.json()).then(data => {
+        document.getElementById('signalrCount').textContent = data.count;
+    });
+}, 10000);
+</script>

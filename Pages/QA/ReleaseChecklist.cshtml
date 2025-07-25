@@ -1,0 +1,21 @@
+@page
+@model MVP_Core.Pages.QA.ReleaseChecklistModel
+@{
+    ViewData["Title"] = "Release QA Checklist";
+}
+<!-- Sprint 32.3 - QA Milestone Setup -->
+<h2>Release QA Checklist</h2>
+<form method="post">
+    <ul class="list-group mb-4">
+        @for (int i = 0; i < Model.Checklist.Count; i++)
+        {
+            <li class="list-group-item">
+                <input type="checkbox" name="checkedItems" value="@i" @(Model.Checked[i] ? "checked" : "") onchange="this.form.submit()" />
+                <span class="ms-2">@Model.Checklist[i]</span>
+            </li>
+        }
+    </ul>
+</form>
+<div class="alert alert-info">
+    <strong>Instructions:</strong> Check off each test point as you verify it. All data is seeded for QA.
+</div>

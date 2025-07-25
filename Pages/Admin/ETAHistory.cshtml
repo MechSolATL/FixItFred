@@ -1,0 +1,32 @@
+@page
+@model MVP_Core.Pages.Admin.ETAHistoryModel
+@{
+    ViewData["Title"] = "ETA Change History";
+}
+<!-- Sprint 32 - Admin Reschedule Logic -->
+<h2>ETA Change History</h2>
+<table class="table table-bordered table-sm">
+    <thead>
+        <tr>
+            <th>Time</th>
+            <th>Technician</th>
+            <th>Job Address</th>
+            <th>Previous ETA</th>
+            <th>New ETA</th>
+            <th>Reason</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var entry in Model.Entries)
+    {
+        <tr>
+            <td>@entry.Timestamp.ToLocalTime().ToString("g")</td>
+            <td>@entry.TechnicianName</td>
+            <td>@entry.JobAddress</td>
+            <td>@entry.PreviousETA?.ToLocalTime().ToShortTimeString()</td>
+            <td>@entry.NewETA?.ToLocalTime().ToShortTimeString()</td>
+            <td>@entry.UpdateReason</td>
+        </tr>
+    }
+    </tbody>
+</table>

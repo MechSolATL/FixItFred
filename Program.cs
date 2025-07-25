@@ -43,6 +43,7 @@ builder.Services.AddScoped<AuditLogger>();
 builder.Services.AddScoped<EmailVerificationService>();
 builder.Services.AddHostedService<BackupReminderService>();
 builder.Services.AddHostedService<MVP_Core.Services.SlaEscalationService>();
+builder.Services.AddHostedService<SLAMonitorService>();
 builder.Services.AddScoped<ITechnicianService, TechnicianService>();
 builder.Services.AddScoped<MVP_Core.Services.IDeviceResolver, MVP_Core.Services.DeviceResolver>();
 builder.Services.AddScoped<MVP_Core.Services.INotificationService, MVP_Core.Services.NotificationService>();

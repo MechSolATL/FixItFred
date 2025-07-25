@@ -13,5 +13,9 @@ namespace MVP_Core.Models.Admin
         public List<string>? MatchedTags { get; set; }
         // Added for Razor compatibility
         public string TechnicianName { get; set; } = string.Empty;
+        // Sprint 37: AI Routing Preview
+        public int? AISuggestedTechnicianId { get; set; }
+        public string? AISuggestedTechnicianName { get; set; }
+        public double? AISuggestedScore { get; set; }
     }
 }

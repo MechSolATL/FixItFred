@@ -1,0 +1,32 @@
+@* Sprint 33.3 - Zone Map View *@
+// FixItFred: CSS animation refactored for Razor compatibility.
+@* Ensure .pulse-marker and animation classes are referenced from site.css *@
+<div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span><strong>Technician Zone Map</strong></span>
+        <span class="text-muted small">Live technician locations & job volume</span>
+    </div>
+    <div class="card-body p-0">
+        <div id="zoneMap" style="height: 420px; width: 100%;"></div>
+    </div>
+</div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="/js/dispatcher-map.js"></script>
+<script>
+// Sprint 33.3 - Zone Map View: Expose live technician markers for dispatcher-map.js
+window.DispatcherTechMarkers = [
+    @foreach (var tech in Model.TechnicianStatuses)
+    {
+        if (tech.Latitude.HasValue && tech.Longitude.HasValue)
+        {
+            <text>{ id: @tech.TechnicianId, name: '@tech.Name', lat: @tech.Latitude.Value, lng: @tech.Longitude.Value, jobs: @tech.AssignedJobs, eta: '@(tech.ETA ?? "N/A")', currentJob: '@(tech.CurrentJob ?? "")' },</text>
+        }
+    }
+];
+// Optional: Zone polygons (stub)
+window.DispatcherZonePolygons = [
+    // Example: { name: 'North', coords: [[33.8,-84.4],[33.85,-84.3],[33.9,-84.4]], color: 'blue' }
+];
+</script>
+@* End Sprint 33.3 - Zone Map View *@

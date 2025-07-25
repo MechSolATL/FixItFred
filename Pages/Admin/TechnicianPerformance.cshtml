@@ -1,0 +1,71 @@
+@page
+@using MVP_Core.Models.Admin
+@model MVP_Core.Pages.Admin.TechnicianPerformanceModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    ViewData["Title"] = "Technician Performance";
+}
+<!-- FixItFred: Sprint 35.2.B - Technician Performance Dashboard -->
+<h2>Technician Performance Dashboard</h2>
+<div class="card mb-3">
+    <div class="card-body">
+        <form method="get" class="row g-2 align-items-end">
+            <div class="col-md-3">
+                <label class="form-label">Technician</label>
+                <input type="text" name="Technician" class="form-control" value="@Model.FilterTechnician" placeholder="Name..." />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Zone</label>
+                <select name="Zone" class="form-select">
+                    <option value="">All Zones</option>
+                    @foreach (var zone in Model.ServiceZones)
+                    {
+                        <option value="@zone" selected="@(Model.FilterZone == zone ? "selected" : null)">@zone</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Sort By</label>
+                <select name="SortBy" class="form-select">
+                    <option value="Score">Score</option>
+                    <option value="OnTime">On-time %</option>
+                    <option value="SLA">SLA %</option>
+                    <option value="Feedback">Feedback Avg</option>
+                    <option value="LastUpdate">Last Update</option>
+                </select>
+            </div>
+            <div class="col-md-2 d-grid">
+                <button type="submit" class="btn btn-primary mt-2">Filter</button>
+            </div>
+            <div class="col-md-2 d-grid">
+                <button type="submit" name="export" value="csv" class="btn btn-outline-success mt-2">Export CSV</button>
+            </div>
+        </form>
+    </div>
+</div>
+<table class="table table-bordered table-hover">
+    <thead class="table-light">
+        <tr>
+            <th>Technician</th>
+            <th>Score</th>
+            <th>On-time %</th>
+            <th>SLA %</th>
+            <th>Feedback Avg</th>
+            <th>Last Update</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var tech in Model.TechnicianPerformances)
+    {
+        <tr>
+            <td>@tech.Name</td>
+            <td>@tech.Score</td>
+            <td>@tech.OnTimePercent.ToString("P0")</td>
+            <td>@tech.SLAPercent.ToString("P0")</td>
+            <td>@tech.FeedbackAvg.ToString("0.0")</td>
+            <td>@tech.LastUpdate.ToLocalTime().ToString("g")</td>
+        </tr>
+    }
+    </tbody>
+</table>
+<!-- FixItFred: End Sprint 35.2.B -->

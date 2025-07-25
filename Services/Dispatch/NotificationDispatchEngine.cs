@@ -44,5 +44,37 @@ namespace MVP_Core.Services.Dispatch
                 .OrderBy(q => q.ScheduledTime)
                 .ToList();
         }
+
+        // Broadcast live technician location/status update
+        public async Task BroadcastTechnicianLocationAsync(int technicianId, double lat, double lng, string status, int jobs, string eta, string currentJob, string name)
+        {
+            await _hubContext.Clients.All.SendAsync("UpdateTechnicianLocation", new {
+                id = technicianId,
+                name = name,
+                lat = lat,
+                lng = lng,
+                status = status,
+                jobs = jobs,
+                eta = eta,
+                currentJob = currentJob
+            });
+        }
+
+        // FixItFred: Sprint 34.1 - SLA Escalation Broadcast [2024-07-25T09:45Z]
+        public async Task BroadcastSLAEscalationAsync(string zone, string message)
+        {
+            await _hubContext.Clients.Group($"Zone-{zone}")
+                .SendAsync("ReceiveSLAEscalation", message);
+
+            _db.NotificationsSent.Add(new NotificationsSent
+            {
+                TechnicianId = 0,
+                Zone = $"Zone-{zone}",
+                Status = message,
+                CreatedAt = DateTime.UtcNow
+            });
+
+            await _db.SaveChangesAsync();
+        }
     }
 }

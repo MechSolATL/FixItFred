@@ -18,6 +18,9 @@ namespace MVP_Core.Controllers.Api
     [ApiController]
     public class TechnicianApiController : ControllerBase
     {
+        private readonly IAuditTrailLogger _auditLogger;
+        public TechnicianApiController(IAuditTrailLogger auditLogger) { _auditLogger = auditLogger; }
+
         [HttpGet("/api/technicians/active")]
         public async Task<IActionResult> GetActiveTechnicians([FromServices] ITechnicianService techService)
         {
@@ -84,6 +87,7 @@ namespace MVP_Core.Controllers.Api
                 await db.SaveChangesAsync();
                 await dispatchEngine.BroadcastETAAsync(queue.Zone, $"Technician {tech.FullName} ETA: {eta:t}");
             }
+            await _auditLogger.LogAsync(User?.Identity?.Name ?? "unknown", "TechLocationUpdate", HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown", $"Lat={dto.Latitude};Lng={dto.Longitude}");
             return Ok(new { success = true });
         }
 
@@ -120,6 +124,7 @@ namespace MVP_Core.Controllers.Api
                 return BadRequest();
             await db.SaveChangesAsync();
             await hubContext.Clients.All.SendAsync("ScheduleQueueUpdated", entry.Id, entry.Status.ToString());
+            await _auditLogger.LogAsync(User?.Identity?.Name ?? "unknown", "TechScheduleResponse", HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown", $"ScheduleQueueId={dto.ScheduleQueueId};Response={dto.Response}");
             return Ok(new { success = true });
         }
         public class ScheduleResponseDto

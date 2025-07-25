@@ -17,12 +17,17 @@
                 </tr>
             </thead>
             <tbody>
+                @* Sprint 33.2 - Drag-and-Drop Dispatcher UI [DropZone Setup] *@
                 @foreach (var tech in Model)
                 {
                     var percent = tech.MaxJobCapacity > 0 ? (double)tech.CurrentJobCount / tech.MaxJobCapacity : 0;
                     string statusClass = percent < 0.5 ? "table-success" : percent < 1.0 ? "table-warning" : "table-danger";
                     <tr class="@statusClass">
-                        <td>@tech.FullName</td>
+                        <td>
+                            <div class="dropzone" data-tech-id="@tech.Id">
+                                @tech.FullName
+                            </div>
+                        </td>
                         <td>@tech.CurrentJobCount</td>
                         <td>@tech.MaxJobCapacity</td>
                         <td>

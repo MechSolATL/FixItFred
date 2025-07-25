@@ -1,0 +1,48 @@
+@page
+@using MVP_Core.Data.Models
+@model MVP_Core.Pages.Admin.EscalationLogModel
+@{
+    ViewData["Title"] = "Escalation Log";
+}
+<!-- Sprint 34.2 - Escalation Log Viewer -->
+<h2>Escalation Log</h2>
+<form method="get" class="row g-2 mb-3">
+    <div class="col-md-3">
+        <input type="text" name="tech" class="form-control" placeholder="Technician name..." value="@Model.FilterTech" />
+    </div>
+    <div class="col-md-3">
+        <input type="date" name="from" class="form-control" value="@Model.FilterFromString" />
+    </div>
+    <div class="col-md-3">
+        <input type="date" name="to" class="form-control" value="@Model.FilterToString" />
+    </div>
+    <div class="col-md-3">
+        <button class="btn btn-primary">Filter</button>
+    </div>
+</form>
+<table class="table table-bordered table-hover">
+    <thead class="table-light">
+        <tr>
+            <th>Job</th>
+            <th>Technician</th>
+            <th>Triggered By</th>
+            <th>Reason</th>
+            <th>Action</th>
+            <th>Time</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var log in Model.Logs)
+    {
+        var queue = Model.ScheduleQueues.FirstOrDefault(q => q.Id == log.ScheduleQueueId);
+        <tr>
+            <td><a href="/Admin/DispatcherHistory?requestId=@queue?.ServiceRequestId">@queue?.ServiceRequestId</a></td>
+            <td>@queue?.AssignedTechnicianName</td>
+            <td>@log.TriggeredBy</td>
+            <td>@log.Reason</td>
+            <td>@log.ActionTaken</td>
+            <td>@log.CreatedAt.ToLocalTime().ToString("g")</td>
+        </tr>
+    }
+    </tbody>
+</table>

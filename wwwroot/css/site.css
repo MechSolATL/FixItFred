@@ -242,3 +242,43 @@ footer {
   border-left: 3px solid #0078D7;
   font-size: 0.95rem;
 }
+
+/* FixItFred: CSS animation refactored for Razor compatibility. */
+.sla-blink {
+    animation: sla-blink 1s linear infinite;
+}
+
+@keyframes sla-blink {
+    0% { opacity: 1; }
+    50% { opacity: 0.3; }
+    100% { opacity: 1; }
+}
+
+/* FixItFred: CSS animation refactored for Razor compatibility. */
+.escalation-border {
+    border-width: 3px !important;
+    border-color: #dc3545 !important;
+}
+
+/* FixItFred: CSS animation refactored for Razor compatibility. */
+.pulse-marker {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #dc3545;
+    position: relative;
+    box-shadow: 0 0 0 0 rgba(220,53,69,0.7);
+    animation: pulse-marker 1.5s infinite;
+}
+
+@keyframes pulse-marker {
+    0% {
+        box-shadow: 0 0 0 0 rgba(220,53,69,0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(220,53,69,0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(220,53,69,0);
+    }
+}

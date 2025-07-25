@@ -40,6 +40,11 @@
             <div class="mb-2">@job.JobSummary</div>
             <div class="mb-2 job-label">ETA:</div>
             <div class="mb-2">@job.ETA.ToLocalTime():t</div>
+            <div class="mb-2 job-label">Countdown to ETA:</div>
+            <div class="mb-2"><span id="countdown-timer"></span></div>
+            <div class="progress mb-2" style="height: 18px;">
+                <div id="progress-bar" class="progress-bar bg-success" role="progressbar" style="width: 0%"></div>
+            </div>
             <div class="mb-2 job-label">Address:</div>
             <div class="mb-2"><a href="https://maps.google.com/?q=@job.Address" target="_blank">@job.Address</a></div>
             <div class="mb-2 job-label">Last Dispatcher Note:</div>
@@ -56,6 +61,27 @@
                 <div class="alert alert-success mt-2">@TempData["PingStatus"]</div>
             }
         </div>
+        <script>
+            // Countdown and progress bar logic
+            (function() {
+                var eta = new Date('@job.ETA.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")');
+                var now = new Date();
+                var start = now;
+                var end = eta;
+                var total = (end - start) > 0 ? (end - start) : 1;
+                function updateCountdown() {
+                    now = new Date();
+                    var diff = Math.max(0, end - now);
+                    var mins = Math.floor(diff / 60000);
+                    var secs = Math.floor((diff % 60000) / 1000);
+                    document.getElementById('countdown-timer').textContent = mins + 'm ' + secs + 's';
+                    var percent = 100 - Math.floor((diff / total) * 100);
+                    document.getElementById('progress-bar').style.width = percent + '%';
+                    if (diff > 0) setTimeout(updateCountdown, 1000);
+                }
+                updateCountdown();
+            })();
+        </script>
     }
     <div class="mt-4 text-center">
         <span class="text-muted">Scan QR to login (coming soon)</span>

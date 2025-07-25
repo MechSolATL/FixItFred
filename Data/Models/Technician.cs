@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
+using System.Collections.Generic;
 
 namespace MVP_Core.Data.Models
 {
@@ -37,5 +38,11 @@ namespace MVP_Core.Data.Models
         // FixItFred: Sprint 30E – Live Tracking: Add GPS fields
         public double? Latitude { get; set; }
         public double? Longitude { get; set; }
+
+        public int? DispatchScore { get; set; } // Sprint 35: Technician performance/dispatch score
+
+        // Sprint 39: Skill-based tags for technician specialization
+        [MaxLength(1000)]
+        public string? SkillTags { get; set; } // Comma-separated skill tags (e.g., "Tankless,Mini Split,Backflow Cert")
     }
 }

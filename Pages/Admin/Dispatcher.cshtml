@@ -18,20 +18,62 @@
     var stats = Model.DispatcherStats;
     var workloads = new[] { "All", "Light", "Moderate", "Heavy" };
 }
-//<partial name="_ValidationSummary" />
-@if (TempData["SystemMessages"] != null)
-{
-    ViewData["AlertType"] = "info";
-    ViewData["AlertMessage"] = TempData["SystemMessages"];
-    <partial name="_Alert" />
-}
-@if (broadcast != null)
-{
-    ViewData["AlertType"] = "danger";
-    ViewData["AlertMessage"] = broadcast.Message;
-    <partial name="_Alert" />
-}
-<partial name="_LoadingSpinner" />
+// Sprint 33.3 - Dispatcher Smart Filters
+<div class="card mb-3">
+    <div class="card-body">
+        <form method="get" class="row g-2 align-items-end">
+            <div class="col-md-2">
+                <label class="form-label">Show Only</label>
+                <select name="PendingOnly" class="form-select">
+                    <option value="">All Jobs</option>
+                    <option value="true" selected="@(Model.PendingOnly ? "selected" : null)">Pending</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Show Only</label>
+                <select name="AssignedOrDispatchedOnly" class="form-select">
+                    <option value="">All</option>
+                    <option value="true" selected="@(Model.AssignedOrDispatchedOnly ? "selected" : null)">Assigned/Dispatched</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Zone</label>
+                <select name="FilterZone" class="form-select">
+                    <option value="">All Zones</option>
+                    @foreach (var zone in Model.ServiceZones)
+                    {
+                        <option value="@zone" selected="@(Model.FilterZone == zone ? "selected" : null)">@zone</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Service Type</label>
+                <select name="FilterServiceType" class="form-select">
+                    <option value="">All Types</option>
+                    <option value="Plumbing" selected="@(Model.FilterServiceType == "Plumbing" ? "selected" : null)">Plumbing</option>
+                    <option value="HVAC" selected="@(Model.FilterServiceType == "HVAC" ? "selected" : null)">HVAC</option>
+                    <option value="Water" selected="@(Model.FilterServiceType == "Water" ? "selected" : null)">Water</option>
+                </select>
+            </div>
+            <!-- Skill Tag Multi-Select Filter -->
+            <div class="col-md-3">
+                <label class="form-label">Skill Tags</label>
+                <select name="SkillTags" multiple class="form-control">
+                    @Html.Raw(Model.SkillTagOptionsHtml)
+                </select>
+                <div class="form-text">Hold Ctrl (Windows) or Cmd (Mac) to select multiple.</div>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Search</label>
+                <input type="text" name="SearchTerm" class="form-control" value="@Model.SearchTerm" placeholder="Customer Name or Job ID" />
+            </div>
+            <div class="col-md-1 d-grid">
+                <button type="submit" class="btn btn-primary mt-2">Filter</button>
+            </div>
+        </form>
+    </div>
+</div>
+<!-- End Sprint 33.3 - Dispatcher Smart Filters -->
 @* --- Live Diagnostics Panel --- *@
 <div class="row mb-3">
     <div class="col-md-12">
@@ -133,23 +175,63 @@
                         <th>Priority</th>
                         <th>ZIP</th>
                         <th>Delay (min)</th>
+                        <th>Predictive Hint</th>
+                        <th>Override?</th>
                         <th>Reassign</th>
                         <th>Emergency</th>
                         <th>Actions</th>
+                        <th>Optimizer</th>
                     </tr>
                 </thead>
                 <tbody>
                 @foreach (var req in filteredRequests)
                 {
                     var emergencyClass = req.IsEmergency ? "border border-danger" : "";
+                    // Predictive dispatch hint logic
+                    var aiSuggestions = Model.OptimizedSuggestions != null && Model.OptimizedSuggestions.ContainsKey(req.Id) ? Model.OptimizedSuggestions[req.Id] : null;
+                    string aiTechName = "-";
+                    string aiScore = "-";
+                    if (aiSuggestions != null)
+                    {
+                        foreach (var s in aiSuggestions)
+                        {
+                            if (!s.IsFallback && s.Technician != null)
+                            {
+                                aiTechName = s.Technician.Name ?? "-";
+                                aiScore = s.Score.ToString("F0");
+                                break;
+                            }
+                        }
+                    }
+                    var assignedTech = req.Technician ?? "-";
+                    bool isOverride = !string.IsNullOrEmpty(aiTechName) && aiTechName != "-" && !string.Equals(aiTechName, assignedTech, StringComparison.OrdinalIgnoreCase);
                     <tr class="@emergencyClass">
                         <td>@req.Id @if (req.IsEmergency) { <span title="Emergency" class="text-danger fw-bold">??</span> }</td>
                         <td>@req.ServiceType</td>
-                        <td>@req.Technician</td>
+                        <td>@assignedTech</td>
                         <td>@req.Status</td>
                         <td>@req.Priority</td>
                         <td>@req.Zip</td>
                         <td>@req.DelayMinutes</td>
+                        <td>
+                            <span title="AI-suggested technician and score">
+                                <strong>@aiTechName</strong> <span class="text-muted">(@aiScore)</span>
+                            </span>
+                        </td>
+                        <td>
+                            @if (isOverride)
+                            {
+                                <span class="badge bg-warning text-dark">Override</span>
+                            }
+                            else if (!string.IsNullOrEmpty(aiTechName) && aiTechName == assignedTech)
+                            {
+                                <span class="badge bg-success">Match</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">-</span>
+                            }
+                        </td>
                         <td>
                             @if (User.IsInRole("Dispatcher") || User.IsInRole("Supervisor")) {
                             <form method="post" asp-page-handler="ReassignTech" style="display:inline;">
@@ -194,6 +276,33 @@
                             <a href="/Admin/DispatcherHistory?requestId=@req.Id" class="btn btn-outline-info btn-sm">View Timeline</a>
                             <a href="/Admin/UploadMedia?requestId=@req.Id" class="btn btn-outline-primary btn-sm">?? Upload Media</a>
                             <a href="/Admin/ViewMedia?requestId=@req.Id" class="btn btn-outline-secondary btn-sm">?? View Media Vault</a>
+                            <!-- Sprint 32 - Admin Reschedule Logic -->
+                            <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#rescheduleModal" data-job-id="@req.Id" data-tech="@req.Technician">Reschedule</button>
+                            <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#escalateModal-@req.Id" title="Escalate Job">?? Escalate</button>
+                        </td>
+                        <td>
+                            @if (Model.OptimizedSuggestions != null && Model.OptimizedSuggestions.ContainsKey(req.Id))
+                            {
+                                var suggestions = Model.OptimizedSuggestions[req.Id];
+                                var fallback = Model.OptimizerFallbackReasons != null && Model.OptimizerFallbackReasons.ContainsKey(req.Id) ? Model.OptimizerFallbackReasons[req.Id] : null;
+                                <div>
+                                    <strong>Top Suggestions:</strong>
+                                    <ul class="mb-1 ps-3">
+                                    @foreach (var s in suggestions.Take(3))
+                                    {
+                                        <li>@s.Technician.Name (@s.Score.ToString("F0")) @(s.IsFallback ? "[Fallback]" : "")</li>
+                                    }
+                                    </ul>
+                                    @if (!string.IsNullOrEmpty(fallback))
+                                    {
+                                        <span class="text-danger small">Fallback: @fallback</span>
+                                    }
+                                </div>
+                            }
+                            else
+                            {
+                                <span class="text-muted">No data</span>
+                            }
                         </td>
                     </tr>
                 }
@@ -326,6 +435,9 @@
         </div>
     </div>
 </div>
+@* Sprint 33.3 - Zone Map View *@
+@await Html.PartialAsync("_ZoneMap")
+@* End Sprint 33.3 - Zone Map View *@
 <ul class="nav nav-tabs mb-3" id="kanbanTabs">
     @foreach (var status in statuses)
     {
@@ -350,7 +462,7 @@
                     return s == status;
                 })))
                 {
-                    <div data-request-id="@req.Id">
+                    <div class="draggable-job" draggable="true" data-job-id="@req.Id">
                         @await Html.PartialAsync("_JobCard", req)
                         @if (string.IsNullOrEmpty(req.AssignedTechnicianId?.ToString()) && status == "Unassigned")
                         {
@@ -548,7 +660,133 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('reorderForm').submit();
     }
 });
+// Sprint 32 - Admin Reschedule Logic
+var rescheduleModal = document.getElementById('rescheduleModal');
+rescheduleModal.addEventListener('show.bs.modal', function (event) {
+  var button = event.relatedTarget;
+  var jobId = button.getAttribute('data-job-id');
+  var tech = button.getAttribute('data-tech');
+  document.getElementById('modalRequestId').value = jobId;
+  document.getElementById('modalTechnician').value = tech;
+});
+// Sprint 33.2 - Drag-and-Drop Dispatcher UI [JS Assignment Logic]
+document.addEventListener('DOMContentLoaded', function () {
+    // Sprint 33.2 - Drag-and-Drop Dispatcher UI [SignalR + AJAX Hook]
+    document.querySelectorAll('.draggable-job').forEach(el => {
+        el.addEventListener('dragstart', e => {
+            e.dataTransfer.setData('job-id', el.dataset.jobId);
+        });
+    });
+    document.querySelectorAll('.dropzone').forEach(el => {
+        el.addEventListener('dragover', e => e.preventDefault());
+        el.addEventListener('drop', async e => {
+            e.preventDefault();
+            const jobId = e.dataTransfer.getData('job-id');
+            const techId = el.dataset.techId;
+            const res = await fetch('/api/dispatch/assign-job', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ jobId, techId })
+            });
+            if (res.ok) {
+                alert("Job reassigned!");
+                location.reload(); // Optional: auto-refresh UI or requery SignalR data
+            } else {
+                alert("Assignment failed.");
+            }
+        });
+    });
+});
+// FixItFred: CSS animation refactored for Razor compatibility.
+// All animation and keyframes CSS should be referenced from site.css
+// No inline <style> blocks for animation remain in this file.
 </script>
 <footer class="mt-5 text-center">
     <a href="/Admin/AssignmentLog" class="btn btn-outline-secondary">View Assignment Log</a>
 </footer>
+
+<!-- Sprint 32 - Admin Reschedule Logic -->
+<div class="modal fade" id="rescheduleModal" tabindex="-1" aria-labelledby="rescheduleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form id="rescheduleForm" method="post" asp-page-handler="OverrideETA">
+        <div class="modal-header">
+          <h5 class="modal-title" id="rescheduleModalLabel">Reschedule Job ETA</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" name="RequestId" id="modalRequestId" />
+          <div class="mb-3">
+            <label for="modalTechnician" class="form-label">Technician</label>
+            <input type="text" class="form-control" id="modalTechnician" name="Technician" readonly />
+          </div>
+          <div class="mb-3">
+            <label for="modalNewETA" class="form-label">New ETA</label>
+            <input type="datetime-local" class="form-control" id="modalNewETA" name="NewETA" required />
+          </div>
+          <div class="mb-3">
+            <label for="modalReason" class="form-label">Reason</label>
+            <input type="text" class="form-control" id="modalReason" name="Reason" required />
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+@* Sprint 34.2 - Escalation Override Modal: Inject partial for escalation modal *@
+@{
+    var adminUser = User?.Identity?.Name ?? "admin";
+}
+<partial name="_EscalationModal" model="(0, adminUser)" />
+@* Sprint 36.A – Real-time zone load/capacity and admin override UI *@
+<div class="card mb-4">
+    <div class="card-header bg-info text-white"><strong>Zone Load Balancer</strong></div>
+    <div class="card-body">
+        <table class="table table-sm table-bordered mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Zone</th>
+                    <th>Active Jobs</th>
+                    <th>Available Techs</th>
+                    <th>Manual Rebalance</th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach (var zone in Model.ServiceZones)
+            {
+                var zoneLoad = Model.ZoneLoadStatuses?.FirstOrDefault(z => z.Zone == zone);
+                <tr>
+                    <td>@zone</td>
+                    <td>@(zoneLoad?.JobCount ?? 0)</td>
+                    <td>@(zoneLoad?.AvailableTechCount ?? 0)</td>
+                    <td>
+                        <form method="post" asp-page-handler="OverrideJobZone" class="d-flex align-items-center">
+                            <select name="OverrideJobId" class="form-select form-select-sm me-2">
+                                <option value="">Select Job</option>
+                                @foreach (var req in Model.DispatcherRequests.Where(r => r.Zip == zone))
+                                {
+                                    <option value="@req.Id">#@req.Id - @req.ServiceType</option>
+                                }
+                            </select>
+                            <select name="OverrideNewZone" class="form-select form-select-sm me-2">
+                                <option value="">To Zone</option>
+                                @foreach (var z in Model.ServiceZones.Where(z2 => z2 != zone))
+                                {
+                                    <option value="@z">@z</option>
+                                }
+                            </select>
+                            <button type="submit" class="btn btn-outline-primary btn-sm">Rebalance</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+        <div class="small text-muted mt-2">Move jobs between zones to manually rebalance load. Changes take effect immediately.</div>
+    </div>
+</div>
+@* End Sprint 36.A *@
