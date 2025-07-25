@@ -494,5 +494,43 @@ namespace MVP_Core.Services.Admin
         public void LogDispatcherAction(string action, int? requestId = null) { }
         public void FlagEmergency(int requestId, string reason = "") { }
         public bool ReassignTechnician(int requestId, int newTechnicianId) => true;
+
+        // Sprint 40.2 – Dispatcher Audit Intelligence Panel
+        public async Task<DispatchAuditStatsDto> GetDispatchAuditStatsAsync()
+        {
+            // Use AssignmentLogEntry to calculate AI match %, override rates, and reason frequencies
+            var logs = _assignmentLogs;
+            var total = logs.Count;
+            var aiMatched = logs.Count(x => x.AISuggestedTechnicianId.HasValue && x.AISuggestedTechnicianId == x.TechnicianId);
+            var overrideCount = logs.Count(x => x.AISuggestedTechnicianId.HasValue && x.AISuggestedTechnicianId != x.TechnicianId);
+            var overrideReasons = logs
+                .Where(x => x.AISuggestedTechnicianId.HasValue && x.AISuggestedTechnicianId != x.TechnicianId && !string.IsNullOrWhiteSpace(x.Rationale))
+                .GroupBy(x => x.Rationale)
+                .OrderByDescending(g => g.Count())
+                .Take(3)
+                .Select(g => g.Key)
+                .ToList();
+            double aiSuccessRate = total > 0 ? aiMatched * 100.0 / total : 0;
+            double overrideRate = total > 0 ? overrideCount * 100.0 / total : 0;
+            double avgAvailability = logs.Count > 0 ? logs.Average(x => x.DispatchScore) : 0;
+            return new DispatchAuditStatsDto
+            {
+                TotalAssignments = total,
+                AiMatchedCount = aiMatched,
+                DispatcherOverrideCount = overrideCount,
+                MostCommonOverrideReasons = overrideReasons,
+                AiSuccessRate = aiSuccessRate,
+                OverrideRate = overrideRate,
+                TechAvailabilityAtDispatch = avgAvailability
+            };
+        }
+
+        // FixItFred – Sprint 40.3 Razor Patch: AddBroadcast implementation for SendBroadcast
+        public void AddBroadcast(DispatcherBroadcast broadcast)
+        {
+            if (broadcast == null) return;
+            broadcast.IssuedAt = DateTime.UtcNow;
+            _broadcasts.Add(broadcast);
+        }
     }
 }

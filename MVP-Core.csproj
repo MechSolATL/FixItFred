@@ -31,6 +31,7 @@
 
   <ItemGroup>
     <!-- Package references: EF Core, Logging, Config, SendGrid, Twilio -->
+    <PackageReference Include="DinkToPdf" Version="1.0.8" />
     <PackageReference Include="EPPlus" Version="8.0.8" />
     <PackageReference Include="GoogleApi" Version="5.8.6" />
     <PackageReference Include="Microsoft.AspNetCore.Authorization" Version="9.0.7" />

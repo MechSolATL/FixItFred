@@ -1,41 +1,56 @@
 @page
-@using MVP_Core.Models.Admin
-@using DispatcherAuditLog = MVP_Core.Models.Admin.DispatcherAuditLog
-@inject MVP_Core.Services.Admin.DispatcherService DispatcherService
+@model MVP_Core.Pages.Admin.DispatcherAuditModel
 @{
-    ViewData["Title"] = "Dispatcher Command Log";
-    var auditLog = DispatcherService.GetAuditLog();
+    ViewData["Title"] = "Dispatcher Audit Intelligence Panel";
+    var stats = Model.AuditStats;
 }
-<h2 class="mb-4">Dispatcher Command Log</h2>
-@if (auditLog == null || !auditLog.Any())
+<!-- Sprint 40.2 – Dispatcher Audit Intelligence Panel -->
+<h2 class="mb-4">Dispatcher Audit Intelligence Panel</h2>
+@if (stats == null)
 {
-    <div class="alert alert-info">No actions have been logged.</div>
+    <div class="alert alert-info">No audit data available.</div>
 }
 else
 {
-    <table class="table table-bordered table-hover">
-        <thead class="table-light">
-            <tr>
-                <th>Date</th>
-                <th>Action Type</th>
-                <th>Request ID</th>
-                <th>Technician</th>
-                <th>Performed By</th>
-                <th>Notes</th>
-            </tr>
-        </thead>
-        <tbody>
-        @foreach (var entry in auditLog)
-        {
-            <tr>
-                <td>@entry.Timestamp.ToString("g")</td>
-                <td>@entry.ActionType</td>
-                <td>@entry.RequestId</td>
-                <td>@(entry.TechnicianId?.ToString() ?? "-")</td>
-                <td>@entry.PerformedBy</td>
-                <td>@entry.Notes</td>
-            </tr>
-        }
-        </tbody>
-    </table>
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-header">AI Success Rate</div>
+                <div class="card-body display-5">@stats.AiSuccessRate.ToString("F1")% <small class="text-muted">(@stats.AiMatchedCount/@stats.TotalAssignments)</small></div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-header">Override Rate</div>
+                <div class="card-body display-5">@stats.OverrideRate.ToString("F1")% <small class="text-muted">(@stats.DispatcherOverrideCount/@stats.TotalAssignments)</small></div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-header">Avg. Tech Availability</div>
+                <div class="card-body display-5">@stats.TechAvailabilityAtDispatch.ToString("F1")</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-header">Top Override Reasons</div>
+                <div class="card-body">
+                    @if (stats.MostCommonOverrideReasons != null && stats.MostCommonOverrideReasons.Any())
+                    {
+                        <ul class="list-unstyled mb-0">
+                        @foreach (var reason in stats.MostCommonOverrideReasons)
+                        {
+                            <li>@reason</li>
+                        }
+                        </ul>
+                    }
+                    else
+                    {
+                        <span class="text-muted">None</span>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+    <a class="btn btn-outline-secondary" href="/api/dispatcher/export-audit-csv">Export CSV</a>
 }

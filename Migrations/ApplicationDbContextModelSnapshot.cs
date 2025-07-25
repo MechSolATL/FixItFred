@@ -487,6 +487,34 @@ namespace MVP_Core.Migrations
                     b.ToTable("EquipmentMatchups", (string)null);
                 });
 
+            modelBuilder.Entity("MVP_Core.Data.Models.EscalationLogEntry", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ActionTaken")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Reason")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ScheduleQueueId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("TriggeredBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("EscalationLogs", (string)null);
+                });
+
             modelBuilder.Entity("MVP_Core.Data.Models.FlaggedCustomer", b =>
                 {
                     b.Property<int>("Id")
@@ -596,6 +624,53 @@ namespace MVP_Core.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("HeatPumpMatchups", (string)null);
+                });
+
+            modelBuilder.Entity("MVP_Core.Data.Models.JobMessageEntry", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("IsInternalNote")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<string>("ReadBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime?>("ReadTimestamp")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("SenderName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("SenderRole")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<DateTime>("SentAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("ServiceRequestId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("JobMessageEntries", (string)null);
                 });
 
             modelBuilder.Entity("MVP_Core.Data.Models.KanbanHistoryLog", b =>
@@ -1127,6 +1202,10 @@ namespace MVP_Core.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("CustomerFeedback")
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
                     b.Property<string>("CustomerName")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -1160,6 +1239,9 @@ namespace MVP_Core.Migrations
                     b.Property<bool>("IsEscalated")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsLocked")
+                        .HasColumnType("bit");
+
                     b.Property<bool>("IsUrgent")
                         .HasColumnType("bit");
 
@@ -1185,6 +1267,9 @@ namespace MVP_Core.Migrations
                     b.Property<string>("RequiredSkills")
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
+
+                    b.Property<int?>("SatisfactionScore")
+                        .HasColumnType("int");
 
                     b.Property<DateTime?>("ScheduledAt")
                         .HasColumnType("datetime2");
@@ -1255,6 +1340,9 @@ namespace MVP_Core.Migrations
                     b.Property<int>("CurrentJobCount")
                         .HasColumnType("int");
 
+                    b.Property<int?>("DispatchScore")
+                        .HasColumnType("int");
+
                     b.Property<string>("Email")
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar(150)");
@@ -1286,6 +1374,10 @@ namespace MVP_Core.Migrations
                     b.Property<string>("PhotoUrl")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("SkillTags")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
 
                     b.Property<string>("Specialty")
                         .HasMaxLength(100)
@@ -1428,6 +1520,36 @@ namespace MVP_Core.Migrations
                     b.HasKey("MessageId");
 
                     b.ToTable("TechnicianMessages");
+                });
+
+            modelBuilder.Entity("MVP_Core.Data.Models.TechnicianScoreEntry", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Points")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Reason")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("TechnicianId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("TechnicianScoreEntries", (string)null);
                 });
 
             modelBuilder.Entity("MVP_Core.Data.Models.TechnicianSkill", b =>

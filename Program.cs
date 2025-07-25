@@ -124,6 +124,8 @@ app.MapControllerRoute(
 app.MapBlazorHub();
 app.MapHub<MVP_Core.Hubs.RequestHub>("/hubs/requests");
 app.MapHub<MVP_Core.Hubs.ETAHub>("/etahub");
+// Sprint 41.3 – Real-Time Message Broadcast
+app.MapHub<MVP_Core.Hubs.JobMessageHub>("/hubs/jobmessages");
 
 // DB Seeding
 using (var scope = app.Services.CreateScope())

@@ -84,6 +84,15 @@ namespace MVP_Core.Data.Models
         [Required]
         [MaxLength(100)]
         public string ServiceSubtype { get; set; } = string.Empty;
+
+        // Sprint 42.2 – Ticket Locking
+        public bool IsLocked { get; set; } = false;
+
+        // Sprint 42.3 – Customer Satisfaction Rating
+        public int? SatisfactionScore { get; set; }
+
+        [MaxLength(2000)]
+        public string? CustomerFeedback { get; set; }
     }
 
     public class SlaSetting

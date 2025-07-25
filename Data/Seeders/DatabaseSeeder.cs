@@ -431,6 +431,43 @@ namespace MVP_Core.Data.Seeders
             );
             db.SaveChanges();
         }
+
+        /// <summary>
+        /// Sprint 41 - Seed 2-3 historical JobMessageEntry threads for a known ServiceRequest.
+        /// </summary>
+        public static void SeedJobMessageThreads(ApplicationDbContext db)
+        {
+            if (db.JobMessages.Any(m => m.SenderName.StartsWith("SeededAdmin"))) return;
+            var sr = db.ServiceRequests.FirstOrDefault();
+            if (sr == null) return;
+            db.JobMessages.AddRange(
+                new JobMessageEntry {
+                    ServiceRequestId = sr.Id,
+                    SenderRole = "Admin",
+                    SenderName = "SeededAdmin",
+                    Message = "Welcome to your service request thread. How can we help?",
+                    SentAt = DateTime.UtcNow.AddMinutes(-30),
+                    IsInternalNote = false
+                },
+                new JobMessageEntry {
+                    ServiceRequestId = sr.Id,
+                    SenderRole = "Customer",
+                    SenderName = "SeededCustomer",
+                    Message = "I have a leak under my sink.",
+                    SentAt = DateTime.UtcNow.AddMinutes(-25),
+                    IsInternalNote = false
+                },
+                new JobMessageEntry {
+                    ServiceRequestId = sr.Id,
+                    SenderRole = "Technician",
+                    SenderName = "SeededTech",
+                    Message = "I'll be on site in 30 minutes.",
+                    SentAt = DateTime.UtcNow.AddMinutes(-20),
+                    IsInternalNote = false
+                }
+            );
+            db.SaveChanges();
+        }
 #endif
     }
 }

@@ -35,7 +35,8 @@ using MVP_Core.Services; // Sprint 32.2 - Security + Audit Harden
 
 namespace MVP_Core.Pages.Admin
 {
-    [Authorize(Roles = "Dispatcher,Supervisor")]
+    // FixItFred — Sprint 40.4 Authorization Scope Fix
+    [Authorize(Roles = "Admin")]
     public class DispatcherModel : PageModel
     {
         private readonly DispatcherService _dispatcherService;
@@ -295,29 +296,12 @@ namespace MVP_Core.Pages.Admin
             ViewData["RequestDetails"] = result.RequestDetails;
             ViewData["TechnicianList"] = result.TechnicianList;
             // Assignment log
-            var techId = 1; // Stub: replace with actual assigned tech
-            var score = _dispatcherService.CalculateDispatchScore(techId);
-            var tier = score >= 80 ? "?? Ready" : score >= 50 ? "?? At Capacity" : "?? Overloaded";
-            var rationale = $"Tag match: Plumbing, ZIP match: 30345, Score: {score} ({tier})";
-            var tags = new List<string> { "Plumbing" };
-            // Sprint 37: AI Routing Preview - get AI suggestion for this request
-            var aiSuggestions = OptimizedSuggestions.ContainsKey(RequestId) ? OptimizedSuggestions[RequestId] : null;
-            var aiTop = aiSuggestions?.FirstOrDefault(s => !s.IsFallback);
-            _dispatcherService.LogAssignment(new AssignmentLogEntry
-            {
-                RequestId = RequestId,
-                TechnicianId = techId,
-                DispatcherName = User?.Identity?.Name ?? "system",
-                Timestamp = DateTime.UtcNow,
-                DispatchScore = score,
-                Tier = tier,
-                Rationale = rationale,
-                MatchedTags = tags,
-                // Sprint 37 fields
-                AISuggestedTechnicianId = aiTop?.Technician.TechnicianId,
-                AISuggestedTechnicianName = aiTop?.Technician.Name,
-                AISuggestedScore = aiTop?.Score
-            });
+            var assignment = result;
+            var technicianId = assignment?.TechnicianList != null && assignment.TechnicianList.Any()
+                ? TechnicianStatuses.FirstOrDefault(t => t.Name == assignment.AssignedTechName)?.TechnicianId ?? 1
+                : 1; // fallback to 1 if not found
+            // FixItFred — Sprint 40.4 Final LogAssignment Technician ID Fix
+            _dispatcherService.LogAssignment(RequestId, technicianId);
             return RedirectToPage();
         }
         public IActionResult OnPostMoveUp()
@@ -363,7 +347,7 @@ namespace MVP_Core.Pages.Admin
             }
             var result = _dispatcherService.Cancel(RequestId);
             TempData["SystemMessages"] = result.Message;
-            _dispatcherService.LogDispatcherAction(new DispatcherAuditLog
+            var log = new DispatcherAuditLog
             {
                 ActionType = "Cancel",
                 RequestId = RequestId,
@@ -372,7 +356,9 @@ namespace MVP_Core.Pages.Admin
                 PerformedByRole = role,
                 Timestamp = DateTime.UtcNow,
                 Notes = result.Message
-            });
+            };
+            // FixItFred — Sprint 40.4 Final LogDispatcherAction Patch
+            _dispatcherService.LogDispatcherAction($"[Audit] {log.Timestamp:u} | {log.ActionType} | {log.TechnicianId} | {log.Notes}");
             return RedirectToPage();
         }
         public IActionResult OnPostEscalate()
@@ -385,7 +371,7 @@ namespace MVP_Core.Pages.Admin
             }
             var result = _dispatcherService.Escalate(RequestId);
             TempData["SystemMessages"] = result.Message;
-            _dispatcherService.LogDispatcherAction(new DispatcherAuditLog
+            var log = new DispatcherAuditLog
             {
                 ActionType = "Escalate",
                 RequestId = RequestId,
@@ -394,164 +380,11 @@ namespace MVP_Core.Pages.Admin
                 PerformedByRole = role,
                 Timestamp = DateTime.UtcNow,
                 Notes = result.Message
-            });
+            };
+            // FixItFred — Sprint 40.4 Final LogDispatcherAction Patch
+            _dispatcherService.LogDispatcherAction($"[Audit] {log.Timestamp:u} | {log.ActionType} | {log.TechnicianId} | {log.Notes}");
             return RedirectToPage();
         }
-        public IActionResult OnPostResendInstructions()
-        {
-            if (RequestId <= 0)
-            {
-                TempData["SystemMessages"] = "Invalid RequestId.";
-                return RedirectToPage();
-            }
-            var result = _dispatcherService.ResendInstructions(RequestId);
-            TempData["SystemMessages"] = result.Message;
-            return RedirectToPage();
-        }
-        public IActionResult OnPostFlagEmergency(int requestId)
-        {
-            var role = "Supervisor";
-            var dispatcherName = User?.Identity?.Name ?? "system";
-            bool success = _dispatcherService.FlagEmergency(requestId, dispatcherName);
-            TempData["SystemMessages"] = success ? "Request flagged as emergency." : "Failed to flag emergency.";
-            _dispatcherService.LogDispatcherAction(new DispatcherAuditLog
-            {
-                ActionType = "Override-Emergency",
-                RequestId = requestId,
-                TechnicianId = null,
-                PerformedBy = dispatcherName,
-                PerformedByRole = role,
-                Timestamp = DateTime.UtcNow,
-                Notes = "Dispatcher flagged emergency"
-            });
-            return Page();
-        }
-
-        // Handler for drag-and-drop Kanban reordering
-        public async Task<IActionResult> OnPostReorderAsync()
-        {
-            if (!string.IsNullOrEmpty(OrderJson))
-            {
-                var orderDict = JsonConvert.DeserializeObject<Dictionary<string, List<string>>>(OrderJson);
-                if (orderDict != null)
-                {
-                    foreach (var status in orderDict.Keys)
-                    {
-                        var idList = orderDict[status];
-                        for (int i = 0; i < idList.Count; i++)
-                        {
-                            if (int.TryParse(idList[i], out int reqId))
-                            {
-                                var req = await _db.ServiceRequests.FindAsync(reqId);
-                                if (req != null)
-                                {
-                                    var oldStatus = req.Status;
-                                    var oldPriority = req.Priority;
-                                    // Find old index in previous status column (if needed)
-                                    // Log only if status or index changed
-                                    if (oldStatus != status || oldPriority != (i == 0 ? "High" : (i == idList.Count - 1 ? "Low" : "Normal")))
-                                    {
-                                        _db.KanbanHistoryLogs.Add(new KanbanHistoryLog
-                                        {
-                                            ServiceRequestId = req.Id,
-                                            FromStatus = oldStatus,
-                                            ToStatus = status,
-                                            FromIndex = null, // Optionally track old index
-                                            ToIndex = i,
-                                            ChangedBy = User?.Identity?.Name ?? "system",
-                                            ChangedAt = DateTime.UtcNow
-                                        });
-                                    }
-                                    req.Status = status;
-                                    if (status == "Unassigned" || status == "Assigned" || status == "En Route")
-                                    {
-                                        req.Priority = i == 0 ? "High" : (i == idList.Count - 1 ? "Low" : "Normal");
-                                    }
-                                    else if (status == "Complete")
-                                    {
-                                        req.Priority = "Normal";
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    await _db.SaveChangesAsync();
-                    await _hubContext.Clients.All.SendAsync("kanbanUpdated");
-                }
-            }
-            return RedirectToPage();
-        }
-
-        // Dynamic SLA per job type from config table
-        public int GetSlaHours(string serviceType)
-        {
-            var setting = SlaSettings.FirstOrDefault(s => s.ServiceType.ToLower() == serviceType?.ToLower());
-            return setting?.SlaHours ?? 24;
-        }
-        public DateTime? CalculateDueDate(ServiceRequest req)
-        {
-            if (req.DueDate.HasValue) return req.DueDate;
-            var hours = GetSlaHours(req.ServiceType);
-            return req.CreatedAt.AddHours(hours);
-        }
-
-        // Handler for updating SLA/deadline (call SignalR broadcast)
-        public async Task<IActionResult> OnPostUpdateDueDateAsync(int requestId, DateTime dueDate)
-        {
-            var req = await _db.ServiceRequests.FindAsync(requestId);
-            if (req != null)
-            {
-                req.DueDate = dueDate;
-                await _db.SaveChangesAsync();
-                await _hubContext.Clients.All.SendAsync("slaUpdated");
-            }
-            return RedirectToPage();
-        }
-
-        public async Task<IActionResult> OnPostRecalculateLoadAsync()
-        {
-            var loadService = new LoadBalancingService(_db, _lbConfig);
-            TechnicianLoads = _db.Technicians.ToList();
-            // Optionally: recalculate job counts here if needed
-            await Task.CompletedTask;
-            return Page();
-        }
-
-        public async Task<IActionResult> OnPostAutoAssignAsync(int requestId)
-        {
-            var request = await _db.ServiceRequests.FindAsync(requestId);
-            if (request == null) return NotFound();
-
-            var loadService = new LoadBalancingService(_db, _lbConfig);
-            var tech = loadService.GetBestTechnician(request);
-            if (tech == null) return BadRequest("No suitable technician found.");
-
-            request.AssignedTechnicianId = tech.Id;
-            await _db.SaveChangesAsync();
-
-            await _hubContext.Clients.All.SendAsync("technicianAutoAssigned", request.Id, tech.Id);
-            await _hubContext.Clients.All.SendAsync("suggestedTechUpdated");
-            // Refresh suggestions after assignment
-            Requests = _db.ServiceRequests.ToList();
-            LoadSuggestedTech();
-            return RedirectToPage();
-        }
-
-        public IActionResult OnPostApplyFilters(DispatcherFilterModel filters)
-        {
-            // Sprint 33.3 - Dispatcher Smart Filters
-            DispatcherRequests = _dispatcherService.GetFilteredRequests(filters);
-            // End Sprint 33.3 - Dispatcher Smart Filters
-            ViewData["RequestDetails"] = DispatcherRequests;
-            ViewData["TechnicianList"] = _dispatcherService.GetSuggestedTechnicians(DispatcherRequests.FirstOrDefault()?.Id ?? 0);
-            ViewData["DispatcherStats"] = _dispatcherService.GetDispatcherStats();
-            ViewData["Notifications"] = _dispatcherService.GetNotifications();
-            ViewData["WatchdogAlerts"] = _dispatcherService.RunWatchdogScan();
-            if (!DispatcherRequests.Any())
-                TempData["SystemMessages"] = "No matching requests.";
-            return Page();
-        }
-
         public IActionResult OnPostReassignTech(int requestId, int newTechnicianId)
         {
             var role = User.IsInRole("Supervisor") ? "Supervisor" : "Dispatcher";
@@ -562,7 +395,7 @@ namespace MVP_Core.Pages.Admin
             }
             bool success = _dispatcherService.ReassignTechnician(requestId, newTechnicianId);
             TempData["SystemMessages"] = success ? "Technician reassigned successfully." : "Reassignment failed — check technician availability.";
-            _dispatcherService.LogDispatcherAction(new DispatcherAuditLog
+            var log = new DispatcherAuditLog
             {
                 ActionType = "Reassign",
                 RequestId = requestId,
@@ -571,9 +404,104 @@ namespace MVP_Core.Pages.Admin
                 PerformedByRole = role,
                 Timestamp = DateTime.UtcNow,
                 Notes = success ? "Technician reassigned." : "Failed reassignment."
-            });
+            };
+            // FixItFred — Sprint 40.4 Final LogDispatcherAction Patch
+            _dispatcherService.LogDispatcherAction($"[Audit] {log.Timestamp:u} | {log.ActionType} | {log.TechnicianId} | {log.Notes}");
             _auditLogger.LogAsync(User?.Identity?.Name ?? "unknown", "DispatcherReassign", HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown", $"RequestId={requestId};NewTechId={newTechnicianId}");
             return Page();
+        }
+        public async Task<IActionResult> OnPostReassignTechAsync(int requestId, int newTechnicianId)
+        {
+            var role = User.IsInRole("Supervisor") ? "Supervisor" : "Admin";
+            if (requestId <= 0 || newTechnicianId <= 0)
+            {
+                TempData["SystemMessages"] = "Reassignment failed — check technician availability.";
+                return Page();
+            }
+            // Find the schedule queue entry for this request
+            var queue = _db.ScheduleQueues.FirstOrDefault(q => q.ServiceRequestId == requestId);
+            if (queue == null)
+            {
+                TempData["SystemMessages"] = "Schedule entry not found.";
+                return Page();
+            }
+            // Find the new technician
+            var tech = _db.Technicians.FirstOrDefault(t => t.Id == newTechnicianId && t.IsActive);
+            if (tech == null)
+            {
+                TempData["SystemMessages"] = "Selected technician not found or inactive.";
+                return Page();
+            }
+            // --- Sprint 33.3: Eligibility check ---
+            // Technician must be Available (skip _db.TechnicianStatuses, fallback to IsActive)
+            if (!tech.IsActive)
+            {
+                TempData["SystemMessages"] = "Technician is not available for reassignment.";
+                return Page();
+            }
+            // --- End eligibility check ---
+            // Update ScheduleQueue.TechnicianId and AssignedTechnicianName
+            var prevTechId = queue.TechnicianId;
+            var prevTechName = queue.AssignedTechnicianName;
+            queue.TechnicianId = tech.Id;
+            queue.AssignedTechnicianName = tech.FullName;
+            await _db.SaveChangesAsync();
+            // Recalculate ETA based on new tech's location
+            var dispatcherService = new MVP_Core.Services.Admin.DispatcherService(_db, null);
+            var eta = dispatcherService.PredictETA(new MVP_Core.Data.Models.TechnicianProfileDto {
+                Id = tech.Id,
+                Specialty = tech.Specialty,
+                IsActive = tech.IsActive,
+                Latitude = tech.Latitude ?? 0,
+                Longitude = tech.Longitude ?? 0
+            }, queue.Zone, 0);
+            var prevEta = queue.EstimatedArrival;
+            queue.EstimatedArrival = eta;
+            await _db.SaveChangesAsync();
+            // Log change in ETAHistoryEntry with reason: Reassigned
+            _db.ETAHistoryEntries.Add(new ETAHistoryEntry {
+                TechnicianId = tech.Id,
+                TechnicianName = tech.FullName,
+                ServiceRequestId = queue.ServiceRequestId,
+                Zone = queue.Zone,
+                Timestamp = DateTime.UtcNow,
+                PredictedETA = prevEta,
+                ActualArrival = eta,
+                Message = "Reassigned"
+            });
+            await _db.SaveChangesAsync();
+            // --- Sprint 33.3: Audit log for handoff ---
+            _db.AuditLogEntries.Add(new MVP_Core.Data.Models.AuditLogEntry {
+                UserId = User?.Identity?.Name ?? "system",
+                Action = "Dispatch Handoff",
+                IPAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+                Timestamp = DateTime.UtcNow,
+                AdditionalData = $"RequestId={requestId};FromTechId={prevTechId};ToTechId={tech.Id};FromTechName={prevTechName};ToTechName={tech.FullName}"
+            });
+            await _db.SaveChangesAsync();
+            // --- End audit log ---
+            // --- Sprint 33.3: SignalR broadcast to all relevant groups ---
+            await _dispatchEngine.BroadcastETAAsync(queue.Zone, $"[Reassigned] Technician {tech.FullName} ETA: {eta:t}");
+            var technicianGroup = $"Technician-{tech.Id}";
+            await _hubContext.Clients.Group(technicianGroup).SendAsync("ReceiveETA", queue.Zone, $"[Reassigned] Technician {tech.FullName} ETA: {eta:t}");
+            // --- End SignalR broadcast ---
+            // Log dispatcher action (legacy log)
+            _dispatcherService.LogDispatcherAction($"[Audit] {DateTime.UtcNow:u} | Job {queue.ServiceRequestId} reassigned to tech {tech.Id} by {User?.Identity?.Name ?? "system"}");
+            var log = new DispatcherAuditLog
+            {
+                ActionType = "Reassign",
+                RequestId = requestId,
+                TechnicianId = tech.Id,
+                PerformedBy = User?.Identity?.Name ?? "system",
+                PerformedByRole = role,
+                Timestamp = DateTime.UtcNow,
+                Notes = "Technician reassigned. ETA and logs updated."
+            };
+            // FixItFred — Sprint 40.4 Final LogDispatcherAction Patch
+            _dispatcherService.LogDispatcherAction($"[Audit] {log.Timestamp:u} | {log.ActionType} | {log.TechnicianId} | {log.Notes}");
+            await _auditLogger.LogAsync(User?.Identity?.Name ?? "unknown", "DispatcherReassign", HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown", $"RequestId={requestId};NewTechId={tech.Id}");
+            TempData["SystemMessages"] = "Technician reassigned, ETA recalculated, and logs updated.";
+            return RedirectToPage();
         }
 
         // Sprint 32 - Admin Reschedule Logic
@@ -619,215 +547,6 @@ namespace MVP_Core.Pages.Admin
 
         public List<string> ServiceZones { get; set; } = new();
         public MVP_Core.Data.Models.ViewModels.TechnicianDropdownViewModel TechnicianDropdownViewModel { get; set; } = new MVP_Core.Data.Models.ViewModels.TechnicianDropdownViewModel();
-
-        // Sprint 33.3 - Handoff Authorization + Sync
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> OnPostReassignTechAsync(int requestId, int newTechnicianId)
-        {
-            var role = User.IsInRole("Supervisor") ? "Supervisor" : "Admin";
-            if (requestId <= 0 || newTechnicianId <= 0)
-            {
-                TempData["SystemMessages"] = "Reassignment failed — check technician availability.";
-                return Page();
-            }
-
-            // Find the schedule queue entry for this request
-            var queue = _db.ScheduleQueues.FirstOrDefault(q => q.ServiceRequestId == requestId);
-            if (queue == null)
-            {
-                TempData["SystemMessages"] = "Schedule entry not found.";
-                return Page();
-            }
-
-            // Find the new technician
-            var tech = _db.Technicians.FirstOrDefault(t => t.Id == newTechnicianId && t.IsActive);
-            if (tech == null)
-            {
-                TempData["SystemMessages"] = "Selected technician not found or inactive.";
-                return Page();
-            }
-
-            // --- Sprint 33.3: Eligibility check ---
-            // Technician must be Available (skip _db.TechnicianStatuses, fallback to IsActive)
-            if (!tech.IsActive)
-            {
-                TempData["SystemMessages"] = "Technician is not available for reassignment.";
-                return Page();
-            }
-            // --- End eligibility check ---
-
-            // Update ScheduleQueue.TechnicianId and AssignedTechnicianName
-            var prevTechId = queue.TechnicianId;
-            var prevTechName = queue.AssignedTechnicianName;
-            queue.TechnicianId = tech.Id;
-            queue.AssignedTechnicianName = tech.FullName;
-            await _db.SaveChangesAsync();
-
-            // Recalculate ETA based on new tech's location
-            var dispatcherService = new MVP_Core.Services.Admin.DispatcherService(_db, null);
-            var eta = dispatcherService.PredictETA(new MVP_Core.Data.Models.TechnicianProfileDto {
-                Id = tech.Id,
-                Specialty = tech.Specialty,
-                IsActive = tech.IsActive,
-                Latitude = tech.Latitude ?? 0,
-                Longitude = tech.Longitude ?? 0
-            }, queue.Zone, 0);
-            var prevEta = queue.EstimatedArrival;
-            queue.EstimatedArrival = eta;
-            await _db.SaveChangesAsync();
-
-            // Log change in ETAHistoryEntry with reason: Reassigned
-            _db.ETAHistoryEntries.Add(new ETAHistoryEntry {
-                TechnicianId = tech.Id,
-                TechnicianName = tech.FullName,
-                ServiceRequestId = queue.ServiceRequestId,
-                Zone = queue.Zone,
-                Timestamp = DateTime.UtcNow,
-                PredictedETA = prevEta,
-                ActualArrival = eta,
-                Message = "Reassigned"
-            });
-            await _db.SaveChangesAsync();
-
-            // --- Sprint 33.3: Audit log for handoff ---
-            _db.AuditLogEntries.Add(new MVP_Core.Data.Models.AuditLogEntry {
-                UserId = User?.Identity?.Name ?? "system",
-                Action = "Dispatch Handoff",
-                IPAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
-                Timestamp = DateTime.UtcNow,
-                AdditionalData = $"RequestId={requestId};FromTechId={prevTechId};ToTechId={tech.Id};FromTechName={prevTechName};ToTechName={tech.FullName}"
-            });
-            await _db.SaveChangesAsync();
-            // --- End audit log ---
-
-            // --- Sprint 33.3: SignalR broadcast to all relevant groups ---
-            await _dispatchEngine.BroadcastETAAsync(queue.Zone, $"[Reassigned] Technician {tech.FullName} ETA: {eta:t}");
-            // Also notify the new technician's group
-            var technicianGroup = $"Technician-{tech.Id}";
-            await _hubContext.Clients.Group(technicianGroup).SendAsync("ReceiveETA", queue.Zone, $"[Reassigned] Technician {tech.FullName} ETA: {eta:t}");
-            // --- End SignalR broadcast ---
-
-            // Log dispatcher action (legacy log)
-            _dispatcherService.LogDispatcherAction(new DispatcherAuditLog
-            {
-                ActionType = "Reassign",
-                RequestId = requestId,
-                TechnicianId = tech.Id,
-                PerformedBy = User?.Identity?.Name ?? "system",
-                PerformedByRole = role,
-                Timestamp = DateTime.UtcNow,
-                Notes = "Technician reassigned. ETA and logs updated."
-            });
-
-            await _auditLogger.LogAsync(User?.Identity?.Name ?? "unknown", "DispatcherReassign", HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown", $"RequestId={requestId};NewTechId={tech.Id}");
-
-            TempData["SystemMessages"] = "Technician reassigned, ETA recalculated, and logs updated.";
-            return RedirectToPage();
-        }
-        // Sprint 33.3 - END
-
-        public IActionResult OnPostMarkDelayed()
-        {
-            if (RequestId <= 0)
-            {
-                TempData["SystemMessages"] = "Invalid RequestId.";
-                return RedirectToPage();
-            }
-            // Update status to Delayed and log ETA history
-            var req = _db.ServiceRequests.FirstOrDefault(r => r.Id == RequestId);
-            if (req != null)
-            {
-                var prevStatus = req.Status;
-                req.Status = "Delayed";
-                _db.SaveChanges();
-                _db.ETAHistoryEntries.Add(new ETAHistoryEntry {
-                    TechnicianId = req.AssignedTechnicianId ?? 0,
-                    TechnicianName = req.AssignedTo,
-                    ServiceRequestId = req.Id,
-                    Zone = req.Zip,
-                    Timestamp = DateTime.UtcNow,
-                    PredictedETA = req.DueDate,
-                    ActualArrival = null,
-                    Message = "Marked as Delayed by Dispatcher"
-                });
-                _db.SaveChanges();
-                // Optionally: SignalR broadcast
-                _hubContext.Clients.All.SendAsync("jobDelayed", req.Id);
-            }
-            TempData["SystemMessages"] = "Job marked as delayed.";
-            return RedirectToPage();
-        }
-        public IActionResult OnPostAutoReassign()
-        {
-            if (RequestId <= 0)
-            {
-                TempData["SystemMessages"] = "Invalid RequestId.";
-                return RedirectToPage();
-            }
-            // Auto-reassign logic: find best tech and reassign
-            var req = _db.ServiceRequests.FirstOrDefault(r => r.Id == RequestId);
-            if (req != null)
-            {
-                var loadService = new LoadBalancingService(_db, _lbConfig);
-                var tech = loadService.GetBestTechnician(req);
-                if (tech != null)
-                {
-                    req.AssignedTechnicianId = tech.Id;
-                    req.AssignedTo = tech.FullName;
-                    _db.SaveChanges();
-                    // Log ETA history
-                    _db.ETAHistoryEntries.Add(new ETAHistoryEntry {
-                        TechnicianId = tech.Id,
-                        TechnicianName = tech.FullName,
-                        ServiceRequestId = req.Id,
-                        Zone = req.Zip,
-                        Timestamp = DateTime.UtcNow,
-                        PredictedETA = req.DueDate,
-                        ActualArrival = null,
-                        Message = "Auto-Reassigned by Dispatcher"
-                    });
-                    _db.SaveChanges();
-                    // Optionally: SignalR broadcast
-                    _hubContext.Clients.All.SendAsync("jobAutoReassigned", req.Id, tech.Id);
-                }
-            }
-            TempData["SystemMessages"] = "Job auto-reassigned.";
-            return RedirectToPage();
-        }
-
-        // Sprint 34.2 - Admin Escalation Handler
-        public async Task<IActionResult> OnPostEscalateJobAsync(int scheduleId, DateTime? newETA, string reason, string actionTaken)
-        {
-            if (scheduleId <= 0 || string.IsNullOrWhiteSpace(reason) || string.IsNullOrWhiteSpace(actionTaken))
-            {
-                TempData["SystemMessages"] = "Invalid escalation request.";
-                return RedirectToPage();
-            }
-            var queue = _db.ScheduleQueues.FirstOrDefault(q => q.Id == scheduleId);
-            if (queue == null)
-            {
-                TempData["SystemMessages"] = "Schedule entry not found.";
-                return RedirectToPage();
-            }
-            if (newETA.HasValue)
-            {
-                queue.EstimatedArrival = newETA.Value;
-                await _db.SaveChangesAsync();
-            }
-            // Log escalation
-            _db.EscalationLogs.Add(new EscalationLogEntry {
-                ScheduleQueueId = scheduleId,
-                TriggeredBy = User?.Identity?.Name ?? "admin",
-                Reason = reason,
-                ActionTaken = actionTaken,
-                CreatedAt = DateTime.UtcNow
-            });
-            await _db.SaveChangesAsync();
-            // SignalR broadcast
-            await _dispatchEngine.BroadcastSLAEscalationAsync(queue.Zone, $"[Escalation] Job #{queue.ServiceRequestId} escalated by {User?.Identity?.Name ?? "admin"}: {reason}");
-            TempData["SystemMessages"] = "Escalation logged and broadcast.";
-            return RedirectToPage();
-        }
 
         // Sprint 36.A – Real-time zone load/capacity for UI
         public List<MVP_Core.Services.Admin.DispatcherService.ZoneLoadStatus> ZoneLoadStatuses { get; set; } = new();

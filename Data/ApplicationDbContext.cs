@@ -70,6 +70,8 @@ namespace MVP_Core.Data
         public DbSet<EscalationLogEntry> EscalationLogs { get; set; } = null!;
         // Sprint 35 - Technician Reward Scoring System
         public DbSet<TechnicianScoreEntry> TechnicianScoreEntries { get; set; } = null!;
+        // Sprint 41 - Job Message Entry
+        public DbSet<JobMessageEntry> JobMessages { get; set; } = null!;
 
         #endregion
 
@@ -110,6 +112,8 @@ namespace MVP_Core.Data
             _ = modelBuilder.Entity<EscalationLogEntry>().ToTable("EscalationLogs");
             // Sprint 35 - Technician Reward Scoring System
             _ = modelBuilder.Entity<TechnicianScoreEntry>().ToTable("TechnicianScoreEntries");
+            // Sprint 41 - Job Message Entry
+            _ = modelBuilder.Entity<JobMessageEntry>().ToTable("JobMessageEntries");
         }
 
         #endregion

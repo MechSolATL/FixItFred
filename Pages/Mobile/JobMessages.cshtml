@@ -1,14 +1,13 @@
 @page
-@using MVP_Core.Data.Models
+@using MVP_Core.Models.Admin
 @inject MVP_Core.Services.Admin.DispatcherService DispatcherService
 @{
-    // Sprint 21: Technician view for job message thread
+    // FixItFred – Sprint 40.3 Final Razor Cleanup
     int techId = 0;
     int.TryParse(Request.Query["techId"], out techId);
     int requestId = 0;
     int.TryParse(Request.Query["requestId"], out requestId);
     var thread = DispatcherService.GetMessageThreadForRequest(requestId);
-    var unreadCount = thread.Count(m => !m.ReadFlag && m.SenderType == "Dispatcher");
     ViewData["Title"] = "Job Messages";
 }
 <h2 class="mb-4">Job Messages</h2>
@@ -18,23 +17,12 @@
 }
 else
 {
-    <div class="mb-3">
-        @if (unreadCount > 0)
-        {
-            <span class="badge bg-danger">New message!</span>
-        }
-    </div>
     <ul class="list-group mb-4">
     @foreach (var msg in thread)
     {
-        var color = msg.SenderType == "Tech" ? "bg-success text-white" : "bg-light text-dark";
-        <li class="list-group-item @color">
-            <span class="fw-bold">@msg.SenderType:</span> @msg.MessageBody
+        <li class="list-group-item">
+            <span class="fw-bold">@msg.Type:</span> @msg.Message
             <span class="float-end small text-muted">@msg.Timestamp.ToLocalTime().ToString("g")</span>
-            @if (!msg.ReadFlag && msg.SenderType == "Dispatcher")
-            {
-                <span class="badge bg-warning ms-2">Unread</span>
-            }
         </li>
     }
     </ul>
