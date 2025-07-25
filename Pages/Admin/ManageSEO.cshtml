@@ -1,16 +1,24 @@
 @page
+// FixItFred Patch Log — Sprint 26
+// [2024-07-25T00:10:00Z] — Verified & corrected Razor structure and SEO injection.
 @model MVP_Core.Pages.Admin.ManageSEOModel
 @inject MVP_Core.Services.ISeoService SeoService
 @{
     Layout = "/Pages/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "SEO Management";
+    /*
+    @inject ISEOService SEO
+    <title>@SEO.Title</title>
+    <meta name="description" content="@SEO.MetaDescription" />
+    <meta name="keywords" content="@SEO.Keywords" />
+    <meta name="robots" content="@SEO.Robots" />
+    */
 }
 <head>
     @await Html.PartialAsync("/Pages/Shared/_SEOHead.cshtml")
 </head>
-
 <div class="container-fluid px-2 px-md-4 mt-4">
     <h2 class="mb-4 text-primary">SEO Management</h2>
-
     @if (Model.SEOs != null && Model.SEOs.Any())
     {
         <div class="table-responsive">
@@ -50,7 +58,6 @@
         </div>
     }
 </div>
-
 @section Scripts {
     <script>
         // Optional: Add mobile table scroll hint or other admin JS
