@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Data.Models;
 using MVP_Core.Services;
 
 namespace MVP_Core.Pages.Admin
@@ -10,7 +9,7 @@ namespace MVP_Core.Pages.Admin
         private readonly ITechnicianService _techService;
 
         [BindProperty]
-        public Technician? Technician { get; set; }
+        public MVP_Core.Data.Models.Technician? Technician { get; set; }
 
         public DeleteTechnicianModel(ITechnicianService techService)
         {
@@ -22,7 +21,7 @@ namespace MVP_Core.Pages.Admin
             var techVm = await _techService.GetByIdAsync(id);
             if (techVm == null)
                 return NotFound();
-            Technician = new Technician
+            Technician = new MVP_Core.Data.Models.Technician
             {
                 Id = techVm.Id,
                 FullName = techVm.FullName,

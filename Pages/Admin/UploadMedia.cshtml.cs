@@ -1,3 +1,7 @@
+// FixItFred: Sprint 30D.2 — CS860x nullability audit 2024-07-25
+// Added null checks and safe navigation for all nullable references per CS8601, CS8602, CS8603, CS8604
+// Each change is marked with FixItFred comment and timestamp
+
 using MVP_Core.Services;
 using MVP_Core.Services.Admin;
 using MVP_Core.Data.Models;
@@ -30,24 +34,28 @@ namespace MVP_Core.Pages.Admin
 
         public void OnGet()
         {
+            // FixItFred: Sprint 30D.2 — Safe null navigation for GetAllTechnicianHeartbeats 2024-07-25
             TechList = _dispatcherService.GetAllTechnicianHeartbeats()?.ToList<dynamic>() ?? new List<dynamic>();
             JobList = new List<ServiceRequest>(); // TODO: Query jobs for dropdown
         }
 
         public async Task<IActionResult> OnPostAsync()
         {
-            var techId = int.TryParse(Request.Form["TechnicianId"], out var tId) ? tId : 0;
-            var requestId = int.TryParse(Request.Form["RequestId"], out var rId) ? rId : 0;
-            var notes = Request.Form["NotesOrTags"];
-            var file = Request.Form.Files["MediaFile"];
+            // FixItFred: Sprint 30D.2 — Safe parsing and null checks for form fields 2024-07-25
+            var techId = int.TryParse(Request?.Form["TechnicianId"], out var tId) ? tId : 0;
+            var requestId = int.TryParse(Request?.Form["RequestId"], out var rId) ? rId : 0;
+            var notes = Request?.Form["NotesOrTags"];
+            var file = Request?.Form.Files["MediaFile"];
             if (file == null || techId == 0 || requestId == 0)
             {
                 TempData["MediaStatus"] = "Missing required fields.";
                 await Task.CompletedTask;
                 return Page();
             }
-            notes = notes.ToString() ?? string.Empty; // FixItFred Patch: Ensure notesOrTags is not null
-            var success = _mediaService.SaveMediaUpload(file, techId, requestId, User?.Identity?.Name ?? "system", notes);
+            // FixItFred: Sprint 30D.2 — Ensure notes is not null 2024-07-25
+            notes = notes?.ToString() ?? string.Empty;
+            var username = User?.Identity?.Name ?? "system"; // FixItFred: Sprint 30D.2 — Safe username fallback 2024-07-25
+            var success = _mediaService.SaveMediaUpload(file, techId, requestId, username, notes);
             TempData["MediaStatus"] = success ? "Media uploaded successfully." : "Upload failed (invalid file or size).";
             await Task.CompletedTask; // FixItFred Patch: Ensure async compliance
             return RedirectToPage();

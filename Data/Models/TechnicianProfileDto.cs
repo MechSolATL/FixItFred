@@ -16,6 +16,10 @@ namespace MVP_Core.Data.Models
         public string? PhotoUrl { get; set; }
         public string? Badges { get; set; } // JSON array
 
+        // FixItFred: Sprint 30E – Live Tracking: Add GPS fields
+        public double? Latitude { get; set; }
+        public double? Longitude { get; set; }
+
         // Stats
         public int CompletedJobs { get; set; }
         public int Callbacks { get; set; }

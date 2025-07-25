@@ -233,3 +233,12 @@ footer {
     border-radius: 8px;
     margin-bottom: 20px;
 }
+
+/* FixItFred: Responsive ETA layout */
+.eta-grid div {
+  padding: 8px;
+  margin-bottom: 5px;
+  background-color: #f0f8ff;
+  border-left: 3px solid #0078D7;
+  font-size: 0.95rem;
+}

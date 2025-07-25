@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Data.Models;
 using MVP_Core.Services;
 using System;
 using System.Collections.Generic;
@@ -12,7 +11,7 @@ namespace MVP_Core.Pages.Admin
     {
         private readonly TechnicianProfileService _profileService;
         private readonly ITechnicianService _techService;
-        public List<Technician> Technicians { get; set; } = new();
+        public List<MVP_Core.Data.Models.Technician> Technicians { get; set; } = new();
         public List<int> SelectedTechIds { get; set; } = new();
         public Dictionary<int, TechnicianAnalyticsDto> Analytics { get; set; } = new();
         public DateTime StartDate { get; set; }
@@ -30,7 +29,8 @@ namespace MVP_Core.Pages.Admin
             EndDate = string.IsNullOrEmpty(end) ? DateTime.UtcNow : DateTime.Parse(end);
             // Load all techs for dropdown
             var techViewModels = await _techService.GetAllAsync();
-            Technicians = techViewModels.Select(t => new Technician {
+            Technicians = techViewModels.Select(t => new MVP_Core.Data.Models.Technician
+            {
                 Id = t.Id,
                 FullName = t.FullName,
                 IsActive = t.IsActive,

@@ -30,6 +30,7 @@ using MVP_Core.Services.Admin;
 using System.Threading.Tasks;
 using DispatcherAuditLog = MVP_Core.Models.Admin.DispatcherAuditLog;
 using MVP_Core.Data.Models.ViewModels;
+using MVP_Core.Services.Dispatch; // FixItFred: Sprint 30D.2 — Add using for NotificationDispatchEngine to resolve CS0246 2024-07-25
 
 namespace MVP_Core.Pages.Admin
 {
@@ -41,12 +42,17 @@ namespace MVP_Core.Pages.Admin
         private readonly IHubContext<RequestHub> _hubContext;
         private readonly IOptions<LoadBalancingConfig> _lbConfig;
 
-        public DispatcherModel(DispatcherService dispatcherService, ApplicationDbContext db, IHubContext<RequestHub> hubContext, IOptions<LoadBalancingConfig> lbConfig)
+        // FixItFred: Sprint 30D.1 - Live ETA Routing & Broadcast
+        // NotificationDispatchEngine is injected for live ETA SignalR updates
+        private readonly NotificationDispatchEngine _dispatchEngine;
+
+        public DispatcherModel(DispatcherService dispatcherService, ApplicationDbContext db, IHubContext<RequestHub> hubContext, IOptions<LoadBalancingConfig> lbConfig, NotificationDispatchEngine dispatchEngine)
         {
             _dispatcherService = dispatcherService;
             _db = db;
             _hubContext = hubContext;
             _lbConfig = lbConfig;
+            _dispatchEngine = dispatchEngine;
         }
 
         public List<RequestSummaryDto> DispatcherRequests { get; set; } = new();
@@ -82,8 +88,8 @@ namespace MVP_Core.Pages.Admin
 
         public List<KanbanHistoryLog> KanbanHistory { get; set; } = new();
         public List<SlaSetting> SlaSettings { get; set; } = new();
-        public List<Technician> TechnicianLoads { get; set; } = new();
-        public Dictionary<int, Technician?> SuggestedTechnicians { get; set; } = new();
+        public List<MVP_Core.Data.Models.Technician> TechnicianLoads { get; set; } = new();
+        public Dictionary<int, MVP_Core.Data.Models.Technician?> SuggestedTechnicians { get; set; } = new();
         public Dictionary<int, double> SuggestedScores { get; set; } = new();
         public Dictionary<int, (string TechName, double Confidence)> SuggestedTech { get; set; } = new();
 

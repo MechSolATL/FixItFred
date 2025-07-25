@@ -28,7 +28,7 @@ namespace MVP_Core.Controllers.Api
             var range = new DateRange
             {
                 Start = from ?? DateTime.UtcNow.AddDays(-30),
-                End   = to   ?? DateTime.UtcNow
+                End = to ?? DateTime.UtcNow
             };
 
             var analytics = await _profileService.GetAnalyticsAsync(id, range);

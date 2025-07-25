@@ -1,0 +1,62 @@
+@page
+@model MVP_Core.Pages.Technician.LiveTrackingModel
+@{
+    ViewData["Title"] = "Live Tracking";
+}
+<!-- Sprint 30E.5 - Technician Mobile Tracking View UI -->
+<h2>My Live Location</h2>
+<div id="gps-status">Detecting location...</div>
+<div id="gps-map" style="height:300px;width:100%;background:#e9ecef;"></div>
+
+<h3>My Active Jobs</h3>
+<table class="table table-sm">
+    <thead>
+        <tr><th>Job</th><th>Zone</th><th>ETA</th><th>Status</th></tr>
+    </thead>
+    <tbody>
+    @foreach (var job in Model.ActiveJobs)
+    {
+        <tr>
+            <td>@job.ServiceRequestId</td>
+            <td>@job.Zone</td>
+            <td id="eta-@job.Id">@job.EstimatedArrival?.ToLocalTime().ToShortTimeString()</td>
+            <td>@job.Status</td>
+        </tr>
+    }
+    </tbody>
+</table>
+<script>
+// Sprint 30E.5 - Technician Mobile Tracking View UI
+let lat = null, lng = null;
+const statusDiv = document.getElementById('gps-status');
+const mapDiv = document.getElementById('gps-map');
+function updateStatus(msg) { statusDiv.textContent = msg; }
+function showMap(lat, lng) {
+    mapDiv.innerHTML = `<img src='https://maps.googleapis.com/maps/api/staticmap?center=${lat},${lng}&zoom=15&size=300x300&markers=color:blue|${lat},${lng}' alt='Map' style='width:100%;height:100%;'/>`;
+}
+function pollEta() {
+    fetch('/api/tech/active-jobs?techId=@Model.TechnicianId')
+        .then(r => r.json())
+        .then(jobs => {
+            jobs.forEach(job => {
+                const etaCell = document.getElementById('eta-' + job.id);
+                if (etaCell) etaCell.textContent = job.estimatedArrival ? new Date(job.estimatedArrival).toLocaleTimeString() : '';
+            });
+        });
+}
+if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(function(pos) {
+        lat = pos.coords.latitude;
+        lng = pos.coords.longitude;
+        updateStatus(`Lat: ${lat.toFixed(5)}, Lng: ${lng.toFixed(5)}`);
+        showMap(lat, lng);
+    }, function(err) {
+        updateStatus('GPS error: ' + err.message);
+        mapDiv.innerHTML = '<span style="color:#888">[No GPS]</span>';
+    });
+} else {
+    updateStatus('Geolocation not supported.');
+    mapDiv.innerHTML = '<span style="color:#888">[No GPS]</span>';
+}
+setInterval(pollEta, 30000);
+</script>

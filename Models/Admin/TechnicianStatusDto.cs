@@ -14,7 +14,7 @@ namespace MVP_Core.Models.Admin
         {
             >= 80 => "?? Ready",
             >= 50 => "?? At Capacity",
-            _     => "?? Overloaded"
+            _ => "?? Overloaded"
         };
         // Added for Razor compatibility
         public string TechnicianName => Name;

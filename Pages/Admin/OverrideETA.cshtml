@@ -1,0 +1,26 @@
+@page
+@using Microsoft.AspNetCore.Authorization
+// FixItFred Patch Log — Sprint 29B-Expand: Admin Manual ETA Override
+// [2025-07-25T00:00:00Z] — Added secure admin ETA override form for multi-zone ETA broadcast.
+@attribute [Authorize(Roles = "Admin")]
+@inject Microsoft.AspNetCore.SignalR.IHubContext<MVP_Core.Hubs.ETAHub> ETAHubContext
+@model MVP_Core.Pages.Admin.OverrideETAModel
+@{
+    ViewData["Title"] = "Manual ETA Override";
+}
+<h2>Manual ETA Override</h2>
+<form method="post">
+    <div class="mb-3">
+        <label for="zoneId">Zone/Technician ID</label>
+        <input type="number" id="zoneId" name="ZoneId" class="form-control" required />
+    </div>
+    <div class="mb-3">
+        <label for="etaMessage">ETA Message</label>
+        <input type="text" id="etaMessage" name="EtaMessage" class="form-control" required />
+    </div>
+    <button type="submit" class="btn btn-primary">Send ETA</button>
+</form>
+@if (Model.StatusMessage != null)
+{
+    <div class="alert alert-info mt-3">@Model.StatusMessage</div>
+}

@@ -11,3 +11,94 @@ window.downloadFileFromBase64 = (fileName, base64) => {
     link.click();
     document.body.removeChild(link);
 };
+
+// FixItFred Patch Log — Sprint 29B: ETA Real-Time Display Patch
+// [2025-07-25T00:00:00Z] — Appended SignalR connection and ReceiveETA listener for ETA updates.
+
+// FixItFred: SignalR ETA real-time listener
+const connection = new signalR.HubConnectionBuilder()
+    .withUrl("/etaHub")
+    .configureLogging(signalR.LogLevel.Information)
+    .build();
+
+connection.on("ReceiveETA", function (zoneId, message) {
+    var etaDiv = document.getElementById("etaDisplay");
+    if (etaDiv) {
+        etaDiv.innerText = message + " (Last updated: " + new Date().toLocaleTimeString() + ")";
+    }
+});
+
+connection.start().catch(function (err) {
+    console.error("SignalR connection error: ", err.toString());
+});
+// /FixItFred
+
+// FixItFred Patch Log — Sprint 29B: Hardened SignalR ETA UX
+// [2025-07-25T00:00:00Z] — Added reconnect logic, null safety, and fallback UI for ETA display.
+
+// FixItFred: Hardened SignalR reconnect
+let retryAttempts = 0;
+let maxRetries = 5;
+
+async function startConnection() {
+    try {
+        await connection.start();
+        console.log("SignalR connected.");
+        retryAttempts = 0; // Reset
+    } catch (err) {
+        console.warn("SignalR connection failed. Retrying...", err);
+        retryAttempts++;
+        if (retryAttempts <= maxRetries) {
+            setTimeout(startConnection, 2000);
+        } else {
+            const display = document.getElementById("etaDisplay");
+            if (display) display.innerText = "ETA unavailable. Please check back.";
+        }
+    }
+}
+
+connection.onclose(() => {
+    console.warn("SignalR disconnected. Attempting reconnect...");
+    startConnection();
+});
+
+connection.on("ReceiveETA", function (zoneId, message) {
+    const display = document.getElementById("etaDisplay");
+    if (display && message) {
+        display.innerText = message + " (Last updated: " + new Date().toLocaleTimeString() + ")";
+    }
+});
+
+startConnection(); // 🔁 Initial connect
+// /FixItFred
+
+// FixItFred Patch Log — Sprint 29B-Expand: Multi-Zone ETA + History
+// [2025-07-25T00:00:00Z] — Multi-zone ETA display, history tracking, and responsive support.
+
+// FixItFred: Multi-Zone ETA Broadcast Handler
+connection.on("ReceiveETA", function (zoneId, message) {
+    const container = document.getElementById("etaContainer");
+    if (!container) return;
+
+    let zoneDiv = document.getElementById("eta-" + zoneId);
+    const timestamp = new Date().toLocaleTimeString();
+
+    if (!zoneDiv) {
+        zoneDiv = document.createElement("div");
+        zoneDiv.id = "eta-" + zoneId;
+        container.appendChild(zoneDiv);
+    }
+    zoneDiv.innerText = `Zone ${zoneId} ETA: ${message} (Updated: ${timestamp})`;
+
+    // FixItFred: ETA History Tracking
+    let history = document.getElementById("eta-history-" + zoneId);
+    if (!history) {
+        history = document.createElement("ul");
+        history.id = "eta-history-" + zoneId;
+        container.appendChild(history);
+    }
+    const historyItem = document.createElement("li");
+    historyItem.innerText = `→ ${timestamp}: ${message}`;
+    history.prepend(historyItem);
+});
+// /FixItFred

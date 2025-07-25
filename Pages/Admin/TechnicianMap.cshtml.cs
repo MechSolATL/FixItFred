@@ -19,8 +19,8 @@ namespace MVP_Core.Pages.Admin
         {
             Technicians = _dispatcherService.GetAllTechnicianStatuses();
             // Demo: inject mock locations if missing
-            double[] lats = {33.7510, 33.7550, 33.7495, 33.7480, 33.7525};
-            double[] lngs = {-84.3900, -84.3850, -84.3885, -84.3920, -84.3875};
+            double[] lats = { 33.7510, 33.7550, 33.7495, 33.7480, 33.7525 };
+            double[] lngs = { -84.3900, -84.3850, -84.3885, -84.3920, -84.3875 };
             for (int i = 0; i < Technicians.Count; i++)
             {
                 Technicians[i].Latitude ??= lats[i % lats.Length];

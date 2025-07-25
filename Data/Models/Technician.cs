@@ -33,5 +33,9 @@ namespace MVP_Core.Data.Models
         [MaxLength(500)]
         public string? PhotoUrl { get; set; }
         public string? Badges { get; set; } // JSON array of badge names/objects
+
+        // FixItFred: Sprint 30E – Live Tracking: Add GPS fields
+        public double? Latitude { get; set; }
+        public double? Longitude { get; set; }
     }
 }

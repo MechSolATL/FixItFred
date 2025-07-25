@@ -6,6 +6,8 @@ using MVP_Core.Services; // Only use this for AuditLogger and BackupReminderServ
 using Wangkanai.Detection;
 using MVP_Core.Middleware;
 using MVP_Core.Helpers;
+using MVP_Core.Services.Admin;
+using MVP_Core.Services.Dispatch;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,13 +23,12 @@ builder.Services.AddControllersWithViews()
         options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
         options.JsonSerializerOptions.WriteIndented = true;
     });
-
 builder.Services.AddRazorPages()
     .AddJsonOptions(options =>
     {
         options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
     });
-
+builder.Services.AddDetection();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddSignalR();
 
@@ -48,6 +49,10 @@ builder.Services.AddScoped<MVP_Core.Services.INotificationService, MVP_Core.Serv
 builder.Services.AddScoped<MVP_Core.Services.TechnicianProfileService>();
 builder.Services.AddScoped<MVP_Core.Services.Reports.TechnicianReportService>();
 builder.Services.AddScoped<ITechnicianProfileService, TechnicianProfileService>();
+builder.Services.AddScoped<DispatcherService>();
+builder.Services.AddScoped<NotificationDispatchEngine>();
+builder.Services.AddScoped<ServiceRequestService>();
+builder.Services.AddScoped<TechnicianFeedbackService>(); // FixItFred: Sprint 30B - Register TechnicianFeedbackService required by DispatcherService
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
@@ -85,10 +90,10 @@ builder.Logging.AddSimpleConsole(options =>
 });
 builder.Logging.AddDebug();
 
-var app = builder.Build();
-
 builder.Services.Configure<MVP_Core.Services.Config.LoadBalancingConfig>(
     builder.Configuration.GetSection("LoadBalancing"));
+
+var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())
 {
@@ -124,8 +129,15 @@ using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     db.Database.Migrate();
-    MVP_Core.Data.Seeders.DatabaseSeeder.Seed(db);
+    MVP_Core.Data.Seeders.DatabaseSeeder.Seed(db, 0); // FixItFred: Use explicit discard value instead of _
     MVP_Core.Data.Seeders.PagesSeeder.Seed(db);
+
+#if DEBUG
+    // FixItFred: Sprint 30D.3 — Trigger Live QA Test Run for ScheduleQueue/Dispatcher/SignalR 2024-07-25
+    var dispatcherService = scope.ServiceProvider.GetRequiredService<DispatcherService>();
+    var dispatchEngine = scope.ServiceProvider.GetRequiredService<NotificationDispatchEngine>();
+    MVP_Core.Data.Seeders.DatabaseSeeder.SeedTestServiceRequests(db, dispatcherService, dispatchEngine);
+#endif
 
     try
     {

@@ -2,8 +2,8 @@
 // FixItFred Patch Log — Sprint 26.4D
 // [2025-07-25T00:00:00Z] — Added polling timer for live technician status/ETA refresh (SignalR-ready stub).
 @model MVP_Core.Pages.Admin.SchedulerQueueModel
-@using MVP_Core.Models.Dispatch
-@inject MVP_Core.Services.NotificationDispatchEngine DispatchEngine
+@using MVP_Core.Services.Dispatch
+@inject MVP_Core.Services.Dispatch.NotificationDispatchEngine DispatchEngine
 @{
     Layout = "/Pages/Shared/_AdminLayout.cshtml";
     ViewData["Title"] = "Scheduler Queue";
@@ -105,8 +105,12 @@
                             <td>@item.AssignedTechnicianName ?? $"ID: {item.TechnicianId}"</td>
                             <td><span class="badge @(item.TechnicianStatus == "Available" ? "bg-success" : item.TechnicianStatus == "Busy" ? "bg-warning text-dark" : "bg-secondary")">@item.TechnicianStatus</span></td>
                             <td>@item.ServiceRequestId</td>
-                            <td>@item.ScheduledFor.ToLocalTime().ToString("g")</td>
                             <td>
+                                @* FixItFred: null-safe DateTime *@
+                                @(item.ScheduledFor?.ToLocalTime().ToString("g") ?? "N/A")
+                            </td>
+                            <td>
+                                @* FixItFred: null-safe DateTime/TimeSpan *@
                                 @if (item.EstimatedArrival.HasValue)
                                 {
                                     <span class="fw-bold">@item.EstimatedArrival.Value.ToLocalTime().ToString("t")</span>

@@ -18,12 +18,14 @@
 // Do not override previous logs — appended below each existing log block.
 using AdminTechnicianProfileDto = MVP_Core.Models.Admin.TechnicianProfileDto;
 using DataTechnicianProfileDto = MVP_Core.Data.Models.TechnicianProfileDto;
+using DataDto = MVP_Core.Data.Models.TechnicianProfileDto;
 using MVP_Core.Models.Admin;
 using MVP_Core.Models.Mobile;
 using System.Collections.Generic;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using MVP_Core.Data.Models;
 
 namespace MVP_Core.Services.Admin
 {
@@ -65,7 +67,8 @@ namespace MVP_Core.Services.Admin
                 AssignedTechName = "Tech A"
             };
         }
-        public DispatcherResult MoveUp(int requestId) => new DispatcherResult {
+        public DispatcherResult MoveUp(int requestId) => new DispatcherResult
+        {
             Message = "Moved up.",
             RequestDetails = $"Request {requestId} details...",
             TechnicianList = new List<string>(),
@@ -74,7 +77,8 @@ namespace MVP_Core.Services.Admin
             RequestSummary = $"Summary for request {requestId}",
             AssignedTechName = "Tech A"
         };
-        public DispatcherResult MoveDown(int requestId) => new DispatcherResult {
+        public DispatcherResult MoveDown(int requestId) => new DispatcherResult
+        {
             Message = "Moved down.",
             RequestDetails = $"Request {requestId} details...",
             TechnicianList = new List<string>(),
@@ -83,7 +87,8 @@ namespace MVP_Core.Services.Admin
             RequestSummary = $"Summary for request {requestId}",
             AssignedTechName = "Tech A"
         };
-        public DispatcherResult Reassign(int requestId) => new DispatcherResult {
+        public DispatcherResult Reassign(int requestId) => new DispatcherResult
+        {
             Message = "Reassigned.",
             RequestDetails = $"Request {requestId} details...",
             TechnicianList = new List<string>(),
@@ -92,7 +97,8 @@ namespace MVP_Core.Services.Admin
             RequestSummary = $"Summary for request {requestId}",
             AssignedTechName = "Tech A"
         };
-        public DispatcherResult Cancel(int requestId) => new DispatcherResult {
+        public DispatcherResult Cancel(int requestId) => new DispatcherResult
+        {
             Message = "Cancelled.",
             RequestDetails = $"Request {requestId} details...",
             TechnicianList = new List<string>(),
@@ -101,7 +107,8 @@ namespace MVP_Core.Services.Admin
             RequestSummary = $"Summary for request {requestId}",
             AssignedTechName = "Tech A"
         };
-        public DispatcherResult ResendInstructions(int requestId) => new DispatcherResult {
+        public DispatcherResult ResendInstructions(int requestId) => new DispatcherResult
+        {
             Message = "Instructions resent.",
             RequestDetails = $"Request {requestId} details...",
             TechnicianList = new List<string>(),
@@ -110,7 +117,8 @@ namespace MVP_Core.Services.Admin
             RequestSummary = $"Summary for request {requestId}",
             AssignedTechName = "Tech A"
         };
-        public DispatcherResult Escalate(int requestId) => new DispatcherResult {
+        public DispatcherResult Escalate(int requestId) => new DispatcherResult
+        {
             Message = "Escalated.",
             RequestDetails = $"Request {requestId} details...",
             TechnicianList = new List<string>(),
@@ -119,7 +127,8 @@ namespace MVP_Core.Services.Admin
             RequestSummary = $"Summary for request {requestId}",
             AssignedTechName = "Tech A"
         };
-        public DispatcherResult ShowMap(int requestId) => new DispatcherResult {
+        public DispatcherResult ShowMap(int requestId) => new DispatcherResult
+        {
             Message = "Map shown.",
             RequestDetails = $"Request {requestId} details...",
             TechnicianList = new List<string>(),
@@ -416,6 +425,7 @@ namespace MVP_Core.Services.Admin
 
         public List<TechnicianStatusDto> GetSuggestedTechsBySkill(string requiredSkill, string zip)
         {
+            // FixItFred: Sprint 30D.2 — Safe null checks for SkillTags, TopZIPs, and LastActive 2024-07-25
             var profiles = _techHeartbeats.Select(t => new AdminTechnicianProfileDto
             {
                 TechnicianId = t.TechnicianId,
@@ -430,8 +440,8 @@ namespace MVP_Core.Services.Admin
                 TotalJobsLast30Days = 0
             }).ToList();
             var filtered = profiles
-                .Where(p => p.SkillTags != null && p.SkillTags.Contains(requiredSkill) && p.TopZIPs.Contains(zip))
-                .OrderBy(p => (DateTime.UtcNow - p.LastActive).TotalMinutes)
+                .Where(p => (p.SkillTags?.Contains(requiredSkill) ?? false) && (p.TopZIPs?.Contains(zip) ?? false) && p.LastActive != null)
+                .OrderBy(p => (DateTime.UtcNow - (p.LastActive != null ? p.LastActive : DateTime.UtcNow)).TotalMinutes) // FixItFred: Sprint 30D.2 — Safe fallback for LastActive (DateTime is non-nullable)
                 .ToList();
             if (!filtered.Any())
             {
@@ -464,6 +474,22 @@ namespace MVP_Core.Services.Admin
                 SkillTags = new List<string>()
             }).ToList();
             return result ?? new List<AdminTechnicianProfileDto>();
+        }
+        // FixItFred: Sprint 30B - Real-Time Dispatch
+        public DataDto FindAvailableTechnicianForZone(string zone)
+        {
+            // FixItFred: Zone matching patched to use Specialty field due to missing Zone on TechnicianProfileDto
+            return _db.Set<DataDto>()
+                .Where(t => t.Specialty == zone && t.IsActive)
+                .OrderBy(t => t.CompletedJobs) // Or use CurrentJobsCount if available
+                .FirstOrDefault();
+        }
+
+        public DateTime PredictETA(DataDto tech, string zone, int delayMinutes)
+        {
+            int baseTravelTime = 12; // Could be mapped from zone later
+            // Example: int jobCount = _db.ServiceRequests.Count(r => r.TechnicianId == tech.Id);
+            return DateTime.UtcNow.AddMinutes(baseTravelTime + delayMinutes);
         }
     }
 }

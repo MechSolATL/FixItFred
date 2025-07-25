@@ -194,7 +194,8 @@ namespace MVP_Core.Pages
             // Set cooldown and increment resend count
             HttpContext?.Session?.SetInt32("ResendCount", ResendCount + 1);
             HttpContext?.Session?.SetInt32("ResendCooldown", 1);
-            _ = Task.Run(async () => {
+            _ = Task.Run(async () =>
+            {
                 await Task.Delay(60000);
                 HttpContext?.Session?.SetInt32("ResendCooldown", 0);
             });

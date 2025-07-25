@@ -1,0 +1,50 @@
+@page
+@model MVP_Core.Pages.Technician.UpdateLocationModel
+@{
+    ViewData["Title"] = "Update Location";
+}
+<!-- FixItFred: Sprint 30E.2 - GPS Update Logic -->
+<h2>Technician Live Location Update</h2>
+<p id="gps-status">Waiting for location...</p>
+<form id="gpsForm" method="post" onsubmit="return false;">
+    <input type="hidden" id="techId" value="@Model.TechnicianId" />
+    <input type="hidden" id="lat" name="Latitude" />
+    <input type="hidden" id="lng" name="Longitude" />
+    <button type="button" id="sendLocationBtn" class="btn btn-primary">Send My Location</button>
+</form>
+<script>
+// FixItFred: Sprint 30E.2 - GPS Update Logic
+const status = document.getElementById('gps-status');
+const btn = document.getElementById('sendLocationBtn');
+let lat = null, lng = null;
+
+function updateStatus(msg) { status.textContent = msg; }
+
+function sendLocation() {
+    const techId = document.getElementById('techId').value;
+    if (!lat || !lng) { updateStatus('No GPS fix.'); return; }
+    fetch('/api/tech/update-location', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ technicianId: techId, latitude: lat, longitude: lng })
+    })
+    .then(r => r.json())
+    .then(data => updateStatus(data.success ? 'Location sent!' : 'Failed to update.'));
+}
+
+btn.onclick = sendLocation;
+
+if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(function(pos) {
+        lat = pos.coords.latitude;
+        lng = pos.coords.longitude;
+        document.getElementById('lat').value = lat;
+        document.getElementById('lng').value = lng;
+        updateStatus('Location ready.');
+    }, function(err) {
+        updateStatus('GPS error: ' + err.message);
+    });
+} else {
+    updateStatus('Geolocation not supported.');
+}
+</script>

@@ -9,7 +9,7 @@ using System.Linq;
 
 namespace MVP_Core.Controllers.Api
 {
-    [Route("api/technician")] 
+    [Route("api/technician")]
     [ApiController]
     public class TechnicianReportController : ControllerBase
     {

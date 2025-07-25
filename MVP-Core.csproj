@@ -33,6 +33,7 @@
     <!-- Package references: EF Core, Logging, Config, SendGrid, Twilio -->
     <PackageReference Include="EPPlus" Version="8.0.8" />
     <PackageReference Include="GoogleApi" Version="5.8.6" />
+    <PackageReference Include="Microsoft.AspNetCore.Authorization" Version="9.0.7" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.5" />
     <PackageReference Include="Microsoft.AspNetCore.Session" Version="2.3.0" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="9.0.7" />
@@ -63,7 +64,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="MVP_Core.Data.Models.ViewModels\" />
     <Folder Include="wwwroot\assets\" />
   </ItemGroup>
 

@@ -2,8 +2,8 @@
 // FixItFred Patch Log — Sprint 26.4E
 // [2025-07-25T00:00:00Z] — Admin ETA Report view scaffolded for ETA accuracy review.
 @model MVP_Core.Pages.Admin.ETAReportModel
-@using MVP_Core.Models.Dispatch
-@inject MVP_Core.Services.NotificationDispatchEngine DispatchEngine
+@using MVP_Core.Services.Dispatch
+@inject MVP_Core.Services.Dispatch.NotificationDispatchEngine DispatchEngine
 @{
     Layout = "/Pages/Shared/_AdminLayout.cshtml";
     ViewData["Title"] = "ETA Accuracy Report";
@@ -41,9 +41,20 @@
                         <tr>
                             <td>@entry.TechnicianName</td>
                             <td>@entry.ServiceRequestId</td>
-                            <td>@entry.PredictedETA.ToLocalTime().ToString("g")</td>
-                            <td>@entry.ActualArrival?.ToLocalTime().ToString("g") ?? "N/A"</td>
-                            <td>@(entry.ActualArrival.HasValue ? (entry.ActualArrival.Value - entry.PredictedETA).TotalMinutes.ToString("0") : "-")</td>
+                            <td>
+                                @* FixItFred: null-safe DateTime *@
+                                @(entry.PredictedETA?.ToLocalTime().ToString("g") ?? "N/A")
+                            </td>
+                            <td>
+                                @* FixItFred: null-safe DateTime *@
+                                @(entry.ActualArrival?.ToLocalTime().ToString("g") ?? "N/A")
+                            </td>
+                            <td>
+                                @* FixItFred: null-safe TimeSpan *@
+                                @(entry.ActualArrival.HasValue && entry.PredictedETA.HasValue
+                                    ? (entry.ActualArrival.Value - entry.PredictedETA.Value).TotalMinutes.ToString("F0") + " min"
+                                    : "—")
+                            </td>
                             <td>@entry.Timestamp.ToLocalTime().ToString("g")</td>
                         </tr>
                     }

@@ -1,0 +1,52 @@
+@page
+@model MVP_Core.Pages.Technician.ScheduleQueueModel
+@{
+    ViewData["Title"] = "My Schedule Queue";
+}
+<!-- Sprint 31.1 - Technician Schedule Acceptance Workflow -->
+<h2>My Pending Schedule</h2>
+@if (!Model.PendingJobs.Any())
+{
+    <div class="alert alert-info">No pending jobs in your queue.</div>
+}
+else
+{
+    <table class="table table-sm">
+        <thead>
+            <tr><th>Job</th><th>Zone</th><th>ETA</th><th>Status</th><th>Action</th></tr>
+        </thead>
+        <tbody>
+        @foreach (var job in Model.PendingJobs)
+        {
+            <tr>
+                <td>@job.ServiceRequestId</td>
+                <td>@job.Zone</td>
+                <td>@job.EstimatedArrival?.ToLocalTime().ToShortTimeString()</td>
+                <td id="status-@job.Id">@job.Status</td>
+                <td>
+                    <button class="btn btn-success btn-sm" onclick="respond(@job.Id, 'Accepted')">Accept</button>
+                    <button class="btn btn-danger btn-sm" onclick="respond(@job.Id, 'Declined')">Reject</button>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+<script>
+// Sprint 31.1 - Technician Schedule Acceptance Workflow
+function respond(id, action) {
+    fetch('/api/tech/respond-to-schedule', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ scheduleQueueId: id, response: action })
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            document.getElementById('status-' + id).textContent = action;
+        } else {
+            alert('Failed to update status.');
+        }
+    });
+}
+</script>

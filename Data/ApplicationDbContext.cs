@@ -59,6 +59,11 @@ namespace MVP_Core.Data
         public DbSet<TechnicianMessage> TechnicianMessages { get; set; } = null!; // Sprint 21: Messaging model
         public DbSet<TechnicianFeedback> TechnicianFeedbacks { get; set; } = null!; // Sprint 22: Technician rating/feedback
         public DbSet<TechnicianMedia> TechnicianMedias { get; set; } = null!; // Sprint 23: Media uploads
+        public DbSet<ScheduleQueue> ScheduleQueues { get; set; } = null!;
+        public DbSet<ScheduleHistory> ScheduleHistories { get; set; } = null!;
+        public DbSet<NotificationsSent> NotificationsSent { get; set; } = null!;
+        public DbSet<ETAHistoryEntry> ETAHistoryEntries { get; set; } = null!;
+        public DbSet<MVP_Core.Data.TechTrackingLog> TechTrackingLogs { get; set; } = null!; // Sprint 30E - Secure Technician GPS API
 
         #endregion
 
@@ -93,6 +98,9 @@ namespace MVP_Core.Data
             _ = modelBuilder.Entity<TechnicianSkill>().ToTable("TechnicianSkills");
             _ = modelBuilder.Entity<TechnicianSkillMap>().ToTable("TechnicianSkillMaps");
             _ = modelBuilder.Entity<TechnicianLoadLog>().ToTable("TechnicianLoadLogs");
+            _ = modelBuilder.Entity<ScheduleQueue>().ToTable("ScheduleQueues");
+            _ = modelBuilder.Entity<ScheduleHistory>().ToTable("ScheduleHistories");
+            _ = modelBuilder.Entity<NotificationsSent>().ToTable("NotificationsSent");
         }
 
         #endregion

@@ -10,7 +10,7 @@
     ViewData["Title"] = "Dispatcher Kanban";
     Layout = "/Pages/Shared/_Layout.cshtml";
     var statuses = new[] { "Unassigned", "Assigned", "En Route", "Complete" };
-    var activeTab = Request.Query["tab"].ToString() ?? "Unassigned";
+    var activeTab = Request?.Query["tab"].ToString() ?? "Unassigned"; // FixItFred: Sprint 30D.2 — Safe null navigation 2024-07-25
     var filteredRequests = Model.DispatcherRequests ?? new List<RequestSummaryDto>();
     var techList = Model.TechnicianStatuses?.Select(t => t.Name).ToList() ?? new List<string>();
     var broadcast = Model.Notifications?.FirstOrDefault(n => n.Type == "Broadcast");
@@ -459,6 +459,27 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script>
+// FixItFred: Sprint 30D.1 - Live ETA SignalR client binding
+let etaConnection = new signalR.HubConnectionBuilder()
+    .withUrl("/etahub?zone=" + encodeURIComponent('@(Model.ServiceZones.FirstOrDefault() ?? "1")'))
+    .build();
+
+etaConnection.on("ReceiveETA", function(zone, message) {
+    // FixItFred: Display ETA/status updates in real time
+    let etaPanel = document.getElementById("live-eta-panel");
+    if (!etaPanel) {
+        etaPanel = document.createElement("div");
+        etaPanel.id = "live-eta-panel";
+        etaPanel.className = "alert alert-info mt-3";
+        document.body.prepend(etaPanel);
+    }
+    etaPanel.innerHTML = `<strong>Live ETA Update (Zone ${zone}):</strong> ${message}`;
+});
+
+etaConnection.start().catch(function (err) {
+    return console.error("SignalR connection error:", err.toString());
+});
+
 function renderKanbanCharts() {
     // Status chart
     var statusCounts = {
