@@ -1,27 +1,27 @@
 @page
 // FixItFred Patch Log — Sprint 25: SEO + Razor Compliance Sweep
 // [2024-07-25T00:00:00Z] — Verified & corrected SEO injection, layout structure, and title block.
+// FixItFred Patch Log — Sprint 26.3
+// [2025-07-25T00:00:00Z] — Migrated legacy alerts to shared _Alert partial (ViewData pattern). Injected _ValidationSummary for model errors.
 @using MVP_Core.Models.Admin
 @model MVP_Core.Pages.Admin.SendBroadcastModel
 @{
-    // FixItFred Sprint25: Razor SEO block injected.
     ViewData["Title"] = "Send Broadcast Alert";
     Layout = "/Pages/Shared/_Layout.cshtml";
-    // FixItFred Sprint25: Razor SEO block injected.
-    // SEO = await _seoService.GetSEOAsync("SendBroadcast");
-    // ViewData["Title"] = SEO.Title;
-    // ViewData["MetaDescription"] = SEO.MetaDescription;
-    // ViewData["Keywords"] = SEO.Keywords;
-    // ViewData["Robots"] = SEO.Robots;
 }
 <h2 class="mb-4">Send Broadcast Alert</h2>
+<partial name="_ValidationSummary" />
 @if (Model.SuccessMessage != null)
 {
-    <div class="alert alert-success">@Model.SuccessMessage</div>
+    ViewData["AlertType"] = "success";
+    ViewData["AlertMessage"] = Model.SuccessMessage;
+    <partial name="_Alert" />
 }
 @if (Model.ErrorMessage != null)
 {
-    <div class="alert alert-danger">@Model.ErrorMessage</div>
+    ViewData["AlertType"] = "danger";
+    ViewData["AlertMessage"] = Model.ErrorMessage;
+    <partial name="_Alert" />
 }
 <form method="post" class="mb-4">
     <div class="mb-3">

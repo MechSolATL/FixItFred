@@ -1,33 +1,25 @@
 @page
-@using MVP_Core.Models.Admin
-@using MVP_Core.Data.Models
+@using MVP_Core.Data.Models // Corrected ServiceRequest namespace
+@using MVP_Core.Data.Models.ViewModels
 @inject MVP_Core.Services.TechnicianFeedbackService FeedbackService
 @inject MVP_Core.Services.Admin.DispatcherService DispatcherService
 @model MVP_Core.Pages.Admin.SubmitFeedbackModel
 @{
     ViewData["Title"] = "Submit Technician Feedback";
-    var techList = DispatcherService.GetAllTechnicianHeartbeats();
-    var completedJobs = new List<ServiceRequest>();
-    string status = TempData["FeedbackStatus"] as string ?? "";
-    var safeTechList = techList != null && techList.Any() ? techList : new List<TechnicianStatusDto>();
+    var status = TempData["FeedbackStatus"] as string ?? "";
 }
 <h2 class="mb-4">? Submit Technician Feedback</h2>
+<partial name="_ValidationSummary" />
 <form method="post">
     <div class="mb-3">
         <label class="form-label">Technician</label>
-        <select name="TechnicianId" class="form-select" required>
-            <option value="">Select technician...</option>
-            @foreach (var tech in safeTechList)
-            {
-                <option value="@tech.TechnicianId">@tech.Name</option>
-            }
-        </select>
+        <partial name="_TechnicianDropdown" model="Model.TechnicianDropdownViewModel" />
     </div>
     <div class="mb-3">
         <label class="form-label">Completed Job</label>
         <select name="RequestId" class="form-select" required>
             <option value="">Select job...</option>
-            @foreach (var job in completedJobs)
+            @foreach (var job in Model.CompletedJobs ?? new List<ServiceRequest>())
             {
                 <option value="@job.Id">#@job.Id - @job.ServiceType</option>
             }
@@ -50,5 +42,7 @@
 </form>
 @if (!string.IsNullOrEmpty(status))
 {
-    <div class="alert alert-info mt-3">@status</div>
+    ViewData["AlertType"] = "info";
+    ViewData["AlertMessage"] = status;
+    <partial name="_Alert" />
 }

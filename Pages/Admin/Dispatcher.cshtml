@@ -1,8 +1,11 @@
 @page
+// FixItFred Patch Log — Sprint 26.3
+// [2025-07-25T00:00:00Z] — Migrated legacy alerts to shared _Alert partial (ViewData pattern). Injected _ValidationSummary for model errors. Added _LoadingSpinner for async dashboard actions.
 @using System.Linq
 @using MVP_Core.Models.Admin
 @using MVP_Core.Data.Models
 @model MVP_Core.Pages.Admin.DispatcherModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @{
     ViewData["Title"] = "Dispatcher Kanban";
     Layout = "/Pages/Shared/_Layout.cshtml";
@@ -14,17 +17,20 @@
     var techHeartbeats = Model.TechnicianStatuses ?? new List<TechnicianStatusDto>();
     var stats = Model.DispatcherStats;
 }
-@* --- Broadcast Banner --- *@
+<partial name="_ValidationSummary" />
+@if (TempData["SystemMessages"] != null)
+{
+    ViewData["AlertType"] = "info";
+    ViewData["AlertMessage"] = TempData["SystemMessages"];
+    <partial name="_Alert" />
+}
 @if (broadcast != null)
 {
-    <div class="alert alert-danger text-center" role="alert">
-        ?? @broadcast.Message
-        @if (broadcast.ExpiresAt.HasValue)
-        {
-            <span class="ms-2 small text-muted">(Expires @broadcast.ExpiresAt.Value.ToLocalTime():t)</span>
-        }
-    </div>
+    ViewData["AlertType"] = "danger";
+    ViewData["AlertMessage"] = broadcast.Message;
+    <partial name="_Alert" />
 }
+<partial name="_LoadingSpinner" />
 @* --- Dispatcher Metrics Overlay --- *@
 <div class="row mb-4">
     <div class="col-12">
@@ -61,7 +67,9 @@
                 }
                 else
                 {
-                    <div class="alert alert-info mb-0">No job data available.</div>
+                    ViewData["AlertType"] = "info";
+                    ViewData["AlertMessage"] = "No job data available.";
+                    <partial name="_Alert" />
                 }
             </div>
         </div>
@@ -80,13 +88,7 @@
         </div>
         <div class="col-md-2">
             <label class="form-label">Technician</label>
-            <select name="Technician" class="form-select">
-                <option value="">All</option>
-                @foreach (var tech in techList)
-                {
-                    <option value="@tech">@tech</option>
-                }
-            </select>
+            <partial name="_TechnicianDropdown" model="Model.TechnicianDropdownViewModel" />
         </div>
         <div class="col-md-2">
             <label class="form-label">Status</label>

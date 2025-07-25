@@ -15,12 +15,13 @@
 }
 
 <h2>Add New Technician</h2>
+<partial name="_ValidationSummary" />
 
 <form method="post">
     <div class="mb-3">
         <label asp-for="Technician.FullName" class="form-label"></label>
         <input asp-for="Technician.FullName" class="form-control" />
-        <span asp-validation-for="Technician.FullName" class="text-danger"></span>
+        <!-- Legacy validation migrated to partial -->
     </div>
 
     <div class="form-check">

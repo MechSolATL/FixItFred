@@ -13,6 +13,7 @@
     var safeNotesOrTags = Model?.NotesOrTags ?? string.Empty;
 }
 <h2 class="mb-4">?? Upload Media</h2>
+<partial name="_ValidationSummary" />
 <form method="post" enctype="multipart/form-data">
     <div class="mb-3">
         <label class="form-label">Technician</label>
@@ -47,6 +48,8 @@
 </form>
 @if (!string.IsNullOrEmpty(status))
 {
-    <div class="alert alert-info mt-3">@status</div>
+    ViewData["AlertType"] = "info";
+    ViewData["AlertMessage"] = status;
+    <partial name="_Alert" />
 }
 <!-- Co-Pilot: This page allows admin/dispatcher to upload media for a job. Validates file type/size. Only allowed roles. -->
