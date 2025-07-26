@@ -37,5 +37,30 @@ namespace MVP_Core.Pages.Admin
             // No-op: queue loaded via property
         }
         // FixItFred: Notification logic to be updated for new engine
+        // Sprint 55.0: Notify handler for queue actions
+        public async Task<IActionResult> OnPostNotifyAsync()
+        {
+            // Example: Send JobAssigned notification
+            var technician = IntelligentQueue.FirstOrDefault(q => q.TechnicianId == TechnicianId && q.ServiceRequestId == ServiceRequestId);
+            if (technician != null)
+            {
+                // Compose message
+                string message = $"You have been assigned to job #{technician.ServiceRequestId}.";
+                var scheduler = HttpContext.RequestServices.GetService(typeof(MVP_Core.Services.NotificationSchedulerService)) as MVP_Core.Services.NotificationSchedulerService;
+                if (scheduler != null)
+                {
+                    await scheduler.QueueNotificationAsync(
+                        recipient: technician.AssignedTechnicianName ?? $"Tech-{technician.TechnicianId}",
+                        channel: NotificationChannelType.Email, // Example: Email
+                        trigger: NotificationTriggerType.JobAssigned,
+                        targetId: technician.ServiceRequestId,
+                        messageBody: message,
+                        scheduledTime: DateTime.UtcNow
+                    );
+                }
+            }
+            TempData["SystemMessages"] = "Notification queued.";
+            return RedirectToPage();
+        }
     }
 }

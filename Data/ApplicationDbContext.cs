@@ -87,6 +87,7 @@ namespace MVP_Core.Data
         public DbSet<DisputeRecord> DisputeRecords { get; set; } = null!;
         public DbSet<ReferralCode> ReferralCodes { get; set; } = null!;
         public DbSet<ReferralEventLog> ReferralEventLogs { get; set; } = null!;
+        public DbSet<NotificationQueue> NotificationQueues { get; set; } = null!; // Sprint 55.0: Notification queue model
 
         #endregion
 

@@ -111,6 +111,9 @@ namespace MVP_Core.Data.Models
 
         // Sprint ??.
         public DateTime? CompletedDate { get; set; } // New property for dispute tracking
+
+        // Sprint 55.0: ETA property for technician arrival
+        public DateTime? EstimatedArrival { get; set; }
     }
 
     public class SlaSetting

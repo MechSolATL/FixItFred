@@ -122,5 +122,66 @@ namespace MVP_Core.Services.Dispatch
             });
             await _db.SaveChangesAsync();
         }
+
+        // Sprint 55.0: Dispatch notification from NotificationQueue
+        public async Task<bool> DispatchNotificationAsync(NotificationQueue notification)
+        {
+            try
+            {
+                switch (notification.ChannelType)
+                {
+                    case NotificationChannelType.Email:
+                        // TODO: Integrate with EmailService
+                        // await _emailService.SendEmailAsync(notification.Recipient, "Notification", notification.MessageBody);
+                        break;
+                    case NotificationChannelType.SMS:
+                        // TODO: Integrate with SmsService (Twilio)
+                        // await _smsService.SendSmsAsync(notification.Recipient, notification.MessageBody);
+                        break;
+                    case NotificationChannelType.Push:
+                        // TODO: Integrate with WebPush
+                        // await _webPushService.SendPushAsync(notification.Recipient, notification.MessageBody);
+                        break;
+                }
+                // Optionally broadcast via SignalR for live status
+                if (notification.TriggerType == NotificationTriggerType.OnTheWay)
+                {
+                    await _hubContext.Clients.All.SendAsync("TechOnTheWay", notification.Recipient, notification.MessageBody);
+                }
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        // Sprint 55.0: Estimate notification triggers
+        public void TriggerEstimateAcknowledged(string customerEmail, int estimateId)
+        {
+            // Example logic: log, send email, or push notification
+            var estimate = _db.BillingInvoiceRecords.FirstOrDefault(e => e.Id == estimateId);
+            if (estimate != null)
+            {
+                // TODO: Integrate with EmailService/SMS/WebPush
+                // For now, just log or update status
+                estimate.IsAcknowledged = true;
+                estimate.AcknowledgedBy = customerEmail;
+                estimate.AcknowledgedDate = DateTime.UtcNow;
+                _db.SaveChanges();
+            }
+        }
+
+        public void TriggerEstimateDecision(string customerEmail, int estimateId, bool wasAccepted)
+        {
+            var estimate = _db.BillingInvoiceRecords.FirstOrDefault(e => e.Id == estimateId);
+            if (estimate != null)
+            {
+                estimate.WasAccepted = wasAccepted;
+                estimate.DecisionDate = DateTime.UtcNow;
+                // TODO: Integrate with EmailService/SMS/WebPush
+                _db.SaveChanges();
+            }
+        }
     }
 }

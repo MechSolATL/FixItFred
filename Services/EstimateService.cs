@@ -35,7 +35,7 @@ namespace MVP_Core.Services
             invoice.AcknowledgedBy = acknowledgedBy;
             invoice.AcknowledgedDate = DateTime.UtcNow;
             _db.SaveChanges();
-            _dispatchEngine.TriggerEstimateAcknowledged(invoiceId);
+            _dispatchEngine.TriggerEstimateAcknowledged(invoice.CustomerEmail, invoiceId);
         }
         public void SaveDecision(int invoiceId, bool accepted)
         {
@@ -44,7 +44,7 @@ namespace MVP_Core.Services
             invoice.WasAccepted = accepted;
             invoice.DecisionDate = DateTime.UtcNow;
             _db.SaveChanges();
-            _dispatchEngine.TriggerEstimateDecision(invoiceId, accepted);
+            _dispatchEngine.TriggerEstimateDecision(invoice.CustomerEmail, invoiceId, accepted);
         }
     }
 }
