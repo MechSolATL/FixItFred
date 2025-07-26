@@ -98,6 +98,9 @@ namespace MVP_Core.Data
         public DbSet<TechnicianBonusLog> TechnicianBonusLogs { get; set; } = null!;
         public DbSet<OfflineZoneHeatmap> OfflineZoneHeatmaps { get; set; } = null!;
         public DbSet<TechnicianOfflineSession> TechnicianOfflineSessions { get; set; } = null!;
+        public DbSet<MediaSyncLog> MediaSyncLogs { get; set; } = null!;
+        public DbSet<TechnicianSyncScore> TechnicianSyncScores { get; set; } = null!;
+        public DbSet<SyncRankOverrideLog> SyncRankOverrideLogs { get; set; } = null!;
 
         #endregion
 
@@ -163,6 +166,9 @@ namespace MVP_Core.Data
             _ = modelBuilder.Entity<TechnicianBonusLog>().ToTable("TechnicianBonusLogs");
             _ = modelBuilder.Entity<OfflineZoneHeatmap>().ToTable("OfflineZoneHeatmaps");
             _ = modelBuilder.Entity<TechnicianOfflineSession>().ToTable("TechnicianOfflineSessions");
+            _ = modelBuilder.Entity<MediaSyncLog>().ToTable("MediaSyncLogs");
+            _ = modelBuilder.Entity<TechnicianSyncScore>().ToTable("TechnicianSyncScores");
+            _ = modelBuilder.Entity<SyncRankOverrideLog>().ToTable("SyncRankOverrideLogs");
         }
 
         #endregion

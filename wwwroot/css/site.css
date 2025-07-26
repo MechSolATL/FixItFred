@@ -300,3 +300,52 @@ footer {
 .offline-banner.active {
   display: block;
 }
+
+/* Sprint 68.3 - Save Tracker UX Styles */
+.save-status-chip {
+    position: fixed;
+    top: 18px;
+    right: 18px;
+    z-index: 9999;
+    min-width: 120px;
+    padding: 8px 18px;
+    border-radius: 18px;
+    font-weight: 600;
+    font-size: 1rem;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.10);
+    background: #f5f5f5;
+    color: #333;
+    opacity: 0;
+    transition: opacity 0.3s, background 0.3s, color 0.3s;
+    pointer-events: none;
+}
+.save-status-chip.syncing {
+    background: #e3f2fd;
+    color: #1976d2;
+    opacity: 1;
+}
+.save-status-chip.success {
+    background: #e8f5e9;
+    color: #388e3c;
+    opacity: 1;
+}
+.save-status-chip.error {
+    background: #ffebee;
+    color: #d32f2f;
+    opacity: 1;
+}
+.save-status-chip.offline {
+    background: #fffde7;
+    color: #fbc02d;
+    opacity: 1;
+}
+
+/* Sync Champion Animation for Razor Partial */
+@keyframes championBounce {
+    0% { transform: scale(1); }
+    100% { transform: scale(1.15); }
+}
+
+.sync-champion-widget .badge {
+    animation: championBounce 1s infinite alternate;
+}

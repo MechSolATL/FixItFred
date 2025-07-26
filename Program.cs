@@ -64,6 +64,8 @@ builder.Services.AddScoped<SkillsTrackerService>();
 builder.Services.AddScoped<MVP_Core.Services.Admin.AssignmentScoringEngine>();
 builder.Services.AddScoped<OfflineZoneTracker>();
 builder.Services.AddScoped<AutoPrepEngine>();
+builder.Services.AddScoped<SyncAnalyticsService>();
+builder.Services.AddScoped<SyncIncentiveEngine>();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));

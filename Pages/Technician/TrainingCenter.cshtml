@@ -82,17 +82,27 @@
 </section>
 <script src="https://kit.fontawesome.com/7c3b9e2e2a.js" crossorigin="anonymous"></script>
 <script src="~/js/ConnectivityMonitor.js"></script>
-<style>
-@@media (max-width: 768px) {
-    .grid-cols-2 { grid-template-columns: 1fr !important; }
-}
-.high-contrast, .high-contrast * {
-    background: #000 !important;
-    color: #fff !important;
-    border-color: #fff !important;
-}
-</style>
+<script src="~/js/MediaQueueHandler.js"></script>
+<script src="~/js/SaveStatusTracker.js"></script>
 <script>
+function triggerSaveStatus(action) {
+    showSaveStatus('syncing');
+    // Simulate API or offline queue
+    setTimeout(() => {
+        if (navigator.onLine) {
+            showSaveStatus('success');
+        } else {
+            showSaveStatus('syncing');
+        }
+    }, 1200);
+}
+// Patch all forms to trigger save status
+const forms = document.querySelectorAll('form');
+forms.forEach(f => {
+    f.addEventListener('submit', function(e) {
+        triggerSaveStatus('form');
+    });
+});
 document.addEventListener('keydown', function(e) {
     if (e.key === 'Tab') {
         document.body.classList.add('user-is-tabbing');
@@ -136,4 +146,14 @@ window.addEventListener('OnlineStatusChanged', updateQueueDisplay);
 window.addEventListener('storage', updateQueueDisplay);
 document.addEventListener('DOMContentLoaded', updateQueueDisplay);
 </script>
+<style>
+@@media (max-width: 768px) {
+    .grid-cols-2 { grid-template-columns: 1fr !important; }
+}
+.high-contrast, .high-contrast * {
+    background: #000 !important;
+    color: #fff !important;
+    border-color: #fff !important;
+}
+</style>
 </main>

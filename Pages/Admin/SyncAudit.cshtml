@@ -1,0 +1,76 @@
+@page
+@using MVP_Core.Services.Admin
+@model MVP_Core.Pages.Admin.SyncAuditModel
+@inject SyncAnalyticsService SyncAnalyticsService
+@inject SyncIncentiveEngine SyncIncentiveEngine
+@{
+    ViewData["Title"] = "Sync Audit Dashboard";
+    Layout = "/Pages/Shared/_Layout.cshtml";
+    var metrics = SyncAnalyticsService.GetTechnicianSyncMetrics();
+    var heatmap = SyncAnalyticsService.GetSyncZoneHeatmap();
+    var scores = SyncIncentiveEngine.CalculateAllSyncScores();
+}
+@await Html.PartialAsync("_SyncChampionSpotlight")
+<h2 class="mb-4">Technician Sync Metrics</h2>
+<table class="table table-bordered table-hover">
+    <thead class="table-light">
+        <tr>
+            <th>Technician</th>
+            <th>Success %</th>
+            <th>Avg Retry</th>
+            <th>Failed Media Recovered</th>
+            <th>Rank</th>
+            <th>Penalty</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var m in metrics)
+        {
+            var score = scores.FirstOrDefault(s => s.TechnicianId == m.TechnicianId);
+            var failedDays = SyncIncentiveEngine.GetConsecutiveFailedDays(m.TechnicianId);
+            <tr>
+                <td>@m.TechnicianName</td>
+                <td>@m.SuccessPercent%</td>
+                <td>@m.AvgRetryCount</td>
+                <td>@m.TotalFailedRecovered</td>
+                <td>
+                    <span class="badge bg-@(score?.SyncRankLevel.ToString().ToLower() ?? "bronze")"
+                          title="@(score != null ? $"{score.SyncSuccessRate}% success from {score.SyncRankLevel} rank" : "No data")">
+                        @(score?.SyncRankLevel.ToString() ?? "Bronze")
+                    </span>
+                </td>
+                <td>
+                    @if (failedDays > 3)
+                    {
+                        <span class="text-danger fw-bold">?? @failedDays days</span>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<h3 class="mt-5">Sync Bottleneck Heatmap</h3>
+<table class="table table-bordered heatmap-table">
+    <thead class="table-light">
+        <tr>
+            <th>Zone</th>
+            <th>Delayed Uploads</th>
+            <th>Avg Retry</th>
+            <th>Poor Signal Score</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var z in heatmap)
+        {
+            <tr>
+                <td>@z.Zone</td>
+                <td>@z.DelayedUploads</td>
+                <td>@z.AvgRetry</td>
+                <td>@z.PoorSignalScore</td>
+            </tr>
+        }
+    </tbody>
+</table>
+<div class="alert alert-info mt-4">
+    <strong>Offline-Triggered Sync Flags:</strong> Failed uploads retried from offline are tracked and rewarded. Techs who recover media in harsh zones earn bonus multipliers.
+</div>

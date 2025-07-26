@@ -8,6 +8,8 @@ namespace MVP_Core.Data.Models
     {
         [Key]
         public int Id { get; set; }
+        public string Zone { get; set; } = string.Empty; // Added for sync metrics
+        public int PoorSignalScore { get; set; } = 0; // Added for sync metrics
         public int TechnicianId { get; set; }
         public string ZipCode { get; set; } = string.Empty;
         public double Latitude { get; set; }

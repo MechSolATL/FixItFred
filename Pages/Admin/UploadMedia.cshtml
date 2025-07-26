@@ -53,3 +53,22 @@
     <partial name="_Alert" />
 }
 <!-- Co-Pilot: This page allows admin/dispatcher to upload media for a job. Validates file type/size. Only allowed roles. -->
+<script src="~/js/SaveStatusTracker.js"></script>
+<script>
+function triggerSaveStatus(action) {
+    showSaveStatus('syncing');
+    setTimeout(() => {
+        if (navigator.onLine) {
+            showSaveStatus('success');
+        } else {
+            showSaveStatus('syncing');
+        }
+    }, 1200);
+}
+const forms = document.querySelectorAll('form');
+forms.forEach(f => {
+    f.addEventListener('submit', function(e) {
+        triggerSaveStatus('form');
+    });
+});
+</script>

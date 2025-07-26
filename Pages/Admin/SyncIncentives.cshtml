@@ -1,0 +1,106 @@
+@page
+@using MVP_Core.Services.Admin
+@using MVP_Core.Data.Models
+@model MVP_Core.Pages.Admin.SyncIncentivesModel
+@inject SyncIncentiveEngine SyncIncentiveEngine
+@{
+    ViewData["Title"] = "Sync Incentives";
+    Layout = "/Pages/Shared/_Layout.cshtml";
+    var scores = SyncIncentiveEngine.CalculateAllSyncScores();
+    var techs = Model.GetTechniciansByIds(scores.Select(s => s.TechnicianId));
+}
+<h2 class="mb-4">Technician Sync Incentives</h2>
+<form method="post" asp-page-handler="OverrideRank">
+<table class="table table-bordered table-hover">
+    <thead class="table-light">
+        <tr>
+            <th>Name</th>
+            <th>Sync Success %</th>
+            <th>SyncRankLevel</th>
+            <th>Bonus Multiplier</th>
+            <th>Override Rank</th>
+            <th>Audit Log</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @for (int i = 0; i < scores.Count; i++)
+        {
+            var score = scores[i];
+            var tech = techs.FirstOrDefault(t => t.Id == score.TechnicianId);
+            <tr>
+                <td>@tech?.FullName ?? "Unknown"</td>
+                <td>@score.SyncSuccessRate%</td>
+                <td>
+                    <span class="badge bg-@score.SyncRankLevel.ToString().ToLower()" title="@GetRankTooltip(score)">@score.SyncRankLevel</span>
+                </td>
+                <td>
+                    <span title="@GetMultiplierTooltip(score)">@score.BonusMultiplier x</span>
+                </td>
+                <td>
+                    <select name="OverrideRank_@score.TechnicianId" class="form-select form-select-sm" style="width:120px;display:inline-block;">
+                        @foreach (SyncRankLevel rank in Enum.GetValues(typeof(SyncRankLevel)))
+                        {
+                            <option value="@rank" selected="@(score.SyncRankLevel == rank ? "selected" : null)">@rank</option>
+                        }
+                    </select>
+                    <input type="text" name="OverrideReason_@score.TechnicianId" class="form-control form-control-sm" placeholder="Reason" style="width:140px;display:inline-block;" />
+                    <button type="submit" name="SubmitOverride" value="@score.TechnicianId" class="btn btn-outline-primary btn-sm">Submit</button>
+                </td>
+                <td>
+                    <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#auditModal_@score.TechnicianId">View</button>
+                    <div class="modal fade" id="auditModal_@score.TechnicianId" tabindex="-1" aria-labelledby="auditModalLabel_@score.TechnicianId" aria-hidden="true">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="auditModalLabel_@score.TechnicianId">Override Log for @tech?.FullName</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <table class="table table-sm table-bordered">
+                                        <thead><tr><th>Previous</th><th>New</th><th>Reason</th><th>By</th><th>Timestamp</th></tr></thead>
+                                        <tbody>
+                                        @foreach (var log in SyncIncentiveEngine.GetOverrideLog(score.TechnicianId))
+                                        {
+                                            <tr>
+                                                <td>@log.PreviousRank</td>
+                                                <td>@log.NewRank</td>
+                                                <td>@log.Reason</td>
+                                                <td>@log.ModifiedBy</td>
+                                                <td>@log.Timestamp.ToString("g")</td>
+                                            </tr>
+                                        }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <a class="btn btn-outline-info btn-sm" href="/Admin/SyncAudit?techId=@score.TechnicianId">View Log</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+</form>
+<form method="post" asp-page-handler="ExportCsv">
+    <button type="submit" class="btn btn-success mt-2">Export CSV</button>
+</form>
+@functions{
+    public string GetRankTooltip(TechnicianSyncScore score)
+    {
+        return $"{score.SyncSuccessRate}% success, {score.SyncRankLevel} rank";
+    }
+    public string GetMultiplierTooltip(TechnicianSyncScore score)
+    {
+        return score.SyncRankLevel switch
+        {
+            SyncRankLevel.Platinum => "?90% success, 2.0x bonus (Platinum)",
+            SyncRankLevel.Gold => "75–89% success, 1.5x bonus (Gold)",
+            SyncRankLevel.Silver => "50–74% success, 1.2x bonus (Silver)",
+            _ => "<50% success, 1.0x bonus (Bronze)"
+        };
+    }
+}

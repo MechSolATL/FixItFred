@@ -120,4 +120,12 @@
         }
         </ul>
     </div>
+
+    <!-- Sync Champion Spotlight Widget -->
+    <div class="mb-3">
+        @using MVP_Core.Services.Admin
+        @using MVP_Core.Data.Models
+        @inject SyncIncentiveEngine SyncIncentiveEngine
+        @await Html.PartialAsync("_SyncChampionSpotlight")
+    </div>
 </div>

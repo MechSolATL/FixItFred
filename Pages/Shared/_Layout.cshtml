@@ -61,7 +61,27 @@
             font-size: 1rem;
             border-radius: 0.5rem;
         }
+
+        .save-status-chip {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            z-index: 9999;
+            padding: 6px 12px;
+            border-radius: 16px;
+            background: #28a745;
+            color: #fff;
+            font-weight: bold;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            display: none;
+        }
+
+        .save-status-chip.syncing {
+            background: #007bff;
+        }
     </style>
+
+    <script src="~/js/MediaQueueHandler.js"></script>
 </head>
 <body>
     <!-- ?? Header -->
@@ -126,6 +146,7 @@
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="~/js/ConnectivityMonitor.js" asp-append-version="true"></script>
+    <script src="~/js/SaveStatusTracker.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
 
     <!-- ?? Disable Right-Click, Ctrl+U, F12 -->
@@ -169,5 +190,8 @@
             </div>
         </div>
     }
+
+    <div id="media-sync-chip" class="success" style="position:fixed;top:10px;right:10px;z-index:9999;padding:6px 12px;border-radius:16px;background:#eee;color:#333;font-weight:bold;box-shadow:0 2px 8px rgba(0,0,0,0.1);">0 pending media items</div>
+    <div class="save-status-chip syncing" style="display:none;">?? Saving…</div>
 </body>
 </html>

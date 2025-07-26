@@ -52,5 +52,7 @@ namespace MVP_Core.Data.Models
         public bool RequiresSupervision { get; set; } = false; // Supervision required
         [MaxLength(50)]
         public string? OnboardingStatus { get; set; } // Onboarding status (e.g., Pending, Approved, Blocked)
+
+        public string Name => FullName;
     }
 }

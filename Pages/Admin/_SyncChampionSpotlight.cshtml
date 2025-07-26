@@ -1,0 +1,23 @@
+@using MVP_Core.Services.Admin
+@using MVP_Core.Data.Models
+@inject SyncIncentiveEngine SyncIncentiveEngine
+@{
+    var scores = SyncIncentiveEngine.CalculateAllSyncScores();
+    var techs = scores.Select(s => s.TechnicianId).ToList();
+    var db = Context.RequestServices.GetService(typeof(ApplicationDbContext)) as ApplicationDbContext;
+    var techList = db?.Technicians.Where(t => techs.Contains(t.Id)).ToList() ?? new List<MVP_Core.Data.Models.Technician>();
+    var champion = scores.OrderByDescending(s => s.SyncSuccessRate).FirstOrDefault();
+    var championTech = techList.FirstOrDefault(t => t.Id == champion?.TechnicianId);
+}
+@if (champion != null && championTech != null)
+{
+    <div class="sync-champion-widget p-3 mb-4 bg-light border rounded shadow-sm text-center">
+        <h4 class="mb-2">?? Sync Champion: <span class="text-success">@championTech.FullName</span></h4>
+        <div class="mb-1">
+            <span class="badge bg-@champion.SyncRankLevel.ToString().ToLower()">@champion.SyncRankLevel</span>
+            <span class="ms-2">Bonus: <b>@champion.BonusMultiplier x</b></span>
+        </div>
+        <div class="mb-1">Zone Consistency: <span class="fw-bold">@champion.SyncSuccessRate%</span></div>
+        <div class="mt-2 text-info">Celebrating top sync reliability this month!</div>
+    </div>
+}
