@@ -20,10 +20,19 @@ namespace MVP_Core.Services.Admin
             var scores = new List<TechnicianSyncScore>();
             foreach (var tech in techs)
             {
-                var logs = mediaLogs.Where(m => m.TechnicianId == tech.Id);
-                int total = logs.Count();
+                var logs = mediaLogs.Where(m => m.TechnicianId == tech.Id).OrderByDescending(m => m.Timestamp).ToList();
+                int total = logs.Count;
                 int success = logs.Count(m => m.IsSuccess);
                 double successRate = total > 0 ? (double)success / total : 0;
+                // Streak logic
+                int streak = 0;
+                for (int i = 0; i < Math.Min(7, logs.Count); i++)
+                {
+                    if (logs[i].IsSuccess) streak++;
+                    else break;
+                }
+                // Penalty logic
+                int penaltyCount = logs.Take(7).Count(m => !m.IsSuccess);
                 // Weight by high-failure zones
                 var techZones = zoneHeatmaps.Where(z => z.TechnicianId == tech.Id);
                 int highRiskZones = techZones.Count(z => z.FailureCount >= 3);
@@ -39,13 +48,55 @@ namespace MVP_Core.Services.Admin
                 else if (weightedRate >= 0.75) { rank = SyncRankLevel.Gold; multiplier = 1.5; }
                 else if (weightedRate >= 0.50) { rank = SyncRankLevel.Silver; multiplier = 1.2; }
                 else { rank = SyncRankLevel.Bronze; multiplier = 1.0; }
+                // Streak accelerator
+                if (streak >= 5) multiplier += 0.5;
+                // Bonus cooldown
+                var score = _db.TechnicianSyncScores.FirstOrDefault(s => s.TechnicianId == tech.Id);
+                DateTime? lastBonus = score?.LastBonusAwarded;
+                DateTime? cooldownUntil = score?.CooldownUntil;
+                bool bonusEligible = true;
+                if (cooldownUntil.HasValue && DateTime.UtcNow < cooldownUntil.Value)
+                {
+                    bonusEligible = false;
+                }
+                // Auto-upgrade
+                bool autoPromoted = false;
+                if (weightedRate >= 0.98 && streak >= 5 && penaltyCount == 0)
+                {
+                    if (score != null && score.SyncRankLevel != SyncRankLevel.Platinum)
+                    {
+                        var previousRank = score.SyncRankLevel;
+                        score.SyncRankLevel = SyncRankLevel.Platinum;
+                        score.LastUpdated = DateTime.UtcNow;
+                        score.BonusMultiplier = multiplier;
+                        _db.SyncRankOverrideLogs.Add(new SyncRankOverrideLog
+                        {
+                            TechnicianId = tech.Id,
+                            PreviousRank = previousRank,
+                            NewRank = SyncRankLevel.Platinum,
+                            Reason = "Auto upgrade: flawless streak and high sync %",
+                            ModifiedBy = "Auto",
+                            Timestamp = DateTime.UtcNow
+                        });
+                        _db.SaveChanges();
+                        autoPromoted = true;
+                    }
+                }
                 scores.Add(new TechnicianSyncScore
                 {
                     TechnicianId = tech.Id,
                     SyncSuccessRate = Math.Round(weightedRate * 100, 1),
                     LastUpdated = DateTime.UtcNow,
                     SyncRankLevel = rank,
-                    BonusMultiplier = multiplier
+                    BonusMultiplier = multiplier,
+                    LastBonusAwarded = lastBonus,
+                    CooldownUntil = cooldownUntil,
+                    // Custom fields for UI
+                    BonusEligible = bonusEligible,
+                    StreakLength = streak,
+                    CooldownRemaining = cooldownUntil.HasValue ? (cooldownUntil.Value - DateTime.UtcNow).TotalDays : 0,
+                    AutoPromoted = autoPromoted,
+                    RecentPenaltyCount = penaltyCount
                 });
             }
             return scores;

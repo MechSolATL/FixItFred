@@ -20,5 +20,14 @@ namespace MVP_Core.Data.Models
         public DateTime LastUpdated { get; set; }
         public SyncRankLevel SyncRankLevel { get; set; }
         public double BonusMultiplier { get; set; }
+        public DateTime? LastBonusAwarded { get; set; }
+        public DateTime? CooldownUntil { get; set; }
+
+        // Sprint 68.5: Automation UI fields
+        public bool BonusEligible { get; set; }
+        public int StreakLength { get; set; }
+        public double CooldownRemaining { get; set; }
+        public bool AutoPromoted { get; set; }
+        public int RecentPenaltyCount { get; set; }
     }
 }

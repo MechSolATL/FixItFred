@@ -19,6 +19,10 @@ namespace MVP_Core.Pages.Admin
         public void OnGet()
         {
             SyncIncentiveEngine = HttpContext.RequestServices.GetRequiredService<SyncIncentiveEngine>();
+            // Refresh sync scores with new automation logic
+            var scores = SyncIncentiveEngine.CalculateAllSyncScores();
+            // Optionally expose to ViewData for Razor UI
+            ViewData["SyncScores"] = scores;
         }
         public IActionResult OnPostOverrideRank()
         {

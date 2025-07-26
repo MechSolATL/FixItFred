@@ -21,6 +21,7 @@
             <th>Failed Media Recovered</th>
             <th>Rank</th>
             <th>Penalty</th>
+            <th>Status</th>
         </tr>
     </thead>
     <tbody>
@@ -43,6 +44,27 @@
                     @if (failedDays > 3)
                     {
                         <span class="text-danger fw-bold">?? @failedDays days</span>
+                    }
+                </td>
+                <td>
+                    @if (score != null)
+                    {
+                        if (!score.BonusEligible)
+                        {
+                            <span class="badge bg-warning text-dark">? Cooldown in effect</span>
+                        }
+                        if (score.StreakLength < 5)
+                        {
+                            <span class="badge bg-danger">?? Streak Broken</span>
+                        }
+                        if (score.AutoPromoted)
+                        {
+                            <span class="badge bg-success">?? Auto-Ranked to Platinum</span>
+                        }
+                        if (score.RecentPenaltyCount > 3)
+                        {
+                            <span class="badge bg-danger">?? Sync Risk: Penalties Exceed 3 in 7 Days</span>
+                        }
                     }
                 </td>
             </tr>
