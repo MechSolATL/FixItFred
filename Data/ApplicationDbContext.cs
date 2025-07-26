@@ -118,6 +118,7 @@ namespace MVP_Core.Data
         public DbSet<TechnicianInsightLog> TechnicianInsightLogs { get; set; } = null!;
         public DbSet<TechnicianForecastLog> TechnicianForecastLogs { get; set; } = null!;
         public DbSet<TechnicianSkillMatrix> TechnicianSkillMatrices { get; set; } = null!;
+        public DbSet<TechnicianWarningLog> TechnicianWarningLogs { get; set; } = null!;
 
         #endregion
 
@@ -211,6 +212,11 @@ namespace MVP_Core.Data
                 .OnDelete(DeleteBehavior.SetNull);
             _ = modelBuilder.Entity<TechnicianSkillMatrix>().ToTable("TechnicianSkillMatrices");
             _ = modelBuilder.Entity<TechnicianSkillMatrix>()
+                .HasOne(t => t.Technician)
+                .WithMany()
+                .HasForeignKey(t => t.TechnicianId);
+            _ = modelBuilder.Entity<TechnicianWarningLog>().ToTable("TechnicianWarningLogs");
+            modelBuilder.Entity<TechnicianWarningLog>()
                 .HasOne(t => t.Technician)
                 .WithMany()
                 .HasForeignKey(t => t.TechnicianId);

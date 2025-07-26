@@ -1,0 +1,69 @@
+@page
+@using MVP_Core.Data.Models
+@using MVP_Core.Services.Admin
+@model MVP_Core.Pages.Admin.WarningCenterModel
+@inject TechnicianWarningService WarningService
+@{
+    ViewData["Title"] = "Technician Warning Center";
+}
+<h2>Technician Warning Center</h2>
+<form method="get" class="mb-3">
+    <label>Technician:</label>
+    <select name="TechnicianId" asp-for="TechnicianId">
+        <option value="">All</option>
+        @foreach (var tech in Model.Technicians)
+        {
+            <option value="@tech.Id" selected="@(Model.TechnicianId == tech.Id ? "selected" : null)">@tech.FullName</option>
+        }
+    </select>
+    <label>Zone:</label>
+    <input type="text" name="Zone" value="@Model.Zone" />
+    <label>Severity:</label>
+    <select name="Severity">
+        <option value="">All</option>
+        <option value="Info" selected="@(Model.Severity == "Info" ? "selected" : null)">Info</option>
+        <option value="Warning" selected="@(Model.Severity == "Warning" ? "selected" : null)">Warning</option>
+        <option value="Critical" selected="@(Model.Severity == "Critical" ? "selected" : null)">Critical</option>
+    </select>
+    <label>Date From:</label>
+    <input type="date" name="FromDate" value="@Model.FromDateString" />
+    <label>Date To:</label>
+    <input type="date" name="ToDate" value="@Model.ToDateString" />
+    <button type="submit" class="btn btn-secondary">Filter</button>
+</form>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Technician</th>
+            <th>Trigger</th>
+            <th>Zone</th>
+            <th>Request</th>
+            <th>Timestamp</th>
+            <th>Severity</th>
+            <th>Resolved</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var log in Model.WarningLogs)
+        {
+            <tr>
+                <td>@log.Technician?.FullName</td>
+                <td>@log.TriggerCode</td>
+                <td>@log.SourceZone</td>
+                <td>@log.RelatedRequestId</td>
+                <td>@log.Timestamp.ToString("g")</td>
+                <td>@log.Severity</td>
+                <td>@(log.ResolvedFlag ? "Yes" : "No")</td>
+                <td>
+                    @if (!log.ResolvedFlag)
+                    {
+                        <form method="post" asp-page-handler="Resolve" asp-route-id="@log.Id" style="display:inline">
+                            <button type="submit" class="btn btn-success btn-sm">Resolve</button>
+                        </form>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
