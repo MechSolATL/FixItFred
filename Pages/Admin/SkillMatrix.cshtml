@@ -1,0 +1,53 @@
+@page
+@using MVP_Core.Data.Models
+@using MVP_Core.Services.Admin
+@model MVP_Core.Pages.Admin.SkillMatrixModel
+@inject TechnicianSkillMatrixService SkillMatrixService
+@{
+    ViewData["Title"] = "Technician Skill Matrix";
+}
+<h2>Technician Skill Matrix</h2>
+<form method="get">
+    <label for="techSelect">Select Technician:</label>
+    <select id="techSelect" name="TechnicianId" asp-for="TechnicianId" onchange="this.form.submit()">
+        @foreach (var tech in Model.Technicians)
+        {
+            <option value="@tech.Id" selected="@(Model.TechnicianId == tech.Id ? "selected" : null)">@tech.FullName</option>
+        }
+    </select>
+</form>
+@if (Model.SkillMatrix != null && Model.SkillMatrix.Any())
+{
+    <form method="post">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Skill Tag</th>
+                    <th>Proficiency Level</th>
+                    <th>Experience (Years)</th>
+                    <th>Last Updated</th>
+                    <th>Edit</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (int i = 0; i < Model.SkillMatrix.Count; i++)
+                {
+                    <tr>
+                        <td>@Model.SkillMatrix[i].SkillTag</td>
+                        <td><input type="number" name="SkillMatrix[@i].ProficiencyLevel" value="@Model.SkillMatrix[i].ProficiencyLevel" min="1" max="10" /></td>
+                        <td><input type="number" step="0.1" name="SkillMatrix[@i].ExperienceYears" value="@Model.SkillMatrix[i].ExperienceYears" min="0" /></td>
+                        <td>@Model.SkillMatrix[i].LastUpdated.ToString("g")</td>
+                        <td><input type="hidden" name="SkillMatrix[@i].Id" value="@Model.SkillMatrix[i].Id" />
+                            <input type="hidden" name="SkillMatrix[@i].SkillTag" value="@Model.SkillMatrix[i].SkillTag" />
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+    </form>
+}
+else
+{
+    <p>No skill matrix found for selected technician.</p>
+}
