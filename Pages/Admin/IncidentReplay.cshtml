@@ -1,0 +1,69 @@
+@page
+@using MVP_Core.Data.Models
+@using MVP_Core.Services.Admin
+@model MVP_Core.Pages.Admin.IncidentReplayModel
+@inject TechnicianReplayService ReplayService
+@{
+    ViewData["Title"] = "Technician Incident Replay Viewer";
+    var technicians = Model.Technicians;
+    var selectedTechId = Model.SelectedTechnicianId;
+    var replays = Model.Replays;
+}
+<h2 class="mb-4">Technician Incident Replay Viewer</h2>
+<form method="post" class="mb-3 row g-2 align-items-end">
+    <div class="col-md-4">
+        <label class="form-label">Technician</label>
+        <select name="SelectedTechnicianId" class="form-select">
+            <option value="">-- Select Technician --</option>
+            @foreach (var tech in technicians)
+            {
+                <option value="@tech.Id" selected="@(selectedTechId == tech.Id ? "selected" : null)">@tech.FullName</option>
+            }
+        </select>
+    </div>
+    <div class="col-md-2">
+        <button type="submit" class="btn btn-primary">Filter</button>
+    </div>
+</form>
+@if (replays != null && replays.Count > 0)
+{
+    <table class="table table-bordered table-hover">
+        <thead>
+            <tr>
+                <th>Timestamp</th>
+                <th>Incident Type</th>
+                <th>Severity</th>
+                <th>Triggered By</th>
+                <th>Notes</th>
+                <th>Session</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var replay in replays)
+        {
+            var severityClass = replay.Severity switch
+            {
+                "Critical" => "table-danger",
+                "High" => "table-warning",
+                "Medium" => "table-info",
+                "Low" => "table-success",
+                _ => ""
+            };
+            <tr class="@severityClass">
+                <td>@replay.Timestamp.ToLocalTime().ToString("g")</td>
+                <td>@replay.IncidentType</td>
+                <td><span class="badge bg-@(severityClass.Replace("table-", ""))">@replay.Severity</span></td>
+                <td>@replay.TriggeredBy</td>
+                <td>@replay.Notes</td>
+                <td>
+                    <a href="/Admin/SessionPlayback?hash=@replay.SnapshotHash" class="btn btn-sm btn-outline-primary">View Snapshot</a>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+else
+{
+    <div class="alert alert-info">No incident replays found for selected technician.</div>
+}
