@@ -21,5 +21,8 @@ namespace MVP_Core.Data.Models
         public DateTime SubmittedAt { get; set; } = DateTime.UtcNow;
         public bool IsGamifiedBonus { get; set; } = false; // For random bonus events
         public string? BadgeAwarded { get; set; } // For gamified badges
+        public float? SentimentScore { get; set; } // Sprint 57.0: Sentiment analysis score
+        public string? Keywords { get; set; } // Sprint 57.0: Extracted keywords
+        public bool IsFlagged { get; set; } = false; // Sprint 57.0: Flag for concerning feedback
     }
 }

@@ -104,4 +104,20 @@
             </tbody>
         </table>
     </div>
+
+    <!-- Feedback Spotlight Widget -->
+    <div class="mb-3">
+        <strong>Feedback Spotlight:</strong>
+        <ul>
+        @{
+            var loyaltyDb = Model != null && Model.HttpContext != null ? Model.HttpContext.RequestServices.GetService(typeof(MVP_Core.Data.ApplicationDbContext)) as MVP_Core.Data.ApplicationDbContext : null;
+            var reviews = loyaltyDb != null ? loyaltyDb.CustomerReviews.ToList() : new List<MVP_Core.Data.Models.CustomerReview>();
+            var spotlight = reviews.OrderByDescending(r => r.SentimentScore ?? 0).FirstOrDefault();
+            if (spotlight != null)
+            {
+                <li><b>Review #@spotlight.Id</b>: @spotlight.Feedback <span class="badge bg-info">Sentiment: @spotlight.SentimentScore</span></li>
+            }
+        }
+        </ul>
+    </div>
 </div>

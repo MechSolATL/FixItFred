@@ -31,6 +31,29 @@
     }
     </ul>
 </div>
+<div class="mb-3">
+    <strong>Feedback Highlights by Technician:</strong>
+    <ul>
+    @{
+        var loyaltyDb = LoyaltyService.GetDbContext();
+        var serviceRequests = loyaltyDb.ServiceRequests.ToList();
+        var customerReviews = loyaltyDb.CustomerReviews.ToList();
+        var techGroups = serviceRequests
+            .Join(customerReviews, s => s.Id, r => r.ServiceRequestId, (s, r) => new { s.AssignedTechnicianId, r.SentimentScore, r.Feedback })
+            .GroupBy(x => x.AssignedTechnicianId)
+            .Select(g => new {
+                TechnicianId = g.Key,
+                AvgSentiment = g.Average(x => x.SentimentScore ?? 0),
+                Highlight = g.OrderByDescending(x => x.SentimentScore ?? 0).FirstOrDefault()?.Feedback ?? "No feedback"
+            })
+            .ToList();
+        foreach (var item in techGroups)
+        {
+            <li>Tech #@item.TechnicianId: <b>Avg Sentiment:</b> @item.AvgSentiment.ToString("0.00") <br /> <b>Highlight:</b> @item.Highlight</li>
+        }
+    }
+    </ul>
+</div>
 <table class="table table-bordered">
     <thead><tr><th>Name</th><th>Points Required</th><th>Bonus Points</th><th>Description</th><th>Badge</th><th>Status</th></tr></thead>
     <tbody>

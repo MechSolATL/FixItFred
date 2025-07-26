@@ -1,0 +1,58 @@
+@page
+@model MVP_Core.Pages.Admin.FeedbackAnalyticsModel
+@inject MVP_Core.Services.FeedbackAnalyticsService AnalyticsService
+@{
+    ViewData["Title"] = "Feedback Analytics";
+    var reviews = Model.Reviews != null && Model.Reviews.Any() ? Model.Reviews : new List<MVP_Core.Data.Models.CustomerReview>();
+    var flagged = Model.FlaggedReviews != null && Model.FlaggedReviews.Any() ? Model.FlaggedReviews : new List<MVP_Core.Data.Models.CustomerReview>();
+    var avgByService = reviews.GroupBy(r => r.ServiceRequestId)
+        .Select(g => new { ServiceRequestId = g.Key, AvgRating = g.Average(r => r.Rating) }).ToList();
+}
+<h2 class="mb-4">Feedback Analytics & Sentiment Insights</h2>
+<div class="mb-3">
+    <strong>Flagged Reviews:</strong>
+    <ul>
+    @foreach (var review in flagged)
+    {
+        <li>
+            <b>Review #@review.Id</b> - @review.Feedback
+            <span class="badge bg-danger">Flagged</span>
+            <span class="badge bg-warning">Sentiment: @review.SentimentScore</span>
+            <span class="badge bg-info">Keywords: @review.Keywords</span>
+        </li>
+    }
+    </ul>
+</div>
+<div class="mb-3">
+    <strong>Average Rating by Service Request:</strong>
+    <ul>
+    @foreach (var item in avgByService)
+    {
+        <li>Request #@item.ServiceRequestId: @item.AvgRating.ToString("0.0")</li>
+    }
+    </ul>
+</div>
+<div class="mb-3">
+    <strong>All Reviews Sentiment Heatmap:</strong>
+    <canvas id="sentimentHeatmap" height="60"></canvas>
+</div>
+@section Scripts {
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    var reviews = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.Reviews));
+    var ctx = document.getElementById('sentimentHeatmap').getContext('2d');
+    var data = reviews.map(r => r.SentimentScore);
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: reviews.map(r => r.Id),
+            datasets: [{
+                label: 'Sentiment',
+                data: data,
+                backgroundColor: data.map(s => s > 0.5 ? '#28a745' : s < -0.5 ? '#dc3545' : '#ffc107')
+            }]
+        },
+        options: { scales: { y: { min: -1, max: 1 } } }
+    });
+</script>
+}
