@@ -1,0 +1,62 @@
+@page
+@model MVP_Core.Pages.Admin.JobHistoryExportModel
+@inject MVP_Core.Services.ReceiptArchiveService ArchiveService
+@inject MVP_Core.Services.CustomerPortalService PortalService
+@{
+    Layout = "/Pages/Shared/_Layout.cshtml";
+    var customers = Model.Customers;
+    var selectedCustomer = Model.CustomerEmail;
+    var selectedDate = Model.Date;
+    var jobs = Model.Jobs;
+}
+<h2>Job History Export</h2>
+<form method="get" class="row mb-3">
+    <div class="col-md-4">
+        <select name="CustomerEmail" class="form-select">
+            <option value="">Select Customer</option>
+            @foreach (var c in customers)
+            {
+                <option value="@c.Email" selected="@(selectedCustomer == c.Email ? "selected" : null)">@c.Name (@c.Email)</option>
+            }
+        </select>
+    </div>
+    <div class="col-md-3">
+        <input type="date" name="Date" class="form-control" value="@selectedDate" />
+    </div>
+    <div class="col-md-3">
+        <button type="submit" class="btn btn-primary">Filter</button>
+    </div>
+</form>
+@if (jobs.Any())
+{
+    <table class="table table-bordered">
+        <thead><tr><th>Date</th><th>Service</th><th>Technician</th><th>Status</th><th>Receipt</th><th>Actions</th></tr></thead>
+        <tbody>
+        @foreach (var job in jobs)
+        {
+            <tr>
+                <td>@job.RequestedAt.ToShortDateString()</td>
+                <td>@job.ServiceType</td>
+                <td>@job.AssignedTo</td>
+                <td>@job.Status</td>
+                <td>
+                    @if (!string.IsNullOrEmpty(job.FinalizedPDFPath)) {
+                        <a href="@job.FinalizedPDFPath.Replace("wwwroot", "")" target="_blank">Download PDF</a>
+                    } else {
+                        <span class="text-muted">Not archived</span>
+                    }
+                </td>
+                <td>
+                    <form method="post" asp-page-handler="Reissue" asp-route-id="@job.Id" style="display:inline">
+                        <button type="submit" class="btn btn-sm btn-warning">Reissue Invoice Packet</button>
+                    </form>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+else
+{
+    <div class="alert alert-info">No jobs found for selected criteria.</div>
+}

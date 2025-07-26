@@ -44,5 +44,15 @@ namespace MVP_Core.Services
         {
             return _db.Customers.FirstOrDefault(c => c.Email == email);
         }
+        // Sprint 60.0: Get all technicians for avatar display
+        public List<Technician> GetTechnicians()
+        {
+            return _db.Technicians.ToList();
+        }
+        // Sprint 60.0: Get all customers for admin export
+        public List<Customer> GetCustomerList()
+        {
+            return _db.Customers.ToList();
+        }
     }
 }

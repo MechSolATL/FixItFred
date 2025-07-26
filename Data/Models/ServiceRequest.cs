@@ -114,6 +114,11 @@ namespace MVP_Core.Data.Models
 
         // Sprint 55.0: ETA property for technician arrival
         public DateTime? EstimatedArrival { get; set; }
+
+        // Sprint 60.0: Timeline PDF archive and visibility
+        [MaxLength(500)]
+        public string? FinalizedPDFPath { get; set; } // Path to finalized PDF receipt
+        public bool ShowInTimeline { get; set; } = true; // Show in customer timeline
     }
 
     public class SlaSetting

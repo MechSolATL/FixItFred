@@ -23,5 +23,9 @@ namespace MVP_Core.Data.Models
         public DateTime? DecisionDate { get; set; }
         public string? SignatureAuditLog { get; set; } // Sprint 58.0: JSON audit log of signatures
         public bool WasExportedForLegalReview { get; set; } // Sprint 58.0: Legal export flag
+        // Sprint 60.0: Receipt archive fields
+        public DateTime? ArchivedAt { get; set; } // When invoice was archived
+        [MaxLength(500)]
+        public string? DownloadUrl { get; set; } // Downloadable PDF URL
     }
 }
