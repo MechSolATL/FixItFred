@@ -1,0 +1,61 @@
+@page
+@using MVP_Core.Data.Models
+@using MVP_Core.Services.Admin
+@model BehaviorCenterModel
+@inject TechnicianBehaviorAnalyzerService BehaviorAnalyzerService
+@{
+    ViewData["Title"] = "Technician Behavior Center";
+}
+<h2>Technician Behavior Center</h2>
+<form method="get" class="mb-3 row g-2 align-items-end">
+    <div class="col-md-3">
+        <label class="form-label">Technician ID</label>
+        <input type="number" name="techId" class="form-control" value="@Model.TechFilter" />
+    </div>
+    <div class="col-md-3">
+        <label class="form-label">Date</label>
+        <input type="date" name="date" class="form-control" value="@Model.DateFilter" />
+    </div>
+    <div class="col-md-3">
+        <label class="form-label">Severity</label>
+        <select name="severity" class="form-control">
+            <option value="" selected="@(string.IsNullOrEmpty(Model.SeverityFilter) ? "selected" : null)">All</option>
+            <option value="Info" selected="@(Model.SeverityFilter == "Info" ? "selected" : null)">Info</option>
+            <option value="Warning" selected="@(Model.SeverityFilter == "Warning" ? "selected" : null)">Warning</option>
+            <option value="Critical" selected="@(Model.SeverityFilter == "Critical" ? "selected" : null)">Critical</option>
+        </select>
+    </div>
+    <div class="col-md-3">
+        <button type="submit" class="btn btn-primary">Filter</button>
+        <button type="submit" formaction="?handler=AnalyzePatterns" formmethod="post" class="btn btn-warning ms-2">Analyze Patterns</button>
+        <input type="checkbox" name="autoFlag" value="true" @(Model.AutoFlagEnabled ? "checked" : null) /> Auto-Flag Critical
+    </div>
+</form>
+<table class="table table-bordered table-hover">
+    <thead>
+        <tr>
+            <th>Technician ID</th>
+            <th>Type</th>
+            <th>Description</th>
+            <th>Severity</th>
+            <th>Timestamp</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var log in Model.BehaviorLogs)
+        {
+            var rowClass = log.SeverityLevel == "Critical" ? "table-danger" : log.SeverityLevel == "Warning" ? "table-warning" : "table-info";
+            <tr class="@rowClass">
+                <td>@log.TechnicianId</td>
+                <td>@log.BehaviorType</td>
+                <td>@log.Description</td>
+                <td>@log.SeverityLevel</td>
+                <td>@log.Timestamp.ToString("g")</td>
+            </tr>
+        }
+    </tbody>
+</table>
+@if (!string.IsNullOrEmpty(Model.StatusMessage))
+{
+    <div class="alert alert-info">@Model.StatusMessage</div>
+}
