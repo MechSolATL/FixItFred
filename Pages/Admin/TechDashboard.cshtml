@@ -1,0 +1,81 @@
+@page
+@model MVP_Core.Pages.Admin.TechDashboardModel
+@using MVP_Core.Data.Models
+@{
+    ViewData["Title"] = "Technician Intelligence Dashboard";
+}
+<h2>Technician Intelligence Dashboard</h2>
+
+<form method="get">
+    <label for="techFilter">Technician:</label>
+    <select id="techFilter" name="TechnicianId">
+        <option value="">All</option>
+        @foreach (var tech in Model.KPIs.Select(k => new { k.TechnicianId, k.TechnicianName }).Distinct())
+        {
+            var selected = Model.FilterTechnicianId == tech.TechnicianId ? "selected" : "";
+            <option value="@tech.TechnicianId" selected="@(selected)">@tech.TechnicianName</option>
+        }
+    </select>
+    <label for="typeFilter">Insight Type:</label>
+    <input id="typeFilter" name="InsightType" value="@Model.FilterInsightType" />
+    <button type="submit">Filter</button>
+</form>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Technician</th>
+            <th>Avg Response Time</th>
+            <th>Completion Rate</th>
+            <th>Total Earnings</th>
+            <th>Active Certifications</th>
+            <th>Customer Rating</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var kpi in Model.KPIs)
+        {
+            <tr>
+                <td>@kpi.TechnicianName</td>
+                <td>@kpi.AvgResponseTime</td>
+                <td>@(kpi.CompletionRate.ToString("P2"))</td>
+                <td>@kpi.TotalEarnings.ToString("C")</td>
+                <td>@kpi.ActiveCertifications</td>
+                <td>@kpi.CustomerRating.ToString("F2")</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<h3>Log Technician Insight</h3>
+<form method="post">
+    <input type="hidden" name="TechnicianId" value="@Model.FilterTechnicianId" />
+    <label for="insightType">Type:</label>
+    <input id="insightType" name="InsightType" value="@Model.NewInsightType" required />
+    <label for="insightDetail">Detail:</label>
+    <input id="insightDetail" name="InsightDetail" value="@Model.NewInsightDetail" required />
+    <button type="submit">Log Insight</button>
+</form>
+
+<h3>Recent Insights</h3>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Technician</th>
+            <th>Type</th>
+            <th>Detail</th>
+            <th>Logged At</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var log in Model.InsightLogs)
+        {
+            <tr>
+                <td>@Model.KPIs.FirstOrDefault(k => k.TechnicianId == log.TechnicianId)?.TechnicianName</td>
+                <td>@log.InsightType</td>
+                <td>@log.InsightDetail</td>
+                <td>@log.LoggedAt.ToString("g")</td>
+            </tr>
+        }
+    </tbody>
+</table>

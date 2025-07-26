@@ -115,6 +115,7 @@ namespace MVP_Core.Data
         // Sprint 70.5: Register session playback and dispute insight logs
         public DbSet<SessionPlaybackLog> SessionPlaybackLogs { get; set; } = null!;
         public DbSet<DisputeInsightLog> DisputeInsightLogs { get; set; } = null!;
+        public DbSet<TechnicianInsightLog> TechnicianInsightLogs { get; set; } = null!;
 
         #endregion
 
