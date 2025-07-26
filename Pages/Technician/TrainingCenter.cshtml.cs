@@ -13,6 +13,7 @@ namespace MVP_Core.Pages.Technician
         public List<MVP_Core.Data.Models.SkillTrack> AssignedTracks { get; set; } = new();
         public List<MVP_Core.Data.Models.SkillProgress> Progress { get; set; } = new();
         public List<MVP_Core.Data.Models.CertificationUpload> Certs { get; set; } = new();
+        public bool HasRequiredMedia { get; set; } = false; // Sprint 69.0: Expose compliance status
         public TrainingCenterModel(SkillsTrackerService skillsService, CertificationService certService)
         {
             _skillsService = skillsService;
@@ -24,6 +25,11 @@ namespace MVP_Core.Pages.Technician
             AssignedTracks = _skillsService.GetAssignedTracks(techId);
             Progress = _skillsService.GetProgressForTechnician(techId);
             Certs = _certService.GetCertifications(techId);
+            // Get compliance status for current open ticket (pseudo: assumes one open request per tech)
+            // TODO: Implement logic to get open ServiceRequest for techId
+            MVP_Core.Data.Models.ServiceRequest openRequest = null; // Placeholder
+            if (openRequest != null)
+                HasRequiredMedia = openRequest.HasRequiredMedia;
         }
         public async Task<IActionResult> OnPostCompleteTrackAsync(int trackId)
         {

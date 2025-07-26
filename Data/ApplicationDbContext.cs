@@ -101,6 +101,12 @@ namespace MVP_Core.Data
         public DbSet<MediaSyncLog> MediaSyncLogs { get; set; } = null!;
         public DbSet<TechnicianSyncScore> TechnicianSyncScores { get; set; } = null!;
         public DbSet<SyncRankOverrideLog> SyncRankOverrideLogs { get; set; } = null!;
+        public DbSet<TechnicianPerformanceLog> TechnicianPerformanceLogs { get; set; } = null!; // Sprint 69.0: Compliance log
+        public DbSet<SystemDiagnosticLog> SystemDiagnosticLogs { get; set; } = null!;
+        public DbSet<SlaDriftSnapshot> SlaDriftSnapshots { get; set; } = null!;
+        public DbSet<RootCauseCorrelationLog> RootCauseCorrelationLogs { get; set; } = null!;
+        public DbSet<StorageGrowthSnapshot> StorageGrowthSnapshots { get; set; } = null!;
+        public DbSet<AdminAlertLog> AdminAlertLogs { get; set; } = null!;
 
         #endregion
 
@@ -169,6 +175,12 @@ namespace MVP_Core.Data
             _ = modelBuilder.Entity<MediaSyncLog>().ToTable("MediaSyncLogs");
             _ = modelBuilder.Entity<TechnicianSyncScore>().ToTable("TechnicianSyncScores");
             _ = modelBuilder.Entity<SyncRankOverrideLog>().ToTable("SyncRankOverrideLogs");
+            _ = modelBuilder.Entity<TechnicianPerformanceLog>().ToTable("TechnicianPerformanceLogs");
+            _ = modelBuilder.Entity<SystemDiagnosticLog>().ToTable("SystemDiagnosticLogs");
+            _ = modelBuilder.Entity<SlaDriftSnapshot>().ToTable("SlaDriftSnapshots");
+            _ = modelBuilder.Entity<RootCauseCorrelationLog>().ToTable("RootCauseCorrelationLogs");
+            _ = modelBuilder.Entity<StorageGrowthSnapshot>().ToTable("StorageGrowthSnapshots");
+            _ = modelBuilder.Entity<AdminAlertLog>().ToTable("AdminAlertLogs");
         }
 
         #endregion

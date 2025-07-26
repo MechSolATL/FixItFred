@@ -2,6 +2,7 @@ using MVP_Core.Data;
 using MVP_Core.Data.Models;
 using System.Collections.Generic;
 using System.Linq;
+using System;
 
 namespace MVP_Core.Services
 {
@@ -42,7 +43,7 @@ namespace MVP_Core.Services
             var progress = _db.SkillProgresses.FirstOrDefault(p => p.TechnicianId == technicianId && p.SkillTrackId == skillTrackId);
             if (progress == null) return false;
             progress.Status = "Completed";
-            progress.CompletedDate = System.DateTime.UtcNow;
+            progress.CompletedDate = DateTime.UtcNow;
             _db.SaveChanges();
             return true;
         }

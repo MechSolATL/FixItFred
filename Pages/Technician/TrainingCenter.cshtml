@@ -10,6 +10,7 @@
     var assignedTracks = Model.AssignedTracks;
     var progress = Model.Progress;
     var certs = Model.Certs;
+    var hasRequiredMedia = Model.HasRequiredMedia;
 }
 <h2>Training Center</h2>
 <section aria-label="Assigned Skill Tracks" class="mb-4 grid grid-cols-1 md:grid-cols-2">
@@ -156,4 +157,19 @@ document.addEventListener('DOMContentLoaded', updateQueueDisplay);
     border-color: #fff !important;
 }
 </style>
+@if (!hasRequiredMedia)
+{
+    <div class="alert alert-danger" role="alert" aria-label="Sync Compliance Failure">
+        <b>Compliance Required:</b> You must upload both BeforeWork and AfterWork photos (geo-matched, not backdated) before closing this ticket.
+    </div>
+}
+@* Disable close ticket button if not compliant *@
+@if (!hasRequiredMedia)
+{
+    <button class="btn btn-danger" disabled aria-label="Close Ticket Disabled">Close Ticket (Compliance Required)</button>
+}
+else
+{
+    <button class="btn btn-success" aria-label="Close Ticket">Close Ticket</button>
+}
 </main>

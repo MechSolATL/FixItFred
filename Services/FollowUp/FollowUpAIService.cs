@@ -3,18 +3,18 @@ using System.Threading.Tasks;
 using System;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
-using MVP_Core.Services.Dispatch;
+using MVP_Core.Services.FollowUp;
 
 namespace MVP_Core.Services.FollowUp
 {
     public class FollowUpAIService
     {
         private readonly ApplicationDbContext _db;
-        private readonly NotificationDispatchEngine _dispatchEngine;
-        public FollowUpAIService(ApplicationDbContext db, NotificationDispatchEngine dispatchEngine)
+        private readonly INotificationHelperService _notificationHelper;
+        public FollowUpAIService(ApplicationDbContext db, INotificationHelperService notificationHelper)
         {
             _db = db;
-            _dispatchEngine = dispatchEngine;
+            _notificationHelper = notificationHelper;
         }
 
         // Trigger follow-up for a specific scenario
@@ -52,7 +52,7 @@ namespace MVP_Core.Services.FollowUp
             await _db.SaveChangesAsync();
 
             // Auto-schedule notification
-            await _dispatchEngine.SendFollowUpNotificationAsync(serviceRequestId, reason, escalationLevel);
+            await _notificationHelper.SendFollowUpNotificationAsync(_db, serviceRequestId, reason, escalationLevel);
         }
 
         // Automated triggers for inactivity, unclaimed rewards, pending reviews, etc.

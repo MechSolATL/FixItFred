@@ -1,0 +1,52 @@
+@page
+@model MVP_Core.Pages.Admin.SystemDiagnosticsModel
+@{
+    ViewData["Title"] = "System Diagnostics";
+}
+<h2>System Diagnostics</h2>
+<button class="btn btn-primary" asp-page-handler="RunDiagnostics">Run Diagnostics</button>
+<table class="table mt-3">
+    <thead>
+        <tr>
+            <th>Timestamp</th>
+            <th>Module</th>
+            <th>Status</th>
+            <th>Summary</th>
+            <th>Details</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var log in Model.LatestLogs)
+        {
+            var statusClass = log.StatusLevel switch
+            {
+                MVP_Core.Data.Models.DiagnosticStatusLevel.OK => "table-success",
+                MVP_Core.Data.Models.DiagnosticStatusLevel.Warning => "table-warning",
+                MVP_Core.Data.Models.DiagnosticStatusLevel.Error => "table-danger",
+                _ => ""
+            };
+            <tr class="@statusClass">
+                <td>@log.Timestamp.ToString("g")</td>
+                <td>@log.ModuleName</td>
+                <td>@log.StatusLevel</td>
+                <td>@log.Summary</td>
+                <td>
+                    <button class="btn btn-link" data-bs-toggle="modal" data-bs-target="#detailsModal@log.Id">View</button>
+                    <div class="modal fade" id="detailsModal@log.Id" tabindex="-1" aria-labelledby="detailsModalLabel@log.Id" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="detailsModalLabel@log.Id">Diagnostic Details</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <pre>@log.Details</pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

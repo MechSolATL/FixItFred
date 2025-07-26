@@ -58,5 +58,32 @@ namespace MVP_Core.Services
             => _db.TechnicianMedias.Where(m => m.RequestId == requestId).OrderByDescending(m => m.UploadedAt).ToList();
         public List<TechnicianMedia> GetMediaForTechnician(int techId)
             => _db.TechnicianMedias.Where(m => m.TechnicianId == techId).OrderByDescending(m => m.UploadedAt).ToList();
+        /// <summary>
+        /// Validates that required media (BeforeWork and AfterWork photos) are present and compliant for a service request.
+        /// </summary>
+        /// <param name="requestId">ServiceRequest ID</param>
+        /// <param name="technicianId">Technician ID</param>
+        /// <returns>True if compliant, false otherwise</returns>
+        public bool ValidateRequiredMedia(int requestId, int technicianId)
+        {
+            var media = _db.TechnicianMedias.Where(m => m.RequestId == requestId && m.TechnicianId == technicianId).ToList();
+            // Must have at least one BeforeWork and one AfterWork photo
+            bool hasBefore = media.Any(m => m.NotesOrTags != null && m.NotesOrTags.Contains("BeforeWork", StringComparison.OrdinalIgnoreCase) && m.FileType == "Image");
+            bool hasAfter = media.Any(m => m.NotesOrTags != null && m.NotesOrTags.Contains("AfterWork", StringComparison.OrdinalIgnoreCase) && m.FileType == "Image");
+            if (!hasBefore || !hasAfter)
+                return false;
+            // Check geo-matching and backdating (pseudo, assumes NotesOrTags contains geo info and timestamps are valid)
+            foreach (var m in media.Where(x => x.NotesOrTags != null && (x.NotesOrTags.Contains("BeforeWork") || x.NotesOrTags.Contains("AfterWork"))))
+            {
+                // Example: NotesOrTags contains "Geo:VALID" if geo-matched
+                if (!m.NotesOrTags.Contains("Geo:VALID"))
+                    return false;
+                // UploadedAt must not be backdated (not before request creation)
+                var request = _db.ServiceRequests.FirstOrDefault(r => r.Id == requestId);
+                if (request != null && m.UploadedAt < request.CreatedAt)
+                    return false;
+            }
+            return true;
+        }
     }
 }

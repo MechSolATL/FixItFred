@@ -8,6 +8,8 @@ using MVP_Core.Middleware;
 using MVP_Core.Helpers;
 using MVP_Core.Services.Admin;
 using MVP_Core.Services.Dispatch;
+using MVP_Core.Services.System;
+using MVP_Core.Services.FollowUp;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -54,6 +56,7 @@ builder.Services.AddScoped<DispatcherService>();
 builder.Services.AddScoped<NotificationDispatchEngine>();
 builder.Services.AddScoped<ServiceRequestService>();
 builder.Services.AddScoped<TechnicianFeedbackService>(); // FixItFred: Sprint 30B - Register TechnicianFeedbackService required by DispatcherService
+builder.Services.AddScoped<INotificationHelperService, NotificationHelperService>();
 builder.Services.AddScoped<MVP_Core.Services.FollowUp.FollowUpAIService>();
 builder.Services.AddScoped<TechnicianPayService>();
 builder.Services.AddScoped<CertificationService>();
@@ -66,6 +69,13 @@ builder.Services.AddScoped<OfflineZoneTracker>();
 builder.Services.AddScoped<AutoPrepEngine>();
 builder.Services.AddScoped<SyncAnalyticsService>();
 builder.Services.AddScoped<SyncIncentiveEngine>();
+builder.Services.AddScoped<SystemDiagnosticsService>();
+builder.Services.AddScoped<Services.Admin.AutoRepairEngine>();
+builder.Services.AddScoped<Services.Dispatch.SlaDriftAnalyzerService>();
+builder.Services.AddScoped<Services.Diagnostics.RootCauseCorrelationEngine>();
+builder.Services.AddScoped<Services.Storage.StorageMonitorService>();
+builder.Services.AddScoped<Services.Admin.ComplianceReportService>();
+builder.Services.AddScoped<Services.Admin.SmartAdminAlertsService>();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));

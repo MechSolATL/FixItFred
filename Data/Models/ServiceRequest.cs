@@ -122,6 +122,10 @@ namespace MVP_Core.Data.Models
 
         [MaxLength(8000)]
         public string? RoutePlaybackPath { get; set; } // Sprint 61.0: Cached GeoJSON/array for route playback
+
+        // Sprint 69.0: Sync Compliance Enforcer
+        public bool HasRequiredMedia { get; set; } = false; // True if required media is present
+        public DateTime? SyncComplianceCheckedAt { get; set; } // Last time compliance was checked
     }
 
     public class SlaSetting

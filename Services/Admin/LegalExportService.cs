@@ -10,6 +10,7 @@ using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using MVP_Core.Data;
 using System.IO.Compression;
+using System.Text.Json; // Use correct System.Text.Json namespace
 
 namespace MVP_Core.Services.Admin
 {
@@ -65,10 +66,10 @@ namespace MVP_Core.Services.Admin
                 File.Copy("Pages/Legal/TermsAndConditions.cshtml", termsPath, true);
             // Serialize audit logs
             var auditLogPath = Path.Combine(tempDir, "AuditLog.json");
-            File.WriteAllText(auditLogPath, System.Text.Json.JsonSerializer.Serialize(auditLogs));
+            File.WriteAllText(auditLogPath, JsonSerializer.Serialize(auditLogs)); // Use System.Text.Json.JsonSerializer
             // Bundle as ZIP
             var zipPath = Path.Combine(tempDir, "LegalExportPacket.zip");
-            System.IO.Compression.ZipFile.CreateFromDirectory(tempDir, zipPath);
+            ZipFile.CreateFromDirectory(tempDir, zipPath);
             return zipPath;
         }
     }

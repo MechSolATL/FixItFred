@@ -15,13 +15,13 @@ namespace MVP_Core.Services.Dispatch
     {
         private readonly IHubContext<ETAHub> _hubContext;
         private readonly ApplicationDbContext _db;
-        private readonly FollowUpAIService _followUpAIService;
+        private readonly INotificationHelperService _notificationHelper;
 
-        public NotificationDispatchEngine(IHubContext<ETAHub> hubContext, ApplicationDbContext db, FollowUpAIService followUpAIService)
+        public NotificationDispatchEngine(IHubContext<ETAHub> hubContext, ApplicationDbContext db, INotificationHelperService notificationHelper)
         {
             _hubContext = hubContext;
             _db = db;
-            _followUpAIService = followUpAIService;
+            _notificationHelper = notificationHelper;
         }
 
         public async Task BroadcastETAAsync(string zone, string message)
@@ -90,37 +90,19 @@ namespace MVP_Core.Services.Dispatch
             var failedContacts = _db.ServiceRequests.Where(r => r.Status == "NoShow" || r.Status == "FailedContact").ToList();
 
             foreach (var job in missedConfirmations)
-                await _followUpAIService.TriggerFollowUp(job.ServiceRequestId, "MissedConfirmation");
+                await _notificationHelper.SendFollowUpNotificationAsync(_db, job.ServiceRequestId, "MissedConfirmation", "Gentle");
             foreach (var job in unassignedJobs)
-                await _followUpAIService.TriggerFollowUp(job.ServiceRequestId, "UnassignedJob");
+                await _notificationHelper.SendFollowUpNotificationAsync(_db, job.ServiceRequestId, "UnassignedJob", "Gentle");
             foreach (var job in repeatedSLABreaches)
-                await _followUpAIService.TriggerFollowUp(job.ServiceRequestId, "RepeatedSLABreach");
+                await _notificationHelper.SendFollowUpNotificationAsync(_db, job.ServiceRequestId, "RepeatedSLABreach", "Assertive");
             foreach (var req in failedContacts)
-                await _followUpAIService.TriggerFollowUp(req.Id, "FailedContact");
+                await _notificationHelper.SendFollowUpNotificationAsync(_db, req.Id, "FailedContact", "Gentle");
         }
 
         // Sprint 52.0: Send follow-up notification and log action
         public async Task SendFollowUpNotificationAsync(int serviceRequestId, string reason, string escalationLevel)
         {
-            var request = _db.ServiceRequests.FirstOrDefault(r => r.Id == serviceRequestId);
-            if (request == null) return;
-            string message = escalationLevel == "Gentle"
-                ? $"Hi {request.CustomerName}, we noticed you have a pending action: {reason}. Please take a moment to complete it."
-                : $"Action Required: {reason} for your recent service. Please respond promptly.";
-            // TODO: Integrate with EmailService/SmsService
-            // Log notification sent
-            _db.FollowUpActionLogs.Add(new FollowUpActionLog
-            {
-                UserId = 0, // TODO: Lookup user/customer ID
-                ActionType = "Email/SMS",
-                TriggerType = reason,
-                TriggeredAt = DateTime.UtcNow,
-                Status = "Sent",
-                RelatedServiceRequestId = serviceRequestId,
-                EscalationLevel = escalationLevel,
-                Notes = message
-            });
-            await _db.SaveChangesAsync();
+            await _notificationHelper.SendFollowUpNotificationAsync(_db, serviceRequestId, reason, escalationLevel);
         }
 
         // Sprint 55.0: Dispatch notification from NotificationQueue
