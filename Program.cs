@@ -61,6 +61,7 @@ builder.Services.AddScoped<LoyaltyRewardService>();
 builder.Services.AddScoped<ReviewService>();
 builder.Services.AddScoped<CustomerPortalService>();
 builder.Services.AddScoped<SkillsTrackerService>();
+builder.Services.AddScoped<MVP_Core.Services.Admin.AssignmentScoringEngine>();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));

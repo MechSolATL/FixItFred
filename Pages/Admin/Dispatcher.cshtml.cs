@@ -269,6 +269,19 @@ namespace MVP_Core.Pages.Admin
             if (dbTags.Any())
                 AllSkillTags = dbTags;
 
+            // Sprint 64.0: Smart Assignment AI scoring
+            var scoringEngine = new AssignmentScoringEngine();
+            SmartAssignmentScores.Clear();
+            foreach (var req in DispatcherRequests)
+            {
+                var scores = scoringEngine.GetScores(
+                    _db.ServiceRequests.FirstOrDefault(r => r.Id == req.Id),
+                    TechnicianStatuses,
+                    _db
+                );
+                SmartAssignmentScores[req.Id] = scores;
+            }
+
             return Page();
         }
 
@@ -600,5 +613,7 @@ namespace MVP_Core.Pages.Admin
                 CongestionLevel = ZoneStressStatuses?.FirstOrDefault(s => s.Zone == z)?.CongestionLevel ?? 0
             })
         );
+
+        public Dictionary<int, List<MVP_Core.Services.Admin.AssignmentScoringEngine.TechnicianAssignmentScore>> SmartAssignmentScores { get; set; } = new();
     }
 }
