@@ -17,6 +17,7 @@
             <th>Failure Count</th>
             <th>Last Failure</th>
             <th>Notes</th>
+            <th>Pending Sync Actions</th> <!-- Sprint 67.2: Queue Size Indicator -->
             <th>Override/Prep</th>
         </tr>
     </thead>
@@ -31,6 +32,7 @@
                 <td>@zone.FailureCount</td>
                 <td>@zone.LastFailureAt.ToString("g")</td>
                 <td>@zone.Notes</td>
+                <td><span class="badge bg-info" id="pendingSync_@zone.TechnicianId">0</span></td> <!-- Sprint 67.2: Queue Size Placeholder -->
                 <td>
                     <form method="post" asp-page-handler="PrepZone">
                         <input type="hidden" name="zoneId" value="@zone.Id" />
@@ -61,5 +63,28 @@
                 marker.bindPopup(`TechID: ${z.TechnicianId}<br>Zip: ${z.ZipCode}<br>Failures: ${z.FailureCount}`);
             });
         });
+    </script>
+    <script>
+    // Sprint 67.2: Update queue size indicators if client-side data available
+    function updateAdminQueueIndicators() {
+        // Example: localStorage['pendingSyncQueue'] = JSON.stringify([...])
+        let queue = [];
+        try {
+            queue = JSON.parse(localStorage.getItem('pendingSyncQueue') || '[]');
+        } catch { queue = []; }
+        // Group by technicianId if available
+        let techCounts = {};
+        queue.forEach(action => {
+            if (action.technicianId) {
+                techCounts[action.technicianId] = (techCounts[action.technicianId] || 0) + 1;
+            }
+        });
+        Object.keys(techCounts).forEach(techId => {
+            let el = document.getElementById('pendingSync_' + techId);
+            if (el) el.textContent = techCounts[techId];
+        });
+    }
+    document.addEventListener('DOMContentLoaded', updateAdminQueueIndicators);
+    window.addEventListener('storage', updateAdminQueueIndicators);
     </script>
 }

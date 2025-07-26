@@ -1,9 +1,17 @@
 @page
 @using MVP_Core.Data.Models
 @using MVP_Core.Services
+@using MVP_Core.Services.Admin
 @model MVP_Core.Pages.Admin.TechAuditModel
 @{
     ViewData["Title"] = "Technician Audit Logs";
+    var analytics = new TechnicianAnalyticsService(Model._db);
+    var selectedTechId = Model.TechnicianId ?? 0;
+    var offlineHours = selectedTechId > 0 ? analytics.GetOfflineHoursLast30Days(selectedTechId) : 0;
+    var offlinePercent = selectedTechId > 0 ? analytics.GetOfflinePercentVsJobs(selectedTechId) : 0;
+    var offlineIncidents = selectedTechId > 0 ? analytics.GetOfflineIncidentCount(selectedTechId) : 0;
+    var frequentZones = selectedTechId > 0 ? analytics.GetFrequentOfflineZones(selectedTechId) : new List<string>();
+    var slaImpact = selectedTechId > 0 ? analytics.GetSlaImpactFromOffline(selectedTechId) : 0;
 }
 <h2>Technician Audit Logs</h2>
 <form method="get">
@@ -27,6 +35,19 @@
     </select>
     <button type="submit">Filter</button>
 </form>
+@if (selectedTechId > 0)
+{
+    <div class="card mb-3">
+        <div class="card-body">
+            <span class="badge bg-warning text-dark" title="Offline hours in last 30 days">?? Offline Hours (30d): <strong>@offlineHours</strong></span>
+            <span class="badge bg-info ms-2" title="Offline incidents">? Downtime Incidents: <strong>@offlineIncidents</strong></span>
+            <span class="badge bg-secondary ms-2" title="Frequent drop zones">?? Frequent Drop Zones: <strong>@string.Join(", ", frequentZones)</strong></span>
+            <span class="badge bg-danger ms-2" title="SLA impact">? SLA Impact: <strong>@slaImpact %</strong></span>
+            <span class="badge bg-primary ms-2" title="Offline % vs jobs">?? Offline % vs Jobs: <strong>@offlinePercent %</strong></span>
+            <span class="ms-2" data-bs-toggle="tooltip" title="Offline hours are calculated from TechnicianOfflineSession logs. SLA impact is % of jobs breached during offline."><i class="fas fa-info-circle"></i></span>
+        </div>
+    </div>
+}
 <table class="table">
     <thead>
         <tr>
@@ -52,3 +73,11 @@
         }
     </tbody>
 </table>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.forEach(function (tooltipTriggerEl) {
+        new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+});
+</script>

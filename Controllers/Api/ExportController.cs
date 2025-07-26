@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 using MVP_Core.Services.Admin;
-// ...existing code...
+using System.IO;
+
 public class ExportController : Controller
 {
     [HttpPost]
@@ -8,9 +9,13 @@ public class ExportController : Controller
     public async Task<IActionResult> ExportInvestorPack([FromForm] string summary, [FromForm] string architectureDiagramPath, [FromForm] string featureMatrix, [FromForm] string revenueModel, [FromForm] string pitchPack, [FromForm] string sprintTag)
     {
         string outputDir = Path.Combine(Directory.GetCurrentDirectory(), "InvestorExports");
-        await InvestorExportPipeline.GenerateInvestorPackAsync(summary, architectureDiagramPath, featureMatrix, revenueModel, pitchPack, outputDir, sprintTag);
+        var report = new InvestorAnalyticsReport
+        {
+            ExecutiveSummary = summary,
+            // TODO: Populate other properties from form data or service as needed
+        };
+        await InvestorExportPipeline.GenerateInvestorPackAsync(report, outputDir, sprintTag);
         string pdfPath = Path.Combine(outputDir, $"InvestorPack_{sprintTag}.pdf");
         return PhysicalFile(pdfPath, "application/pdf", $"InvestorPack_{sprintTag}.pdf");
     }
 }
-// ...existing code...

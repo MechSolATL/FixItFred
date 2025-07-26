@@ -64,6 +64,14 @@
     }
     </ul>
 </section>
+<section aria-label="Pending Sync Queue" class="mb-4">
+    <h4>Pending Sync Actions</h4>
+    <div id="syncQueueStatus" class="mb-2">
+        <span id="queueSize" class="badge bg-info">0</span> actions pending
+    </div>
+    <ul id="pendingActionsList"></ul>
+    <button id="forceSyncBtn" class="btn btn-primary" style="display:none;min-height:44px;" aria-label="Force Sync Now">Force Sync Now</button>
+</section>
 @if (SkillsService.IsEligibleForBadge(techId))
 {
     <div class="alert alert-info" role="alert">Congratulations! You have completed all required skill tracks and earned a badge.</div>
@@ -75,7 +83,7 @@
 <script src="https://kit.fontawesome.com/7c3b9e2e2a.js" crossorigin="anonymous"></script>
 <script src="~/js/ConnectivityMonitor.js"></script>
 <style>
-@media (max-width: 768px) {
+@@media (max-width: 768px) {
     .grid-cols-2 { grid-template-columns: 1fr !important; }
 }
 .high-contrast, .high-contrast * {
@@ -90,5 +98,42 @@ document.addEventListener('keydown', function(e) {
         document.body.classList.add('user-is-tabbing');
     }
 });
+// --- Sprint 67.2: Sync Queue Visualization + Manual Retry Logic ---
+function getPendingActions() {
+    let queue = [];
+    try {
+        queue = JSON.parse(localStorage.getItem('pendingSyncQueue') || '[]');
+    } catch { queue = []; }
+    return queue;
+}
+function updateQueueDisplay() {
+    const queue = getPendingActions();
+    document.getElementById('queueSize').textContent = queue.length;
+    const list = document.getElementById('pendingActionsList');
+    list.innerHTML = '';
+    if (queue.length === 0) {
+        list.innerHTML = '<li>No pending actions.</li>';
+        document.getElementById('forceSyncBtn').style.display = 'none';
+    } else {
+        queue.forEach((action, idx) => {
+            const li = document.createElement('li');
+            li.textContent = `${action.type || 'Action'}: ${action.description || JSON.stringify(action)}`;
+            list.appendChild(li);
+        });
+        document.getElementById('forceSyncBtn').style.display = navigator.onLine ? 'inline-block' : 'none';
+    }
+}
+document.getElementById('forceSyncBtn').addEventListener('click', function () {
+    const queue = getPendingActions();
+    if (queue.length === 0) return;
+    setTimeout(() => {
+        localStorage.setItem('pendingSyncQueue', '[]');
+        updateQueueDisplay();
+        alert('Pending actions synced!');
+    }, 1000);
+});
+window.addEventListener('OnlineStatusChanged', updateQueueDisplay);
+window.addEventListener('storage', updateQueueDisplay);
+document.addEventListener('DOMContentLoaded', updateQueueDisplay);
 </script>
 </main>

@@ -6,13 +6,14 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using MVP_Core.Data;
 using MVP_Core.Data.Models;
 using MVP_Core.Services;
+using MVP_Core.Services.Admin;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MVP_Core.Pages.Admin
 {
     public class TechAuditModel : PageModel
     {
-        private readonly ApplicationDbContext _db;
+        internal readonly ApplicationDbContext _db;
         private readonly TechnicianAuditService _auditService;
         public TechAuditModel(ApplicationDbContext db)
         {

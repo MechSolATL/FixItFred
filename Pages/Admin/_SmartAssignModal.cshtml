@@ -1,5 +1,9 @@
 @* SmartAssign Modal for Sprint 64.0: Shows assignment scores, factors, and confidence for each technician *@
 @model MVP_Core.Pages.Admin.DispatcherModel
+@{
+    var requestId = Model.RequestId;
+    var scores = Model.SmartAssignmentScores.ContainsKey(requestId) ? Model.SmartAssignmentScores[requestId] : new List<MVP_Core.Services.Admin.AssignmentScoringEngine.TechnicianAssignmentScore>();
+}
 <div class="modal fade" id="smartAssignModal" tabindex="-1" role="dialog" aria-labelledby="smartAssignModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content" role="region" aria-label="SmartAssign Modal">
@@ -64,7 +68,7 @@ document.getElementById('smartAssignModal').addEventListener('keydown', function
 });
 </script>
 <style>
-@media (max-width: 768px) {
+@@media (max-width: 768px) {
     .modal-lg { width: 100vw !important; }
 }
 .high-contrast, .high-contrast * {

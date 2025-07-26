@@ -97,6 +97,7 @@ namespace MVP_Core.Data
         // Already mapped: ServiceRequests
         public DbSet<TechnicianBonusLog> TechnicianBonusLogs { get; set; } = null!;
         public DbSet<OfflineZoneHeatmap> OfflineZoneHeatmaps { get; set; } = null!;
+        public DbSet<TechnicianOfflineSession> TechnicianOfflineSessions { get; set; } = null!;
 
         #endregion
 
@@ -161,6 +162,7 @@ namespace MVP_Core.Data
             _ = modelBuilder.Entity<KanbanHistoryLog>().HasKey(k => k.Id);
             _ = modelBuilder.Entity<TechnicianBonusLog>().ToTable("TechnicianBonusLogs");
             _ = modelBuilder.Entity<OfflineZoneHeatmap>().ToTable("OfflineZoneHeatmaps");
+            _ = modelBuilder.Entity<TechnicianOfflineSession>().ToTable("TechnicianOfflineSessions");
         }
 
         #endregion
