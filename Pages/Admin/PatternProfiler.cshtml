@@ -1,0 +1,55 @@
+@page
+@model MVP_Core.Pages.Admin.PatternProfilerModel
+@{
+    ViewData["Title"] = "Technician Pattern Profiler";
+}
+<h2>Technician Pattern Profiler</h2>
+<form method="post">
+    <div>
+        <label>Risk Level:</label>
+        <select asp-for="SelectedRiskLevel">
+            <option value="">All</option>
+            <option value="Low">Low</option>
+            <option value="Medium">Medium</option>
+            <option value="High">High</option>
+        </select>
+        <label>Pattern Type:</label>
+        <select asp-for="SelectedPatternType">
+            <option value="">All</option>
+            <option value="Escalation Spike">Escalation Spike</option>
+            <option value="Normal">Normal</option>
+        </select>
+        <button type="submit" asp-page-handler="RunAnalysis">Run Pattern Analysis</button>
+    </div>
+</form>
+<table class="table">
+    <thead>
+        <tr>
+            <th>TechnicianId</th>
+            <th>PatternType</th>
+            <th>Description</th>
+            <th>DetectedAt</th>
+            <th>RiskLevel</th>
+            <th>Auto-Flagged</th>
+            <th>Annotation</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var pattern in Model.Patterns)
+        {
+            <tr>
+                <td>@pattern.TechnicianId</td>
+                <td>@pattern.PatternType</td>
+                <td>@pattern.Description</td>
+                <td>@pattern.DetectedAt</td>
+                <td>@pattern.RiskLevel</td>
+                <td>
+                    <input type="checkbox" checked="@(pattern.IsAutoFlagged ? "checked" : null)" disabled />
+                </td>
+                <td>
+                    <input type="text" name="Annotations[@pattern.Id]" value="@Model.GetAnnotation(pattern.Id)" />
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -124,6 +124,7 @@ namespace MVP_Core.Data
         public DbSet<TechnicianTrustLog> TechnicianTrustLogs { get; set; } = null!;
         public DbSet<TechnicianEscalationLog> TechnicianEscalationLogs { get; set; } = null!;
         public DbSet<TechnicianIncidentReplay> TechnicianIncidentReplays { get; set; } = null!;
+        public DbSet<TechnicianPatternProfile> TechnicianPatternProfiles { get; set; } = null!;
 
         #endregion
 
@@ -230,6 +231,7 @@ namespace MVP_Core.Data
             _ = modelBuilder.Entity<TechnicianTrustLog>().ToTable("TechnicianTrustLogs");
             _ = modelBuilder.Entity<TechnicianEscalationLog>().ToTable("TechnicianEscalationLogs");
             _ = modelBuilder.Entity<TechnicianIncidentReplay>().ToTable("TechnicianIncidentReplays");
+            _ = modelBuilder.Entity<TechnicianPatternProfile>().ToTable("TechnicianPatternProfiles");
         }
 
         #endregion
