@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using MVP_Core.Data;
 using MVP_Core.Data.Models;
 using Microsoft.EntityFrameworkCore;
+using Helpers;
 
 namespace Services.Admin
 {
@@ -19,7 +20,7 @@ namespace Services.Admin
         // Analyzes past recovery scenarios and logs frequent error patterns
         public async Task<List<RecoveryLearningLog>> AnalyzeRecoveryPatternsAsync()
         {
-            var logs = await _db.RecoveryScenarioLogs.ToListAsync();
+            var logs = await _db.RecoveryScenarioLogs.Include(x => x.ServiceRequest).ToListAsync();
             var grouped = logs
                 .GroupBy(l => new { l.ScenarioName, l.SnapshotHash })
                 .Select(g => new
@@ -28,7 +29,9 @@ namespace Services.Admin
                     PatternHash = g.Key.SnapshotHash,
                     Outcome = g.GroupBy(x => x.OutcomeSummary).OrderByDescending(x => x.Count()).FirstOrDefault()?.Key ?? "Unknown",
                     Count = g.Count(),
-                    LastRecorded = g.Max(x => x.ExecutedAtUtc ?? x.ScheduledForUtc)
+                    LastRecorded = g.Max(x => x.ExecutedAtUtc ?? x.ScheduledForUtc),
+                    ErrorObject = g.FirstOrDefault(),
+                    ServiceRequest = g.FirstOrDefault()?.ServiceRequest
                 })
                 .OrderByDescending(x => x.Count)
                 .Take(10)
@@ -42,7 +45,10 @@ namespace Services.Admin
                     TriggerSignature = item.TriggerSignature,
                     PatternHash = item.PatternHash,
                     Outcome = item.Outcome,
-                    RecordedAt = item.LastRecorded
+                    RecordedAt = item.LastRecorded,
+                    SourceModule = "SystemDiagnostics",
+                    TriggerContextJson = TraceCaptureHelper.CaptureContext(item.ErrorObject),
+                    LinkedRequestId = item.ServiceRequest?.Id
                 };
                 learningLogs.Add(log);
             }

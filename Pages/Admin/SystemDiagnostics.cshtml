@@ -191,24 +191,40 @@
                 <th>Pattern Hash</th>
                 <th>Outcome</th>
                 <th>Timestamp</th>
+                <th>Source Module</th>
+                <th>Context</th>
+                <th>Linked Request</th>
             </tr>
         </thead>
         <tbody>
             @if (Model.LearnedPatterns != null && Model.LearnedPatterns.Any())
             {
-                foreach (var trigger in Model.LearnedPatterns)
+                foreach (var log in Model.LearnedPatterns)
                 {
                     <tr>
-                        <td>@trigger.TriggerSignature</td>
-                        <td>@trigger.PatternHash</td>
-                        <td>@trigger.Outcome</td>
-                        <td>@trigger.RecordedAt.ToString("g")</td>
+                        <td>@log.TriggerSignature</td>
+                        <td>@log.PatternHash</td>
+                        <td>@log.Outcome</td>
+                        <td>@log.RecordedAt.ToString("g")</td>
+                        <td>@log.SourceModule</td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-info" type="button" data-bs-toggle="collapse" data-bs-target="#context@log.Id">Show</button>
+                            <div class="collapse" id="context@log.Id">
+                                <pre>@log.TriggerContextJson</pre>
+                            </div>
+                        </td>
+                        <td>
+                            @if (log.LinkedRequestId != null)
+                            {
+                                <a asp-page="/Admin/ServiceRequests" asp-route-id="@log.LinkedRequestId">View Request</a>
+                            }
+                        </td>
                     </tr>
                 }
             }
             else
             {
-                <tr><td colspan="4">No learned triggers yet.</td></tr>
+                <tr><td colspan="7">No learned triggers yet.</td></tr>
             }
         </tbody>
     </table>

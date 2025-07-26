@@ -9,4 +9,7 @@ public class RecoveryScenarioLog
     public string? OutcomeSummary { get; set; }
     public string? SnapshotHash { get; set; }
     public string? Notes { get; set; }
+    // Sprint 70.3 Patch - Establish link to originating ServiceRequest
+    public int? ServiceRequestId { get; set; }
+    public ServiceRequest? ServiceRequest { get; set; }
 }

@@ -191,6 +191,18 @@ namespace MVP_Core.Data
             _ = modelBuilder.Entity<ReplayAuditLog>().ToTable("ReplayAuditLogs");
             _ = modelBuilder.Entity<RecoveryScenarioLog>().ToTable("RecoveryScenarioLogs");
             _ = modelBuilder.Entity<RecoveryLearningLog>().ToTable("RecoveryLearningLogs");
+            modelBuilder.Entity<RecoveryLearningLog>(entity =>
+            {
+                entity.Property(e => e.TriggerContextJson).HasMaxLength(1000);
+                entity.Property(e => e.SourceModule).HasMaxLength(100);
+                entity.Property(e => e.LinkedRequestId).IsRequired(false);
+            });
+            // Sprint 70.3 Patch - Link RecoveryScenarioLog ? ServiceRequest
+            modelBuilder.Entity<RecoveryScenarioLog>()
+                .HasOne(r => r.ServiceRequest)
+                .WithMany()
+                .HasForeignKey(r => r.ServiceRequestId)
+                .OnDelete(DeleteBehavior.SetNull);
         }
 
         #endregion
