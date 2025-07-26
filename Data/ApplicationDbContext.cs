@@ -111,6 +111,7 @@ namespace MVP_Core.Data
         public DbSet<AdminAlertAcknowledgeLog> AdminAlertAcknowledgeLogs { get; set; } = null!;
         public DbSet<ReplayAuditLog> ReplayAuditLogs { get; set; } = null!;
         public DbSet<RecoveryScenarioLog> RecoveryScenarioLogs { get; set; } = null!;
+        public DbSet<RecoveryLearningLog> RecoveryLearningLogs { get; set; } = null!;
 
         #endregion
 
@@ -189,6 +190,7 @@ namespace MVP_Core.Data
             _ = modelBuilder.Entity<AdminAlertAcknowledgeLog>().ToTable("AdminAlertAcknowledgeLogs");
             _ = modelBuilder.Entity<ReplayAuditLog>().ToTable("ReplayAuditLogs");
             _ = modelBuilder.Entity<RecoveryScenarioLog>().ToTable("RecoveryScenarioLogs");
+            _ = modelBuilder.Entity<RecoveryLearningLog>().ToTable("RecoveryLearningLogs");
         }
 
         #endregion

@@ -38,6 +38,7 @@ namespace MVP_Core.Pages.Admin
         public List<AdminAlertLog> ActiveAlerts { get; set; } = new();
         public string AdminUserId => User?.Identity?.Name ?? "admin";
         public List<RecoveryScenarioLog> ScheduledScenarios { get; set; } = new();
+        public List<RecoveryLearningLog> TopRecoveryTriggers { get; set; } = new();
 
         public async Task OnGetAsync()
         {
@@ -102,6 +103,14 @@ namespace MVP_Core.Pages.Admin
                 _db.RecoveryScenarioLogs.Update(scenario);
                 await _db.SaveChangesAsync();
             }
+            await OnGetAsync();
+            return Page();
+        }
+
+        public async Task<IActionResult> OnPostAnalyzePatternsAsync()
+        {
+            var aiService = new RecoveryAILearningService(_db);
+            TopRecoveryTriggers = await aiService.AnalyzeRecoveryPatternsAsync();
             await OnGetAsync();
             return Page();
         }

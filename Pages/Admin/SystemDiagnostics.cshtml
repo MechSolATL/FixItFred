@@ -154,3 +154,38 @@
         }
     </tbody>
 </table>
+<!-- Recovery AI Learning Engine Widget -->
+<div class="mb-3">
+    <h4>Recovery AI Learning Engine</h4>
+    <form method="post" asp-page-handler="AnalyzePatterns">
+        <button type="submit" class="btn btn-info mb-2">Analyze Patterns</button>
+    </form>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Trigger Signature</th>
+                <th>Pattern Hash</th>
+                <th>Outcome</th>
+                <th>Timestamp</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.TopRecoveryTriggers != null && Model.TopRecoveryTriggers.Any())
+            {
+                foreach (var trigger in Model.TopRecoveryTriggers)
+                {
+                    <tr>
+                        <td>@trigger.TriggerSignature</td>
+                        <td>@trigger.PatternHash</td>
+                        <td>@trigger.Outcome</td>
+                        <td>@trigger.RecordedAt.ToString("g")</td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr><td colspan="4">No learned triggers yet.</td></tr>
+            }
+        </tbody>
+    </table>
+</div>
