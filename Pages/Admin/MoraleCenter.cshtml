@@ -1,0 +1,64 @@
+@page
+@model MVP_Core.Pages.Admin.MoraleCenterModel
+@{
+    ViewData["Title"] = "Technician Morale Center";
+}
+<h2>Technician Morale Center</h2>
+<form method="post">
+    <label>Technician ID:</label>
+    <input type="number" asp-for="TechnicianId" />
+    <button type="submit" asp-page-handler="Filter">Filter</button>
+</form>
+<div>
+    <h4>Morale Trend</h4>
+    <canvas id="moraleTrendChart"></canvas>
+</div>
+<form method="post">
+    <input type="hidden" asp-for="TechnicianId" />
+    <label>Morale Score:</label>
+    <input type="number" asp-for="MoraleScore" />
+    <label>Notes:</label>
+    <input type="text" asp-for="Notes" />
+    <label>Trust Impact:</label>
+    <input type="number" asp-for="TrustImpact" />
+    <button type="submit" asp-page-handler="AddMorale">Add Morale Entry</button>
+</form>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Timestamp</th>
+            <th>MoraleScore</th>
+            <th>Notes</th>
+            <th>TrustImpact</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var log in Model.MoraleLogs)
+        {
+            <tr>
+                <td>@log.Timestamp</td>
+                <td>@log.MoraleScore</td>
+                <td>@log.Notes</td>
+                <td>@log.TrustImpact</td>
+            </tr>
+        }
+    </tbody>
+</table>
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        var ctx = document.getElementById('moraleTrendChart').getContext('2d');
+        var chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.MoraleLogs.Select(x => x.Timestamp.ToString("MM/dd HH:mm")))) ,
+                datasets: [{
+                    label: 'Morale Score',
+                    data: @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.MoraleLogs.Select(x => x.MoraleScore))),
+                    borderColor: 'blue',
+                    fill: false
+                }]
+            }
+        });
+    </script>
+}

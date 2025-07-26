@@ -1,0 +1,31 @@
+@page
+@model MVP_Core.Pages.Admin.TrustRecoveryModel
+@{
+    ViewData["Title"] = "Technician Trust Recovery";
+}
+<h2>Technician Trust Recovery</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>TechnicianId</th>
+            <th>PreviousTrustScore</th>
+            <th>RestoredTrustScore</th>
+            <th>Delta</th>
+            <th>ActionsTaken</th>
+            <th>Timestamp</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var log in Model.RedemptionLogs)
+        {
+            <tr>
+                <td>@log.TechnicianId</td>
+                <td>@log.PreviousTrustScore</td>
+                <td>@log.RestoredTrustScore</td>
+                <td>@(log.RestoredTrustScore - log.PreviousTrustScore)</td>
+                <td>@log.ActionsTaken</td>
+                <td>@log.Timestamp</td>
+            </tr>
+        }
+    </tbody>
+</table>
