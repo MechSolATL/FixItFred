@@ -1,0 +1,65 @@
+@page
+@model MVP_Core.Pages.Admin.EscalationCenterModel
+@using MVP_Core.Data.Models
+@inject MVP_Core.Services.Admin.TechnicianEscalationService EscalationService
+@{
+    ViewData["Title"] = "Technician Escalation Center";
+}
+<h2>Technician Escalation Center</h2>
+<form method="get">
+    <label>Technician ID:</label>
+    <input type="number" name="TechnicianId" value="@Model.FilterTechnicianId" />
+    <label>Resolved:</label>
+    <select name="Resolved">
+        <option value="">All</option>
+        <option value="true" selected="@(Model.FilterResolved == true ? "selected" : null)">Resolved</option>
+        <option value="false" selected="@(Model.FilterResolved == false ? "selected" : null)">Unresolved</option>
+    </select>
+    <button type="submit">Filter</button>
+</form>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>TechnicianId</th>
+            <th>EscalationLevel</th>
+            <th>EscalationReason</th>
+            <th>Resolved</th>
+            <th>CreatedAt</th>
+            <th>ResolvedAt</th>
+            <th>ResolutionNotes</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var e in Model.Escalations)
+        {
+            <tr>
+                <td>@e.Id</td>
+                <td>@e.TechnicianId</td>
+                <td>@e.EscalationLevel</td>
+                <td>@e.EscalationReason</td>
+                <td>@e.Resolved</td>
+                <td>@e.CreatedAt</td>
+                <td>@e.ResolvedAt</td>
+                <td>@e.ResolutionNotes</td>
+                <td>
+                    @if (!e.Resolved)
+                    {
+                        <form method="post">
+                            <input type="hidden" name="EscalationId" value="@e.Id" />
+                            <input type="text" name="ResolutionNotes" placeholder="Resolution notes" />
+                            <select name="TrustImpactTier">
+                                <option value="">Trust Impact Tier</option>
+                                <option value="1">Tier 1</option>
+                                <option value="2">Tier 2</option>
+                                <option value="3">Tier 3</option>
+                            </select>
+                            <button type="submit">Override & Resolve</button>
+                        </form>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

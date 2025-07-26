@@ -122,6 +122,7 @@ namespace MVP_Core.Data
         public DbSet<TechnicianBehaviorLog> TechnicianBehaviorLogs { get; set; } = null!; // Sprint 71.0: Behavior analyzer log
         public DbSet<TechnicianResponseLog> TechnicianResponseLogs { get; set; } = null!;
         public DbSet<TechnicianTrustLog> TechnicianTrustLogs { get; set; } = null!;
+        public DbSet<TechnicianEscalationLog> TechnicianEscalationLogs { get; set; } = null!;
 
         #endregion
 
@@ -226,6 +227,7 @@ namespace MVP_Core.Data
             _ = modelBuilder.Entity<TechnicianBehaviorLog>().ToTable("TechnicianBehaviorLogs");
             _ = modelBuilder.Entity<TechnicianResponseLog>().ToTable("TechnicianResponseLogs");
             _ = modelBuilder.Entity<TechnicianTrustLog>().ToTable("TechnicianTrustLogs");
+            _ = modelBuilder.Entity<TechnicianEscalationLog>().ToTable("TechnicianEscalationLogs");
         }
 
         #endregion
