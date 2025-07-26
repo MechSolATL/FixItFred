@@ -1,10 +1,39 @@
 @page
 @model MVP_Core.Pages.Admin.SystemDiagnosticsModel
+@inject global::Services.Admin.AutoRepairEngine AutoRepairEngine
+@inject global::Services.Diagnostics.RootCauseCorrelationEngine RootCauseCorrelationEngine
+@inject global::Services.Admin.SmartAdminAlertsService SmartAdminAlertsService
 @{
     ViewData["Title"] = "System Diagnostics";
+    var healthStatus = "";
+    var rootCauseSummary = "";
+    var alerts = new List<string>();
+    try { healthStatus = AutoRepairEngine.DetectCorruptionAsync().GetAwaiter().GetResult()?.ToString() ?? "Unknown"; } catch { healthStatus = "Error loading health status."; }
+    try { rootCauseSummary = RootCauseCorrelationEngine.CorrelateRootCausesAsync().GetAwaiter().GetResult()?.ToString() ?? "No summary"; } catch { rootCauseSummary = "Error loading root cause summary."; }
+    try { alerts = SmartAdminAlertsService.TriggerAlertsAsync().GetAwaiter().GetResult() as List<string> ?? new List<string>(); } catch { alerts = new List<string>{"Error loading alerts."}; }
 }
 <h2>System Diagnostics</h2>
-<button class="btn btn-primary" asp-page-handler="RunDiagnostics">Run Diagnostics</button>
+<!-- AutoRepairEngine Health Badge + Rollback Button -->
+<div class="mb-3">
+    <h4>AutoRepairEngine Health</h4>
+    <span class="badge bg-@(healthStatus == "Healthy" ? "success" : "danger")">@healthStatus</span>
+    <form method="post">
+        <button type="submit" class="btn btn-outline-danger" formaction="/Admin/RunRollback">Run Rollback</button>
+    </form>
+</div>
+<!-- RootCauseCorrelationEngine Summary Widget -->
+<div class="mb-3">
+    <h4>Root Cause Correlation Log</h4>
+    <div class="alert alert-info">@rootCauseSummary</div>
+</div>
+<!-- SmartAdminAlerts Display -->
+<div class="mb-3">
+    <h4>Smart Admin Alerts</h4>
+    <div class="alert alert-warning d-flex align-items-center">
+        <span class="me-2"><i class="fas fa-exclamation-triangle"></i></span>
+        <span>@string.Join(", ", alerts)</span>
+    </div>
+</div>
 <table class="table mt-3">
     <thead>
         <tr>

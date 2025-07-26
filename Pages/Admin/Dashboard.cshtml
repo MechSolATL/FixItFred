@@ -1,12 +1,60 @@
 @page
 @model MVP_Core.Pages.Admin.DashboardModel
+@inject global::Services.Dispatch.SlaDriftAnalyzerService SlaDriftAnalyzerService
+@inject global::Services.Storage.StorageMonitorService StorageMonitorService
+@inject global::Services.Admin.ComplianceReportService ComplianceReportService
+@inject global::Services.Admin.SmartAdminAlertsService SmartAdminAlertsService
 @{
     ViewData["Title"] = "Admin Dashboard";
     Layout = "~/Pages/Shared/_Layout.cshtml";
+    var slaHeatmap = "";
+    var storageChart = "";
+    var alerts = new List<string>();
+    try { slaHeatmap = SlaDriftAnalyzerService.AnalyzeSlaDriftAsync().GetAwaiter().GetResult()?.ToString() ?? "No data"; } catch { slaHeatmap = "Error loading SLA drift heatmap."; }
+    try { storageChart = StorageMonitorService.MonitorStorageAsync().GetAwaiter().GetResult()?.ToString() ?? "No data"; } catch { storageChart = "Error loading storage chart."; }
+    try { alerts = SmartAdminAlertsService.TriggerAlertsAsync().GetAwaiter().GetResult() as List<string> ?? new List<string>(); } catch { alerts = new List<string>{"Error loading alerts."}; }
 }
 
 <div class="container mt-5">
     <h1 class="text-center mb-4">?? Service Requests Dashboard</h1>
+
+    <!-- SLA Drift Heatmap Widget -->
+    <div class="mb-4">
+        <h4>SLA Drift Heatmap <span class="badge bg-warning">Live</span></h4>
+        <div>@slaHeatmap</div>
+    </div>
+
+    <!-- Storage Growth Chart + Compress Now Button -->
+    <div class="mb-4">
+        <h4>Storage Growth <span class="badge bg-info">Live</span></h4>
+        <div>@storageChart</div>
+        <form method="post">
+            <button type="submit" class="btn btn-secondary" formaction="/Admin/CompressStorage">Compress Now</button>
+        </form>
+    </div>
+
+    <!-- Compliance Report Export Buttons -->
+    <div class="mb-4">
+        <h4>Compliance Reports</h4>
+        <form method="post">
+            <button type="submit" class="btn btn-outline-primary me-2" formaction="/Admin/ExportCompliance?type=pdf">Export PDF</button>
+            <button type="submit" class="btn btn-outline-success" formaction="/Admin/ExportCompliance?type=csv">Export CSV</button>
+        </form>
+    </div>
+
+    <!-- SmartAdminAlerts Bar + Icon Stack -->
+    <div class="mb-4">
+        <h4>Smart Admin Alerts</h4>
+        <div class="alert alert-warning d-flex align-items-center">
+            <span class="me-2"><i class="fas fa-exclamation-triangle"></i></span>
+            <span>@string.Join(", ", alerts)</span>
+        </div>
+        <div class="d-flex flex-row">
+            <span class="me-2"><i class="fas fa-bell"></i></span>
+            <span class="me-2"><i class="fas fa-bolt"></i></span>
+            <span class="me-2"><i class="fas fa-shield-alt"></i></span>
+        </div>
+    </div>
 
     <!-- ?? Filters -->
     <div class="card mb-4 p-4 shadow-sm">
