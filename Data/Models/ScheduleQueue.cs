@@ -45,6 +45,11 @@ namespace MVP_Core.Data.Models
         public string? OverrideReason { get; set; } // Reason for override
         public double? EstimatedDurationHours { get; set; }
         public decimal? CommissionAmount { get; set; }
+        // Sprint 54.0: Smart Dispatch fields
+        public double? GeoDistanceToJob { get; set; } // Mapbox-calculated distance (km)
+        public TimeSpan? OptimizedETA { get; set; } // Mapbox-calculated ETA
+        public double? RouteScore { get; set; } // Composite score for dispatch optimization
+        public int? PreferredTechnicianId { get; set; } // ID of top suggested tech
     }
 
     public class ScheduleHistory

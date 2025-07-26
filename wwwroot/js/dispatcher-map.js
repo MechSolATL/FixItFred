@@ -140,6 +140,26 @@ function mockRoute(tech, customer) {
         window.updateEtaModal(1800); // Mock ETA: 30 min
     }
 }
+// Sprint 54.0: Plot techs + job pins, draw route, animate preferred route preview
+function plotOptimizedRoute(routeGeoJson) {
+    if (!window.L || !window.zoneMap || !routeGeoJson) return;
+    const map = window.zoneMap;
+    // Remove previous route
+    if (window.optimizedRouteLayer) {
+        map.removeLayer(window.optimizedRouteLayer);
+    }
+    // Draw route from GeoJSON
+    window.optimizedRouteLayer = L.geoJSON(routeGeoJson, {
+        style: { color: 'purple', weight: 6, dashArray: '10,6' }
+    }).addTo(map);
+    // Animate route preview
+    const routeEl = document.getElementById('routePreview');
+    if (routeEl) {
+        routeEl.innerHTML = '<span class="badge bg-success">Route previewed</span>';
+        routeEl.classList.add('route-animate');
+        setTimeout(() => routeEl.classList.remove('route-animate'), 1200);
+    }
+}
 window.plotOptimizedRoute = plotOptimizedRoute;
 // Usage: plotOptimizedRoute({lat, lng}, {lat, lng})
 // End Sprint 49.0 Patch Log

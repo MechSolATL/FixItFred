@@ -781,3 +781,28 @@ slaConnection.start();
 }
 <!-- Add button to job actions column -->
 @* In job table row, add: @Html.Raw(GetSuggestBestTechButton(req.Id)) *@
+@* Sprint 54.0: Optimized Technician Suggestion Button & Route Preview *@
+@* Add Optimized Technician Suggestion button to each job row *@
+@functions{
+    public string GetOptimizedTechButton(int requestId) => $"<button type='button' class='btn btn-outline-success btn-sm' onclick='showOptimizedTech({requestId})'>Optimized Tech</button>";
+}
+<script>
+function showOptimizedTech(requestId) {
+    var modal = new bootstrap.Modal(document.getElementById('suggestBestTechModal'));
+    var body = document.getElementById('suggestBestTechBody');
+    body.innerHTML = '<div class="spinner-border text-success" role="status"><span class="visually-hidden">Loading...</span></div>';
+    fetch(`/api/dispatcher/optimized-tech?requestId=${requestId}`)
+        .then(resp => resp.json())
+        .then(data => {
+            let html = `<strong>Top 3 Technicians:</strong><ul>`;
+            data.topTechs.forEach(function(t) {
+                html += `<li>${t.name} (ETA: ${t.eta}, RouteScore: ${t.routeScore})</li>`;
+            });
+            html += `</ul><strong>Preferred Technician:</strong> ${data.preferredTechName}<br/><strong>Route Preview:</strong> <span id='routePreview'></span>`;
+            body.innerHTML = html;
+            // Optionally trigger map route preview
+            if (window.plotOptimizedRoute) window.plotOptimizedRoute(data.routeGeoJson);
+        });
+    modal.show();
+}
+</script>

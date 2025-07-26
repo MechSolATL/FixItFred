@@ -768,5 +768,38 @@ namespace MVP_Core.Services.Admin
             var fallback = suggestions.FirstOrDefault();
             return (fallback.Technician, fallback.Score, fallbackReason);
         }
+
+        // Sprint 54.0: CalculateOptimizedTechnicianAsync
+        public async Task CalculateOptimizedTechnicianAsync(ScheduleQueue queue)
+        {
+            // 1. Get technician candidates
+            var techs = GetAllTechnicianStatuses();
+            // 2. Get job location (mock: use queue.Zone as address)
+            string jobAddress = queue.Zone;
+            // 3. For each tech, get location (mock: use tech.Status as address)
+            // 4. Call Mapbox Directions API for each tech (mock: random values for now)
+            double bestScore = double.MaxValue;
+            int? bestTechId = null;
+            foreach (var tech in techs)
+            {
+                // TODO: Replace with real Mapbox API call
+                double travelTime = new Random(tech.TechnicianId + queue.Id).Next(10, 45); // minutes
+                double geoDistance = new Random(tech.TechnicianId + queue.Id).NextDouble() * 20; // km
+                int jobDensityWeight = _db.ScheduleQueues.Count(q => q.Zone == queue.Zone && (q.Status == ScheduleStatus.Pending || q.Status == ScheduleStatus.Dispatched));
+                int slaPressure = _db.ScheduleQueues.Count(q => q.Zone == queue.Zone && q.SLAExpiresAt != null && q.SLAExpiresAt > DateTime.UtcNow && (q.SLAExpiresAt.Value - DateTime.UtcNow).TotalMinutes < 15);
+                double routeScore = travelTime + jobDensityWeight * 2 + slaPressure * 5;
+                // Update best
+                if (routeScore < bestScore)
+                {
+                    bestScore = routeScore;
+                    bestTechId = tech.TechnicianId;
+                    queue.OptimizedETA = TimeSpan.FromMinutes(travelTime);
+                    queue.GeoDistanceToJob = geoDistance;
+                    queue.RouteScore = routeScore;
+                    queue.PreferredTechnicianId = tech.TechnicianId;
+                }
+            }
+            await Task.CompletedTask;
+        }
     }
 }
