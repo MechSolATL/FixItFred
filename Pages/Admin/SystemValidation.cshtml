@@ -1,0 +1,46 @@
+@page
+@model MVP_Core.Pages.Admin.SystemValidationModel
+@{
+    ViewData["Title"] = "System Validation";
+}
+<h2>System Validation & Deep Testing</h2>
+<div class="mb-3">
+    <form method="post">
+        <div class="btn-group mb-2" role="group">
+            <button type="submit" class="btn btn-primary" asp-page-handler="RunDiagnostics">Run Diagnostics</button>
+            <button type="submit" class="btn btn-warning" asp-page-handler="TriggerAlert">Trigger Alert</button>
+            <button type="submit" class="btn btn-danger" asp-page-handler="SimulateStorageSpike">Simulate Storage Spike</button>
+            <button type="submit" class="btn btn-info" asp-page-handler="SimulateSLADrift">Simulate SLA Drift</button>
+            <button type="submit" class="btn btn-success" asp-page-handler="RestoreSnapshot">Restore Snapshot</button>
+        </div>
+    </form>
+</div>
+<div class="mb-3">
+    <h4>Test Results</h4>
+    <div class="card p-2">
+        <strong>Last Outcome:</strong> @Model.LastOutcome <br />
+        <small class="text-muted">@Model.LastOutcomeTimestamp</small>
+    </div>
+</div>
+<div class="mb-3">
+    <h4>Last 5 System Snapshots</h4>
+    <ul class="list-group">
+        @foreach (var snap in Model.LastSnapshots)
+        {
+            <li class="list-group-item">
+                <strong>@snap.Timestamp.ToString("yyyy-MM-dd HH:mm:ss")</strong> - @snap.SnapshotType: @snap.Summary
+            </li>
+        }
+    </ul>
+</div>
+<div class="mb-3">
+    <h4>Recent Admin Alerts (Last 10)</h4>
+    <ul class="list-group">
+        @foreach (var alert in Model.LastAlerts)
+        {
+            <li class="list-group-item">
+                <strong>@alert.Timestamp.ToString("yyyy-MM-dd HH:mm:ss")</strong> - [@alert.Severity] @alert.Message
+            </li>
+        }
+    </ul>
+</div>

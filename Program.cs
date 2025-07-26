@@ -78,6 +78,7 @@ builder.Services.AddScoped<Services.Admin.ComplianceReportService>();
 builder.Services.AddScoped<Services.Admin.SmartAdminAlertsService>();
 builder.Services.AddScoped<Services.Admin.ScheduledMaintenanceEngine>();
 builder.Services.AddScoped<Services.Admin.AdminDigestMailerService>();
+builder.Services.AddScoped<Services.Admin.ValidationSimulatorService>();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
