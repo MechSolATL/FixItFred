@@ -96,3 +96,50 @@ window.addEventListener('DOMContentLoaded', function () {
     window.DispatcherMapUpdateTech = createOrUpdateMarker;
 })();
 // End Sprint 33.3 - SignalR Integration
+
+// Sprint 49.0 Patch Log: Mapbox Directions API integration for route optimization
+// This file powers the live technician zone map and route optimization on the Dispatcher page.
+// Requires: Leaflet.js loaded on page
+// Mapbox API fallback: If no key, use mock route
+
+const MAPBOX_TOKEN = window.MapboxToken || '';
+
+function plotOptimizedRoute(tech, customer) {
+    if (!window.L || !window.zoneMap) return;
+    const map = window.zoneMap;
+    // Remove previous route
+    if (window.optimizedRouteLayer) {
+        map.removeLayer(window.optimizedRouteLayer);
+    }
+    if (MAPBOX_TOKEN) {
+        // Call Mapbox Directions API
+        const url = `https://api.mapbox.com/directions/v5/mapbox/driving/${tech.lng},${tech.lat};${customer.lng},${customer.lat}?geometries=geojson&access_token=${MAPBOX_TOKEN}`;
+        fetch(url)
+            .then(resp => resp.json())
+            .then(data => {
+                if (data.routes && data.routes.length > 0) {
+                    const coords = data.routes[0].geometry.coordinates.map(c => [c[1], c[0]]);
+                    window.optimizedRouteLayer = L.polyline(coords, {color: 'red', weight: 5}).addTo(map);
+                    // Update ETA display
+                    if (window.updateEtaModal) {
+                        window.updateEtaModal(data.routes[0].duration);
+                    }
+                }
+            })
+            .catch(() => mockRoute(tech, customer));
+    } else {
+        mockRoute(tech, customer);
+    }
+}
+function mockRoute(tech, customer) {
+    // Draw straight line as fallback
+    const map = window.zoneMap;
+    const coords = [[tech.lat, tech.lng], [customer.lat, customer.lng]];
+    window.optimizedRouteLayer = L.polyline(coords, {color: 'gray', weight: 3, dashArray: '8,8'}).addTo(map);
+    if (window.updateEtaModal) {
+        window.updateEtaModal(1800); // Mock ETA: 30 min
+    }
+}
+window.plotOptimizedRoute = plotOptimizedRoute;
+// Usage: plotOptimizedRoute({lat, lng}, {lat, lng})
+// End Sprint 49.0 Patch Log

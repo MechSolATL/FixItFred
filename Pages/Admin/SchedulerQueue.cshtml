@@ -9,7 +9,7 @@
     ViewData["Title"] = "Scheduler Queue";
     var sortBy = Request.Query["sortBy"].ToString();
     var filterStatus = Request.Query["filterStatus"].ToString();
-    var filteredQueue = Model.Queue;
+    var filteredQueue = Model.IntelligentQueue;
     if (!string.IsNullOrEmpty(filterStatus))
         filteredQueue = filteredQueue.Where(q => q.TechnicianStatus == filterStatus).ToList();
     if (sortBy == "eta")
@@ -22,6 +22,7 @@
 </head>
 <div class="container-fluid px-2 px-md-4 mt-4">
     <h2 class="mb-4 text-primary">Scheduler Queue</h2>
+    <div id="confirmation-countdown" class="mb-2"></div>
     <partial name="_ValidationSummary" />
     @if (TempData["SystemMessages"] != null)
     {
@@ -95,6 +96,12 @@
                         <th>Service Request</th>
                         <th>Scheduled For</th>
                         <th>ETA</th>
+                        <th>SLA Window</th>
+                        <th>Geo Distance (km)</th>
+                        <th>Priority</th>
+                        <th>Urgent</th>
+                        <th>Emergency</th>
+                        <th>Override</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -105,12 +112,8 @@
                             <td>@item.AssignedTechnicianName ?? $"ID: {item.TechnicianId}"</td>
                             <td><span class="badge @(item.TechnicianStatus == "Available" ? "bg-success" : item.TechnicianStatus == "Busy" ? "bg-warning text-dark" : "bg-secondary")">@item.TechnicianStatus</span></td>
                             <td>@item.ServiceRequestId</td>
+                            <td>@(item.ScheduledFor?.ToLocalTime().ToString("g") ?? "N/A")</td>
                             <td>
-                                @* FixItFred: null-safe DateTime *@
-                                @(item.ScheduledFor?.ToLocalTime().ToString("g") ?? "N/A")
-                            </td>
-                            <td>
-                                @* FixItFred: null-safe DateTime/TimeSpan *@
                                 @if (item.EstimatedArrival.HasValue)
                                 {
                                     <span class="fw-bold">@item.EstimatedArrival.Value.ToLocalTime().ToString("t")</span>
@@ -121,6 +124,12 @@
                                     <span class="text-muted">N/A</span>
                                 }
                             </td>
+                            <td>@(item.SLAWindowStart?.ToLocalTime().ToString("t") ?? "N/A") - @(item.SLAWindowEnd?.ToLocalTime().ToString("t") ?? "N/A")</td>
+                            <td>@(item.GeoDistanceKm?.ToString("F1") ?? "N/A")</td>
+                            <td>@item.ServiceTypePriority</td>
+                            <td>@(item.IsUrgent ? "Yes" : "No")</td>
+                            <td>@(item.IsEmergency ? "Yes" : "No")</td>
+                            <td>@(item.DispatcherOverride ? $"Yes ({item.OverrideReason})" : "No")</td>
                             <td>
                                 <form method="post" asp-page-handler="Notify" style="display:inline;">
                                     <input type="hidden" name="technicianId" value="@item.TechnicianId" />
@@ -145,5 +154,53 @@
         setInterval(function() {
             document.querySelector('form[asp-page-handler="Reannotate"]')?.submit();
         }, 30000); // 30s interval
+        // Sprint 50.1: Confirmation countdown + urgency badge
+        function updateCountdown() {
+            var rows = document.querySelectorAll('tbody tr');
+            rows.forEach(function(row) {
+                var etaCell = row.querySelector('td:nth-child(5)');
+                if (etaCell) {
+                    var etaText = etaCell.textContent.trim();
+                    var minMatch = etaText.match(/(\d+) min/);
+                    if (minMatch) {
+                        var mins = parseInt(minMatch[1]);
+                        var badge = row.querySelector('.urgency-badge');
+                        if (!badge) {
+                            badge = document.createElement('span');
+                            badge.className = 'urgency-badge ms-2 badge';
+                            row.querySelector('td:nth-child(5)').appendChild(badge);
+                        }
+                        badge.textContent = mins <= 10 ? 'URGENT' : mins <= 30 ? 'Soon' : 'Normal';
+                        badge.classList.toggle('bg-danger', mins <= 10);
+                        badge.classList.toggle('bg-warning', mins > 10 && mins <= 30);
+                        badge.classList.toggle('bg-success', mins > 30);
+                    }
+                }
+            });
+        }
+        setInterval(updateCountdown, 10000); // Update every 10s
+        updateCountdown();
+        // Sprint 50.1: Dynamic status messages
+        function updateStatusMessages() {
+            var rows = document.querySelectorAll('tbody tr');
+            rows.forEach(function(row) {
+                var statusCell = row.querySelector('td:nth-child(2)');
+                if (statusCell) {
+                    var status = statusCell.textContent.trim();
+                    var msgCell = row.querySelector('.dynamic-status-msg');
+                    if (!msgCell) {
+                        msgCell = document.createElement('td');
+                        msgCell.className = 'dynamic-status-msg';
+                        row.appendChild(msgCell);
+                    }
+                    if (status === 'Available') msgCell.textContent = "We're on it!";
+                    else if (status === 'Busy') msgCell.textContent = "Waiting on tech...";
+                    else if (status === 'Unavailable') msgCell.textContent = "Tech not assigned.";
+                    else msgCell.textContent = "Status pending.";
+                }
+            });
+        }
+        setInterval(updateStatusMessages, 10000);
+        updateStatusMessages();
     </script>
 }

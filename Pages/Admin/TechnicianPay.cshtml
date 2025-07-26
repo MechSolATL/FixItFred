@@ -1,0 +1,49 @@
+@page
+@model MVP_Core.Pages.Admin.TechnicianPayModel
+@using MVP_Core.Data.Models
+@inject MVP_Core.Services.TechnicianPayService PayService
+@{
+    ViewData["Title"] = "Technician Pay & Bonus Log";
+    var techId = Model.TechId;
+    var payHistory = Model.PayHistory;
+}
+<h2>Technician Pay Records</h2>
+<form method="get" class="mb-3">
+    <label>Technician ID:</label>
+    <input type="number" name="techId" value="@techId" />
+    <button type="submit" class="btn btn-primary">View</button>
+</form>
+@if (payHistory.Count == 0)
+{
+    <div class="alert alert-info">No pay records found.</div>
+}
+else
+{
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Period</th>
+                <th>Pay Type</th>
+                <th>Hours</th>
+                <th>Commission</th>
+                <th>Hourly Rate</th>
+                <th>Total Pay</th>
+                <th>Bonus Notes</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var record in payHistory)
+        {
+            <tr>
+                <td>@record.PeriodStart.ToShortDateString() - @record.PeriodEnd.ToShortDateString()</td>
+                <td>@record.PayType</td>
+                <td>@record.HoursWorked</td>
+                <td>@record.CommissionEarned</td>
+                <td>@record.HourlyRate</td>
+                <td>@record.TotalPay</td>
+                <td>@record.BonusNotes</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}

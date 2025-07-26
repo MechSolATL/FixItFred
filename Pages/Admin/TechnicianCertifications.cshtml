@@ -1,0 +1,75 @@
+@page
+@model MVP_Core.Pages.Admin.TechnicianCertificationsModel
+@using MVP_Core.Data.Models
+@inject MVP_Core.Services.CertificationService CertService
+@{
+    ViewData["Title"] = "Technician Certifications";
+    var techId = Model.TechId;
+    var certs = Model.Certifications;
+    var expiredCerts = Model.ExpiredCerts;
+}
+<h2>Technician Certifications</h2>
+<form method="get" class="mb-3">
+    <label>Technician ID:</label>
+    <input type="number" name="techId" value="@techId" />
+    <button type="submit" class="btn btn-primary">View</button>
+</form>
+@if (certs.Count == 0)
+{
+    <div class="alert alert-info">No certifications found.</div>
+}
+else
+{
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>License #</th>
+                <th>Issue</th>
+                <th>Expiry</th>
+                <th>Status</th>
+                <th>Document</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var cert in certs)
+        {
+            <tr class="@(cert.IsExpired ? "table-danger" : "")">
+                <td>@cert.CertificationName</td>
+                <td>@cert.LicenseNumber</td>
+                <td>@cert.IssueDate.ToShortDateString()</td>
+                <td>@cert.ExpiryDate.ToShortDateString()</td>
+                <td>@(cert.IsVerified ? "Verified" : cert.IsExpired ? "Expired" : "Pending")</td>
+                <td>
+                    @if (!string.IsNullOrEmpty(cert.DocumentPath))
+                    {
+                        <a href="@cert.DocumentPath" target="_blank">View</a>
+                    }
+                </td>
+                <td>
+                    @if (!cert.IsVerified)
+                    {
+                        <form method="post">
+                            <input type="hidden" name="certId" value="@cert.Id" />
+                            <button type="submit" class="btn btn-success btn-sm">Verify</button>
+                        </form>
+                    }
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+@if (expiredCerts.Count > 0)
+{
+    <div class="alert alert-warning mt-3">
+        <strong>Expired Certifications:</strong>
+        <ul>
+        @foreach (var cert in expiredCerts)
+        {
+            <li>@cert.CertificationName (Tech ID: @cert.TechnicianId) - Expired @cert.ExpiryDate.ToShortDateString()</li>
+        }
+        </ul>
+    </div>
+}

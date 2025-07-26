@@ -19,6 +19,15 @@ namespace MVP_Core.Pages.Admin
             _dispatchEngine = dispatchEngine;
         }
         public IReadOnlyList<ScheduleQueue> Queue => _dispatchEngine.GetPendingDispatches().ToList();
+        // Sprint 50.0: Add intelligence sorting and escalation logic
+        public IReadOnlyList<ScheduleQueue> IntelligentQueue => Queue
+            .OrderByDescending(q => q.IsEmergency)
+            .ThenByDescending(q => q.IsUrgent)
+            .ThenBy(q => q.SLAWindowEnd ?? DateTime.MaxValue)
+            .ThenBy(q => q.GeoDistanceKm ?? double.MaxValue)
+            .ThenByDescending(q => q.IsTechnicianAvailable)
+            .ThenBy(q => q.ServiceTypePriority)
+            .ToList();
         [BindProperty]
         public int TechnicianId { get; set; }
         [BindProperty]

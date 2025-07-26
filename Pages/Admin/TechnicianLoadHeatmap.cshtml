@@ -1,0 +1,56 @@
+@page
+@model MVP_Core.Pages.Admin.TechnicianLoadHeatmapModel
+@{
+    ViewData["Title"] = "Technician Load Heatmap";
+}
+
+<h2>Technician Load Heatmap</h2>
+<div id="heatmap-container">
+    <table class="heatmap-table">
+        <thead>
+            <tr>
+                <th>Technician</th>
+                <th>Status</th>
+                <th>Active Jobs</th>
+                <th>SLA Risk Jobs</th>
+                <th>Dispatch Score</th>
+                <th>Last Ping</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var tech in Model.TechnicianLoads)
+        {
+            var slaClass = tech.SlaRiskJobs > 0 ? "heatmap-risk" : "heatmap-ok";
+            var pulseClass = tech.SlaRiskJobs > 0 ? "pulse" : "";
+            <tr class="@slaClass @pulseClass">
+                <td>@tech.Name</td>
+                <td>@tech.Status</td>
+                <td>@tech.ActiveJobs</td>
+                <td>@tech.SlaRiskJobs</td>
+                <td>@tech.DispatchScore</td>
+                <td>@tech.LastPing.ToLocalTime().ToString("HH:mm:ss")</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>
+
+@section Scripts {
+    <script src="~/js/Heatmap.js"></script>
+    <script>
+        // SignalR live update for SLA color zones
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/hubs/requests")
+            .build();
+        connection.on("ReceiveSmartETA", function (data) {
+            // Optionally update UI with new ETA or SLA risk
+            // For demo, fade/pulse row for technician
+            const row = document.querySelector(`tr[data-tech-id='${data.TechnicianId}']`);
+            if (row) {
+                row.classList.add("pulse");
+                setTimeout(() => row.classList.remove("pulse"), 2000);
+            }
+        });
+        connection.start();
+    </script>
+}

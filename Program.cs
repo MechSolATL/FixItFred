@@ -54,6 +54,9 @@ builder.Services.AddScoped<DispatcherService>();
 builder.Services.AddScoped<NotificationDispatchEngine>();
 builder.Services.AddScoped<ServiceRequestService>();
 builder.Services.AddScoped<TechnicianFeedbackService>(); // FixItFred: Sprint 30B - Register TechnicianFeedbackService required by DispatcherService
+builder.Services.AddScoped<MVP_Core.Services.FollowUp.FollowUpAIService>();
+builder.Services.AddScoped<TechnicianPayService>();
+builder.Services.AddScoped<CertificationService>();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));

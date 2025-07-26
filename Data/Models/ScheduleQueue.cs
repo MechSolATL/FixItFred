@@ -33,6 +33,18 @@ namespace MVP_Core.Data.Models
         public DateTime? ScheduledFor { get; set; }
         // FixItFred: Sprint 34.1 — SLA Escalation
         public DateTime? SLAExpiresAt { get; set; }
+        // Sprint 50.0: Intelligence fields
+        public DateTime? SLAWindowStart { get; set; }
+        public DateTime? SLAWindowEnd { get; set; }
+        public double? GeoDistanceKm { get; set; } // Distance to job in km
+        public bool IsTechnicianAvailable { get; set; } // Real-time availability
+        public string ServiceTypePriority { get; set; } = string.Empty; // e.g. Emergency, Urgent, Routine
+        public bool IsUrgent { get; set; } // DB flag for urgent
+        public bool IsEmergency { get; set; } // DB flag for emergency
+        public bool DispatcherOverride { get; set; } // True if manually overridden
+        public string? OverrideReason { get; set; } // Reason for override
+        public double? EstimatedDurationHours { get; set; }
+        public decimal? CommissionAmount { get; set; }
     }
 
     public class ScheduleHistory

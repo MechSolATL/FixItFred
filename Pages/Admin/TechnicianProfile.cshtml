@@ -2,11 +2,16 @@
 @using MVP_Core.Models.Admin
 @inject MVP_Core.Services.Admin.DispatcherService DispatcherService
 @inject MVP_Core.Services.TechnicianFeedbackService FeedbackService
+@inject MVP_Core.Services.CertificationService CertService
+@inject MVP_Core.Services.TechnicianPayService PayService
 @model MVP_Core.Pages.Admin.TechnicianProfileModel
 @{
     int techId = Model.TechId;
     var profile = Model.Profile;
     ViewData["Title"] = "Technician Profile";
+    var certs = CertService.GetCertifications(techId);
+    var badges = Model.SkillBadges ?? new List<SkillBadge>();
+    var payHistory = User.IsInRole("Admin") ? PayService.GetPayHistory(techId) : new List<TechnicianPayRecord>();
 }
 <h2 class="mb-4">Technician Profile</h2>
 @if (profile == null)
@@ -105,6 +110,68 @@ else
         <a href="/Admin/UploadMedia?techId=@profile.TechnicianId" class="btn btn-outline-primary me-2">?? Upload Media</a>
         <a href="/Admin/ViewMedia?techId=@profile.TechnicianId" class="btn btn-outline-secondary">?? View Media Vault</a>
     </div>
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <h4>Certifications</h4>
+            <ul class="list-group">
+            @foreach (var cert in certs)
+            {
+                <li class="list-group-item @(cert.IsExpired ? "list-group-item-danger" : "")">
+                    <strong>@cert.CertificationName</strong>
+                    @if (cert.IsVerified)
+                    {
+                        <span class="badge bg-success ms-2">Verified</span>
+                    }
+                    else if (cert.IsExpired)
+                    {
+                        <span class="badge bg-danger ms-2">Expired</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-warning ms-2">Pending</span>
+                    }
+                    @if (!string.IsNullOrEmpty(cert.DocumentPath))
+                    {
+                        <a href="@cert.DocumentPath" target="_blank" class="ms-2">View</a>
+                    }
+                </li>
+            }
+            </ul>
+        </div>
+        <div class="col-md-6">
+            <h4>Skill Badges</h4>
+            <div>
+            @foreach (var badge in badges)
+            {
+                <span class="me-2">
+                    <img src="@badge.IconPath" alt="@badge.SkillName" style="height:32px;" title="@badge.SkillName" />
+                    <span>@badge.SkillName</span>
+                </span>
+            }
+            </div>
+        </div>
+    </div>
+    @if (payHistory.Count > 0)
+    {
+        <div class="mt-4">
+            <h4>Earnings Summary</h4>
+            <table class="table table-sm">
+                <thead>
+                    <tr><th>Period</th><th>Total Pay</th><th>Type</th></tr>
+                </thead>
+                <tbody>
+                @foreach (var pay in payHistory)
+                {
+                    <tr>
+                        <td>@pay.PeriodStart.ToShortDateString() - @pay.PeriodEnd.ToShortDateString()</td>
+                        <td>@pay.TotalPay</td>
+                        <td>@pay.PayType</td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    }
 }
 
 <script>

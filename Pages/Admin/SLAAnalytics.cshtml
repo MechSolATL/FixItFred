@@ -1,0 +1,87 @@
+@page
+@model MVP_Core.Pages.Admin.SLAAnalyticsModel
+@{
+    ViewData["Title"] = "SLA Analytics";
+    Layout = "/Pages/Shared/_Layout.cshtml";
+}
+<!-- Sprint 49.0 Patch Log: SLA Analytics Page + Leaderboard + CSV Export -->
+<meta name="description" content="SLA analytics dashboard, leaderboard, and export for dispatch optimization.">
+<link rel="stylesheet" href="/css/Leaderboard.css" />
+<h2 class="mb-4">SLA Analytics Dashboard</h2>
+<div class="leaderboard-panel mb-4">
+    <div class="leaderboard-title">Top Technicians Leaderboard</div>
+    <ul class="leaderboard-list">
+        @foreach (var tech in Model.Leaderboard)
+        {
+            <li class="@(tech.Rank == 1 ? "top" : "")">
+                <span>@tech.Name</span>
+                <span class="leaderboard-score">Jobs: @tech.JobsCompleted</span>
+                <span class="leaderboard-score">SLA: @tech.SLACompliance.ToString("P0")</span>
+                <span class="leaderboard-upsell">Upsell: @tech.UpsellCount</span>
+            </li>
+        }
+    </ul>
+    <div class="mt-2 text-muted small">Monthly/Weekly winners highlighted</div>
+</div>
+<div class="card mb-4">
+    <div class="card-header bg-primary text-white">SLA Trends</div>
+    <div class="card-body">
+        <canvas id="slaTrendsChart" height="120"></canvas>
+    </div>
+</div>
+<div class="card mb-4">
+    <div class="card-header bg-info text-white">SLA Distribution</div>
+    <div class="card-body">
+        <canvas id="slaDistributionChart" height="120"></canvas>
+    </div>
+</div>
+<form method="post" asp-page-handler="ExportCsv" class="mb-4">
+    <button type="submit" class="btn btn-outline-success">Export SLA Logs (CSV)</button>
+</form>
+@section Scripts {
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+    // Sprint 49.0: Fetch SLA analytics data from PageModel
+    const slaTrends = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.SlaTrends));
+    const slaDistribution = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.SlaDistribution));
+    document.addEventListener('DOMContentLoaded', function () {
+        // SLA Trends Chart
+        const ctxTrends = document.getElementById('slaTrendsChart').getContext('2d');
+        new Chart(ctxTrends, {
+            type: 'line',
+            data: {
+                labels: slaTrends.map(x => x.GroupKey),
+                datasets: [{
+                    label: 'Avg SLA Minutes',
+                    data: slaTrends.map(x => x.AverageSlaMinutes),
+                    borderColor: '#0d6efd',
+                    backgroundColor: '#0d6efd33',
+                    tension: 0.2
+                }]
+            },
+            options: {
+                plugins: { title: { display: true, text: 'SLA Trends by ' + (slaTrends[0]?.GroupType ?? '') } },
+                scales: { y: { beginAtZero: true, title: { display: true, text: 'Minutes' } } }
+            }
+        });
+        // SLA Distribution Chart
+        const ctxDist = document.getElementById('slaDistributionChart').getContext('2d');
+        new Chart(ctxDist, {
+            type: 'bar',
+            data: {
+                labels: slaDistribution.map(x => x.GroupKey),
+                datasets: [{
+                    label: 'Job Count',
+                    data: slaDistribution.map(x => x.Count),
+                    backgroundColor: '#198754',
+                }]
+            },
+            options: {
+                plugins: { title: { display: true, text: 'SLA Distribution' } },
+                scales: { y: { beginAtZero: true, title: { display: true, text: 'Jobs' } } }
+            }
+        });
+    });
+</script>
+}
+<!-- End Sprint 49.0 Patch Log -->

@@ -1,0 +1,39 @@
+@page
+@model MVP_Core.Pages.Admin.DispatcherMobileModel
+@{
+    ViewData["Title"] = "Mobile Dispatcher";
+    Layout = "/Pages/Admin/_AdminLayout.cshtml";
+}
+<!-- Sprint 49.0 Patch Log: Mobile Dispatcher View -->
+<meta name="description" content="Mobile-optimized dispatcher queue for field managers.">
+<link rel="stylesheet" href="/css/DispatcherMobile.css" />
+<div class="container-fluid px-2 py-2">
+    <h2 class="mb-3">Mobile Dispatcher Queue</h2>
+    <div class="dispatcher-mobile-queue">
+        @foreach (var req in Model.Requests)
+        {
+            <div class="job-card-mobile collapsible-card" data-job-id="@req.Id">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span><strong>#@req.Id</strong> @req.ServiceType</span>
+                    <span class="badge bg-@Model.GetStatusClass(req.Status)">@req.Status</span>
+                    <button class="btn btn-sm btn-outline-secondary toggle-card-btn" type="button">?</button>
+                </div>
+                <div class="card-body collapse">
+                    <div><strong>Technician:</strong> @req.Technician</div>
+                    <div><strong>Priority:</strong> @req.Priority</div>
+                    <div><strong>ZIP:</strong> @req.Zip</div>
+                    <div><strong>Delay:</strong> @req.DelayMinutes min</div>
+                    <div class="mt-2">
+                        <button class="btn btn-primary btn-sm w-100 mb-1">Assign</button>
+                        <button class="btn btn-outline-info btn-sm w-100 mb-1">Messages</button>
+                        <button class="btn btn-outline-danger btn-sm w-100">Escalate</button>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+@section Scripts {
+<script src="/js/DispatcherMobile.js"></script>
+}
+<!-- End Sprint 49.0 Patch Log -->

@@ -44,5 +44,7 @@ namespace MVP_Core.Data.Models
         // Sprint 39: Skill-based tags for technician specialization
         [MaxLength(1000)]
         public string? SkillTags { get; set; } // Comma-separated skill tags (e.g., "Tankless,Mini Split,Backflow Cert")
+
+        public decimal? HourlyRate { get; set; } // Hourly rate for pay calculation
     }
 }

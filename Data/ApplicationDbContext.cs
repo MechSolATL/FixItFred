@@ -73,6 +73,9 @@ namespace MVP_Core.Data
         public DbSet<TechnicianDeviceRegistration> TechnicianDeviceRegistrations { get; set; } = null!;
         // FixItFred — Sprint 46.1 Build Stabilization
         public DbSet<MVP_Core.Data.Models.JobMessageEntry> JobMessages { get; set; } = null!;
+        public DbSet<TechnicianPayRecord> TechnicianPayRecords { get; set; } = null!;
+        public DbSet<CertificationRecord> CertificationRecords { get; set; } = null!;
+        public DbSet<SkillBadge> SkillBadges { get; set; } = null!;
 
         #endregion
 
@@ -115,6 +118,9 @@ namespace MVP_Core.Data
             _ = modelBuilder.Entity<TechnicianScoreEntry>().ToTable("TechnicianScoreEntries");
             _ = modelBuilder.Entity<TechnicianDeviceRegistration>().ToTable("TechnicianDeviceRegistrations");
             _ = modelBuilder.Entity<JobMessageEntry>().ToTable("JobMessages");
+            _ = modelBuilder.Entity<TechnicianPayRecord>().ToTable("TechnicianPayRecords");
+            _ = modelBuilder.Entity<CertificationRecord>().ToTable("CertificationRecords");
+            _ = modelBuilder.Entity<SkillBadge>().ToTable("SkillBadges");
         }
 
         #endregion

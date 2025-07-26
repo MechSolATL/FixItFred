@@ -322,8 +322,13 @@ namespace MVP_Core.Services.Admin
             // --- Fallback ETA: if tech unavailable, return now + delayMinutes + 30 min buffer ---
             if (tech.Status == "Unavailable")
                 return now.AddMinutes(delayMinutes + 30);
-            // --- Final ETA calculation ---
-            int totalMinutes = baseTravelTime + loadPenalty + slaPenalty + delayMinutes + workingHourPenalty + lastPingPenalty;
+            // --- Smooth ETA calculation: weighted average for SLA threshold zones ---
+            double precision = 1.0;
+            if (nearingSLA > 0)
+            {
+                precision = 0.7; // fallback precision for SLA risk
+            }
+            int totalMinutes = (int)Math.Round((baseTravelTime * precision) + (loadPenalty * precision) + slaPenalty + delayMinutes + workingHourPenalty + lastPingPenalty);
             await Task.CompletedTask; // CS1998 fix: ensure async compliance
             return now.AddMinutes(totalMinutes);
         }
@@ -499,7 +504,7 @@ namespace MVP_Core.Services.Admin
             return false;
         }
 
-        // FixItFred – Sprint 44 Build Restoration
+        // FixItFred — Sprint 44 Build Restoration
         public void LogDispatcherAction(string logEntry)
         {
             // For now, just add to in-memory audit log (could be extended to DB)
@@ -624,6 +629,144 @@ namespace MVP_Core.Services.Admin
         public void UpdateTechnicianPing(int technicianId)
         {
             // Stub: No-op
+        }
+
+        // Sprint 48.1 – SmartQueue ETA & Technician Load Heatmap
+        /// <summary>
+        /// Returns a summary of active and pending job count per technician, with SLA risk flag.
+        /// </summary>
+        public async Task<List<TechnicianLoadSummaryDto>> GetTechnicianLoadSummaryAsync()
+        {
+            var now = DateTime.UtcNow;
+            var techs = GetAllTechnicianStatuses();
+            var result = new List<TechnicianLoadSummaryDto>();
+            foreach (var tech in techs)
+            {
+                // Count active and pending jobs for this technician
+                int activeJobs = _db.ScheduleQueues.Count(q => q.TechnicianId == tech.TechnicianId && (q.Status == ScheduleStatus.Pending || q.Status == ScheduleStatus.Dispatched));
+                int slaRiskJobs = _db.ScheduleQueues.Count(q => q.TechnicianId == tech.TechnicianId && q.SLAExpiresAt != null && q.SLAExpiresAt > now && (q.SLAExpiresAt.Value - now).TotalMinutes < 15 && (q.Status == ScheduleStatus.Pending || q.Status == ScheduleStatus.Dispatched));
+                result.Add(new TechnicianLoadSummaryDto
+                {
+                    TechnicianId = tech.TechnicianId,
+                    Name = tech.Name,
+                    Status = tech.Status,
+                    ActiveJobs = activeJobs,
+                    SlaRiskJobs = slaRiskJobs,
+                    DispatchScore = tech.DispatchScore,
+                    IsOnline = tech.IsOnline,
+                    LastPing = tech.LastPing
+                });
+            }
+            await Task.CompletedTask; // async compliance
+            return result;
+        }
+
+        /// <summary>
+        /// Predicts Smart ETA for a given service request and technician.
+        /// </summary>
+        public async Task<SmartETADto> PredictSmartETA(int serviceRequestId, int technicianId)
+        {
+            var tech = GetAllTechnicianStatuses().FirstOrDefault(t => t.TechnicianId == technicianId);
+            var req = _db.ServiceRequests.FirstOrDefault(r => r.Id == serviceRequestId);
+            if (tech == null || req == null)
+                return new SmartETADto { TechnicianId = technicianId, ServiceRequestId = serviceRequestId, PredictedETA = null, Reason = "Technician or request not found" };
+            var eta = await PredictETA(tech, req.Zip, req.DelayMinutes);
+            return new SmartETADto
+            {
+                TechnicianId = technicianId,
+                ServiceRequestId = serviceRequestId,
+                PredictedETA = eta,
+                Reason = "OK"
+            };
+        }
+
+        // DTOs for Sprint 48.1
+        public class TechnicianLoadSummaryDto
+        {
+            public int TechnicianId { get; set; }
+            public string Name { get; set; } = string.Empty;
+            public string Status { get; set; } = string.Empty;
+            public int ActiveJobs { get; set; }
+            public int SlaRiskJobs { get; set; }
+            public int DispatchScore { get; set; }
+            public bool IsOnline { get; set; }
+            public DateTime LastPing { get; set; }
+        }
+        public class SmartETADto
+        {
+            public int TechnicianId { get; set; }
+            public int ServiceRequestId { get; set; }
+            public DateTime? PredictedETA { get; set; }
+            public string Reason { get; set; } = string.Empty;
+        }
+
+        // Sprint 48.2: Smart Suggestion Logic for Best Technician
+        /// <summary>
+        /// Suggests the best technician for a given service request using SmartQueue logic.
+        /// </summary>
+        public (TechnicianStatusDto? Technician, double Score, string Reason) SuggestBestTechnician(int serviceRequestId)
+        {
+            var req = _db.ServiceRequests.FirstOrDefault(r => r.Id == serviceRequestId);
+            if (req == null)
+                return (null, 0, "Request not found");
+            string fallbackReason;
+            var suggestions = GetOptimizedTechnicianSuggestions(new RequestSummaryDto {
+                Id = req.Id,
+                ServiceType = req.ServiceType,
+                Technician = req.AssignedTo,
+                Status = req.Status,
+                Priority = req.Priority,
+                Zip = req.Zip,
+                DelayMinutes = req.DelayMinutes
+            }, out fallbackReason);
+            var best = suggestions.FirstOrDefault(s => !s.IsFallback);
+            if (best.Technician != null)
+                return (best.Technician, best.Score, fallbackReason);
+            // Fallback: return first fallback
+            var fallback = suggestions.FirstOrDefault();
+            return (fallback.Technician, fallback.Score, fallbackReason);
+        }
+
+        // Sprint 48.2: SLA Warning Broadcast via SignalR
+        public async Task BroadcastSLAWarningAsync(int serviceRequestId, string message, Microsoft.AspNetCore.SignalR.IHubContext<MVP_Core.Hubs.RequestHub> hubContext)
+        {
+            var req = _db.ServiceRequests.FirstOrDefault(r => r.Id == serviceRequestId);
+            if (req == null) return;
+            await hubContext.Clients.All.SendCoreAsync("ReceiveSLAWarning", new object[] {
+                new {
+                    ServiceRequestId = serviceRequestId,
+                    Message = message
+                }
+            });
+        }
+
+        // Sprint 49.0 – Predictive Tech Assignment AI
+        /// <summary>
+        /// Predicts and returns the top technician assignment for a given service request.
+        /// Considers SLA history, technician efficiency, and zone familiarity.
+        /// </summary>
+        public async Task<(TechnicianStatusDto? Technician, double Score, string Reason)> GetPredictedTechAssignment(int serviceRequestId)
+        {
+            // Fetch request and candidate technicians
+            var req = _db.ServiceRequests.FirstOrDefault(r => r.Id == serviceRequestId);
+            if (req == null)
+                return (null, 0, "Request not found");
+            string fallbackReason;
+            var suggestions = GetOptimizedTechnicianSuggestions(new RequestSummaryDto {
+                Id = req.Id,
+                ServiceType = req.ServiceType,
+                Technician = req.AssignedTo,
+                Status = req.Status,
+                Priority = req.Priority,
+                Zip = req.Zip,
+                DelayMinutes = req.DelayMinutes
+            }, out fallbackReason);
+            var best = suggestions.FirstOrDefault(s => !s.IsFallback);
+            if (best.Technician != null)
+                return (best.Technician, best.Score, fallbackReason);
+            // Fallback: return first fallback
+            var fallback = suggestions.FirstOrDefault();
+            return (fallback.Technician, fallback.Score, fallbackReason);
         }
     }
 }

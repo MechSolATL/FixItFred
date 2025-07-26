@@ -1,3 +1,4 @@
+@* Sprint 47.4 Patch Log: Dispatch queue animation and ETA adjustments.
 @* Sprint 26.5 Patch Log: CS860x/CS8625/CS1998/CS0219 fixes — Nullability, async, and unused variable corrections for Nova review. *@
 @* Sprint 26.6 Patch Log: CS8602/CS8604 fix — Added null-conditional operators and null checks for all model dereferences. Previous comments preserved below. *@
 @page
@@ -619,14 +620,29 @@
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<link rel="stylesheet" href="/css/DispatcherQueueAnimations.css" />
+<script src="/js/DispatcherQueueAnimations.js"></script>
 <script>
+// Sprint 47.4 Patch Log: Dispatch queue animation and ETA adjustments.
 // FixItFred: Sprint 30D.1 - Live ETA SignalR client binding
 let etaConnection = new signalR.HubConnectionBuilder()
     .withUrl("/etahub?zone=" + encodeURIComponent('@(safeServiceZones.FirstOrDefault() ?? "1")'))
     .build();
 
+// Add transition/animation for job movement
+function animateJobMovement(jobId, fromStatus, toStatus) {
+    const jobEl = document.querySelector(`[data-job-id='${jobId}']`);
+    if (!jobEl) return;
+    jobEl.classList.add('job-moving');
+    setTimeout(() => {
+        jobEl.classList.remove('job-moving');
+        jobEl.classList.add('job-arrived');
+        setTimeout(() => jobEl.classList.remove('job-arrived'), 1200);
+    }, 800);
+}
+
+// Listen for SignalR ETA updates and animate ETA changes
 etaConnection.on("ReceiveETA", function(zone, message) {
-    // FixItFred: Display ETA/status updates in real time
     let etaPanel = document.getElementById("live-eta-panel");
     if (!etaPanel) {
         etaPanel = document.createElement("div");
@@ -635,6 +651,11 @@ etaConnection.on("ReceiveETA", function(zone, message) {
         document.body.prepend(etaPanel);
     }
     etaPanel.innerHTML = `<strong>Live ETA Update (Zone ${zone}):</strong> ${message}`;
+    // Animate ETA update for jobs in this zone
+    document.querySelectorAll(`.draggable-job[data-zone='${zone}']`).forEach(el => {
+        el.classList.add('eta-updated');
+        setTimeout(() => el.classList.remove('eta-updated'), 1200);
+    });
 });
 
 etaConnection.start().catch(function (err) {
@@ -709,4 +730,54 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('reorderForm').submit();
     }
 });
+@* Sprint 48.2 Patch Log: SuggestBestTech button & modal UI *@
+<!-- SuggestBestTech Button and Modal -->
+<div id="suggestBestTechModal" class="modal fade" tabindex="-1" aria-labelledby="suggestBestTechLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="suggestBestTechLabel">Smart Technician Suggestion</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="suggestBestTechBody">
+        <div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+function showSuggestBestTech(requestId) {
+    var modal = new bootstrap.Modal(document.getElementById('suggestBestTechModal'));
+    var body = document.getElementById('suggestBestTechBody');
+    body.innerHTML = '<div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div>';
+    fetch(`/api/dispatcher/suggest-best-tech?requestId=${requestId}`)
+        .then(resp => resp.json())
+        .then(data => {
+            body.innerHTML = `<strong>Best Technician:</strong> ${data.technicianName}<br/><strong>Score:</strong> ${data.score}<br/><strong>Reason:</strong> ${data.reason}`;
+        });
+    modal.show();
+}
+// SignalR SLA warning animation
+const slaConnection = new signalR.HubConnectionBuilder().withUrl("/hubs/requests").build();
+slaConnection.on("ReceiveSLAWarning", function(data) {
+    const jobEl = document.querySelector(`[data-job-id='${data.ServiceRequestId}']`);
+    if (jobEl) {
+        jobEl.classList.add('red-glow');
+        setTimeout(() => jobEl.classList.remove('red-glow'), 3000);
+    }
+    // Optionally show notification
+    if (window.Notification && Notification.permission === "granted") {
+        new Notification("SLA Warning", { body: data.Message });
+    }
+});
+slaConnection.start();
 </script>
+@* Add button to each job row *@
+@functions{
+    public string GetSuggestBestTechButton(int requestId) => $"<button type='button' class='btn btn-outline-danger btn-sm' onclick='showSuggestBestTech({requestId})'>SuggestBestTech</button>";
+}
+<!-- Add button to job actions column -->
+@* In job table row, add: @Html.Raw(GetSuggestBestTechButton(req.Id)) *@

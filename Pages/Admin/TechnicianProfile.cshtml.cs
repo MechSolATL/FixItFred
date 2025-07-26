@@ -18,6 +18,7 @@ namespace MVP_Core.Pages.Admin
         public MVP_Core.Models.Admin.TechnicianProfileDto? Profile { get; private set; }
         public double AvgFeedback { get; private set; }
         public List<TechnicianFeedback> RecentReviews { get; private set; } = new();
+        public List<SkillBadge> SkillBadges { get; set; } = new();
 
         public TechnicianProfileModel(DispatcherService dispatcherService, TechnicianFeedbackService feedbackService)
         {
@@ -28,10 +29,10 @@ namespace MVP_Core.Pages.Admin
         public void OnGet()
         {
             TechId = int.TryParse(Request.Query["techId"], out var tId) ? tId : 0;
-            // FixItFred — Sprint 44.4 Await Fix (GetTechnicianProfile)
             Profile = _dispatcherService.GetTechnicianProfile(TechId).GetAwaiter().GetResult();
             AvgFeedback = _feedbackService.CalculateAverageRating(TechId);
             RecentReviews = _feedbackService.GetFeedbackForTechnician(TechId).Take(3).ToList();
+            SkillBadges = new List<SkillBadge>(); // TODO: Load from DB if needed
         }
     }
 }

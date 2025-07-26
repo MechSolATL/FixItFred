@@ -1,0 +1,29 @@
+// Sprint 47.4 Patch Log: Dispatch queue animation and ETA adjustments
+/* Kanban job movement animation */
+.job-moving {
+    transition: transform 0.8s cubic-bezier(0.4, 0.2, 0.2, 1), box-shadow 0.8s;
+    transform: scale(1.05) translateY(-10px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    z-index: 2;
+}
+.job-arrived {
+    transition: background 1.2s, box-shadow 1.2s;
+    background: #e0ffe0;
+    box-shadow: 0 0 0 0 rgba(0,0,0,0);
+}
+.eta-updated {
+    transition: background 1.2s;
+    background: #fff3cd !important;
+}
+
+// Sprint 48.2 Patch Log: Red-glow animation for SLA warning
+.red-glow {
+    animation: redGlowPulse 1.5s infinite;
+    box-shadow: 0 0 10px 2px #ff0000, 0 0 30px 10px #ffcccc;
+    background: #ffeaea !important;
+}
+@keyframes redGlowPulse {
+    0% { box-shadow: 0 0 10px 2px #ff0000, 0 0 30px 10px #ffcccc; }
+    50% { box-shadow: 0 0 20px 8px #ff3333, 0 0 40px 20px #ffcccc; }
+    100% { box-shadow: 0 0 10px 2px #ff0000, 0 0 30px 10px #ffcccc; }
+}
