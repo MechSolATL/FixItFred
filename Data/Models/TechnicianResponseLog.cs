@@ -30,5 +30,6 @@ namespace MVP_Core.Data.Models
         public bool FlaggedLate { get; set; }
 
         public DateTime LoggedAt { get; set; }
+        public DateTime Timestamp => LoggedAt;
     }
 }

@@ -19,6 +19,8 @@ namespace MVP_Core.Data.Models
         [MaxLength(20)]
         public string Severity { get; set; } = "Info";
         public bool ResolvedFlag { get; set; } = false;
+        [MaxLength(100)]
+        public string Reason { get; set; } = string.Empty;
 
         public Technician? Technician { get; set; }
     }

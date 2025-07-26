@@ -1,0 +1,57 @@
+@page
+@model MVP_Core.Pages.Admin.TrustMonitorModel
+@inject MVP_Core.Data.ApplicationDbContext Db
+@inject MVP_Core.Services.Admin.TechnicianTrustEngineService TrustEngine
+@{
+    ViewData["Title"] = "Technician Trust Monitor";
+    var technicians = Db.Technicians.ToList();
+    var trustLogs = Db.TechnicianTrustLogs.OrderByDescending(t => t.RecordedAt).GroupBy(t => t.TechnicianId).Select(g => g.First()).ToList();
+    string filterTech = Request.Query["tech"].ToString();
+    string filterThreshold = Request.Query["threshold"].ToString();
+    var filteredLogs = trustLogs.Where(t => (string.IsNullOrEmpty(filterTech) || t.TechnicianId.ToString() == filterTech) && (string.IsNullOrEmpty(filterThreshold) || t.TrustScore >= decimal.Parse(filterThreshold))).ToList();
+    Func<decimal, string> trustTier = score => score >= 80 ? "Trusted" : score >= 60 ? "Monitor" : "Probation";
+}
+<h2 class="mb-4">Technician Trust Index Monitor</h2>
+<form method="get" class="row mb-3">
+    <div class="col">
+        <label>Technician</label>
+        <select name="tech" class="form-select">
+            <option value="">All</option>
+            @foreach (var tech in technicians)
+            {
+                <option value="@tech.Id" selected="@(filterTech == tech.Id.ToString() ? "selected" : null)">@tech.FullName</option>
+            }
+        </select>
+    </div>
+    <div class="col">
+        <label>Trust Threshold</label>
+        <input type="number" name="threshold" class="form-control" value="@filterThreshold" min="0" max="100" />
+    </div>
+    <div class="col align-self-end">
+        <button type="submit" class="btn btn-primary">Filter</button>
+    </div>
+</form>
+<table class="table table-bordered">
+    <thead><tr><th>Technician</th><th>Trust Score</th><th>Flag Weight</th><th>Tier</th><th>Recorded At</th><th>Actions</th></tr></thead>
+    <tbody>
+    @foreach (var log in filteredLogs)
+    {
+        var tech = technicians.FirstOrDefault(t => t.Id == log.TechnicianId);
+        <tr>
+            <td>@tech?.FullName</td>
+            <td>@log.TrustScore</td>
+            <td>@log.FlagWeight</td>
+            <td>@trustTier(log.TrustScore)</td>
+            <td>@log.RecordedAt.ToLocalTime()</td>
+            <td>
+                <form method="post" asp-page-handler="Flag" asp-route-id="@log.TechnicianId" style="display:inline">
+                    <button type="submit" class="btn btn-warning btn-sm">Flag for Review</button>
+                </form>
+                <form method="post" asp-page-handler="ClearFlags" asp-route-id="@log.TechnicianId" style="display:inline">
+                    <button type="submit" class="btn btn-success btn-sm">Clear Flags</button>
+                </form>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
