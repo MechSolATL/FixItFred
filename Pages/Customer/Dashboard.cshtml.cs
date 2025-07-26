@@ -1,3 +1,4 @@
+// Sprint 26.5 Patch Log: CS860x/CS8625/CS1998/CS0219 fixes — Nullability, async, and unused variable corrections for Nova review
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using MVP_Core.Data;
 using MVP_Core.Data.Models;
@@ -64,9 +65,9 @@ namespace MVP_Core.Pages.Customer
             // Sprint 46.3 – Dashboard Analytics: Ticket Resolution Chart
             OpenCount = Tickets.Count(t => t.Status != "Complete" && t.Status != "Cancelled");
             ClosedCount = Tickets.Count(t => t.Status == "Complete" || t.Status == "Cancelled");
-            var closedTickets = Tickets.Where(t => t.ClosedAt != null).ToList();
+            var closedTickets = Tickets.Where(t => t.ClosedAt.HasValue).ToList(); // Fix: Use .HasValue for nullable DateTime
             if (closedTickets.Any())
-                AvgResolutionHours = closedTickets.Average(t => (t.ClosedAt.Value - t.RequestedAt).TotalHours);
+                AvgResolutionHours = closedTickets.Average(t => (t.ClosedAt!.Value - t.RequestedAt).TotalHours);
             else
                 AvgResolutionHours = 0;
 

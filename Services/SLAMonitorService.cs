@@ -1,3 +1,4 @@
+// Sprint 26.6 Patch Log: CS8601/CS8602/CS8629 fixes — Added null checks and .GetValueOrDefault() for nullable value types. Ensured safe navigation for all nullable references. Previous comments preserved below.
 using System;
 using System.Linq;
 using System.Threading;
@@ -35,8 +36,8 @@ public class SLAMonitorService : BackgroundService
                 var now = DateTime.UtcNow;
                 var candidates = db.ScheduleQueues
                     .Where(q => (q.Status == ScheduleStatus.Pending || q.Status == ScheduleStatus.Dispatched)
-                        && q.SLAExpiresAt < now)
-                    .ToList();
+                        && q.SLAExpiresAt != null && q.SLAExpiresAt < now)
+                    .ToList(); // Fix: Added null check for SLAExpiresAt
                 foreach (var entry in candidates)
                 {
                     bool alreadyEscalated = db.EscalationLogs.Any(e => e.ScheduleQueueId == entry.Id);
@@ -58,14 +59,23 @@ public class SLAMonitorService : BackgroundService
                         if (backupTech != null && backupTech.Id != entry.TechnicianId)
                         {
                             entry.TechnicianId = backupTech.Id;
-                            entry.AssignedTechnicianName = backupTech.FullName;
-                            entry.EstimatedArrival = _dispatcherService.PredictETA(backupTech, entry.Zone, 0);
+                            entry.AssignedTechnicianName = backupTech.FullName ?? string.Empty;
+                            var techStatus = new MVP_Core.Models.Admin.TechnicianStatusDto {
+                                TechnicianId = backupTech.Id,
+                                Name = backupTech.FullName ?? string.Empty,
+                                Status = backupTech.Specialty ?? string.Empty,
+                                DispatchScore = 100,
+                                LastPing = DateTime.UtcNow,
+                                AssignedJobs = 0,
+                                LastUpdate = DateTime.UtcNow
+                            };
+                            entry.EstimatedArrival = _dispatcherService.PredictETA(techStatus, entry.Zone, 0).GetAwaiter().GetResult();
                             entry.Status = ScheduleStatus.Dispatched;
                             db.EscalationLogs.Add(new EscalationLogEntry {
                                 ScheduleQueueId = entry.Id,
                                 TriggeredBy = "system",
                                 Reason = "Automatic SLA Escalation Fallback",
-                                ActionTaken = $"Reassigned to backup tech {backupTech.FullName}",
+                                ActionTaken = $"Reassigned to backup tech {backupTech.FullName ?? "Unknown"}",
                                 CreatedAt = now
                             });
                         }

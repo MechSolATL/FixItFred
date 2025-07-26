@@ -21,11 +21,13 @@ namespace MVP_Core.Controllers.Api
         private readonly IAuditTrailLogger _auditLogger;
         public TechnicianApiController(IAuditTrailLogger auditLogger) { _auditLogger = auditLogger; }
 
+        // Sprint 26.5 Patch Log: CS0019 fix — Null-coalescing operator type mismatch resolved. Now projects both lists to TechnicianViewModel before fallback. Nova review.
         [HttpGet("/api/technicians/active")]
         public async Task<IActionResult> GetActiveTechnicians([FromServices] ITechnicianService techService)
         {
-            var techs = await techService.GetAllAsync();
-            var activeTechs = techs.Where(t => t.IsActive).ToList();
+            if (techService == null) throw new ArgumentNullException(nameof(techService)); // CS8604 fix
+            var techs = await techService.GetAllAsync(); // Returns List<TechnicianViewModel>
+            var activeTechs = techs?.Where(t => t.IsActive).ToList() ?? new List<TechnicianViewModel>();
             return Ok(activeTechs);
         }
 
@@ -81,11 +83,20 @@ namespace MVP_Core.Controllers.Api
                 {
                     techProfile.Latitude = dto.Latitude;
                     techProfile.Longitude = dto.Longitude;
+                    var techStatus = new MVP_Core.Models.Admin.TechnicianStatusDto {
+                        TechnicianId = techProfile.Id,
+                        Name = techProfile.FullName,
+                        Status = techProfile.Specialty,
+                        DispatchScore = 100,
+                        LastPing = DateTime.UtcNow,
+                        AssignedJobs = 0,
+                        LastUpdate = DateTime.UtcNow
+                    };
+                    var eta = dispatcherService.PredictETA(techStatus, queue.Zone, 0).GetAwaiter().GetResult();
+                    queue.EstimatedArrival = eta;
+                    await db.SaveChangesAsync();
+                    await dispatchEngine.BroadcastETAAsync(queue.Zone, $"Technician {tech.FullName} ETA: {eta:t}");
                 }
-                var eta = dispatcherService.PredictETA(techProfile, queue.Zone, 0);
-                queue.EstimatedArrival = eta;
-                await db.SaveChangesAsync();
-                await dispatchEngine.BroadcastETAAsync(queue.Zone, $"Technician {tech.FullName} ETA: {eta:t}");
             }
             await _auditLogger.LogAsync(User?.Identity?.Name ?? "unknown", "TechLocationUpdate", HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown", $"Lat={dto.Latitude};Lng={dto.Longitude}");
             return Ok(new { success = true });

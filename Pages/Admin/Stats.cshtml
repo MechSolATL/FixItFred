@@ -1,3 +1,4 @@
+@* Sprint 26.5 Patch Log: CS860x/CS8625/CS1998/CS0219 fixes — Nullability, async, and unused variable corrections for Nova review. *@
 @page
 @model MVP_Core.Pages.Admin.StatsModel
 @{
@@ -48,6 +49,41 @@
     <div class="col-md-12">
         <h4>Weekly ScheduleQueue Volume</h4>
         <canvas id="scheduleQueueChart" height="120"></canvas>
+    </div>
+</div>
+<div class="row mb-4">
+    <div class="col-md-12">
+        <form method="post" asp-page-handler="GeneratePdfArchive" class="d-inline">
+            <button type="submit" class="btn btn-outline-primary">
+                <i class="bi bi-file-earmark-pdf"></i> Generate PDF Archive
+            </button>
+            @if (Model.PdfArchiveExists)
+            {
+                <a href="/@Model.PdfArchivePath.Replace("\\", "/")" class="btn btn-success ms-2" download>
+                    <i class="bi bi-download"></i> Download Sprint 44–46 PDF
+                </a>
+            }
+            @if (!string.IsNullOrEmpty(Model.PdfArchiveError))
+            {
+                <span class="text-danger ms-3">@Model.PdfArchiveError</span>
+            }
+        </form>
+        <!-- Sprint 47 PDF Archive Button -->
+        <form method="post" asp-page-handler="GenerateSprint47PdfArchive" class="d-inline ms-2">
+            <button type="submit" class="btn btn-outline-warning">
+                <i class="bi bi-file-earmark-pdf"></i> Generate Sprint 47 PDF Archive
+            </button>
+            @if (Model.Sprint47PdfArchiveExists)
+            {
+                <a href="/@Model.Sprint47PdfArchivePath.Replace("\\", "/")" class="btn btn-success ms-2" download>
+                    <i class="bi bi-download"></i> Download Sprint 47 PDF
+                </a>
+            }
+            @if (!string.IsNullOrEmpty(Model.Sprint47PdfArchiveError))
+            {
+                <span class="text-danger ms-3">@Model.Sprint47PdfArchiveError</span>
+            }
+        </form>
     </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>

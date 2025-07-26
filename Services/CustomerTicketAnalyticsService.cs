@@ -1,3 +1,5 @@
+// Sprint 26.5 Patch Log: CS860x/CS8625/CS1998/CS0219 fixes — Nullability, async, and unused variable corrections for Nova review.
+// Sprint 26.6 Patch Log: CS8073 fix — Corrected logic for struct null comparison. DateTime cannot be null, so check for default value instead. Previous comments preserved below.
 // Sprint 46.2 – Customer Ticket Analytics Backend
 using MVP_Core.Data;
 using System;
@@ -26,7 +28,7 @@ namespace MVP_Core.Services
             // No FirstResponseAt in ServiceRequest, so use FirstViewedAt as proxy
             var customer = _db.Customers.FirstOrDefault(c => c.Id == customerId);
             if (customer == null || string.IsNullOrEmpty(customer.Email)) return 0;
-            var requests = _db.ServiceRequests.Where(r => r.Email == customer.Email && r.RequestedAt != null && r.FirstViewedAt != null).ToList();
+            var requests = _db.ServiceRequests.Where(r => r.Email == customer.Email && r.RequestedAt != default(DateTime) && r.FirstViewedAt != null).ToList(); // Fix: Use default(DateTime) for struct null check
             if (!requests.Any()) return 0;
             return requests.Average(r => (r.FirstViewedAt.Value - r.RequestedAt).TotalMinutes);
         }

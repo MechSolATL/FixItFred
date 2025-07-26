@@ -40,6 +40,8 @@
             <th class="p-2 border">Service Type</th>
             <th class="p-2 border">Request Time</th>
             <th class="p-2 border">Status</th>
+            <th class="p-2 border">Commission</th> <!-- Sprint 26.6 -->
+            <th class="p-2 border">Financing</th> <!-- Sprint 26.6 -->
         </tr>
     </thead>
     <tbody>
@@ -50,6 +52,8 @@
                 <td class="border px-4 py-2">@req.ServiceType</td>
                 <td class="border px-4 py-2">@req.CreatedAt.ToLocalTime().ToString("g")</td>
                 <td class="border px-4 py-2">@req.Status</td>
+                <td class="border px-4 py-2">@(req.TechnicianCommission?.ToString("C") ?? "-")</td>
+                <td class="border px-4 py-2">@(req.FinancingAmount.HasValue ? $"{req.FinancingAmount.Value:C} @ {req.FinancingAPR}%" : "-")</td>
             </tr>
         }
     </tbody>

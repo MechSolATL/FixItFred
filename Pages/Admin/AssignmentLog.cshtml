@@ -1,3 +1,4 @@
+@* Sprint 26.5 Patch Log: CS860x/CS8625/CS1998/CS0219 fixes — Nullability, async, and unused variable corrections for Nova review. *@
 @page
 // FixItFred Patch Log — Sprint 25
 // [2024-07-25T00:00:00Z] — Verified & corrected Razor structure and SEO injection.
@@ -7,18 +8,11 @@
 @{
     ViewData["Title"] = "Assignment Log";
     Layout = "/Pages/Shared/_Layout.cshtml";
-    /*
-    @inject ISEOService SEO
-    <title>@SEO.Title</title>
-    <meta name="description" content="@SEO.MetaDescription" />
-    <meta name="keywords" content="@SEO.Keywords" />
-    <meta name="robots" content="@SEO.Robots" />
-    */
     int requestId = 0;
-    int.TryParse(Request.Query["requestId"], out requestId);
-    var logs = DispatcherService.GetAssignmentLogs(requestId).GetAwaiter().GetResult() ?? new List<AssignmentLogEntry>();
-    string techFilter = (Request.Query["techId"].ToString() == "" ? "" : Request.Query["techId"].ToString());
-    string dateFilter = (Request.Query["date"].ToString() == "" ? "" : Request.Query["date"].ToString());
+    int.TryParse(Request?.Query["requestId"], out requestId);
+    var logs = DispatcherService?.GetAssignmentLogs(requestId)?.GetAwaiter().GetResult() ?? new List<AssignmentLogEntry>();
+    string techFilter = (Request?.Query["techId"].ToString() == "" ? "" : Request?.Query["techId"].ToString());
+    string dateFilter = (Request?.Query["date"].ToString() == "" ? "" : Request?.Query["date"].ToString());
     if (!string.IsNullOrEmpty(techFilter))
     {
         if (int.TryParse(techFilter, out var techId))
@@ -29,8 +23,8 @@
         if (DateTime.TryParse(dateFilter, out var dt))
             logs = logs.Where(l => l.Timestamp.Date == dt.Date).ToList();
     }
-    var safeValues = Model.AssignmentEntries?.Select(e => string.IsNullOrEmpty(e?.TechnicianName?.ToString()) ? "fallback" : e.TechnicianName.ToString()) ?? Enumerable.Empty<string>();
-    var joinedNames = string.Join(", ", safeValues ?? new List<string>());
+    var safeValues = Model?.AssignmentEntries?.Select(e => string.IsNullOrEmpty(e?.TechnicianName?.ToString()) ? "fallback" : e.TechnicianName?.ToString() ?? "fallback") ?? Enumerable.Empty<string>();
+    var joinedNames = string.Join(", ", safeValues);
 }
 // FixItFred Patch Log — Sprint 24.9 Recovery Patch R24.9R [2024-07-24T23:20:00Z]
 // Replaced model.Property ?? "fallback" with string.IsNullOrEmpty(model.Property.ToString()) ? "fallback" : model.Property.ToString() for TechnicianName.
@@ -76,7 +70,7 @@
                 <td>@log.DispatcherName</td>
                 <td>@log.DispatchScore</td>
                 <td>@log.Tier</td>
-                <td>@string.Join(", ", log.MatchedTags)</td>
+                <td>@string.Join(", ", log.MatchedTags ?? new List<string>())</td>
                 <td>@log.Rationale</td>
                 <td>@log.Timestamp.ToLocalTime().ToString("g")</td>
             </tr>

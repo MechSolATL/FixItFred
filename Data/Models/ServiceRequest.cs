@@ -93,6 +93,21 @@ namespace MVP_Core.Data.Models
 
         [MaxLength(2000)]
         public string? CustomerFeedback { get; set; }
+
+        // Sprint 26.6 Patch Log: Added commission and financing properties for admin review and calculation.
+        // Commission and financing fields
+        public decimal? TechnicianCommission { get; set; } // Sprint 26.6: Commission for assigned tech
+        public decimal? FinancingAmount { get; set; } // Sprint 26.6: Amount financed by customer
+        public decimal? FinancingAPR { get; set; } // Sprint 26.6: Annual Percentage Rate for financing
+        public int? FinancingTermMonths { get; set; } // Sprint 26.6: Financing term in months
+        public decimal? FinancingMonthlyPayment { get; set; } // Sprint 26.6: Calculated monthly payment
+
+        // Sprint 47.1 Patch Log: Emergency pledge and fraud log system fields added.
+        // Emergency pledge and fraud log fields
+        public bool EmergencyPledge { get; set; } // Sprint 47.1: Emergency pledge flag
+        public string? EmergencyPledgeNotes { get; set; } // Sprint 47.1: Notes for emergency pledge
+        public bool IsFraudSuspected { get; set; } // Sprint 47.1: Suspected fraud flag
+        public string? FraudLogNotes { get; set; } // Sprint 47.1: Fraud log notes
     }
 
     public class SlaSetting

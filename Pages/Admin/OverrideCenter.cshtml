@@ -1,0 +1,104 @@
+@page
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize(Roles = "Admin,Dispatcher")]
+@model MVP_Core.Pages.Admin.OverrideCenterModel
+@{
+    ViewData["Title"] = "Admin Override Center";
+}
+<h2>Admin Override Center</h2>
+<div class="mb-4">
+    <ul class="nav nav-tabs" id="overrideTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="zone-tab" data-bs-toggle="tab" data-bs-target="#zone" type="button" role="tab">Zone Rerouting</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="tech-tab" data-bs-toggle="tab" data-bs-target="#tech" type="button" role="tab">Forced Technician Assignment</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="msg-tab" data-bs-toggle="tab" data-bs-target="#msg" type="button" role="tab">Message Rewrite</button>
+        </li>
+    </ul>
+    <div class="tab-content p-3 border border-top-0" id="overrideTabsContent">
+        <!-- Zone Rerouting -->
+        <div class="tab-pane fade show active" id="zone" role="tabpanel">
+            <form method="post" asp-page-handler="ZoneReroute" class="row g-2 align-items-end">
+                <div class="col-md-3">
+                    <label class="form-label">Job ID</label>
+                    <input type="number" name="JobId" class="form-control" required />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">New Zone</label>
+                    <select name="NewZone" class="form-select">
+                        @foreach (var zone in Model.ServiceZones)
+                        {
+                            <option value="@zone">@zone</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <button class="btn btn-primary mt-2">Reroute</button>
+                </div>
+            </form>
+            @if (!string.IsNullOrEmpty(Model.ZoneRerouteMessage))
+            {
+                <div class="alert alert-info mt-2">@Model.ZoneRerouteMessage</div>
+            }
+        </div>
+        <!-- Forced Technician Assignment -->
+        <div class="tab-pane fade" id="tech" role="tabpanel">
+            <form method="post" asp-page-handler="ForceAssign" class="row g-2 align-items-end">
+                <div class="col-md-3">
+                    <label class="form-label">Job ID</label>
+                    <input type="number" name="JobId" class="form-control" required />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Technician</label>
+                    <select name="TechnicianId" class="form-select">
+                        @foreach (var tech in Model.AllTechnicians)
+                        {
+                            <option value="@tech.TechnicianId">@tech.Name</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <button class="btn btn-primary mt-2">Force Assign</button>
+                </div>
+            </form>
+            @if (!string.IsNullOrEmpty(Model.ForceAssignMessage))
+            {
+                <div class="alert alert-info mt-2">@Model.ForceAssignMessage</div>
+            }
+        </div>
+        <!-- Message Rewrite -->
+        <div class="tab-pane fade" id="msg" role="tabpanel">
+            <form method="post" asp-page-handler="RewriteMessage" class="row g-2 align-items-end">
+                <div class="col-md-3">
+                    <label class="form-label">Message ID</label>
+                    <input type="number" name="MessageId" class="form-control" required />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">New Message</label>
+                    <input type="text" name="NewMessage" class="form-control" required />
+                </div>
+                <div class="col-md-3">
+                    <button class="btn btn-primary mt-2">Rewrite</button>
+                </div>
+            </form>
+            @if (!string.IsNullOrEmpty(Model.RewriteMessageStatus))
+            {
+                <div class="alert alert-info mt-2">@Model.RewriteMessageStatus</div>
+            }
+        </div>
+    </div>
+</div>
+<script>
+    // Bootstrap tab activation (if needed)
+    var triggerTabList = [].slice.call(document.querySelectorAll('#overrideTabs button'));
+    triggerTabList.forEach(function (triggerEl) {
+        var tabTrigger = new bootstrap.Tab(triggerEl);
+        triggerEl.addEventListener('click', function (event) {
+            event.preventDefault();
+            tabTrigger.show();
+        });
+    });
+</script>

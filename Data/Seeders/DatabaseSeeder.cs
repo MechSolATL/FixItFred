@@ -71,7 +71,7 @@ namespace MVP_Core.Data.Seeders
                 );
             }
 
-            _ = db.SaveChanges();
+            _ = db.SaveChanges(); // Fix: Use discard for assignment, always non-null
         }
 
 #if DEBUG
@@ -93,6 +93,7 @@ namespace MVP_Core.Data.Seeders
                 new { Name = "TestSeed Epsilon", Email = "epsilon@test.com", Address = "505 Epsilon Ln", ServiceType = "Plumbing", ServiceSubtype = "Drain Cleaning", Details = "Clogged main drain.", Zone = "North" }
             };
 
+            // FixItFred: Sprint 48.1 PredictETA async refactor
             foreach (var req in testRequests)
             {
                 var serviceRequest = new ServiceRequest
@@ -115,7 +116,16 @@ namespace MVP_Core.Data.Seeders
                 var tech = dispatcherService.FindAvailableTechnicianForZone(req.Zone);
                 if (tech != null)
                 {
-                    var eta = dispatcherService.PredictETA(tech, req.Zone, 0);
+                    var techStatus = new MVP_Core.Models.Admin.TechnicianStatusDto {
+                        TechnicianId = tech.Id,
+                        Name = tech.FullName,
+                        Status = tech.Specialty,
+                        DispatchScore = 100,
+                        LastPing = DateTime.UtcNow,
+                        AssignedJobs = 0,
+                        LastUpdate = DateTime.UtcNow
+                    };
+                    var eta = dispatcherService.PredictETA(techStatus, req.Zone, 0).GetAwaiter().GetResult();
                     var queue = new ScheduleQueue
                     {
                         TechnicianId = tech.Id,

@@ -1,3 +1,4 @@
+// Sprint 26.5 Patch Log: CS860x/CS8625/CS1998/CS0219 fixes — Nullability, async, and unused variable corrections for Nova review.
 // FixItFred: Sprint 30D.2 — CS860x nullability audit 2024-07-25
 // Added null checks and safe navigation for all nullable references per CS8601, CS8602, CS8603, CS8604
 // Each change is marked with FixItFred comment and timestamp
@@ -75,10 +76,20 @@ namespace MVP_Core.Services
             var tech = _dispatcherService.FindAvailableTechnicianForZone(safeZone);
             if (tech == null)
             {
-                // FixItFred: Sprint 30D.2 — Fallback for null tech, skip scheduling if no tech found 2024-07-25
+                // FixItFred: Sprint 30D.2 – Fallback for null tech, skip scheduling if no tech found 2024-07-25
                 return request.Id;
             }
-            var eta = _dispatcherService.PredictETA(tech, safeZone, delayMinutes);
+            // Convert Data.Models.TechnicianProfileDto to TechnicianStatusDto for PredictETA
+            var techStatus = new MVP_Core.Models.Admin.TechnicianStatusDto {
+                TechnicianId = tech.Id,
+                Name = tech.FullName,
+                Status = tech.Specialty,
+                DispatchScore = 100, // Default/mock value
+                LastPing = DateTime.UtcNow,
+                AssignedJobs = 0,
+                LastUpdate = DateTime.UtcNow
+            };
+            var eta = _dispatcherService.PredictETA(techStatus, safeZone, delayMinutes).GetAwaiter().GetResult();
             var entry = new ScheduleQueue
             {
                 TechnicianId = tech.Id,

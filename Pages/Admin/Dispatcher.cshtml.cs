@@ -298,7 +298,7 @@ namespace MVP_Core.Pages.Admin
             // Assignment log
             var assignment = result;
             var technicianId = assignment?.TechnicianList != null && assignment.TechnicianList.Any()
-                ? TechnicianStatuses.FirstOrDefault(t => t.Name == assignment.AssignedTechName)?.TechnicianId ?? 1
+                ? TechnicianStatuses?.FirstOrDefault(t => t.Name == assignment.AssignedTechName)?.TechnicianId ?? 1
                 : 1; // fallback to 1 if not found
             // FixItFred — Sprint 40.4 Final LogAssignment Technician ID Fix
             _dispatcherService.LogAssignment(RequestId, technicianId);
@@ -441,25 +441,25 @@ namespace MVP_Core.Pages.Admin
                 return Page();
             }
             // --- End eligibility check ---
-            // Update ScheduleQueue.TechnicianId and AssignedTechnicianName
             var prevTechId = queue.TechnicianId;
             var prevTechName = queue.AssignedTechnicianName;
             queue.TechnicianId = tech.Id;
             queue.AssignedTechnicianName = tech.FullName;
             await _db.SaveChangesAsync();
-            // Recalculate ETA based on new tech's location
-            var dispatcherService = new MVP_Core.Services.Admin.DispatcherService(_db, null);
-            var eta = dispatcherService.PredictETA(new MVP_Core.Data.Models.TechnicianProfileDto {
-                Id = tech.Id,
-                Specialty = tech.Specialty,
-                IsActive = tech.IsActive,
-                Latitude = tech.Latitude ?? 0,
-                Longitude = tech.Longitude ?? 0
-            }, queue.Zone, 0);
+            // Recalculate ETA based on new tech's status
+            DateTime eta;
+            var techStatus = TechnicianStatuses?.FirstOrDefault(ts => ts.TechnicianId == tech.Id);
+            if (techStatus != null)
+            {
+                eta = await _dispatcherService.PredictETA(techStatus, queue.Zone, 0);
+            }
+            else
+            {
+                eta = DateTime.UtcNow.AddMinutes(15);
+            }
             var prevEta = queue.EstimatedArrival;
             queue.EstimatedArrival = eta;
             await _db.SaveChangesAsync();
-            // Log change in ETAHistoryEntry with reason: Reassigned
             _db.ETAHistoryEntries.Add(new ETAHistoryEntry {
                 TechnicianId = tech.Id,
                 TechnicianName = tech.FullName,
@@ -471,7 +471,6 @@ namespace MVP_Core.Pages.Admin
                 Message = "Reassigned"
             });
             await _db.SaveChangesAsync();
-            // --- Sprint 33.3: Audit log for handoff ---
             _db.AuditLogEntries.Add(new MVP_Core.Data.Models.AuditLogEntry {
                 UserId = User?.Identity?.Name ?? "system",
                 Action = "Dispatch Handoff",
@@ -480,12 +479,9 @@ namespace MVP_Core.Pages.Admin
                 AdditionalData = $"RequestId={requestId};FromTechId={prevTechId};ToTechId={tech.Id};FromTechName={prevTechName};ToTechName={tech.FullName}"
             });
             await _db.SaveChangesAsync();
-            // --- End audit log ---
-            // --- Sprint 33.3: SignalR broadcast to all relevant groups ---
             await _dispatchEngine.BroadcastETAAsync(queue.Zone, $"[Reassigned] Technician {tech.FullName} ETA: {eta:t}");
             var technicianGroup = $"Technician-{tech.Id}";
             await _hubContext.Clients.Group(technicianGroup).SendAsync("ReceiveETA", queue.Zone, $"[Reassigned] Technician {tech.FullName} ETA: {eta:t}");
-            // --- End SignalR broadcast ---
             // Log dispatcher action (legacy log)
             _dispatcherService.LogDispatcherAction($"[Audit] {DateTime.UtcNow:u} | Job {queue.ServiceRequestId} reassigned to tech {tech.Id} by {User?.Identity?.Name ?? "system"}");
             var log = new DispatcherAuditLog
@@ -561,18 +557,32 @@ namespace MVP_Core.Pages.Admin
         {
             if (OverrideJobId > 0 && !string.IsNullOrEmpty(OverrideNewZone))
             {
-                // Try to parse OverrideNewZone as int
-                if (int.TryParse(OverrideNewZone, out int newZoneId))
-                {
-                    bool success = _dispatcherService.OverrideJobZone(OverrideJobId, newZoneId);
-                    TempData["SystemMessages"] = success ? "Job zone updated." : "Failed to update job zone.";
-                }
-                else
-                {
-                    TempData["SystemMessages"] = "Invalid zone ID.";
-                }
+                // Use string-based zone rerouting
+                bool success = _dispatcherService.OverrideJobZone(OverrideJobId, OverrideNewZone);
+                TempData["SystemMessages"] = success ? "Job zone updated." : "Failed to update job zone.";
             }
             return RedirectToPage();
         }
+
+        // Sprint 47.1 – FixItFred Mission Package: Expose ZoneLoadChartData and LiveTechHeartbeatData for UI
+        public string ZoneLoadChartDataJson => Newtonsoft.Json.JsonConvert.SerializeObject(
+            ServiceZones.Select(z => new {
+                Zone = z,
+                Load = ZoneLoadStatuses?.FirstOrDefault(s => s.Zone == z)?.JobCount ?? 0,
+                Techs = ZoneLoadStatuses?.FirstOrDefault(s => s.Zone == z)?.AvailableTechCount ?? 0
+            })
+        );
+        public string LiveTechHeartbeatDataJson => Newtonsoft.Json.JsonConvert.SerializeObject(
+            TechnicianStatuses.Select(t => new {
+                t.TechnicianId,
+                t.Name,
+                t.Status,
+                t.DispatchScore,
+                t.IsOnline,
+                t.LastPing
+            })
+        );
+        // Sprint 47.2 – FixItFred Mission Package: Expose WatchdogAlerts for SignalR
+        public string WatchdogAlertsJson => Newtonsoft.Json.JsonConvert.SerializeObject(WatchdogAlerts);
     }
 }
