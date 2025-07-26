@@ -1,0 +1,35 @@
+@page
+@using MVP_Core.Data.Models
+@using MVP_Core.Services
+@model MVP_Core.Pages.Customer.PostJobSurveyModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    ViewData["Title"] = "Post-Job Feedback Survey";
+}
+<h2>Post-Job Feedback Survey</h2>
+<form method="post">
+    @foreach (var question in Model.SurveyQuestions)
+    {
+        <div class="mb-3">
+            <label class="form-label">@question.QuestionText</label>
+            @if (question.InputType == "slider")
+            {
+                <input type="range" min="1" max="5" name="responses[@question.Id]" class="form-range" />
+            }
+            else if (question.InputType == "checkbox")
+            {
+                <input type="checkbox" name="responses[@question.Id]" value="true" class="form-check-input" />
+            }
+            else
+            {
+                <input type="text" name="responses[@question.Id]" class="form-control" />
+            }
+        </div>
+    }
+    <input type="hidden" name="ServiceRequestId" value="@Model.ServiceRequestId" />
+    <button type="submit" class="btn btn-primary">Submit Survey</button>
+</form>
+@if (Model.Submitted)
+{
+    <div class="alert alert-success mt-3">Thank you for your feedback!</div>
+}

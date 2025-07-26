@@ -1,0 +1,44 @@
+@page
+@using MVP_Core.Data.Models
+@using MVP_Core.Services
+@model MVP_Core.Pages.Admin.SurveyBuilderModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    ViewData["Title"] = "Survey Builder";
+}
+<h2>Survey Builder</h2>
+<form method="post">
+    <div class="mb-3">
+        <label class="form-label">Service Type</label>
+        <input type="text" name="ServiceType" value="@Model.ServiceType" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Question Text</label>
+        <input type="text" name="QuestionText" value="@Model.QuestionText" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Input Type</label>
+        <select name="InputType" class="form-select">
+            <option value="slider">Slider</option>
+            <option value="checkbox">Checkbox</option>
+            <option value="text">Text</option>
+        </select>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Sort Order</label>
+        <input type="number" name="SortOrder" value="@Model.SortOrder" class="form-control" />
+    </div>
+    <button type="submit" class="btn btn-success">Add Question</button>
+</form>
+<hr />
+<h3>Questions by Service Type</h3>
+@foreach (var group in Model.QuestionsByServiceType)
+{
+    <h4>@group.Key</h4>
+    <ul>
+        @foreach (var q in group.Value)
+        {
+            <li>@q.QuestionText (@q.InputType) <form method="post" asp-page-handler="Delete" asp-route-id="@q.Id" style="display:inline"><button type="submit" class="btn btn-danger btn-sm">Delete</button></form></li>
+        }
+    </ul>
+}
