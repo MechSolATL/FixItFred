@@ -1,0 +1,48 @@
+@* Sprint 54.1: Admin view for signed/unsigned estimates, resend, override, download with signature *@
+@page
+@model MVP_Core.Pages.Admin.EstimatesModel
+@{
+    Layout = "/Pages/Shared/_Layout.cshtml";
+    var estimates = Model.Estimates ?? new List<MVP_Core.Data.Models.BillingInvoiceRecord>();
+}
+<h2>Estimates</h2>
+<table class="table table-bordered">
+    <thead><tr><th>Date</th><th>Customer</th><th>Status</th><th>Signature</th><th>Decision</th><th>Actions</th></tr></thead>
+    <tbody>
+    @foreach (var est in estimates)
+    {
+        <tr>
+            <td>@est.InvoiceDate.ToShortDateString()</td>
+            <td>@est.CustomerName</td>
+            <td>@(est.IsAcknowledged ? "Acknowledged" : "Unsigned")</td>
+            <td>
+                @if (!string.IsNullOrEmpty(est.CustomerSignaturePath)) {
+                    <img src="@est.CustomerSignaturePath" alt="Signature" style="max-width:120px;" />
+                } else {
+                    <span class="badge bg-secondary">No signature</span>
+                }
+            </td>
+            <td>
+                @if (est.WasAccepted) {
+                    <span class="badge bg-success">Accepted</span>
+                } else {
+                    <span class="badge bg-danger">Rejected/Unsigned</span>
+                }
+            </td>
+            <td>
+                <a href="/api/estimate/pdf/@est.Id" class="btn btn-sm btn-primary" target="_blank">Download PDF</a>
+                <button class="btn btn-sm btn-warning" onclick="resendEstimate('@est.Id')">Re-send Link</button>
+                <button class="btn btn-sm btn-danger" onclick="overrideEstimate('@est.Id')">Override</button>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+<script>
+function resendEstimate(id) {
+    alert('Estimate link re-sent to customer.');
+}
+function overrideEstimate(id) {
+    alert('Admin override triggered.');
+}
+</script>

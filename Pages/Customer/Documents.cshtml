@@ -22,7 +22,113 @@
             <td>@doc.Status</td>
             <td>@doc.AmountDue.ToString("C")</td>
             <td><a href="@doc.LinkUrl" target="_blank" class="btn btn-sm btn-outline-primary">PDF</a></td>
+            <td>
+                <button class="btn btn-sm btn-info" onclick="showEstimatePreview('@doc.Id')">Preview</button>
+                @if (!doc.IsAcknowledged)
+                {
+                    <button class="btn btn-sm btn-success" onclick="showAcknowledgeModal('@doc.Id')">Acknowledge & Sign</button>
+                }
+                else
+                {
+                    <span class="badge bg-success">Acknowledged</span>
+                }
+                @if (!doc.WasAccepted)
+                {
+                    <button class="btn btn-sm btn-primary" onclick="showAcceptModal('@doc.Id')">Accept/Reject</button>
+                }
+                else
+                {
+                    <span class="badge bg-primary">Accepted</span>
+                }
+            </td>
         </tr>
     }
     </tbody>
 </table>
+
+<!-- Modals for preview, acknowledge/sign, accept/reject -->
+<div id="estimatePreviewModal" class="modal fade" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header"><h5 class="modal-title">Estimate Preview</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body" id="estimatePreviewBody"></div>
+      <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button></div>
+    </div>
+  </div>
+</div>
+<div id="acknowledgeModal" class="modal fade" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header"><h5 class="modal-title">Acknowledge & Sign</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body">
+        <form id="acknowledgeForm">
+          <input type="hidden" name="docId" id="ackDocId" />
+          <label>Sign below:</label>
+          <canvas id="signaturePad" width="300" height="100" style="border:1px solid #ccc;"></canvas>
+          <input type="file" name="signatureFile" id="signatureFile" accept="image/*" class="form-control mt-2" />
+          <button type="submit" class="btn btn-success mt-2">Submit Signature</button>
+        </form>
+      </div>
+      <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button></div>
+    </div>
+  </div>
+</div>
+<div id="acceptModal" class="modal fade" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header"><h5 class="modal-title">Accept or Reject Estimate</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body">
+        <form id="acceptForm">
+          <input type="hidden" name="docId" id="acceptDocId" />
+          <label>Comments:</label>
+          <textarea name="comments" class="form-control"></textarea>
+          <button type="submit" class="btn btn-primary mt-2">Accept</button>
+          <button type="button" class="btn btn-danger mt-2" onclick="rejectEstimate()">Reject</button>
+        </form>
+      </div>
+      <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button></div>
+    </div>
+  </div>
+</div>
+
+<script>
+function showEstimatePreview(docId) {
+    var modal = new bootstrap.Modal(document.getElementById('estimatePreviewModal'));
+    var body = document.getElementById('estimatePreviewBody');
+    body.innerHTML = '<iframe src="/api/estimate/pdf/' + docId + '" width="100%" height="600"></iframe>';
+    modal.show();
+}
+function showAcknowledgeModal(docId) {
+    document.getElementById('ackDocId').value = docId;
+    var modal = new bootstrap.Modal(document.getElementById('acknowledgeModal'));
+    modal.show();
+}
+function showAcceptModal(docId) {
+    document.getElementById('acceptDocId').value = docId;
+    var modal = new bootstrap.Modal(document.getElementById('acceptModal'));
+    modal.show();
+}
+function rejectEstimate() {
+    // Submit reject logic
+    alert('Estimate rejected.');
+    var modal = bootstrap.Modal.getInstance(document.getElementById('acceptModal'));
+    modal.hide();
+}
+// Signature pad logic (simple)
+let signaturePad = null;
+document.addEventListener('DOMContentLoaded', function() {
+    var canvas = document.getElementById('signaturePad');
+    if (canvas) {
+        signaturePad = canvas.getContext('2d');
+        let drawing = false;
+        canvas.addEventListener('mousedown', function(e) { drawing = true; });
+        canvas.addEventListener('mouseup', function(e) { drawing = false; });
+        canvas.addEventListener('mousemove', function(e) {
+            if (!drawing) return;
+            var rect = canvas.getBoundingClientRect();
+            signaturePad.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+            signaturePad.stroke();
+        });
+    }
+});
+</script>

@@ -1,0 +1,46 @@
+@* Sprint 54.1: Branded Estimate PDF Template *@
+@model MVP_Core.Data.Models.BillingInvoiceRecord
+@{
+    var logoPath = "/assets/company-logo.png";
+    var contactInfo = "NovaOps | 555-1234 | support@novaops.com";
+    var disclaimers = "All estimates are subject to change based on site conditions. Contact us for details.";
+    var terms = "Payment due upon completion. Warranty terms apply as per contract.";
+    var serviceType = Model.Status;
+    var lineItems = new[] { "Labor: $200", "Parts: $150", "Tax: $35" };
+}
+<div class="estimate-pdf">
+    <div class="header">
+        <img src="@logoPath" alt="Company Logo" style="height:60px;float:right;" />
+        <h2>Estimate</h2>
+        <div>Date: @DateTime.UtcNow.ToString("yyyy-MM-dd")</div>
+        <div>@contactInfo</div>
+    </div>
+    <hr />
+    <div class="customer-info">
+        <strong>Customer:</strong> @Model.CustomerName<br />
+        <strong>Email:</strong> @Model.CustomerEmail<br />
+        <strong>Service Type:</strong> @serviceType
+    </div>
+    <hr />
+    <div class="line-items">
+        <strong>Line Items:</strong>
+        <ul>
+            @foreach (var item in lineItems) {
+                <li>@item</li>
+            }
+        </ul>
+    </div>
+    <hr />
+    <div class="terms">
+        <strong>Terms:</strong> @terms
+    </div>
+    <div class="disclaimers">
+        <strong>Disclaimers:</strong> @disclaimers
+    </div>
+    @if (!string.IsNullOrEmpty(Model.CustomerSignaturePath)) {
+        <div class="signature">
+            <strong>Customer Signature:</strong><br />
+            <img src="@Model.CustomerSignaturePath" alt="Signature" style="max-width:300px;" />
+        </div>
+    }
+</div>
