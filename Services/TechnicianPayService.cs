@@ -19,9 +19,28 @@ namespace MVP_Core.Services
             var jobs = _db.ScheduleQueues.Where(q => q.TechnicianId == technicianId && q.ScheduledTime >= periodStart && q.ScheduledTime <= periodEnd).ToList();
             decimal hoursWorked = jobs.Sum(j => (decimal)(j.EstimatedDurationHours ?? 0));
             decimal commissionEarned = jobs.Sum(j => (decimal)(j.CommissionAmount ?? 0));
-            decimal hourlyRate = _db.Technicians.FirstOrDefault(t => t.Id == technicianId)?.HourlyRate ?? 0;
-            string payType = hourlyRate > 0 ? "Hourly" : "Commission";
-            decimal totalPay = payType == "Hourly" ? hoursWorked * hourlyRate : commissionEarned;
+            var tech = _db.Technicians.FirstOrDefault(t => t.Id == technicianId);
+            decimal hourlyRate = tech?.HourlyRate ?? 0;
+            string payType = "Commission";
+            decimal totalPay = commissionEarned;
+            // Sprint 51.1: Second-chance techs default to salary model unless overridden
+            if (tech != null && tech.IsSecondChance)
+            {
+                payType = "Salary";
+                // Example salary logic: base salary + commission
+                decimal baseSalary = 1000; // Could be configurable
+                totalPay = baseSalary + commissionEarned;
+                if (hourlyRate > 0)
+                {
+                    payType = "Hourly";
+                    totalPay = hoursWorked * hourlyRate;
+                }
+            }
+            else if (hourlyRate > 0)
+            {
+                payType = "Hourly";
+                totalPay = hoursWorked * hourlyRate;
+            }
             return new TechnicianPayRecord
             {
                 TechnicianId = technicianId,

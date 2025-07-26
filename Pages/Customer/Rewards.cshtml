@@ -1,0 +1,35 @@
+@page
+@model MVP_Core.Pages.Customer.RewardsModel
+@inject MVP_Core.Services.CustomerPortalService PortalService
+@{
+    Layout = "/Pages/Shared/_Layout.cshtml";
+    if (!User.Identity.IsAuthenticated || !User.HasClaim("IsCustomer", "true"))
+    {
+        <div class="alert alert-danger">Access denied. Please log in as a customer.</div>
+        return;
+    }
+    var email = User.Identity.Name ?? string.Empty;
+    var loyalty = PortalService.GetLoyaltyTransactions(email);
+    var tiers = PortalService.GetRewardTiers();
+    var currentTier = tiers.LastOrDefault(t => loyalty.Sum(l => l.Points) >= t.PointsRequired);
+}
+<h2>Rewards & Loyalty</h2>
+<div class="mb-3">
+    <strong>Current Tier:</strong> @currentTier?.Name ?? "None"<br />
+    <strong>Total Points:</strong> @loyalty.Sum(l => l.Points)
+</div>
+<h4>Bonus History</h4>
+<table class="table table-striped">
+    <thead><tr><th>Date</th><th>Type</th><th>Points</th><th>Description</th></tr></thead>
+    <tbody>
+    @foreach (var txn in loyalty)
+    {
+        <tr>
+            <td>@txn.Timestamp.ToShortDateString()</td>
+            <td>@txn.Type</td>
+            <td>@txn.Points</td>
+            <td>@txn.Description</td>
+        </tr>
+    }
+    </tbody>
+</table>

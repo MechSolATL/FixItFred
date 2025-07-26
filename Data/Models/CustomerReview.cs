@@ -1,0 +1,25 @@
+using System;
+using System.ComponentModel.DataAnnotations;
+
+namespace MVP_Core.Data.Models
+{
+    /// <summary>
+    /// Stores customer feedback, rating, and job reference for loyalty/review system.
+    /// </summary>
+    public class CustomerReview
+    {
+        [Key]
+        public int Id { get; set; }
+        [Required]
+        public int CustomerId { get; set; }
+        [Required]
+        public int ServiceRequestId { get; set; }
+        [Range(1,5)]
+        public int Rating { get; set; }
+        [MaxLength(2000)]
+        public string? Feedback { get; set; }
+        public DateTime SubmittedAt { get; set; } = DateTime.UtcNow;
+        public bool IsGamifiedBonus { get; set; } = false; // For random bonus events
+        public string? BadgeAwarded { get; set; } // For gamified badges
+    }
+}

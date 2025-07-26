@@ -1,0 +1,79 @@
+@page
+@model MVP_Core.Pages.Admin.RewardManagerModel
+@inject MVP_Core.Services.LoyaltyRewardService LoyaltyService
+@inject MVP_Core.Services.ReviewService ReviewService
+@{
+    ViewData["Title"] = "Reward Tier Manager";
+    var tiers = LoyaltyService.GetAllTiers();
+    // Analytics: Repeat customer % and average review score
+    var db = LoyaltyService.GetDbContext();
+    var totalCustomers = db.Customers.Count();
+    var repeatCustomers = db.CustomerReviews.GroupBy(r => r.CustomerId).Count(g => g.Count() > 1);
+    var repeatPercent = totalCustomers > 0 ? (repeatCustomers * 100.0 / totalCustomers) : 0;
+    // Fix: Avoid null-propagating operator in LINQ expression tree
+    var serviceTypeScores = db.CustomerReviews
+        .Join(db.ServiceRequests, r => r.ServiceRequestId, s => s.Id, (r, s) => new { r, s.ServiceType })
+        .GroupBy(x => x.ServiceType)
+        .Select(g => new { ServiceType = g.Key, AvgScore = g.Average(x => x.r.Rating) })
+        .ToList();
+}
+<h2 class="mb-4">Reward Tier Manager</h2>
+<div class="mb-3">
+    <strong>Repeat Customer %:</strong> <span id="repeatPercent">@repeatPercent.ToString("0.0")%</span>
+    <canvas id="repeatCustomerChart" height="60"></canvas>
+</div>
+<div class="mb-3">
+    <strong>Average Review Score by Service Type:</strong>
+    <ul>
+    @foreach (var item in serviceTypeScores)
+    {
+        <li>@item.ServiceType: @item.AvgScore.ToString("0.0")</li>
+    }
+    </ul>
+</div>
+<table class="table table-bordered">
+    <thead><tr><th>Name</th><th>Points Required</th><th>Bonus Points</th><th>Description</th><th>Badge</th><th>Status</th></tr></thead>
+    <tbody>
+    @foreach (var tier in tiers)
+    {
+        <tr>
+            <td>@tier.Name</td>
+            <td>@tier.PointsRequired</td>
+            <td>@tier.BonusPoints</td>
+            <td>@tier.Description</td>
+            <td>@tier.BadgeIcon</td>
+            <td>@(tier.IsActive ? "Active" : "Inactive")</td>
+        </tr>
+    }
+    </tbody>
+</table>
+<form method="post">
+    <h4>Add/Edit Tier</h4>
+    <div class="row mb-2">
+        <div class="col"><input type="text" name="Name" class="form-control" placeholder="Tier Name" required /></div>
+        <div class="col"><input type="number" name="PointsRequired" class="form-control" placeholder="Points Required" required /></div>
+        <div class="col"><input type="number" name="BonusPoints" class="form-control" placeholder="Bonus Points" /></div>
+        <div class="col"><input type="text" name="Description" class="form-control" placeholder="Description" /></div>
+        <div class="col"><input type="text" name="BadgeIcon" class="form-control" placeholder="Badge Icon Path" /></div>
+        <div class="col"><select name="IsActive" class="form-select"><option value="true">Active</option><option value="false">Inactive</option></select></div>
+    </div>
+    <button type="submit" class="btn btn-primary">Save Tier</button>
+</form>
+@section Scripts {
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    var ctx = document.getElementById('repeatCustomerChart').getContext('2d');
+    var repeatPercent = parseFloat(document.getElementById('repeatPercent').innerText);
+    new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Repeat', 'New'],
+            datasets: [{
+                data: [repeatPercent, 100-repeatPercent],
+                backgroundColor: ['#28a745', '#ccc']
+            }]
+        },
+        options: { cutout: '70%' }
+    });
+</script>
+}

@@ -1,0 +1,75 @@
+@page
+@model MVP_Core.Pages.RewardsModel
+@inject MVP_Core.Services.LoyaltyRewardService LoyaltyService
+@inject MVP_Core.Services.ReviewService ReviewService
+@{
+    Layout = "/Pages/Shared/_Layout.cshtml";
+    var customerId = User?.Identity?.Name != null ? int.Parse(User.Identity.Name) : 0; // Replace with actual customer ID logic
+    var points = LoyaltyService.GetTotalPoints(customerId);
+    var tier = LoyaltyService.GetCurrentTier(customerId);
+    var reviews = ReviewService.GetReviews(customerId);
+    var transactions = LoyaltyService.GetTransactions(customerId);
+    string badgeIcon = tier?.BadgeIcon ?? "";
+    string badgeLabel = tier?.Name ?? "";
+    string badgeClass = tier?.Name switch {
+        "Gold" => "badge-gold",
+        "Silver" => "badge-silver",
+        "Bronze" => "badge-bronze",
+        _ => "badge-default"
+    };
+}
+<h2 class="mt-4">Your Rewards & Loyalty Status</h2>
+<div class="mb-3">
+    <strong>Total Points:</strong> @points<br />
+    <strong>Current Tier:</strong> @(tier?.Name ?? "None")<br />
+    <strong>Tier Bonus:</strong> @(tier?.BonusPoints ?? 0)
+</div>
+@if (!string.IsNullOrEmpty(badgeIcon))
+{
+    <div class="mb-2">
+        <img src="@badgeIcon" alt="@badgeLabel Badge" class="@badgeClass" style="height:48px;" />
+        <span class="badge @badgeClass ms-2">@badgeLabel</span>
+    </div>
+}
+<h3 class="mt-4">Recent Loyalty Transactions</h3>
+<table class="table table-striped">
+    <thead><tr><th>Date</th><th>Type</th><th>Points</th><th>Description</th></tr></thead>
+    <tbody>
+    @foreach (var txn in transactions)
+    {
+        <tr>
+            <td>@txn.Timestamp.ToShortDateString()</td>
+            <td>@txn.Type</td>
+            <td>@txn.Points</td>
+            <td>@txn.Description</td>
+        </tr>
+    }
+    </tbody>
+</table>
+<h3 class="mt-4">Your Reviews</h3>
+@if (reviews.Any())
+{
+    <ul class="list-group">
+    @foreach (var review in reviews)
+    {
+        <li class="list-group-item">
+            <strong>Job #@review.ServiceRequestId</strong> — Rating: @review.Rating<br />
+            @review.Feedback
+            @if (!string.IsNullOrEmpty(review.BadgeAwarded))
+            {
+                <span class="badge bg-success ms-2">@review.BadgeAwarded</span>
+            }
+        </li>
+    }
+    </ul>
+}
+else
+{
+    <div class="alert alert-info">No reviews submitted yet.</div>
+}
+<style>
+.badge-gold { background: linear-gradient(90deg, #FFD700, #FFFACD); color: #333; }
+.badge-silver { background: linear-gradient(90deg, #C0C0C0, #F8F8FF); color: #333; }
+.badge-bronze { background: linear-gradient(90deg, #CD7F32, #FFE4B5); color: #333; }
+.badge-default { background: #eee; color: #333; }
+</style>

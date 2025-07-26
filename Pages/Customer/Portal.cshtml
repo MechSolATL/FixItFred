@@ -1,0 +1,133 @@
+@page
+@model MVP_Core.Pages.Customer.PortalModel
+@inject MVP_Core.Services.CustomerPortalService PortalService
+@{
+    Layout = "/Pages/Shared/_Layout.cshtml";
+    // Security: Only allow verified/logged-in customers
+    if (!User.Identity.IsAuthenticated || !User.HasClaim("IsCustomer", "true"))
+    {
+        <div class="alert alert-danger">Access denied. Please log in as a customer.</div>
+        return;
+    }
+    var email = User.Identity.Name ?? string.Empty;
+    var requests = PortalService.GetServiceRequests(email);
+    var loyalty = PortalService.GetLoyaltyTransactions(email);
+    var customer = PortalService.GetCustomer(email);
+    var nextJob = requests.FirstOrDefault(r => r.Status == "Pending" || r.Status == "Scheduled");
+    var currentTier = PortalService.GetRewardTiers().LastOrDefault(t => loyalty.Sum(l => l.Points) >= t.PointsRequired);
+    var savedAmount = loyalty.Where(l => l.Type == "Bonus" || l.Type == "Discount").Sum(l => l.Points * 0.01M); // Example: 1pt = $0.01
+    var avgRating = requests.Where(r => r.SatisfactionScore.HasValue).Select(r => r.SatisfactionScore.Value).DefaultIfEmpty(0).Average();
+    var recentBonus = loyalty.OrderByDescending(l => l.Timestamp).FirstOrDefault(l => l.Type == "Surprise Bonus" && l.Timestamp > DateTime.UtcNow.AddDays(-7));
+    string tierColor = currentTier?.Name switch {
+        "Gold" => "#FFD700",
+        "Silver" => "#C0C0C0",
+        "Bronze" => "#CD7F32",
+        _ => "#e9ecef"
+    };
+}
+<div class="container-fluid p-3">
+    <div class="d-flex justify-content-between align-items-start mb-3 flex-wrap">
+        <h2>Welcome, @customer?.Name</h2>
+        <div class="cta-group">
+            <a href="/Review" class="btn btn-lg btn-primary mx-1 mb-2"><i class="bi bi-star"></i> Leave a Review</a>
+            <a href="/Submit" class="btn btn-lg btn-info mx-1 mb-2"><i class="bi bi-calendar-plus"></i> Schedule New Appointment</a>
+            <a href="/Rewards" class="btn btn-lg btn-warning mx-1 mb-2"><i class="bi bi-gift"></i> Claim Bonus</a>
+        </div>
+    </div>
+    <div class="row mb-3">
+        <div class="col-md-12">
+            <div class="tier-banner mb-2" style="background:@tierColor;position:relative;">
+                <span class="fw-bold fs-4">@currentTier?.Name ?? "None" Loyalty Tier</span>
+                @if (recentBonus != null)
+                {
+                    <span class="sparkle"></span>
+                }
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card mb-2">
+                <div class="card-body">
+                    <h5>Current Job Status</h5>
+                    @if (nextJob != null)
+                    {
+                        <b>@nextJob.ServiceType</b> <span>- @nextJob.Status</span><br />
+                        <span>@nextJob.Address</span><br />
+                        <span>Requested: @nextJob.RequestedAt.ToString("g")</span>
+                    }
+                    else
+                    {
+                        <span class="text-muted">No active jobs.</span>
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card mb-2">
+                <div class="card-body">
+                    <h5>Loyalty & Analytics</h5>
+                    <b>@currentTier?.Name ?? "None"</b><br />
+                    <span>Points: @loyalty.Sum(l => l.Points)</span><br />
+                    <div class="mt-2 mini-analytics">
+                        <span class="badge bg-success me-2">You’ve saved $@savedAmount:F2 in rewards</span>
+                        <span class="badge bg-info">Average rating given: @avgRating:F1 stars</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mb-3">
+        <div class="col-md-4">
+            <div class="card cta-card">
+                <div class="card-body">
+                    <h5>Leave Review</h5>
+                    <a href="/Review" class="btn btn-primary">Review Service</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card cta-card">
+                <div class="card-body">
+                    <h5>Claim Bonus</h5>
+                    <a href="/Rewards" class="btn btn-success">Claim Loyalty Bonus</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card cta-card">
+                <div class="card-body">
+                    <h5>Schedule Again</h5>
+                    <a href="/Submit" class="btn btn-info">Book New Service</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <a href="/Customer/ServiceHistory" class="btn btn-outline-secondary w-100 mb-2"><i class="bi bi-clock-history"></i> View Service History</a>
+            <a href="/Customer/Documents" class="btn btn-outline-secondary w-100 mb-2"><i class="bi bi-file-earmark-text"></i> View Documents</a>
+        </div>
+        <div class="col-md-6">
+            <a href="/Customer/Rewards" class="btn btn-outline-warning w-100 mb-2"><i class="bi bi-trophy"></i> View Rewards</a>
+            <a href="/Customer/Profile" class="btn btn-outline-primary w-100 mb-2"><i class="bi bi-person"></i> Manage Profile</a>
+        </div>
+    </div>
+</div>
+<style>
+.cta-group { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.tier-banner { border-radius: 0.5rem; padding: 1rem; color: #222; box-shadow: 0 0 8px rgba(0,0,0,0.08); margin-bottom: 1rem; }
+.sparkle {
+    position: absolute; right: 1rem; top: 1rem; width: 32px; height: 32px;
+    background: url('/assets/sparkle.gif') no-repeat center center; background-size: contain;
+    animation: glow 1.2s infinite alternate;
+}
+keyframes glow {
+    0% { filter: drop-shadow(0 0 2px #fff); }
+    100% { filter: drop-shadow(0 0 12px #ffd700); }
+}
+.mini-analytics .badge { font-size: 1rem; margin-bottom: 0.5rem; }
+media (max-width: 768px) {
+    .cta-group { flex-direction: column; align-items: stretch; }
+    .tier-banner { font-size: 1.2rem; }
+    .mini-analytics .badge { font-size: 0.95rem; }
+}
+</style>

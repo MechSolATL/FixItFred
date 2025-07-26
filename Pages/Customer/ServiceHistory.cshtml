@@ -1,0 +1,57 @@
+@page
+@model MVP_Core.Pages.Customer.ServiceHistoryModel
+@inject MVP_Core.Services.CustomerPortalService PortalService
+@{
+    Layout = "/Pages/Shared/_Layout.cshtml";
+    if (!User.Identity.IsAuthenticated || !User.HasClaim("IsCustomer", "true"))
+    {
+        <div class="alert alert-danger">Access denied. Please log in as a customer.</div>
+        return;
+    }
+    var email = User.Identity.Name ?? string.Empty;
+    var requests = PortalService.GetServiceRequests(email);
+    var filterDate = Request.Query["date"].ToString();
+    var filterType = Request.Query["type"].ToString();
+    var filterTech = Request.Query["tech"].ToString();
+    var filtered = requests.Where(r => (string.IsNullOrEmpty(filterDate) || r.RequestedAt.ToShortDateString() == filterDate) && (string.IsNullOrEmpty(filterType) || r.ServiceType == filterType) && (string.IsNullOrEmpty(filterTech) || r.AssignedTo == filterTech)).ToList();
+}
+<h2>Service History</h2>
+<form method="get" class="row mb-3">
+    <div class="col"><input type="date" name="date" class="form-control" value="@filterDate" /></div>
+    <div class="col"><input type="text" name="type" class="form-control" placeholder="Service Type" value="@filterType" /></div>
+    <div class="col"><input type="text" name="tech" class="form-control" placeholder="Technician" value="@filterTech" /></div>
+    <div class="col"><button type="submit" class="btn btn-primary">Filter</button></div>
+</form>
+<div class="d-block d-md-none mb-3">
+    <nav class="nav nav-pills nav-fill">
+        <a class="nav-link" href="/Customer/Rewards"><i class="bi bi-trophy"></i></a>
+        <a class="nav-link" href="/Customer/Documents"><i class="bi bi-file-earmark-text"></i></a>
+        <a class="nav-link active" href="/Customer/ServiceHistory"><i class="bi bi-clock-history"></i></a>
+        <a class="nav-link" href="/Customer/Profile"><i class="bi bi-person"></i></a>
+    </nav>
+</div>
+<div class="d-none d-md-block mb-3"></div>
+<div class="accordion" id="historyAccordion">
+@foreach (var req in filtered)
+{
+    <div class="accordion-item">
+        <h2 class="accordion-header" id="heading-@req.Id">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-@req.Id" aria-expanded="false" aria-controls="collapse-@req.Id">
+                @req.RequestedAt.ToShortDateString() - @req.ServiceType - @req.Status
+            </button>
+        </h2>
+        <div id="collapse-@req.Id" class="accordion-collapse collapse" aria-labelledby="heading-@req.Id" data-bs-parent="#historyAccordion">
+            <div class="accordion-body">
+                <strong>Technician:</strong> @req.AssignedTo<br />
+                <strong>Details:</strong> @req.Details
+            </div>
+        </div>
+    </div>
+}
+</div>
+<style>
+media (max-width: 768px) {
+    .accordion-button { font-size: 1rem; }
+    .accordion-body { font-size: 0.95rem; }
+}
+</style>

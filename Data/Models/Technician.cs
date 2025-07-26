@@ -46,5 +46,11 @@ namespace MVP_Core.Data.Models
         public string? SkillTags { get; set; } // Comma-separated skill tags (e.g., "Tankless,Mini Split,Backflow Cert")
 
         public decimal? HourlyRate { get; set; } // Hourly rate for pay calculation
+
+        // Sprint 51.1: Extended Technician model fields
+        public bool IsSecondChance { get; set; } = false; // Second-chance tech flag
+        public bool RequiresSupervision { get; set; } = false; // Supervision required
+        [MaxLength(50)]
+        public string? OnboardingStatus { get; set; } // Onboarding status (e.g., Pending, Approved, Blocked)
     }
 }

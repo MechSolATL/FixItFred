@@ -1,0 +1,64 @@
+@page
+@model MVP_Core.Pages.Admin.SecondChanceTechsModel
+@inject MVP_Core.Data.ApplicationDbContext Db
+@{
+    ViewData["Title"] = "Second-Chance Technicians";
+    var techs = Db.Technicians.Where(t => t.IsSecondChance).ToList();
+    var flagLogs = Db.SecondChanceFlagLogs.ToList();
+    var zones = techs.Select(t => t.Specialty).Distinct().ToList();
+    var filterZone = Request.Query["zone"].ToString();
+    var filterSupervision = Request.Query["supervision"].ToString();
+    var filteredTechs = techs.Where(t => (string.IsNullOrEmpty(filterZone) || t.Specialty == filterZone) && (string.IsNullOrEmpty(filterSupervision) || (filterSupervision == "true" ? t.RequiresSupervision : !t.RequiresSupervision))).ToList();
+}
+<h2 class="mb-4">Second-Chance Technician Approval Queue</h2>
+<form method="get" class="row mb-3">
+    <div class="col">
+        <label>Zone</label>
+        <select name="zone" class="form-select">
+            <option value="">All</option>
+            @foreach (var zone in zones)
+            {
+                <option value="@zone" selected="@(filterZone == zone ? "selected" : null)">@zone</option>
+            }
+        </select>
+    </div>
+    <div class="col">
+        <label>Supervision Required</label>
+        <select name="supervision" class="form-select">
+            <option value="">All</option>
+            <option value="true" selected="@(filterSupervision == "true" ? "selected" : null)">Yes</option>
+            <option value="false" selected="@(filterSupervision == "false" ? "selected" : null)">No</option>
+        </select>
+    </div>
+    <div class="col align-self-end">
+        <button type="submit" class="btn btn-primary">Filter</button>
+    </div>
+</form>
+<table class="table table-bordered">
+    <thead><tr><th>Name</th><th>Zone</th><th>Supervision</th><th>Status</th><th>Flag Reason</th><th>Override</th></tr></thead>
+    <tbody>
+    @foreach (var tech in filteredTechs)
+    {
+        var log = flagLogs.FirstOrDefault(l => l.TechnicianId == tech.Id);
+        <tr>
+            <td>@tech.FullName</td>
+            <td>@tech.Specialty</td>
+            <td>@(tech.RequiresSupervision ? "Yes" : "No")</td>
+            <td>@tech.OnboardingStatus</td>
+            <td>@log?.Reason</td>
+            <td>
+                @if (log != null)
+                {
+                    <form method="post">
+                        <input type="hidden" name="TechId" value="@tech.Id" />
+                        <input type="hidden" name="LogId" value="@log.Id" />
+                        <textarea name="OverrideNotes" class="form-control" placeholder="Override notes"></textarea>
+                        <button type="submit" name="Approve" value="true" class="btn btn-success btn-sm mt-1">Approve</button>
+                        <button type="submit" name="Approve" value="false" class="btn btn-danger btn-sm mt-1">Block</button>
+                    </form>
+                }
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>

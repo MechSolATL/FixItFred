@@ -57,6 +57,9 @@ builder.Services.AddScoped<TechnicianFeedbackService>(); // FixItFred: Sprint 30
 builder.Services.AddScoped<MVP_Core.Services.FollowUp.FollowUpAIService>();
 builder.Services.AddScoped<TechnicianPayService>();
 builder.Services.AddScoped<CertificationService>();
+builder.Services.AddScoped<LoyaltyRewardService>();
+builder.Services.AddScoped<ReviewService>();
+builder.Services.AddScoped<CustomerPortalService>();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
@@ -129,6 +132,7 @@ app.MapHub<MVP_Core.Hubs.RequestHub>("/hubs/requests");
 app.MapHub<MVP_Core.Hubs.ETAHub>("/etahub");
 // Sprint 41.3 – Real-Time Message Broadcast
 app.MapHub<MVP_Core.Hubs.JobMessageHub>("/hubs/jobmessages");
+app.MapHub<MVP_Core.Hubs.RewardNotificationHub>("/hubs/rewardnotifications");
 
 // DB Seeding
 using (var scope = app.Services.CreateScope())

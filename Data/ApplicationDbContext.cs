@@ -76,6 +76,10 @@ namespace MVP_Core.Data
         public DbSet<TechnicianPayRecord> TechnicianPayRecords { get; set; } = null!;
         public DbSet<CertificationRecord> CertificationRecords { get; set; } = null!;
         public DbSet<SkillBadge> SkillBadges { get; set; } = null!;
+        public DbSet<CustomerReview> CustomerReviews { get; set; } = null!;
+        public DbSet<LoyaltyPointTransaction> LoyaltyPointTransactions { get; set; } = null!;
+        public DbSet<RewardTier> RewardTiers { get; set; } = null!;
+        public DbSet<SecondChanceFlagLog> SecondChanceFlagLogs { get; set; } = null!;
 
         #endregion
 
@@ -121,6 +125,10 @@ namespace MVP_Core.Data
             _ = modelBuilder.Entity<TechnicianPayRecord>().ToTable("TechnicianPayRecords");
             _ = modelBuilder.Entity<CertificationRecord>().ToTable("CertificationRecords");
             _ = modelBuilder.Entity<SkillBadge>().ToTable("SkillBadges");
+            _ = modelBuilder.Entity<CustomerReview>().ToTable("CustomerReviews");
+            _ = modelBuilder.Entity<LoyaltyPointTransaction>().ToTable("LoyaltyPointTransactions");
+            _ = modelBuilder.Entity<RewardTier>().ToTable("RewardTiers");
+            _ = modelBuilder.Entity<SecondChanceFlagLog>().ToTable("SecondChanceFlagLogs");
         }
 
         #endregion
