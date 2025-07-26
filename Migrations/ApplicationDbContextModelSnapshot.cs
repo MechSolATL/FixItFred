@@ -703,6 +703,37 @@ namespace MVP_Core.Migrations
                     b.ToTable("CustomerReviews", (string)null);
                 });
 
+            modelBuilder.Entity("MVP_Core.Data.Models.DisputeInsightLog", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("DisputeId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("InsightType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LoggedBy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("Timestamp")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("DisputeInsightLogs");
+                });
+
             modelBuilder.Entity("MVP_Core.Data.Models.DisputeRecord", b =>
                 {
                     b.Property<int>("Id")
@@ -2303,6 +2334,34 @@ namespace MVP_Core.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("ServiceRequests", (string)null);
+                });
+
+            modelBuilder.Entity("MVP_Core.Data.Models.SessionPlaybackLog", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("EventDataJson")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("RecordedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("RecordedBy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SessionId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SessionPlaybackLogs");
                 });
 
             modelBuilder.Entity("MVP_Core.Data.Models.SkillBadge", b =>

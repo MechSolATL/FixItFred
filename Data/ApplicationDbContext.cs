@@ -112,6 +112,9 @@ namespace MVP_Core.Data
         public DbSet<ReplayAuditLog> ReplayAuditLogs { get; set; } = null!;
         public DbSet<RecoveryScenarioLog> RecoveryScenarioLogs { get; set; } = null!;
         public DbSet<RecoveryLearningLog> RecoveryLearningLogs { get; set; } = null!;
+        // Sprint 70.5: Register session playback and dispute insight logs
+        public DbSet<SessionPlaybackLog> SessionPlaybackLogs { get; set; } = null!;
+        public DbSet<DisputeInsightLog> DisputeInsightLogs { get; set; } = null!;
 
         #endregion
 
