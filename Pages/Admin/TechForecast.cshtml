@@ -1,0 +1,46 @@
+@page
+@model MVP_Core.Pages.Admin.TechForecastModel
+@{
+    ViewData["Title"] = "Technician Forecasts";
+}
+<h2>Technician Forecasts</h2>
+<form method="get">
+    <label>Date Range:</label>
+    <input type="date" name="StartDate" value="@Model.StartDate?.ToString("yyyy-MM-dd")" />
+    <input type="date" name="EndDate" value="@Model.EndDate?.ToString("yyyy-MM-dd")" />
+    <label>Technician:</label>
+    <select name="TechnicianId">
+        <option value="">All</option>
+        @foreach (var tech in Model.Technicians)
+        {
+            <option value="@tech.Id" selected="@(Model.TechnicianId == tech.Id)">@tech.Name</option>
+        }
+    </select>
+    <button type="submit">Filter</button>
+</form>
+<form method="post">
+    <button type="submit" asp-page-handler="RunForecast">Run Forecast</button>
+</form>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Technician</th>
+            <th>Date</th>
+            <th>Projected Jobs</th>
+            <th>Expected Score</th>
+            <th>Notes</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var forecast in Model.Forecasts)
+        {
+            <tr>
+                <td>@Model.Technicians.FirstOrDefault(t => t.Id == forecast.TechnicianId)?.Name</td>
+                <td>@forecast.ForecastDate.ToShortDateString()</td>
+                <td>@forecast.ProjectedJobs</td>
+                <td>@forecast.ExpectedScore</td>
+                <td>@forecast.ForecastNotes</td>
+            </tr>
+        }
+    </tbody>
+</table>

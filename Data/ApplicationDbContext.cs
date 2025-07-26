@@ -116,6 +116,7 @@ namespace MVP_Core.Data
         public DbSet<SessionPlaybackLog> SessionPlaybackLogs { get; set; } = null!;
         public DbSet<DisputeInsightLog> DisputeInsightLogs { get; set; } = null!;
         public DbSet<TechnicianInsightLog> TechnicianInsightLogs { get; set; } = null!;
+        public DbSet<TechnicianForecastLog> TechnicianForecastLogs { get; set; } = null!;
 
         #endregion
 

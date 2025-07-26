@@ -9,5 +9,6 @@ namespace MVP_Core.Data.Models
         public string InsightType { get; set; } = string.Empty;
         public string InsightDetail { get; set; } = string.Empty;
         public DateTime LoggedAt { get; set; }
+        public decimal Score { get; set; } // Used for forecast calculations
     }
 }
