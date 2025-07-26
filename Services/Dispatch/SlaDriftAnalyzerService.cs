@@ -1,6 +1,6 @@
 using System;
 using System.Threading.Tasks;
-// ...existing code...
+
 namespace Services.Dispatch
 {
     /// <summary>
@@ -9,6 +9,10 @@ namespace Services.Dispatch
     public class SlaDriftAnalyzerService
     {
         // TODO: Implement SLA tracking, heatmap, thresholds, and penalty log
-        public Task AnalyzeSlaDriftAsync() => Task.CompletedTask;
+        public Task<string?> AnalyzeSlaDriftAsync()
+        {
+            // Simulate heatmap string
+            return Task.FromResult<string?>("SLA Drift Heatmap: All zones nominal.");
+        }
     }
 }

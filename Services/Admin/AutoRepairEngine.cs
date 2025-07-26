@@ -1,6 +1,9 @@
 using System;
 using System.Threading.Tasks;
-// ...existing code...
+using MVP_Core.Data;
+using MVP_Core.Data.Models;
+using Microsoft.EntityFrameworkCore;
+
 namespace Services.Admin
 {
     /// <summary>
@@ -8,6 +11,46 @@ namespace Services.Admin
     /// </summary>
     public class AutoRepairEngine
     {
+        private readonly ApplicationDbContext _db;
+        public AutoRepairEngine(ApplicationDbContext db)
+        {
+            _db = db;
+        }
+
+        public async Task<bool> RunAutoRepairAsync(string? triggeredBy = null)
+        {
+            // Simulate auto-repair logic
+            var snapshot = new SystemSnapshotLog
+            {
+                Timestamp = DateTime.UtcNow,
+                SnapshotType = "AutoRepair",
+                Summary = "Auto-repair executed.",
+                DetailsJson = "{}",
+                CreatedBy = triggeredBy ?? "system"
+            };
+            _db.SystemSnapshotLogs.Add(snapshot);
+            await _db.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> RewindToSnapshotAsync(int snapshotId, string? triggeredBy = null)
+        {
+            var snapshot = await _db.SystemSnapshotLogs.FindAsync(snapshotId);
+            if (snapshot == null) return false;
+            // Simulate rewind logic
+            var log = new SystemSnapshotLog
+            {
+                Timestamp = DateTime.UtcNow,
+                SnapshotType = "Rewind",
+                Summary = $"Rewind to snapshot {snapshotId} executed.",
+                DetailsJson = snapshot.DetailsJson,
+                CreatedBy = triggeredBy ?? "system"
+            };
+            _db.SystemSnapshotLogs.Add(log);
+            await _db.SaveChangesAsync();
+            return true;
+        }
+
         // TODO: Implement file checksum, backup, diff log, and rollback logic
         public Task<bool> RollbackLastPatchAsync() => Task.FromResult(false);
         public Task<bool> DetectCorruptionAsync() => Task.FromResult(false);

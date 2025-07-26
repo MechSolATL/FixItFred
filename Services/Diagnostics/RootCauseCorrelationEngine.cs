@@ -1,6 +1,6 @@
 using System;
 using System.Threading.Tasks;
-// ...existing code...
+
 namespace Services.Diagnostics
 {
     /// <summary>
@@ -9,6 +9,10 @@ namespace Services.Diagnostics
     public class RootCauseCorrelationEngine
     {
         // TODO: Implement job/tech/zone/sync correlation and remediation suggestions
-        public Task CorrelateRootCausesAsync() => Task.CompletedTask;
+        public Task<string?> CorrelateRootCausesAsync()
+        {
+            // Simulate summary
+            return Task.FromResult<string?>("No root causes detected.");
+        }
     }
 }

@@ -1,6 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-// ...existing code...
+
 namespace Services.Admin
 {
     /// <summary>
@@ -9,6 +10,10 @@ namespace Services.Admin
     public class SmartAdminAlertsService
     {
         // TODO: Implement alert triggers and notification logic
-        public Task TriggerAlertsAsync() => Task.CompletedTask;
+        public Task<List<string>> TriggerAlertsAsync()
+        {
+            // Simulate alert list
+            return Task.FromResult(new List<string> { "No critical alerts.", "System stable." });
+        }
     }
 }

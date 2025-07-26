@@ -7,12 +7,6 @@
 @{
     ViewData["Title"] = "Admin Dashboard";
     Layout = "~/Pages/Shared/_Layout.cshtml";
-    var slaHeatmap = "";
-    var storageChart = "";
-    var alerts = new List<string>();
-    try { slaHeatmap = SlaDriftAnalyzerService.AnalyzeSlaDriftAsync().GetAwaiter().GetResult()?.ToString() ?? "No data"; } catch { slaHeatmap = "Error loading SLA drift heatmap."; }
-    try { storageChart = StorageMonitorService.MonitorStorageAsync().GetAwaiter().GetResult()?.ToString() ?? "No data"; } catch { storageChart = "Error loading storage chart."; }
-    try { alerts = SmartAdminAlertsService.TriggerAlertsAsync().GetAwaiter().GetResult() as List<string> ?? new List<string>(); } catch { alerts = new List<string>{"Error loading alerts."}; }
 }
 
 <div class="container mt-5">
@@ -21,13 +15,13 @@
     <!-- SLA Drift Heatmap Widget -->
     <div class="mb-4">
         <h4>SLA Drift Heatmap <span class="badge bg-warning">Live</span></h4>
-        <div>@slaHeatmap</div>
+        <div>@Model.SlaHeatmap</div>
     </div>
 
     <!-- Storage Growth Chart + Compress Now Button -->
     <div class="mb-4">
         <h4>Storage Growth <span class="badge bg-info">Live</span></h4>
-        <div>@storageChart</div>
+        <div>@Model.StorageChart</div>
         <form method="post">
             <button type="submit" class="btn btn-secondary" formaction="/Admin/CompressStorage">Compress Now</button>
         </form>
@@ -47,7 +41,7 @@
         <h4>Smart Admin Alerts</h4>
         <div class="alert alert-warning d-flex align-items-center">
             <span class="me-2"><i class="fas fa-exclamation-triangle"></i></span>
-            <span>@string.Join(", ", alerts)</span>
+            <span>@string.Join(", ", Model.Alerts)</span>
         </div>
         <div class="d-flex flex-row">
             <span class="me-2"><i class="fas fa-bell"></i></span>

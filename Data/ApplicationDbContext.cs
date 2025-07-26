@@ -107,6 +107,7 @@ namespace MVP_Core.Data
         public DbSet<RootCauseCorrelationLog> RootCauseCorrelationLogs { get; set; } = null!;
         public DbSet<StorageGrowthSnapshot> StorageGrowthSnapshots { get; set; } = null!;
         public DbSet<AdminAlertLog> AdminAlertLogs { get; set; } = null!;
+        public DbSet<SystemSnapshotLog> SystemSnapshotLogs { get; set; } = null!;
 
         #endregion
 
@@ -181,6 +182,7 @@ namespace MVP_Core.Data
             _ = modelBuilder.Entity<RootCauseCorrelationLog>().ToTable("RootCauseCorrelationLogs");
             _ = modelBuilder.Entity<StorageGrowthSnapshot>().ToTable("StorageGrowthSnapshots");
             _ = modelBuilder.Entity<AdminAlertLog>().ToTable("AdminAlertLogs");
+            _ = modelBuilder.Entity<SystemSnapshotLog>().ToTable("SystemSnapshotLogs");
         }
 
         #endregion

@@ -40,4 +40,14 @@ namespace MVP_Core.Data.Models
         public string? Severity { get; set; }
         public bool IsResolved { get; set; }
     }
+
+    public class SystemSnapshotLog
+    {
+        public int Id { get; set; }
+        public DateTime Timestamp { get; set; }
+        public string? SnapshotType { get; set; } // e.g. "Full", "Partial", "ConfigOnly"
+        public string? Summary { get; set; }
+        public string? DetailsJson { get; set; }
+        public string? CreatedBy { get; set; }
+    }
 }

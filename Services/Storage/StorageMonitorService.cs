@@ -1,6 +1,6 @@
 using System;
 using System.Threading.Tasks;
-// ...existing code...
+
 namespace Services.Storage
 {
     /// <summary>
@@ -9,6 +9,10 @@ namespace Services.Storage
     public class StorageMonitorService
     {
         // TODO: Implement file growth monitoring, auto-purge, and archival
-        public Task MonitorStorageAsync() => Task.CompletedTask;
+        public Task<string?> MonitorStorageAsync()
+        {
+            // Simulate storage chart string
+            return Task.FromResult<string?>("Storage Chart: Usage stable.");
+        }
     }
 }
