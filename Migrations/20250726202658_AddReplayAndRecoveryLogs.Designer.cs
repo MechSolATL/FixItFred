@@ -4,6 +4,7 @@ using MVP_Core.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MVP_Core.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250726202658_AddReplayAndRecoveryLogs")]
+    partial class AddReplayAndRecoveryLogs
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -3337,45 +3340,6 @@ namespace MVP_Core.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
-                });
-
-            modelBuilder.Entity("RecoveryScenarioLog", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<bool>("Executed")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime?>("ExecutedAtUtc")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Notes")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("OutcomeSummary")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ScenarioName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("ScheduledForUtc")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("SnapshotHash")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("TriggeredBy")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("RecoveryScenarioLogs", (string)null);
                 });
 
             modelBuilder.Entity("ReplayAuditLog", b =>

@@ -14,22 +14,25 @@ namespace MVP_Core.Pages.Admin
     {
         private readonly ApplicationDbContext _db;
         private readonly ValidationSimulatorService _simService;
-        public SystemValidationModel(ApplicationDbContext db, ValidationSimulatorService simService)
+        private readonly ReplayEngineService _replayService;
+        public SystemValidationModel(ApplicationDbContext db, ValidationSimulatorService simService, ReplayEngineService replayService)
         {
             _db = db;
             _simService = simService;
+            _replayService = replayService;
         }
 
         public string LastOutcome { get; set; } = "";
         public string LastOutcomeTimestamp { get; set; } = "";
         public List<SystemSnapshotLog> LastSnapshots { get; set; } = new();
         public List<AdminAlertLog> LastAlerts { get; set; } = new();
+        public List<ReplayAuditLog> ReplayAuditLogs { get; set; } = new();
 
         public async Task OnGetAsync()
         {
             LastSnapshots = _db.SystemSnapshotLogs.OrderByDescending(s => s.Timestamp).Take(5).ToList();
             LastAlerts = _db.AdminAlertLogs.OrderByDescending(a => a.Timestamp).Take(10).ToList();
-            // Only valid properties are used in Razor/UI
+            ReplayAuditLogs = _db.ReplayAuditLogs.OrderByDescending(r => r.Timestamp).Take(10).ToList();
         }
 
         public async Task<IActionResult> OnPostRunDiagnosticsAsync()
@@ -63,6 +66,15 @@ namespace MVP_Core.Pages.Admin
         public async Task<IActionResult> OnPostRestoreSnapshotAsync()
         {
             LastOutcome = await _simService.SimulateSnapshotRestoreAsync();
+            LastOutcomeTimestamp = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss");
+            await OnGetAsync();
+            return Page();
+        }
+        public async Task<IActionResult> OnPostRunReplayAsync(string snapshotHash, DateTime? overrideTimestamp, bool autoHealSim)
+        {
+            var notes = autoHealSim ? "Auto-Heal simulation enabled" : null;
+            var success = await _replayService.ReplaySnapshotAsync(snapshotHash, User.Identity?.Name ?? "admin", overrideTimestamp, notes);
+            LastOutcome = success ? "Replay successful." : "Replay failed.";
             LastOutcomeTimestamp = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss");
             await OnGetAsync();
             return Page();

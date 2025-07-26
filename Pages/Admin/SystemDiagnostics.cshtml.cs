@@ -8,6 +8,7 @@ using Services.Diagnostics;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System;
+using System.Linq;
 
 namespace MVP_Core.Pages.Admin
 {
@@ -18,14 +19,16 @@ namespace MVP_Core.Pages.Admin
         private readonly AutoRepairEngine _autoRepairEngine;
         private readonly RootCauseCorrelationEngine _rootCauseCorrelationEngine;
         private readonly SmartAdminAlertsService _smartAdminAlertsService;
+        private readonly ReplayEngineService _replayEngineService;
 
-        public SystemDiagnosticsModel(ApplicationDbContext db, SystemDiagnosticsService diagnosticsService, AutoRepairEngine autoRepairEngine, RootCauseCorrelationEngine rootCauseCorrelationEngine, SmartAdminAlertsService smartAdminAlertsService)
+        public SystemDiagnosticsModel(ApplicationDbContext db, SystemDiagnosticsService diagnosticsService, AutoRepairEngine autoRepairEngine, RootCauseCorrelationEngine rootCauseCorrelationEngine, SmartAdminAlertsService smartAdminAlertsService, ReplayEngineService replayEngineService)
         {
             _db = db;
             _diagnosticsService = diagnosticsService;
             _autoRepairEngine = autoRepairEngine;
             _rootCauseCorrelationEngine = rootCauseCorrelationEngine;
             _smartAdminAlertsService = smartAdminAlertsService;
+            _replayEngineService = replayEngineService;
         }
 
         public List<SystemDiagnosticLog> LatestLogs { get; set; } = new();
@@ -34,6 +37,7 @@ namespace MVP_Core.Pages.Admin
         public List<string> Alerts { get; set; } = new();
         public List<AdminAlertLog> ActiveAlerts { get; set; } = new();
         public string AdminUserId => User?.Identity?.Name ?? "admin";
+        public List<RecoveryScenarioLog> ScheduledScenarios { get; set; } = new();
 
         public async Task OnGetAsync()
         {
@@ -42,6 +46,7 @@ namespace MVP_Core.Pages.Admin
             RootCauseSummary = await _rootCauseCorrelationEngine.CorrelateRootCausesAsync() ?? "No summary";
             Alerts = await _smartAdminAlertsService.TriggerAlertsAsync() ?? new List<string>();
             ActiveAlerts = await _smartAdminAlertsService.GetActiveAlertsAsync(AdminUserId);
+            ScheduledScenarios = await _db.RecoveryScenarioLogs.OrderByDescending(s => s.ScheduledForUtc).ToListAsync();
         }
 
         public async Task<IActionResult> OnPostRunDiagnosticsAsync()
@@ -76,6 +81,29 @@ namespace MVP_Core.Pages.Admin
         {
             await _smartAdminAlertsService.AcknowledgeAlertAsync(alertId, AdminUserId, actionTaken);
             return RedirectToPage();
+        }
+
+        public async Task<IActionResult> OnPostQueueRecoveryAsync(string ScenarioName, DateTime ScheduledForUtc, string SnapshotHash, string Notes)
+        {
+            await _replayEngineService.QueueRecoveryScenarioAsync(ScenarioName, AdminUserId, ScheduledForUtc, SnapshotHash, Notes);
+            await OnGetAsync();
+            return Page();
+        }
+
+        public async Task<IActionResult> OnPostExecuteNowAsync(int id)
+        {
+            var scenario = await _db.RecoveryScenarioLogs.FindAsync(id);
+            if (scenario != null && !scenario.Executed)
+            {
+                var success = await _replayEngineService.ReplaySnapshotAsync(scenario.SnapshotHash, scenario.TriggeredBy, DateTime.UtcNow, scenario.Notes);
+                scenario.Executed = true;
+                scenario.ExecutedAtUtc = DateTime.UtcNow;
+                scenario.OutcomeSummary = success ? "Replay succeeded" : "Replay failed";
+                _db.RecoveryScenarioLogs.Update(scenario);
+                await _db.SaveChangesAsync();
+            }
+            await OnGetAsync();
+            return Page();
         }
     }
 }

@@ -3,6 +3,7 @@
 @inject global::Services.Admin.AutoRepairEngine AutoRepairEngine
 @inject global::Services.Diagnostics.RootCauseCorrelationEngine RootCauseCorrelationEngine
 @inject global::Services.Admin.SmartAdminAlertsService SmartAdminAlertsService
+@inject global::Services.Admin.ReplayEngineService ReplayEngineService
 @{
     ViewData["Title"] = "System Diagnostics";
 }
@@ -16,6 +17,62 @@
         <button type="submit" class="btn btn-outline-warning" asp-page-handler="RewindToSnapshot">Rewind to Snapshot</button>
         <input type="number" name="SnapshotId" class="form-control d-inline-block w-auto ms-2" placeholder="Snapshot ID" />
     </form>
+</div>
+<!-- Recovery Scenario Table and Queue Form -->
+<div class="mb-3">
+    <h4>Scheduled Recovery Scenarios</h4>
+    <form method="post" asp-page-handler="QueueRecovery">
+        <div class="row mb-2">
+            <div class="col-md-3">
+                <input type="text" name="ScenarioName" class="form-control" placeholder="Scenario Name" required />
+            </div>
+            <div class="col-md-3">
+                <input type="datetime-local" name="ScheduledForUtc" class="form-control" required />
+            </div>
+            <div class="col-md-3">
+                <input type="text" name="SnapshotHash" class="form-control" placeholder="Snapshot Hash" required />
+            </div>
+            <div class="col-md-3">
+                <input type="text" name="Notes" class="form-control" placeholder="Notes (optional)" />
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Queue Recovery Trial</button>
+    </form>
+    <table class="table table-bordered mt-3">
+        <thead>
+            <tr>
+                <th>Scenario</th>
+                <th>Scheduled For</th>
+                <th>Executed</th>
+                <th>Outcome</th>
+                <th>Snapshot Hash</th>
+                <th>Notes</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var scenario in Model.ScheduledScenarios)
+            {
+                <tr>
+                    <td>@scenario.ScenarioName</td>
+                    <td>@scenario.ScheduledForUtc.ToString("yyyy-MM-dd HH:mm")</td>
+                    <td>@(scenario.Executed ? "Yes" : "No")</td>
+                    <td>@scenario.OutcomeSummary</td>
+                    <td>@scenario.SnapshotHash</td>
+                    <td>@scenario.Notes</td>
+                    <td>
+                        @if (!scenario.Executed)
+                        {
+                            <form method="post" asp-page-handler="ExecuteNow" class="d-inline">
+                                <input type="hidden" name="id" value="@scenario.Id" />
+                                <button type="submit" class="btn btn-sm btn-warning">Run Now</button>
+                            </form>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
 </div>
 <!-- RootCauseCorrelationEngine Summary Widget -->
 <div class="mb-3">
