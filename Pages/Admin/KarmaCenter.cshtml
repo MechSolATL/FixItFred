@@ -1,0 +1,57 @@
+@page
+@model MVP_Core.Pages.Admin.KarmaCenterModel
+@{
+    ViewData["Title"] = "Technician Karma Center";
+}
+<h2>Technician Karma Center</h2>
+<form method="post">
+    <label>Technician:</label>
+    <select asp-for="TechnicianId">
+        <option value="">Select Technician</option>
+        @foreach (var tech in Model.TechnicianList)
+        {
+            <option value="@tech.Id">@tech.FullName</option>
+        }
+    </select>
+    <button type="submit" asp-page-handler="Filter">View Karma</button>
+</form>
+@if (Model.CurrentKarmaScore.HasValue)
+{
+    <div>
+        <h4>Karma Score: <span style="color:@Model.GetKarmaColor()">@Model.CurrentKarmaScore</span> <span>(@Model.CurrentTrend)</span></h4>
+        <form method="post">
+            <input type="hidden" asp-for="TechnicianId" />
+            <label>Manual Override:</label>
+            <input type="number" asp-for="ManualScore" />
+            <label>Reason:</label>
+            <input type="text" asp-for="AdminNote" />
+            <button type="submit" asp-page-handler="ManualOverride">Apply</button>
+        </form>
+    </div>
+    <h5>Karma History</h5>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Timestamp</th>
+                <th>KarmaScore</th>
+                <th>Trend</th>
+                <th>Category</th>
+                <th>ChangeSource</th>
+                <th>Reason</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var log in Model.KarmaHistory)
+            {
+                <tr style="color:@Model.GetKarmaColor(log.KarmaScore)">
+                    <td>@log.Timestamp</td>
+                    <td>@log.KarmaScore</td>
+                    <td>@log.Trend</td>
+                    <td>@log.KarmaCategory</td>
+                    <td>@log.ChangeSource</td>
+                    <td>@log.Reason</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

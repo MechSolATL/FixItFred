@@ -127,6 +127,7 @@ namespace MVP_Core.Data
         public DbSet<TechnicianPatternProfile> TechnicianPatternProfiles { get; set; } = null!;
         public DbSet<TechnicianMoraleLog> TechnicianMoraleLogs { get; set; } = null!;
         public DbSet<TechnicianRedemptionLog> TechnicianRedemptionLogs { get; set; } = null!;
+        public DbSet<TechnicianKarmaLog> TechnicianKarmaLogs { get; set; } = null!;
 
         #endregion
 
