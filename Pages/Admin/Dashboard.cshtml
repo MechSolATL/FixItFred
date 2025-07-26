@@ -39,10 +39,32 @@
     <!-- SmartAdminAlerts Bar + Icon Stack -->
     <div class="mb-4">
         <h4>Smart Admin Alerts</h4>
-        <div class="alert alert-warning d-flex align-items-center">
-            <span class="me-2"><i class="fas fa-exclamation-triangle"></i></span>
-            <span>@string.Join(", ", Model.Alerts)</span>
-        </div>
+        @if (Model.ActiveAlerts.Any())
+        {
+            <div class="alert alert-warning d-flex flex-column">
+                @foreach (var alert in Model.ActiveAlerts)
+                {
+                    <div class="d-flex align-items-center mb-2">
+                        <span class="me-2"><i class="fas fa-exclamation-triangle"></i></span>
+                        <span class="me-2">[@alert.Severity] @alert.Message</span>
+                        <form method="post" asp-page-handler="AcknowledgeAlert" class="d-inline">
+                            <input type="hidden" name="alertId" value="@alert.Id" />
+                            <input type="hidden" name="actionTaken" value="Acknowledge" />
+                            <button type="submit" class="btn btn-sm btn-success me-1">Acknowledge</button>
+                        </form>
+                        <form method="post" asp-page-handler="AcknowledgeAlert" class="d-inline">
+                            <input type="hidden" name="alertId" value="@alert.Id" />
+                            <input type="hidden" name="actionTaken" value="Mute" />
+                            <button type="submit" class="btn btn-sm btn-secondary">Mute</button>
+                        </form>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-success">No active alerts.</div>
+        }
         <div class="d-flex flex-row">
             <span class="me-2"><i class="fas fa-bell"></i></span>
             <span class="me-2"><i class="fas fa-bolt"></i></span>

@@ -12,9 +12,11 @@ namespace Services.Admin
     public class AutoRepairEngine
     {
         private readonly ApplicationDbContext _db;
-        public AutoRepairEngine(ApplicationDbContext db)
+        private readonly SmartAdminAlertsService _alertsService;
+        public AutoRepairEngine(ApplicationDbContext db, SmartAdminAlertsService alertsService)
         {
             _db = db;
+            _alertsService = alertsService;
         }
 
         public async Task<bool> RunAutoRepairAsync(string? triggeredBy = null)
@@ -30,6 +32,7 @@ namespace Services.Admin
             };
             _db.SystemSnapshotLogs.Add(snapshot);
             await _db.SaveChangesAsync();
+            await _alertsService.LogAlertAsync("AutoRepairEngine", "Auto-repair executed.", "Info");
             return true;
         }
 
@@ -48,6 +51,7 @@ namespace Services.Admin
             };
             _db.SystemSnapshotLogs.Add(log);
             await _db.SaveChangesAsync();
+            await _alertsService.LogAlertAsync("AutoRepairEngine", $"Rewind to snapshot {snapshotId} executed.", "Warning");
             return true;
         }
 

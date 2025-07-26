@@ -22,15 +22,6 @@ namespace MVP_Core.Data.Models
         public string? Module { get; set; }
     }
 
-    public class StorageGrowthSnapshot
-    {
-        public int Id { get; set; }
-        public DateTime Timestamp { get; set; }
-        public long TotalSizeBytes { get; set; }
-        public long GrowthBytes { get; set; }
-        public double CompressionRatio { get; set; }
-    }
-
     public class AdminAlertLog
     {
         public int Id { get; set; }

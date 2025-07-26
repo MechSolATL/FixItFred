@@ -33,6 +33,8 @@ namespace MVP_Core.Pages.Admin
         public string SlaHeatmap { get; set; } = "No data";
         public string StorageChart { get; set; } = "No data";
         public List<string> Alerts { get; set; } = new();
+        public List<AdminAlertLog> ActiveAlerts { get; set; } = new();
+        public string AdminUserId => User?.Identity?.Name ?? "admin";
 
         public async Task OnGetAsync()
         {
@@ -45,6 +47,13 @@ namespace MVP_Core.Pages.Admin
             SlaHeatmap = await _slaDriftAnalyzerService.AnalyzeSlaDriftAsync() ?? "No data";
             StorageChart = await _storageMonitorService.MonitorStorageAsync() ?? "No data";
             Alerts = await _smartAdminAlertsService.TriggerAlertsAsync() ?? new List<string>();
+            ActiveAlerts = await _smartAdminAlertsService.GetActiveAlertsAsync(AdminUserId);
+        }
+
+        public async Task<IActionResult> OnPostAcknowledgeAlertAsync(int alertId, string actionTaken)
+        {
+            await _smartAdminAlertsService.AcknowledgeAlertAsync(alertId, AdminUserId, actionTaken);
+            return RedirectToPage();
         }
     }
 }

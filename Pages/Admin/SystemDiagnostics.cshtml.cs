@@ -32,6 +32,8 @@ namespace MVP_Core.Pages.Admin
         public string HealthStatus { get; set; } = "Unknown";
         public string RootCauseSummary { get; set; } = "No summary";
         public List<string> Alerts { get; set; } = new();
+        public List<AdminAlertLog> ActiveAlerts { get; set; } = new();
+        public string AdminUserId => User?.Identity?.Name ?? "admin";
 
         public async Task OnGetAsync()
         {
@@ -39,6 +41,7 @@ namespace MVP_Core.Pages.Admin
             HealthStatus = (await _autoRepairEngine.DetectCorruptionAsync()) ? "Healthy" : "Corruption Detected";
             RootCauseSummary = await _rootCauseCorrelationEngine.CorrelateRootCausesAsync() ?? "No summary";
             Alerts = await _smartAdminAlertsService.TriggerAlertsAsync() ?? new List<string>();
+            ActiveAlerts = await _smartAdminAlertsService.GetActiveAlertsAsync(AdminUserId);
         }
 
         public async Task<IActionResult> OnPostRunDiagnosticsAsync()
@@ -66,6 +69,12 @@ namespace MVP_Core.Pages.Admin
         public async Task<IActionResult> OnPostRewindToSnapshotAsync(int SnapshotId)
         {
             await _autoRepairEngine.RewindToSnapshotAsync(SnapshotId, User?.Identity?.Name ?? "admin");
+            return RedirectToPage();
+        }
+
+        public async Task<IActionResult> OnPostAcknowledgeAlertAsync(int alertId, string actionTaken)
+        {
+            await _smartAdminAlertsService.AcknowledgeAlertAsync(alertId, AdminUserId, actionTaken);
             return RedirectToPage();
         }
     }

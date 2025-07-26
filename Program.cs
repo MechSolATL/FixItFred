@@ -76,6 +76,8 @@ builder.Services.AddScoped<Services.Diagnostics.RootCauseCorrelationEngine>();
 builder.Services.AddScoped<Services.Storage.StorageMonitorService>();
 builder.Services.AddScoped<Services.Admin.ComplianceReportService>();
 builder.Services.AddScoped<Services.Admin.SmartAdminAlertsService>();
+builder.Services.AddScoped<Services.Admin.ScheduledMaintenanceEngine>();
+builder.Services.AddScoped<Services.Admin.AdminDigestMailerService>();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));

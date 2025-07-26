@@ -108,6 +108,7 @@ namespace MVP_Core.Data
         public DbSet<StorageGrowthSnapshot> StorageGrowthSnapshots { get; set; } = null!;
         public DbSet<AdminAlertLog> AdminAlertLogs { get; set; } = null!;
         public DbSet<SystemSnapshotLog> SystemSnapshotLogs { get; set; } = null!;
+        public DbSet<AdminAlertAcknowledgeLog> AdminAlertAcknowledgeLogs { get; set; } = null!;
 
         #endregion
 
@@ -183,6 +184,7 @@ namespace MVP_Core.Data
             _ = modelBuilder.Entity<StorageGrowthSnapshot>().ToTable("StorageGrowthSnapshots");
             _ = modelBuilder.Entity<AdminAlertLog>().ToTable("AdminAlertLogs");
             _ = modelBuilder.Entity<SystemSnapshotLog>().ToTable("SystemSnapshotLogs");
+            _ = modelBuilder.Entity<AdminAlertAcknowledgeLog>().ToTable("AdminAlertAcknowledgeLogs");
         }
 
         #endregion
