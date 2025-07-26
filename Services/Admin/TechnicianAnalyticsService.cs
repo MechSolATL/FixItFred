@@ -76,7 +76,7 @@ namespace MVP_Core.Services.Admin
                 .Where(r => r.AssignedTechnicianId == technicianId && r.CreatedAt >= since)
                 .ToList();
             int slaBreaches = jobs.Count(j => j.IsEscalated);
-            double offlineHours = sessions.Sum(s => (s.EndTime ?? DateTime.UtcNow) - s.StartTime.TotalHours);
+            double offlineHours = sessions.Sum(s => ((s.EndTime ?? DateTime.UtcNow) - s.StartTime).TotalHours);
             return jobs.Count > 0 ? Math.Round(slaBreaches / (double)jobs.Count * 100, 2) : 0;
         }
     }
