@@ -1,20 +1,16 @@
 @* SmartAssign Modal for Sprint 64.0: Shows assignment scores, factors, and confidence for each technician *@
 @model MVP_Core.Pages.Admin.DispatcherModel
-@{
-    var requestId = ViewData["SmartAssignRequestId"] as int? ?? 0;
-    var scores = Model.SmartAssignmentScores.ContainsKey(requestId) ? Model.SmartAssignmentScores[requestId] : new List<MVP_Core.Services.Admin.AssignmentScoringEngine.TechnicianAssignmentScore>();
-}
 <div class="modal fade" id="smartAssignModal" tabindex="-1" role="dialog" aria-labelledby="smartAssignModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
+        <div class="modal-content" role="region" aria-label="SmartAssign Modal">
             <div class="modal-header">
                 <h5 class="modal-title" id="smartAssignModalLabel">SmartAssign: Technician Assignment AI</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" tabindex="0" style="min-height:44px;" onkeydown="if(event.key==='Escape'){document.getElementById('smartAssignModal').classList.remove('show');}">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
-                <table class="table table-bordered table-hover">
+                <table class="table table-bordered table-hover" role="table" aria-label="Technician Assignment Scores">
                     <thead>
                         <tr>
                             <th>Technician</th>
@@ -34,7 +30,7 @@
                         @foreach (var score in scores)
                         {
                             var tech = Model.TechnicianStatuses.FirstOrDefault(t => t.TechnicianId == score.TechnicianId);
-                            <tr class="@(score.IsEscalationRisk ? "table-danger" : "")">
+                            <tr class="@(score.IsEscalationRisk ? "table-danger" : "")" tabindex="0" aria-label="Technician @tech?.Name">
                                 <td>@tech?.Name</td>
                                 <td>@score.Score.ToString("F1")</td>
                                 <td>@score.Confidence.ToString("P0")</td>
@@ -46,10 +42,10 @@
                                 <td>@(score.Factors["BonusCooldown"] == 1 ? "Yes" : "No")</td>
                                 <td>@(score.IsEscalationRisk ? "Yes" : "No")</td>
                                 <td>
-                                    <form method="post" asp-page-handler="ReassignTech">
+                                    <form method="post" asp-page-handler="ReassignTech" role="form" aria-label="Assign Technician">
                                         <input type="hidden" name="requestId" value="@requestId" />
                                         <input type="hidden" name="newTechnicianId" value="@score.TechnicianId" />
-                                        <button type="submit" class="btn btn-success btn-sm">Assign</button>
+                                        <button type="submit" class="btn btn-success btn-sm" style="min-height:44px;" aria-label="Assign Technician">Assign</button>
                                     </form>
                                 </td>
                             </tr>
@@ -60,3 +56,20 @@
         </div>
     </div>
 </div>
+<script>
+document.getElementById('smartAssignModal').addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        this.classList.remove('show');
+    }
+});
+</script>
+<style>
+@media (max-width: 768px) {
+    .modal-lg { width: 100vw !important; }
+}
+.high-contrast, .high-contrast * {
+    background: #000 !important;
+    color: #fff !important;
+    border-color: #fff !important;
+}
+</style>

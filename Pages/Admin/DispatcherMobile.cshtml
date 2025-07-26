@@ -1,39 +1,72 @@
 @page
 @model MVP_Core.Pages.Admin.DispatcherMobileModel
-@{
-    ViewData["Title"] = "Mobile Dispatcher";
-    Layout = "/Pages/Admin/_AdminLayout.cshtml";
-}
+<main role="main" tabindex="-1" aria-label="Mobile Dispatcher Main Content">
 <!-- Sprint 49.0 Patch Log: Mobile Dispatcher View -->
 <meta name="description" content="Mobile-optimized dispatcher queue for field managers.">
 <link rel="stylesheet" href="/css/DispatcherMobile.css" />
 <div class="container-fluid px-2 py-2">
     <h2 class="mb-3">Mobile Dispatcher Queue</h2>
-    <div class="dispatcher-mobile-queue">
+    <section aria-label="Dispatcher Queue" class="dispatcher-mobile-queue grid grid-cols-1 md:grid-cols-2">
         @foreach (var req in Model.Requests)
         {
-            <div class="job-card-mobile collapsible-card" data-job-id="@req.Id">
+            <div class="job-card-mobile collapsible-card card mb-2" data-job-id="@req.Id" tabindex="0" aria-label="Job Card @req.Id" style="min-height:44px;">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <span><strong>#@req.Id</strong> @req.ServiceType</span>
                     <span class="badge bg-@Model.GetStatusClass(req.Status)">@req.Status</span>
-                    <button class="btn btn-sm btn-outline-secondary toggle-card-btn" type="button">?</button>
+                    <button class="btn btn-sm btn-outline-secondary toggle-card-btn" type="button" aria-label="Toggle Job Details" style="min-height:44px;">?</button>
                 </div>
-                <div class="card-body collapse">
+                <div class="card-body collapse" role="region" aria-label="Job Details">
                     <div><strong>Technician:</strong> @req.Technician</div>
                     <div><strong>Priority:</strong> @req.Priority</div>
                     <div><strong>ZIP:</strong> @req.Zip</div>
                     <div><strong>Delay:</strong> @req.DelayMinutes min</div>
                     <div class="mt-2">
-                        <button class="btn btn-primary btn-sm w-100 mb-1">Assign</button>
-                        <button class="btn btn-outline-info btn-sm w-100 mb-1">Messages</button>
-                        <button class="btn btn-outline-danger btn-sm w-100">Escalate</button>
+                        <button class="btn btn-primary btn-sm w-100 mb-1" aria-label="Assign Technician" style="min-height:44px;">Assign</button>
+                        <button class="btn btn-outline-info btn-sm w-100 mb-1" aria-label="View Messages" style="min-height:44px;">Messages</button>
+                        <button class="btn btn-outline-danger btn-sm w-100" aria-label="Escalate Job" style="min-height:44px;">Escalate</button>
                     </div>
                 </div>
             </div>
         }
-    </div>
+    </section>
+    <section aria-label="High Contrast Toggle" class="mt-3">
+        <label for="contrastToggleMobile" class="form-label">High Contrast Mode</label>
+        <input type="checkbox" id="contrastToggleMobile" aria-label="Toggle high contrast" tabindex="0" style="width:44px;height:44px;" onclick="document.body.classList.toggle('high-contrast')" />
+    </section>
 </div>
 @section Scripts {
 <script src="/js/DispatcherMobile.js"></script>
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Tab') {
+        document.body.classList.add('user-is-tabbing');
+    }
+});
+// Swipe-to-close for mobile modals
+const cards = document.querySelectorAll('.collapsible-card');
+cards.forEach(card => {
+    let startX = null;
+    card.addEventListener('touchstart', e => { startX = e.touches[0].clientX; });
+    card.addEventListener('touchend', e => {
+        if (startX !== null) {
+            let endX = e.changedTouches[0].clientX;
+            if (Math.abs(endX - startX) > 80) {
+                card.querySelector('.card-body').classList.toggle('show');
+            }
+            startX = null;
+        }
+    });
+});
 }
+<style>
+@media (max-width: 768px) {
+    .dispatcher-mobile-queue { flex-direction: column !important; }
+    .job-card-mobile { min-width: 100% !important; }
+}
+.high-contrast, .high-contrast * {
+    background: #000 !important;
+    color: #fff !important;
+    border-color: #fff !important;
+}
+</style>
+</main>
 <!-- End Sprint 49.0 Patch Log -->

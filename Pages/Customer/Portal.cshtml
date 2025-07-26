@@ -4,12 +4,14 @@
 @inject MVP_Core.Data.ApplicationDbContext Db
 @inject MVP_Core.Services.PromotionEngineService PromoService
 @inject MVP_Core.Services.DisputeService DisputeService
+<div class="offline-banner" style="display:none;"></div>
+<main role="main" tabindex="-1" aria-label="Customer Portal Main Content">
 @{
     Layout = "/Pages/Shared/_Layout.cshtml";
     // Security: Only allow verified/logged-in customers
     if (!User.Identity.IsAuthenticated || !User.HasClaim("IsCustomer", "true"))
     {
-        <div class="alert alert-danger">Access denied. Please log in as a customer.</div>
+        <div class="alert alert-danger" role="alert">Access denied. Please log in as a customer.</div>
         return;
     }
     var email = User.Identity.Name ?? string.Empty;
@@ -35,9 +37,10 @@
     var qualifiedPromos = PromoService.GetQualifiedPromotions(email);
     var activeBonusLogs = Db.CustomerBonusLogs.Where(l => l.CustomerEmail == email && !l.IsClaimed).ToList();
 }
+<nav aria-label="Customer quick actions" class="mb-3">
 @if (qualifiedPromos.Any())
 {
-    <div class="alert alert-success text-center mb-3">
+    <div class="alert alert-success text-center mb-3" role="alert">
         <b>Promotion Unlocked!</b> You have unlocked the following promotions:<br />
         <ul class="list-unstyled">
             @foreach (var promo in qualifiedPromos)
@@ -45,7 +48,7 @@
                 <li>
                     <span class="fw-bold">@promo.Title</span> — @promo.Description
                     <form method="post" asp-page-handler="ClaimBonus" asp-route-promoId="@promo.Id" style="display:inline">
-                        <button type="submit" class="btn btn-sm btn-success ms-2">Claim Bonus</button>
+                        <button type="submit" class="btn btn-sm btn-success ms-2" aria-label="Claim @promo.Title Bonus" style="min-height:44px;">Claim Bonus</button>
                     </form>
                 </li>
             }
@@ -54,7 +57,7 @@
 }
 @if (activeBonusLogs.Any())
 {
-    <div class="alert alert-info text-center mb-3">
+    <div class="alert alert-info text-center mb-3" role="alert">
         <b>You have unclaimed loyalty bonuses!</b>
         <ul class="list-unstyled">
             @foreach (var log in activeBonusLogs)
@@ -62,7 +65,7 @@
                 <li>
                     <span class="fw-bold">@log.RewardType</span> — Earned: @log.DateEarned:g
                     <form method="post" asp-page-handler="ClaimBonusLog" asp-route-bonusLogId="@log.Id" style="display:inline">
-                        <button type="submit" class="btn btn-sm btn-warning ms-2">Claim Now</button>
+                        <button type="submit" class="btn btn-sm btn-warning ms-2" aria-label="Claim @log.RewardType Bonus" style="min-height:44px;">Claim Now</button>
                     </form>
                 </li>
             }
@@ -71,45 +74,48 @@
 }
 @if (pendingFollowUp)
 {
-    <div class="alert alert-warning text-center mb-3">
+    <div class="alert alert-warning text-center mb-3" role="alert">
         <b>Action Required:</b> You have a pending follow-up. Please check your email or click below to complete your review, claim your reward, or reschedule!
     </div>
 }
 @if (reviewBannerActive)
 {
-    <div class="alert alert-info text-center mb-3">
+    <div class="alert alert-info text-center mb-3" role="alert">
         <b>Reminder:</b> We noticed your recent service is complete, but no review has been submitted yet.<br />
         Your feedback helps us improve transparency, measure technician performance, and continuously elevate your experience.<br />
-        <a href="/Review" class="btn btn-primary mt-2">Leave a Review</a>
+        <a href="/Review" class="btn btn-primary mt-2" aria-label="Leave a Review" style="min-height:44px;">Leave a Review</a>
     </div>
 }
 @if (openDisputes.Count > 0)
 {
-    <div class="alert alert-warning mb-3">
+    <div class="alert alert-warning mb-3" role="alert">
         <strong>Notice:</strong> You have an open dispute. <a href="/Customer/DisputeCenter">View or update your dispute</a>.
     </div>
 }
+</nav>
 <div class="container-fluid p-3">
-    <div class="d-flex justify-content-between align-items-start mb-3 flex-wrap">
-        <h2>Welcome, @customer?.Name</h2>
-        <div class="cta-group">
-            <a href="/Review" class="btn btn-lg btn-primary mx-1 mb-2"><i class="bi bi-star"></i> Leave a Review</a>
-            <a href="/Submit" class="btn btn-lg btn-info mx-1 mb-2"><i class="bi bi-calendar-plus"></i> Schedule New Appointment</a>
-            <a href="/Rewards" class="btn btn-lg btn-warning mx-1 mb-2"><i class="bi bi-gift"></i> Claim Bonus</a>
+    <section aria-label="Welcome and CTAs" class="mb-3">
+        <div class="flex-col md:flex-row d-flex justify-content-between align-items-start flex-wrap mb-3">
+            <h2>Welcome, @customer?.Name</h2>
+            <div class="cta-group" role="group" aria-label="Main actions">
+                <a href="/Review" class="btn btn-lg btn-primary mx-1 mb-2" aria-label="Leave a Review" style="min-height:44px;"><i class="bi bi-star" aria-hidden="true"></i> Leave a Review</a>
+                <a href="/Submit" class="btn btn-lg btn-info mx-1 mb-2" aria-label="Schedule New Appointment" style="min-height:44px;"><i class="bi bi-calendar-plus" aria-hidden="true"></i> Schedule New Appointment</a>
+                <a href="/Rewards" class="btn btn-lg btn-warning mx-1 mb-2" aria-label="Claim Bonus" style="min-height:44px;"><i class="bi bi-gift" aria-hidden="true"></i> Claim Bonus</a>
+            </div>
         </div>
-    </div>
-    <div class="row mb-3">
+    </section>
+    <section aria-label="Tier and Analytics" class="row mb-3 grid grid-cols-1 md:grid-cols-2">
         <div class="col-md-12">
-            <div class="tier-banner mb-2" style="background:@tierColor;position:relative;">
+            <div class="tier-banner mb-2" style="background:@tierColor;position:relative;" aria-label="Current Loyalty Tier">
                 <span class="fw-bold fs-4">@currentTier?.Name ?? "None" Loyalty Tier</span>
                 @if (recentBonus != null)
                 {
-                    <span class="sparkle"></span>
+                    <span class="sparkle" aria-label="Recent Bonus"></span>
                 }
             </div>
         </div>
         <div class="col-md-6">
-            <div class="card mb-2">
+            <div class="card mb-2" role="region" aria-label="Current Job Status">
                 <div class="card-body">
                     <h5>Current Job Status</h5>
                     @if (nextJob != null)
@@ -126,7 +132,7 @@
             </div>
         </div>
         <div class="col-md-6">
-            <div class="card mb-2">
+            <div class="card mb-2" role="region" aria-label="Loyalty & Analytics">
                 <div class="card-body">
                     <h5>Loyalty & Analytics</h5>
                     <b>@currentTier?.Name ?? "None"</b><br />
@@ -138,57 +144,61 @@
                 </div>
             </div>
         </div>
-    </div>
-    <div class="row mb-3">
+    </section>
+    <section aria-label="Quick Actions" class="row mb-3 grid grid-cols-1 md:grid-cols-3">
         <div class="col-md-4">
-            <div class="card cta-card">
+            <div class="card cta-card" role="region" aria-label="Leave Review">
                 <div class="card-body">
                     <h5>Leave Review</h5>
-                    <a href="/Review" class="btn btn-primary">Review Service</a>
+                    <a href="/Review" class="btn btn-primary" aria-label="Review Service" style="min-height:44px;">Review Service</a>
                 </div>
             </div>
         </div>
         <div class="col-md-4">
-            <div class="card cta-card">
+            <div class="card cta-card" role="region" aria-label="Claim Bonus">
                 <div class="card-body">
                     <h5>Claim Bonus</h5>
-                    <a href="/Rewards" class="btn btn-success">Claim Loyalty Bonus</a>
+                    <a href="/Rewards" class="btn btn-success" aria-label="Claim Loyalty Bonus" style="min-height:44px;">Claim Loyalty Bonus</a>
                 </div>
             </div>
         </div>
         <div class="col-md-4">
-            <div class="card cta-card">
+            <div class="card cta-card" role="region" aria-label="Schedule Again">
                 <div class="card-body">
                     <h5>Schedule Again</h5>
-                    <a href="/Submit" class="btn btn-info">Book New Service</a>
+                    <a href="/Submit" class="btn btn-info" aria-label="Book New Service" style="min-height:44px;">Book New Service</a>
                 </div>
             </div>
         </div>
-    </div>
-    <div class="row mb-3">
+    </section>
+    <section aria-label="Live Status Banner" class="row mb-3">
         <div class="col-md-12">
             @* Sprint 55.0: Live status banner for technician on the way *@
             @if (nextJob != null && nextJob.Status == "OnTheWay" && nextJob.EstimatedArrival.HasValue)
             {
                 var eta = nextJob.EstimatedArrival.Value.ToLocalTime();
                 var etaEnd = eta.AddMinutes(30); // Show a 30-min window
-                <div class="alert alert-success text-center mb-3">
+                <div class="alert alert-success text-center mb-3" role="alert">
                     <b>Live Update:</b> Your technician is on the way! Track status in real time.<br />
                     <span class="fw-bold">Estimated Arrival:</span> @eta:t – @etaEnd:t
                 </div>
             }
         </div>
-    </div>
-    <div class="row">
+    </section>
+    <section aria-label="Navigation Links" class="row">
         <div class="col-md-6">
-            <a href="/Customer/ServiceHistory" class="btn btn-outline-secondary w-100 mb-2"><i class="bi bi-clock-history"></i> View Service History</a>
-            <a href="/Customer/Documents" class="btn btn-outline-secondary w-100 mb-2"><i class="bi bi-file-earmark-text"></i> View Documents</a>
+            <a href="/Customer/ServiceHistory" class="btn btn-outline-secondary w-100 mb-2" aria-label="View Service History" style="min-height:44px;"><i class="bi bi-clock-history" aria-hidden="true"></i> View Service History</a>
+            <a href="/Customer/Documents" class="btn btn-outline-secondary w-100 mb-2" aria-label="View Documents" style="min-height:44px;"><i class="bi bi-file-earmark-text" aria-hidden="true"></i> View Documents</a>
         </div>
         <div class="col-md-6">
-            <a href="/Customer/Rewards" class="btn btn-outline-warning w-100 mb-2"><i class="bi bi-trophy"></i> View Rewards</a>
-            <a href="/Customer/Profile" class="btn btn-outline-primary w-100 mb-2"><i class="bi bi-person"></i> Manage Profile</a>
+            <a href="/Customer/Rewards" class="btn btn-outline-warning w-100 mb-2" aria-label="View Rewards" style="min-height:44px;"><i class="bi bi-trophy" aria-hidden="true"></i> View Rewards</a>
+            <a href="/Customer/Profile" class="btn btn-outline-primary w-100 mb-2" aria-label="Manage Profile" style="min-height:44px;"><i class="bi bi-person" aria-hidden="true"></i> Manage Profile</a>
         </div>
-    </div>
+    </section>
+    <section aria-label="High Contrast Toggle" class="mt-3">
+        <label for="contrastToggle" class="form-label">High Contrast Mode</label>
+        <input type="checkbox" id="contrastToggle" aria-label="Toggle high contrast" tabindex="0" style="width:44px;height:44px;" onclick="document.body.classList.toggle('high-contrast')" />
+    </section>
 </div>
 <style>
 .cta-group { display: flex; flex-wrap: wrap; gap: 0.5rem; }
@@ -208,4 +218,18 @@ media (max-width: 768px) {
     .tier-banner { font-size: 1.2rem; }
     .mini-analytics .badge { font-size: 0.95rem; }
 }
+.high-contrast, .high-contrast * {
+    background: #000 !important;
+    color: #fff !important;
+    border-color: #fff !important;
+}
 </style>
+<script src="~/js/ConnectivityMonitor.js"></script>
+<script>
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Tab') {
+        document.body.classList.add('user-is-tabbing');
+    }
+});
+</script>
+</main>

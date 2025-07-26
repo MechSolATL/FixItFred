@@ -2,6 +2,8 @@
 @model MVP_Core.Pages.Technician.TrainingCenterModel
 @inject SkillsTrackerService SkillsService
 @inject MVP_Core.Services.CertificationService CertService
+<div class="offline-banner" style="display:none;"></div>
+<main role="main" tabindex="-1" aria-label="Technician Training Center Main Content">
 @{
     ViewData["Title"] = "Training Center";
     int techId = User.Identity.IsAuthenticated ? int.Parse(User.Identity.Name) : 0; // Assumes techId is username
@@ -10,34 +12,34 @@
     var certs = Model.Certs;
 }
 <h2>Training Center</h2>
-<div class="mb-4">
+<section aria-label="Assigned Skill Tracks" class="mb-4 grid grid-cols-1 md:grid-cols-2">
     <h4>Assigned Skill Tracks</h4>
     <ul>
     @foreach (var track in assignedTracks)
     {
         var prog = progress.FirstOrDefault(p => p.SkillTrackId == track.Id);
-        <li>
+        <li style="min-height:44px;" tabindex="0" aria-label="Skill Track @track.Name">
             <b>@track.Name</b> - @track.Description
             <span class="badge bg-@(prog?.Status == "Completed" ? "success" : "warning")">@prog?.Status ?? "Assigned"</span>
             @if (prog?.Status != "Completed")
             {
-                <form method="post" asp-page-handler="CompleteTrackAsync">
+                <form method="post" asp-page-handler="CompleteTrackAsync" role="form" aria-label="Mark @track.Name Complete">
                     <input type="hidden" name="trackId" value="@track.Id" />
-                    <button type="submit" class="btn btn-sm btn-primary">Mark Complete</button>
+                    <button type="submit" class="btn btn-sm btn-primary" style="min-height:44px;" aria-label="Mark Complete">Mark Complete</button>
                 </form>
             }
         </li>
     }
     </ul>
-</div>
-<div class="mb-4">
+</section>
+<section aria-label="Upload Certification" class="mb-4">
     <h4>Upload Certification</h4>
-    <form method="post" enctype="multipart/form-data" asp-page-handler="UploadCertAsync">
-        <input type="file" name="certFile" class="form-control mb-2" />
-        <button type="submit" class="btn btn-success">Upload</button>
+    <form method="post" enctype="multipart/form-data" asp-page-handler="UploadCertAsync" role="form" aria-label="Upload Certification">
+        <input type="file" name="certFile" class="form-control mb-2" aria-label="Certification File Upload" style="min-height:44px;" />
+        <button type="submit" class="btn btn-success" style="min-height:44px;" aria-label="Upload Certification">Upload</button>
     </form>
-</div>
-<div class="mb-4">
+</section>
+<section aria-label="My Certifications" class="mb-4 grid grid-cols-1 md:grid-cols-2">
     <h4>My Certifications</h4>
     <ul>
     @foreach (var cert in certs)
@@ -48,22 +50,45 @@
         string badgeTooltip = cert.IsVerified && !cert.IsExpired ? "Verified & Valid" :
                               (!cert.IsExpired && cert.DaysUntilExpiry <= 30 ? $"Expiring in {cert.DaysUntilExpiry} days" :
                               cert.IsExpired ? "Expired" : "Pending Verification");
-        <li>
+        <li style="min-height:44px;" tabindex="0" aria-label="Certification @cert.CertificationName">
             <b>@cert.CertificationName</b>
-            <i class="fas @badgeIcon" title="@badgeTooltip"></i>
+            <i class="fas @badgeIcon" title="@badgeTooltip" aria-label="@badgeTooltip"></i>
             - Expiry: @(cert.ExpiryDate?.ToString("d") ?? "N/A")
             <span title="@badgeTooltip">@((cert.DaysUntilExpiry < int.MaxValue && !cert.IsExpired) ? $"({cert.DaysUntilExpiry} days left)" : "")</span>
             <span class="badge bg-@(cert.VerificationStatus == "Verified" ? "success" : cert.VerificationStatus == "Expired" ? "danger" : cert.DaysUntilExpiry <= 30 ? "warning" : "secondary")">@cert.VerificationStatus</span>
             @if (!string.IsNullOrEmpty(cert.DocumentPath))
             {
-                <a href="@cert.DocumentPath" target="_blank">View</a>
+                <a href="@cert.DocumentPath" target="_blank" aria-label="View Certification Document">View</a>
             }
         </li>
     }
     </ul>
-</div>
+</section>
 @if (SkillsService.IsEligibleForBadge(techId))
 {
-    <div class="alert alert-info">Congratulations! You have completed all required skill tracks and earned a badge.</div>
+    <div class="alert alert-info" role="alert">Congratulations! You have completed all required skill tracks and earned a badge.</div>
 }
+<section aria-label="High Contrast Toggle" class="mt-3">
+    <label for="contrastToggleTech" class="form-label">High Contrast Mode</label>
+    <input type="checkbox" id="contrastToggleTech" aria-label="Toggle high contrast" tabindex="0" style="width:44px;height:44px;" onclick="document.body.classList.toggle('high-contrast')" />
+</section>
 <script src="https://kit.fontawesome.com/7c3b9e2e2a.js" crossorigin="anonymous"></script>
+<script src="~/js/ConnectivityMonitor.js"></script>
+<style>
+@media (max-width: 768px) {
+    .grid-cols-2 { grid-template-columns: 1fr !important; }
+}
+.high-contrast, .high-contrast * {
+    background: #000 !important;
+    color: #fff !important;
+    border-color: #fff !important;
+}
+</style>
+<script>
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Tab') {
+        document.body.classList.add('user-is-tabbing');
+    }
+});
+</script>
+</main>

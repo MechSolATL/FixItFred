@@ -9,6 +9,7 @@
 @using MVP_Core.Data.Models
 @model MVP_Core.Pages.Admin.DispatcherModel
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+<main role="main" tabindex="-1" aria-label="Dispatcher Kanban Main Content">
 @{
     ViewData["Title"] = "Dispatcher Kanban";
     Layout = "/Pages/Shared/_Layout.cshtml";
@@ -23,26 +24,26 @@
     var safeServiceZones = Model.ServiceZones ?? Enumerable.Empty<string>();
 }
 // Sprint 33.3 - Dispatcher Smart Filters
-<div class="card mb-3">
+<div class="card mb-3" role="region" aria-label="Smart Filters">
     <div class="card-body">
-        <form method="get" class="row g-2 align-items-end">
+        <form method="get" class="row g-2 align-items-end" role="form" aria-label="Dispatcher Smart Filters">
             <div class="col-md-2">
-                <label class="form-label">Show Only</label>
-                <select name="PendingOnly" class="form-select">
+                <label class="form-label" for="PendingOnly">Show Only</label>
+                <select id="PendingOnly" name="PendingOnly" class="form-select" aria-label="Show Only">
                     <option value="">All Jobs</option>
                     <option value="true" selected="@(Model.PendingOnly ? "selected" : null)">Pending</option>
                 </select>
             </div>
             <div class="col-md-2">
-                <label class="form-label">Show Only</label>
-                <select name="AssignedOrDispatchedOnly" class="form-select">
+                <label class="form-label" for="AssignedOrDispatchedOnly">Show Only</label>
+                <select id="AssignedOrDispatchedOnly" name="AssignedOrDispatchedOnly" class="form-select" aria-label="Show Only Assigned/Dispatched">
                     <option value="">All</option>
                     <option value="true" selected="@(Model.AssignedOrDispatchedOnly ? "selected" : null)">Assigned/Dispatched</option>
                 </select>
             </div>
             <div class="col-md-2">
-                <label class="form-label">Zone</label>
-                <select name="FilterZone" class="form-select">
+                <label class="form-label" for="FilterZone">Zone</label>
+                <select id="FilterZone" name="FilterZone" class="form-select" aria-label="Zone">
                     <option value="">All Zones</option>
                     @foreach (var zone in safeServiceZones)
                     {
@@ -51,8 +52,8 @@
                 </select>
             </div>
             <div class="col-md-2">
-                <label class="form-label">Service Type</label>
-                <select name="FilterServiceType" class="form-select">
+                <label class="form-label" for="FilterServiceType">Service Type</label>
+                <select id="FilterServiceType" name="FilterServiceType" class="form-select" aria-label="Service Type">
                     <option value="">All Types</option>
                     <option value="Plumbing" selected="@(Model.FilterServiceType == "Plumbing" ? "selected" : null)">Plumbing</option>
                     <option value="HVAC" selected="@(Model.FilterServiceType == "HVAC" ? "selected" : null)">HVAC</option>
@@ -61,18 +62,18 @@
             </div>
             <!-- Skill Tag Multi-Select Filter -->
             <div class="col-md-3">
-                <label class="form-label">Skill Tags</label>
-                <select name="SkillTags" multiple class="form-control">
+                <label class="form-label" for="SkillTags">Skill Tags</label>
+                <select id="SkillTags" name="SkillTags" multiple class="form-control" aria-label="Skill Tags">
                     @Html.Raw(Model.SkillTagOptionsHtml)
                 </select>
                 <div class="form-text">Hold Ctrl (Windows) or Cmd (Mac) to select multiple.</div>
             </div>
             <div class="col-md-3">
-                <label class="form-label">Search</label>
-                <input type="text" name="SearchTerm" class="form-control" value="@Model.SearchTerm" placeholder="Customer Name or Job ID" />
+                <label class="form-label" for="SearchTerm">Search</label>
+                <input type="text" id="SearchTerm" name="SearchTerm" class="form-control" value="@Model.SearchTerm" placeholder="Customer Name or Job ID" aria-label="Search" />
             </div>
             <div class="col-md-1 d-grid">
-                <button type="submit" class="btn btn-primary mt-2">Filter</button>
+                <button type="submit" class="btn btn-primary mt-2" aria-label="Apply Filter" style="min-height:44px;">Filter</button>
             </div>
         </form>
     </div>
@@ -504,28 +505,28 @@
 </form>
 @await Html.PartialAsync("_TechnicianLoadPanel", Model.TechnicianLoads)
 @* --- Kanban Board --- *@
-<div class="row kanban-board" id="kanbanBoard">
+<div class="row kanban-board grid grid-cols-1 md:grid-cols-4" id="kanbanBoard" role="region" aria-label="Kanban Board">
     @foreach (var status in statuses)
     {
-        <div class="col kanban-column">
+        <div class="col kanban-column" role="region" aria-label="@status Column">
             <div class="kanban-column-header bg-light p-2 mb-2 border rounded"><strong>@status</strong></div>
             <div class="kanban-cards" id="kanban-@status" data-status="@status" style="min-height: 200px;">
                 @foreach (var req in Model.Requests?.Where(r => Model.TechnicianStatuses != null && Model.TechnicianStatuses.Any() && Model.TechnicianStatuses.FirstOrDefault(ts => ts.TechnicianId == r.AssignedTechnicianId)?.Status == status) ?? Enumerable.Empty<ServiceRequest>())
                 {
-                    <div class="draggable-job" draggable="true" data-job-id="@req.Id">
+                    <div class="draggable-job card mb-2" draggable="true" data-job-id="@req.Id" tabindex="0" aria-label="Job Card @req.Id" style="min-height:44px;">
                         @await Html.PartialAsync("_JobCard", req)
                         @if (string.IsNullOrEmpty(req.AssignedTechnicianId?.ToString()) && status == "Unassigned")
                         {
                             if (Model.SuggestedTech != null && Model.SuggestedTech.ContainsKey(req.Id))
                             {
                                 var suggestion = Model.SuggestedTech[req.Id];
-                                <div class="suggested-tech mt-2">
+                                <div class="suggested-tech mt-2" aria-label="Suggested Technician">
                                     <strong>Suggested:</strong> @suggestion.TechName 
                                     (<span class="text-muted">@suggestion.Confidence %</span>)
                                 </div>
                             }
-                            <form method="post" asp-page-handler="AutoAssign" asp-route-requestId="@req.Id" class="mt-1">
-                                <button class="btn btn-warning btn-sm">Auto Assign</button>
+                            <form method="post" asp-page-handler="AutoAssign" asp-route-requestId="@req.Id" class="mt-1" role="form" aria-label="Auto Assign Technician">
+                                <button class="btn btn-warning btn-sm" style="min-height:44px;" aria-label="Auto Assign">Auto Assign</button>
                                 @Html.AntiForgeryToken()
                             </form>
                         }
@@ -866,3 +867,4 @@ function showOptimizedTech(requestId) {
         </div>
     </div>
 </div>
+</main>

@@ -1,114 +1,92 @@
 @page
 @model MVP_Core.Pages.Admin.InvestorReportsModel
+<main role="main" tabindex="-1" aria-label="Investor Analytics & Reports Main Content">
 @{
     ViewData["Title"] = "Investor Analytics & Reports";
     Layout = "/Pages/Shared/_AdminLayout.cshtml";
 }
 <h2 class="mb-4">Investor Analytics & Reports</h2>
-<form method="get" class="mb-4">
-    <div class="row">
+<form method="get" class="mb-4" role="form" aria-label="Investor Report Filters">
+    <div class="row grid grid-cols-1 md:grid-cols-4">
         <div class="col-md-3">
-            <label>Date Range</label>
-            <input type="date" asp-for="Start" class="form-control" />
-            <input type="date" asp-for="End" class="form-control mt-1" />
+            <label for="Start">Date Range</label>
+            <input type="date" asp-for="Start" class="form-control" id="Start" aria-label="Start Date" style="min-height:44px;" />
+            <input type="date" asp-for="End" class="form-control mt-1" id="End" aria-label="End Date" style="min-height:44px;" />
         </div>
         <div class="col-md-3">
-            <label>Zone</label>
-            <input type="text" asp-for="Zone" class="form-control" />
+            <label for="Zone">Zone</label>
+            <input type="text" asp-for="Zone" class="form-control" id="Zone" aria-label="Zone" style="min-height:44px;" />
         </div>
         <div class="col-md-3">
-            <label>Technician</label>
-            <input type="text" asp-for="TechnicianId" class="form-control" />
+            <label for="TechnicianId">Technician</label>
+            <input type="text" asp-for="TechnicianId" class="form-control" id="TechnicianId" aria-label="Technician" style="min-height:44px;" />
         </div>
         <div class="col-md-3">
-            <label>Service Type</label>
-            <input type="text" asp-for="ServiceType" class="form-control" />
+            <label for="ServiceType">Service Type</label>
+            <input type="text" asp-for="ServiceType" class="form-control" id="ServiceType" aria-label="Service Type" style="min-height:44px;" />
         </div>
     </div>
-    <button type="submit" class="btn btn-primary mt-3">Apply Filters</button>
+    <button type="submit" class="btn btn-primary mt-3" aria-label="Apply Filters" style="min-height:44px;">Apply Filters</button>
 </form>
-<div class="row">
+<div class="row grid grid-cols-1 md:grid-cols-2">
     <div class="col-md-6">
-        <div class="card mb-4">
+        <div class="card mb-4" role="region" aria-label="Revenue by Month">
             <div class="card-header bg-success text-white">Revenue by Month</div>
             <div class="card-body">
-                <canvas id="revenueChart" height="120"></canvas>
+                <canvas id="revenueChart" height="120" aria-label="Revenue Chart"></canvas>
             </div>
         </div>
-        <div class="card mb-4">
+        <div class="card mb-4" role="region" aria-label="SLA Completion %">
             <div class="card-header bg-info text-white">SLA Completion %</div>
             <div class="card-body">
-                <canvas id="slaChart" height="120"></canvas>
+                <canvas id="slaChart" height="120" aria-label="SLA Chart"></canvas>
             </div>
         </div>
     </div>
     <div class="col-md-6">
-        <div class="card mb-4">
+        <div class="card mb-4" role="region" aria-label="Review Trend">
             <div class="card-header bg-warning text-white">Review Trend</div>
             <div class="card-body">
-                <canvas id="reviewChart" height="120"></canvas>
+                <canvas id="reviewChart" height="120" aria-label="Review Chart"></canvas>
             </div>
         </div>
-        <div class="card mb-4">
+        <div class="card mb-4" role="region" aria-label="Technician Leaderboard">
             <div class="card-header bg-primary text-white">Technician Leaderboard</div>
             <div class="card-body">
                 <ul class="list-group">
                     @foreach (var tech in Model.TechnicianLeaderboard)
                     {
-                        <li class="list-group-item">Tech #@tech.TechnicianId: Pay $@tech.TotalPay, Bonus $@tech.TotalBonus</li>
+                        <li class="list-group-item" style="min-height:44px;" tabindex="0" aria-label="Tech #@tech.TechnicianId: Pay $@tech.TotalPay, Bonus $@tech.TotalBonus">Tech #@tech.TechnicianId: Pay $@tech.TotalPay, Bonus $@tech.TotalBonus</li>
                     }
                 </ul>
             </div>
         </div>
     </div>
 </div>
-<form method="post" asp-page-handler="ExportPdf" class="mb-4">
-    <button type="submit" class="btn btn-outline-secondary"><span style="font-size:1.2em">??</span> Generate Pitch PDF</button>
+<form method="post" asp-page-handler="ExportPdf" class="mb-4" role="form" aria-label="Export Pitch PDF">
+    <button type="submit" class="btn btn-outline-secondary" style="min-height:44px;" aria-label="Generate Pitch PDF"><span style="font-size:1.2em">??</span> Generate Pitch PDF</button>
 </form>
+<section aria-label="High Contrast Toggle" class="mt-3">
+    <label for="contrastToggleInvestor" class="form-label">High Contrast Mode</label>
+    <input type="checkbox" id="contrastToggleInvestor" aria-label="Toggle high contrast" tabindex="0" style="width:44px;height:44px;" onclick="document.body.classList.toggle('high-contrast')" />
+</section>
 @section Scripts {
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-<script>
-    // Revenue Chart
-    const revenueData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.RevenueByMonth));
-    const ctxRevenue = document.getElementById('revenueChart').getContext('2d');
-    new Chart(ctxRevenue, {
-        type: 'bar',
-        data: {
-            labels: revenueData.map(x => `${x.Year}-${x.Month}`),
-            datasets: [{
-                label: 'Revenue',
-                data: revenueData.map(x => x.TotalRevenue),
-                backgroundColor: 'rgba(40,167,69,0.7)'
-            }]
-        }
-    });
-    // SLA Chart
-    const slaRate = @Model.SlaCompletionRate;
-    const ctxSla = document.getElementById('slaChart').getContext('2d');
-    new Chart(ctxSla, {
-        type: 'doughnut',
-        data: {
-            labels: ['Completed', 'Other'],
-            datasets: [{
-                data: [slaRate, 100-slaRate],
-                backgroundColor: ['rgba(23,162,184,0.7)','rgba(200,200,200,0.3)']
-            }]
-        }
-    });
-    // Review Chart
-    const reviewData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.AverageReviewByServiceType));
-    const ctxReview = document.getElementById('reviewChart').getContext('2d');
-    new Chart(ctxReview, {
-        type: 'line',
-        data: {
-            labels: reviewData.map(x => x.ServiceType),
-            datasets: [{
-                label: 'Avg Rating',
-                data: reviewData.map(x => x.AverageRating),
-                borderColor: 'rgba(255,193,7,0.7)',
-                fill: false
-            }]
-        }
-    });
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Tab') {
+        document.body.classList.add('user-is-tabbing');
+    }
+});
 </script>
 }
+<style>
+@media (max-width: 768px) {
+    .grid-cols-2 { grid-template-columns: 1fr !important; }
+}
+.high-contrast, .high-contrast * {
+    background: #000 !important;
+    color: #fff !important;
+    border-color: #fff !important;
+}
+</style>
+</main>

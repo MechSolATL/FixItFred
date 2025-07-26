@@ -1,0 +1,65 @@
+@page
+@model MVP_Core.Pages.Admin.OfflineZoneMonitorModel
+@inject MVP_Core.Services.OfflineZoneTracker ZoneTracker
+@{
+    ViewData["Title"] = "Offline Zone Monitor";
+    var zones = ZoneTracker.GetAllZones().ToList();
+}
+<h2>Offline Zone Monitor</h2>
+<div id="zoneMap" style="height: 500px; margin-bottom: 2rem;"></div>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Technician ID</th>
+            <th>Zip Code</th>
+            <th>Latitude</th>
+            <th>Longitude</th>
+            <th>Failure Count</th>
+            <th>Last Failure</th>
+            <th>Notes</th>
+            <th>Override/Prep</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var zone in zones)
+        {
+            <tr>
+                <td>@zone.TechnicianId</td>
+                <td>@zone.ZipCode</td>
+                <td>@zone.Latitude</td>
+                <td>@zone.Longitude</td>
+                <td>@zone.FailureCount</td>
+                <td>@zone.LastFailureAt.ToString("g")</td>
+                <td>@zone.Notes</td>
+                <td>
+                    <form method="post" asp-page-handler="PrepZone">
+                        <input type="hidden" name="zoneId" value="@zone.Id" />
+                        <button type="submit" class="btn btn-sm btn-warning">Auto-Prep</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+@section Scripts {
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var map = L.map('zoneMap').setView([33.75, -84.39], 11);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+            var zones = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(zones));
+            zones.forEach(function (z) {
+                var marker = L.circleMarker([z.Latitude, z.Longitude], {
+                    color: z.FailureCount >= 3 ? 'red' : 'orange',
+                    radius: 10 + z.FailureCount * 2,
+                    fillOpacity: 0.6
+                }).addTo(map);
+                marker.bindPopup(`TechID: ${z.TechnicianId}<br>Zip: ${z.ZipCode}<br>Failures: ${z.FailureCount}`);
+            });
+        });
+    </script>
+}

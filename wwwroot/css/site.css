@@ -282,3 +282,21 @@ footer {
         box-shadow: 0 0 0 0 rgba(220,53,69,0);
     }
 }
+
+/* Offline Banner Styles */
+.offline-banner {
+  background: #ffcc00;
+  color: #000;
+  text-align: center;
+  padding: 10px;
+  font-weight: bold;
+  display: none;
+  z-index: 2000;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+}
+.offline-banner.active {
+  display: block;
+}
