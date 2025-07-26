@@ -1,0 +1,33 @@
+@page
+@model MVP_Core.Pages.Account.RegisterModel
+@{
+    ViewData["Title"] = "Customer Registration";
+}
+<h2>Sign Up</h2>
+<form method="post">
+    <div class="mb-3">
+        <label>Name</label>
+        <input asp-for="Name" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label>Email</label>
+        <input asp-for="Email" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label>Phone</label>
+        <input asp-for="Phone" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label>Address</label>
+        <input asp-for="Address" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label>Referral Code (optional)</label>
+        <input asp-for="ReferralCodeInput" class="form-control" />
+    </div>
+    <button type="submit" class="btn btn-success">Register</button>
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <div class="alert alert-danger mt-2">@Model.ErrorMessage</div>
+    }
+</form>

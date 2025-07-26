@@ -1,0 +1,36 @@
+@page
+@model MVP_Core.Pages.Admin.ReferralsModel
+@inject MVP_Core.Data.ApplicationDbContext Db
+@{
+    Layout = "/Pages/Admin/_AdminLayout.cshtml";
+    var search = Request.Query["search"].ToString();
+    var codes = string.IsNullOrWhiteSpace(search) ? Db.ReferralCodes.OrderByDescending(r => r.CreatedAt).Take(50).ToList() : Db.ReferralCodes.Where(r => r.Code.Contains(search)).ToList();
+}
+<h2>Referral Codes Admin</h2>
+<form method="get" class="mb-3">
+    <input type="text" name="search" value="@search" placeholder="Search referral code or customer..." class="form-control" style="width:300px;display:inline-block" />
+    <button type="submit" class="btn btn-primary ms-2">Search</button>
+</form>
+<table class="table table-bordered">
+    <thead><tr><th>Code</th><th>Owner</th><th>Created</th><th>Usage</th><th>Fraud Flag</th><th>Actions</th></tr></thead>
+    <tbody>
+    @foreach (var code in codes)
+    {
+        var owner = Db.Customers.FirstOrDefault(c => c.Id == code.OwnerCustomerId);
+        <tr>
+            <td>@code.Code</td>
+            <td>@owner?.Name ?? "Unknown"</td>
+            <td>@code.CreatedAt.ToShortDateString()</td>
+            <td>@code.UsageCount</td>
+            <td>@(code.FraudFlagLevel ?? 0)</td>
+            <td>
+                <form method="post" asp-page-handler="Flag" asp-route-id="@code.Id" style="display:inline">
+                    <button type="submit" class="btn btn-warning btn-sm">Flag Fraud</button>
+                </form>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+<h4>Export & Stats</h4>
+<a class="btn btn-outline-secondary" asp-page-handler="Export">Export Referrals CSV</a>

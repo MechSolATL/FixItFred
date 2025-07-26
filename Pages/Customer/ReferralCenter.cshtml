@@ -1,0 +1,56 @@
+@page
+@model MVP_Core.Pages.Customer.ReferralCenterModel
+@inject MVP_Core.Data.ApplicationDbContext Db
+@inject MVP_Core.Services.LoyaltyRewardService LoyaltyService
+@{
+    Layout = "/Pages/Shared/_Layout.cshtml";
+    var customerEmail = User.Identity?.Name ?? string.Empty;
+    var customer = Db.Customers.FirstOrDefault(c => c.Email == customerEmail);
+    var referralCode = customer != null ? Db.ReferralCodes.FirstOrDefault(r => r.OwnerCustomerId == customer.Id && r.IsActive) : null;
+    var usageLogs = referralCode != null ? Db.ReferralEventLogs.Where(e => e.ReferralCodeId == referralCode.Id).OrderByDescending(e => e.Timestamp).ToList() : new List<MVP_Core.Data.Models.ReferralEventLog>();
+    var rewards = customer != null ? LoyaltyService.GetTransactions(customer.Id).Where(t => t.Type.Contains("Referral")).ToList() : new List<MVP_Core.Data.Models.LoyaltyPointTransaction>();
+    var host = ViewContext.HttpContext.Request.Host.Value;
+}
+<h2>Referral Center</h2>
+@if (referralCode != null)
+{
+    <div class="mb-3">
+        <strong>Your Referral Code:</strong> <span id="referralCode">@referralCode.Code</span>
+        <button onclick="navigator.clipboard.writeText('@referralCode.Code')" class="btn btn-outline-primary btn-sm ms-2">Copy</button>
+        <br />
+        <strong>Share Link:</strong> <input type="text" readonly value="@($"https://{host}/register?ref={referralCode.Code}")" style="width:350px" />
+        <button onclick="navigator.clipboard.writeText('@($"https://{host}/register?ref={referralCode.Code}")')" class="btn btn-outline-primary btn-sm ms-2">Copy Link</button>
+    </div>
+    <h4>Referral Usage History</h4>
+    <table class="table table-striped">
+        <thead><tr><th>Date</th><th>Event</th><th>Notes</th></tr></thead>
+        <tbody>
+        @foreach (var log in usageLogs)
+        {
+            <tr>
+                <td>@log.Timestamp.ToShortDateString()</td>
+                <td>@log.EventType</td>
+                <td>@log.Notes</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+    <h4>Referral Rewards Earned</h4>
+    <table class="table table-striped">
+        <thead><tr><th>Date</th><th>Points</th><th>Description</th></tr></thead>
+        <tbody>
+        @foreach (var r in rewards)
+        {
+            <tr>
+                <td>@r.Timestamp.ToShortDateString()</td>
+                <td>@r.Points</td>
+                <td>@r.Description</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+else
+{
+    <div class="alert alert-info">No referral code found. Contact support to enable referrals.</div>
+}

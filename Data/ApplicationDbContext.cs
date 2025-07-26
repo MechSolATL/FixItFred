@@ -85,6 +85,8 @@ namespace MVP_Core.Data
         public DbSet<SkillProgress> SkillProgresses { get; set; } = null!;
         public DbSet<CertificationUpload> CertificationUploads { get; set; } = null!;
         public DbSet<DisputeRecord> DisputeRecords { get; set; } = null!;
+        public DbSet<ReferralCode> ReferralCodes { get; set; } = null!;
+        public DbSet<ReferralEventLog> ReferralEventLogs { get; set; } = null!;
 
         #endregion
 
@@ -139,6 +141,8 @@ namespace MVP_Core.Data
             _ = modelBuilder.Entity<SkillProgress>().ToTable("SkillProgresses");
             _ = modelBuilder.Entity<CertificationUpload>().ToTable("CertificationUploads");
             _ = modelBuilder.Entity<DisputeRecord>().ToTable("DisputeRecords");
+            _ = modelBuilder.Entity<ReferralCode>().ToTable("ReferralCodes");
+            _ = modelBuilder.Entity<ReferralEventLog>().ToTable("ReferralEventLogs");
         }
 
         #endregion
