@@ -91,6 +91,8 @@ namespace MVP_Core.Data
         public DbSet<MVP_Core.Data.Models.TechnicianAuditLog> TechnicianAuditLogs { get; set; } = null!;
         public DbSet<FeedbackSurveyTemplate> FeedbackSurveyTemplates { get; set; } = null!;
         public DbSet<FeedbackResponse> FeedbackResponses { get; set; } = null!;
+        public DbSet<PromotionEvent> PromotionEvents { get; set; } = null!;
+        public DbSet<CustomerBonusLog> CustomerBonusLogs { get; set; } = null!;
 
         #endregion
 
@@ -150,6 +152,8 @@ namespace MVP_Core.Data
             _ = modelBuilder.Entity<TechnicianAuditLog>().ToTable("TechnicianAuditLogs");
             _ = modelBuilder.Entity<FeedbackSurveyTemplate>().ToTable("FeedbackSurveyTemplates");
             _ = modelBuilder.Entity<FeedbackResponse>().ToTable("FeedbackResponses");
+            _ = modelBuilder.Entity<PromotionEvent>().ToTable("PromotionEvents");
+            _ = modelBuilder.Entity<CustomerBonusLog>().ToTable("CustomerBonusLogs");
         }
 
         #endregion

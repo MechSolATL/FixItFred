@@ -1,0 +1,48 @@
+@page
+@model MVP_Core.Pages.Admin.PromotionsModel
+@using MVP_Core.Data.Models
+@inject MVP_Core.Services.PromotionEngineService PromoService
+@inject MVP_Core.Data.ApplicationDbContext Db
+@{
+    ViewData["Title"] = "Promotions";
+    Layout = "/Pages/Admin/_AdminLayout.cshtml";
+    var promos = PromoService.GetActivePromotions();
+}
+<h2 class="mb-4">Promotion Events</h2>
+<a href="/Admin/Promotions?create=true" class="btn btn-success mb-3">Create Promotion</a>
+<table class="table table-bordered table-hover">
+    <thead class="table-dark">
+        <tr>
+            <th>Title</th>
+            <th>Description</th>
+            <th>Start</th>
+            <th>End</th>
+            <th>Service Type</th>
+            <th>Zone</th>
+            <th>Reward</th>
+            <th>Trigger</th>
+            <th>Active</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var promo in promos)
+        {
+            <tr>
+                <td>@promo.Title</td>
+                <td>@promo.Description</td>
+                <td>@promo.StartDate:g</td>
+                <td>@promo.EndDate:g</td>
+                <td>@promo.ServiceType</td>
+                <td>@promo.Zone</td>
+                <td>@promo.RewardType</td>
+                <td>@promo.TriggerType</td>
+                <td>@promo.Active</td>
+                <td>
+                    <a href="/Admin/Promotions?edit=@promo.Id" class="btn btn-sm btn-primary">Edit</a>
+                    <a href="/Admin/Promotions?toggle=@promo.Id" class="btn btn-sm btn-warning">Toggle</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

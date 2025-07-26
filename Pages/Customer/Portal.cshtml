@@ -2,6 +2,7 @@
 @model MVP_Core.Pages.Customer.PortalModel
 @inject MVP_Core.Services.CustomerPortalService PortalService
 @inject MVP_Core.Data.ApplicationDbContext Db
+@inject MVP_Core.Services.PromotionEngineService PromoService
 @inject MVP_Core.Services.DisputeService DisputeService
 @{
     Layout = "/Pages/Shared/_Layout.cshtml";
@@ -31,6 +32,42 @@
     // Sprint 52.0: Check for active review reminder banner
     var reviewBannerActive = customer != null && Db.FollowUpActionLogs.Any(l => l.Status == "Active" && l.TriggerType == "NoReviewBanner" && l.UserId == customer.Id);
     var openDisputes = DisputeService.GetDisputesByCustomer(email).Where(d => d.Status != "Resolved" && d.Status != "Rejected").ToList();
+    var qualifiedPromos = PromoService.GetQualifiedPromotions(email);
+    var activeBonusLogs = Db.CustomerBonusLogs.Where(l => l.CustomerEmail == email && !l.IsClaimed).ToList();
+}
+@if (qualifiedPromos.Any())
+{
+    <div class="alert alert-success text-center mb-3">
+        <b>Promotion Unlocked!</b> You have unlocked the following promotions:<br />
+        <ul class="list-unstyled">
+            @foreach (var promo in qualifiedPromos)
+            {
+                <li>
+                    <span class="fw-bold">@promo.Title</span> — @promo.Description
+                    <form method="post" asp-page-handler="ClaimBonus" asp-route-promoId="@promo.Id" style="display:inline">
+                        <button type="submit" class="btn btn-sm btn-success ms-2">Claim Bonus</button>
+                    </form>
+                </li>
+            }
+        </ul>
+    </div>
+}
+@if (activeBonusLogs.Any())
+{
+    <div class="alert alert-info text-center mb-3">
+        <b>You have unclaimed loyalty bonuses!</b>
+        <ul class="list-unstyled">
+            @foreach (var log in activeBonusLogs)
+            {
+                <li>
+                    <span class="fw-bold">@log.RewardType</span> — Earned: @log.DateEarned:g
+                    <form method="post" asp-page-handler="ClaimBonusLog" asp-route-bonusLogId="@log.Id" style="display:inline">
+                        <button type="submit" class="btn btn-sm btn-warning ms-2">Claim Now</button>
+                    </form>
+                </li>
+            }
+        </ul>
+    </div>
 }
 @if (pendingFollowUp)
 {
