@@ -108,6 +108,9 @@ namespace MVP_Core.Data.Models
         public string? EmergencyPledgeNotes { get; set; } // Sprint 47.1: Notes for emergency pledge
         public bool IsFraudSuspected { get; set; } // Sprint 47.1: Suspected fraud flag
         public string? FraudLogNotes { get; set; } // Sprint 47.1: Fraud log notes
+
+        // Sprint ??.
+        public DateTime? CompletedDate { get; set; } // New property for dispute tracking
     }
 
     public class SlaSetting

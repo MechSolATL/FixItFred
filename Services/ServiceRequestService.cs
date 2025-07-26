@@ -118,5 +118,15 @@ namespace MVP_Core.Services
                 .AsNoTracking()
                 .FirstOrDefaultAsync(r => r.Id == requestId);
         }
+
+        /// <summary>
+        /// Optional: Retrieve completed requests by customer email (for dispute center)
+        /// </summary>
+        public List<ServiceRequest> GetCompletedRequestsByCustomer(string customerEmail)
+        {
+            return _context.ServiceRequests
+                .Where(r => r.Email == customerEmail && r.CompletedDate != null)
+                .ToList();
+        }
     }
 }

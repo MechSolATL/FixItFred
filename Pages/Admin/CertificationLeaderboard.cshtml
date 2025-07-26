@@ -1,0 +1,42 @@
+@page
+@model MVP_Core.Pages.Admin.CertificationLeaderboardModel
+@using MVP_Core.Data.Models
+@inject MVP_Core.Services.CertificationService CertService
+@inject MVP_Core.Services.SkillsTrackerService SkillsService
+@{
+    ViewData["Title"] = "Certification Leaderboard";
+    var leaderboard = Model.Leaderboard;
+}
+<h2>Certification Leaderboard</h2>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Rank</th>
+            <th>Technician</th>
+            <th>Verified Certs</th>
+            <th>Expiring Soon (Completed Early)</th>
+            <th>Tracks Completed</th>
+            <th>Certified Tech of the Month</th>
+        </tr>
+    </thead>
+    <tbody>
+    @for (int i = 0; i < leaderboard.Count; i++)
+    {
+        var entry = leaderboard[i];
+        <tr>
+            <td>@(i + 1)</td>
+            <td>@entry.TechnicianName</td>
+            <td>@entry.VerifiedCerts</td>
+            <td>@entry.ExpiringSoonCompletedEarly</td>
+            <td>@entry.TracksCompleted</td>
+            <td>
+                @if (entry.IsTechOfMonth)
+                {
+                    <span class="badge bg-success"><i class="fas fa-trophy"></i> Tech of the Month</span>
+                }
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+<script src="https://kit.fontawesome.com/7c3b9e2e2a.js" crossorigin="anonymous"></script>

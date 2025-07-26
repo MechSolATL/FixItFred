@@ -1,6 +1,8 @@
 @page
 @model MVP_Core.Pages.Customer.PortalModel
 @inject MVP_Core.Services.CustomerPortalService PortalService
+@inject MVP_Core.Data.ApplicationDbContext Db
+@inject MVP_Core.Services.DisputeService DisputeService
 @{
     Layout = "/Pages/Shared/_Layout.cshtml";
     // Security: Only allow verified/logged-in customers
@@ -24,6 +26,31 @@
         "Bronze" => "#CD7F32",
         _ => "#e9ecef"
     };
+    // Sprint 52.0: Check for pending follow-up actions
+    var pendingFollowUp = customer != null && Db.FollowUpActionLogs.Any(l => l.Status == "Pending" && l.UserId == customer.Id);
+    // Sprint 52.0: Check for active review reminder banner
+    var reviewBannerActive = customer != null && Db.FollowUpActionLogs.Any(l => l.Status == "Active" && l.TriggerType == "NoReviewBanner" && l.UserId == customer.Id);
+    var openDisputes = DisputeService.GetDisputesByCustomer(email).Where(d => d.Status != "Resolved" && d.Status != "Rejected").ToList();
+}
+@if (pendingFollowUp)
+{
+    <div class="alert alert-warning text-center mb-3">
+        <b>Action Required:</b> You have a pending follow-up. Please check your email or click below to complete your review, claim your reward, or reschedule!
+    </div>
+}
+@if (reviewBannerActive)
+{
+    <div class="alert alert-info text-center mb-3">
+        <b>Reminder:</b> We noticed your recent service is complete, but no review has been submitted yet.<br />
+        Your feedback helps us improve transparency, measure technician performance, and continuously elevate your experience.<br />
+        <a href="/Review" class="btn btn-primary mt-2">Leave a Review</a>
+    </div>
+}
+@if (openDisputes.Count > 0)
+{
+    <div class="alert alert-warning mb-3">
+        <strong>Notice:</strong> You have an open dispute. <a href="/Customer/DisputeCenter">View or update your dispute</a>.
+    </div>
 }
 <div class="container-fluid p-3">
     <div class="d-flex justify-content-between align-items-start mb-3 flex-wrap">

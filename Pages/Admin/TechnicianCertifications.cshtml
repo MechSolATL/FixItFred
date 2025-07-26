@@ -20,9 +20,11 @@
 }
 else
 {
+    <form method="post" id="bulkActionsForm">
     <table class="table table-bordered">
         <thead>
             <tr>
+                <th><input type="checkbox" id="selectAll" onclick="for(let cb of document.querySelectorAll('.bulk-cert')){cb.checked=this.checked}"></th>
                 <th>Name</th>
                 <th>License #</th>
                 <th>Issue</th>
@@ -35,11 +37,18 @@ else
         <tbody>
         @foreach (var cert in certs)
         {
-            <tr class="@(cert.IsExpired ? "table-danger" : "")">
-                <td>@cert.CertificationName</td>
+            string badgeIcon = cert.IsVerified && !cert.IsExpired ? "fa-check-circle text-success" :
+                               (!cert.IsExpired && cert.DaysUntilExpiry <= 30 ? "fa-exclamation-circle text-warning" :
+                               cert.IsExpired ? "fa-times-circle text-danger" : "fa-question-circle text-secondary");
+            string badgeTooltip = cert.IsVerified && !cert.IsExpired ? "Verified & Valid" :
+                                  (!cert.IsExpired && cert.DaysUntilExpiry <= 30 ? $"Expiring in {cert.DaysUntilExpiry} days" :
+                                  cert.IsExpired ? "Expired" : "Pending Verification");
+            <tr class="@(cert.IsExpired ? "table-danger" : cert.DaysUntilExpiry <= 30 ? "table-warning" : "")">
+                <td><input type="checkbox" class="bulk-cert" name="selectedCertIds" value="@cert.Id" /></td>
+                <td>@cert.CertificationName <i class="fas @badgeIcon" title="@badgeTooltip"></i></td>
                 <td>@cert.LicenseNumber</td>
-                <td>@cert.IssueDate.ToShortDateString()</td>
-                <td>@cert.ExpiryDate.ToShortDateString()</td>
+                <td>@(cert.IssueDate != DateTime.MinValue ? cert.IssueDate.ToString("d") : "-")</td>
+                <td>@(cert.ExpiryDate.HasValue ? cert.ExpiryDate.Value.ToString("d") : "-") <span title="@badgeTooltip">@((cert.DaysUntilExpiry < int.MaxValue && !cert.IsExpired) ? $"({cert.DaysUntilExpiry} days left)" : "")</span></td>
                 <td>@(cert.IsVerified ? "Verified" : cert.IsExpired ? "Expired" : "Pending")</td>
                 <td>
                     @if (!string.IsNullOrEmpty(cert.DocumentPath))
@@ -60,6 +69,12 @@ else
         }
         </tbody>
     </table>
+    <div class="mb-2">
+        <button type="submit" formaction="?handler=BulkApprove" class="btn btn-success">Bulk Approve</button>
+        <button type="submit" formaction="?handler=BulkReject" class="btn btn-danger">Bulk Reject</button>
+        <button type="submit" formaction="?handler=ExportCsv" class="btn btn-secondary">Export to CSV</button>
+    </div>
+    </form>
 }
 @if (expiredCerts.Count > 0)
 {
@@ -68,8 +83,9 @@ else
         <ul>
         @foreach (var cert in expiredCerts)
         {
-            <li>@cert.CertificationName (Tech ID: @cert.TechnicianId) - Expired @cert.ExpiryDate.ToShortDateString()</li>
+            <li>@cert.CertificationName (Tech ID: @cert.TechnicianId) - Expired @(cert.ExpiryDate.HasValue ? cert.ExpiryDate.Value.ToString("d") : "-")</li>
         }
         </ul>
     </div>
 }
+<script src="https://kit.fontawesome.com/7c3b9e2e2a.js" crossorigin="anonymous"></script>

@@ -1,0 +1,65 @@
+@page
+@model MVP_Core.Pages.Customer.DisputeCenterModel
+@using MVP_Core.Data.Models
+@inject MVP_Core.Services.DisputeService DisputeService
+@inject MVP_Core.Services.ServiceRequestService ServiceRequestService
+@{
+    ViewData["Title"] = "Dispute Resolution Center";
+    var completedRequests = Model.CompletedRequests;
+    var disputes = Model.MyDisputes;
+}
+<h2>Dispute Resolution Center</h2>
+@if (Model.SubmitSuccess)
+{
+    <div class="alert alert-success">Your dispute has been submitted and will be reviewed by our team.</div>
+}
+<form method="post" enctype="multipart/form-data">
+    <div class="mb-3">
+        <label for="ServiceRequestId">Select Completed Service Request</label>
+        <select name="ServiceRequestId" class="form-select" required>
+            <option value="">-- Select --</option>
+            @foreach (var req in completedRequests)
+            {
+                <option value="@req.Id">#@req.Id - @req.ServiceType (@req.CompletedDate?.ToString("d") ?? "")</option>
+            }
+        </select>
+    </div>
+    <div class="mb-3">
+        <label for="Reason">Reason</label>
+        <select name="Reason" class="form-select" required>
+            <option value="">-- Select --</option>
+            <option value="Billing">Billing</option>
+            <option value="Technician">Technician</option>
+            <option value="Outcome">Outcome</option>
+        </select>
+    </div>
+    <div class="mb-3">
+        <label for="Details">Details</label>
+        <textarea name="Details" class="form-control" rows="4" required></textarea>
+    </div>
+    <div class="mb-3">
+        <label for="Attachment">Optional File Upload</label>
+        <input type="file" name="Attachment" class="form-control" />
+    </div>
+    <button type="submit" class="btn btn-primary">Submit Dispute</button>
+</form>
+@if (disputes.Count > 0)
+{
+    <h4 class="mt-4">My Disputes</h4>
+    <table class="table">
+        <thead><tr><th>Request</th><th>Reason</th><th>Status</th><th>Submitted</th><th>Resolution</th></tr></thead>
+        <tbody>
+        @foreach (var d in disputes)
+        {
+            string badgeClass = d.Status == "Resolved" ? "bg-success" : d.Status == "Rejected" ? "bg-danger" : d.Status == "Under Review" ? "bg-warning text-dark" : "bg-secondary";
+            <tr>
+                <td>#@d.ServiceRequestId</td>
+                <td>@d.Reason</td>
+                <td><span class="badge @badgeClass">@d.Status</span></td>
+                <td>@d.SubmittedDate.ToString("g")</td>
+                <td>@d.ResolutionNotes</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}

@@ -98,5 +98,29 @@ namespace MVP_Core.Services.Dispatch
             foreach (var req in failedContacts)
                 await _followUpAIService.TriggerFollowUp(req.Id, "FailedContact");
         }
+
+        // Sprint 52.0: Send follow-up notification and log action
+        public async Task SendFollowUpNotificationAsync(int serviceRequestId, string reason, string escalationLevel)
+        {
+            var request = _db.ServiceRequests.FirstOrDefault(r => r.Id == serviceRequestId);
+            if (request == null) return;
+            string message = escalationLevel == "Gentle"
+                ? $"Hi {request.CustomerName}, we noticed you have a pending action: {reason}. Please take a moment to complete it."
+                : $"Action Required: {reason} for your recent service. Please respond promptly.";
+            // TODO: Integrate with EmailService/SmsService
+            // Log notification sent
+            _db.FollowUpActionLogs.Add(new FollowUpActionLog
+            {
+                UserId = 0, // TODO: Lookup user/customer ID
+                ActionType = "Email/SMS",
+                TriggerType = reason,
+                TriggeredAt = DateTime.UtcNow,
+                Status = "Sent",
+                RelatedServiceRequestId = serviceRequestId,
+                EscalationLevel = escalationLevel,
+                Notes = message
+            });
+            await _db.SaveChangesAsync();
+        }
     }
 }

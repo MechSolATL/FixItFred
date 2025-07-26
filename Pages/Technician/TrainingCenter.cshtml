@@ -1,0 +1,69 @@
+@page
+@model MVP_Core.Pages.Technician.TrainingCenterModel
+@inject SkillsTrackerService SkillsService
+@inject MVP_Core.Services.CertificationService CertService
+@{
+    ViewData["Title"] = "Training Center";
+    int techId = User.Identity.IsAuthenticated ? int.Parse(User.Identity.Name) : 0; // Assumes techId is username
+    var assignedTracks = Model.AssignedTracks;
+    var progress = Model.Progress;
+    var certs = Model.Certs;
+}
+<h2>Training Center</h2>
+<div class="mb-4">
+    <h4>Assigned Skill Tracks</h4>
+    <ul>
+    @foreach (var track in assignedTracks)
+    {
+        var prog = progress.FirstOrDefault(p => p.SkillTrackId == track.Id);
+        <li>
+            <b>@track.Name</b> - @track.Description
+            <span class="badge bg-@(prog?.Status == "Completed" ? "success" : "warning")">@prog?.Status ?? "Assigned"</span>
+            @if (prog?.Status != "Completed")
+            {
+                <form method="post" asp-page-handler="CompleteTrackAsync">
+                    <input type="hidden" name="trackId" value="@track.Id" />
+                    <button type="submit" class="btn btn-sm btn-primary">Mark Complete</button>
+                </form>
+            }
+        </li>
+    }
+    </ul>
+</div>
+<div class="mb-4">
+    <h4>Upload Certification</h4>
+    <form method="post" enctype="multipart/form-data" asp-page-handler="UploadCertAsync">
+        <input type="file" name="certFile" class="form-control mb-2" />
+        <button type="submit" class="btn btn-success">Upload</button>
+    </form>
+</div>
+<div class="mb-4">
+    <h4>My Certifications</h4>
+    <ul>
+    @foreach (var cert in certs)
+    {
+        string badgeIcon = cert.IsVerified && !cert.IsExpired ? "fa-check-circle text-success" :
+                           (!cert.IsExpired && cert.DaysUntilExpiry <= 30 ? "fa-exclamation-circle text-warning" :
+                           cert.IsExpired ? "fa-times-circle text-danger" : "fa-question-circle text-secondary");
+        string badgeTooltip = cert.IsVerified && !cert.IsExpired ? "Verified & Valid" :
+                              (!cert.IsExpired && cert.DaysUntilExpiry <= 30 ? $"Expiring in {cert.DaysUntilExpiry} days" :
+                              cert.IsExpired ? "Expired" : "Pending Verification");
+        <li>
+            <b>@cert.CertificationName</b>
+            <i class="fas @badgeIcon" title="@badgeTooltip"></i>
+            - Expiry: @(cert.ExpiryDate?.ToString("d") ?? "N/A")
+            <span title="@badgeTooltip">@((cert.DaysUntilExpiry < int.MaxValue && !cert.IsExpired) ? $"({cert.DaysUntilExpiry} days left)" : "")</span>
+            <span class="badge bg-@(cert.VerificationStatus == "Verified" ? "success" : cert.VerificationStatus == "Expired" ? "danger" : cert.DaysUntilExpiry <= 30 ? "warning" : "secondary")">@cert.VerificationStatus</span>
+            @if (!string.IsNullOrEmpty(cert.DocumentPath))
+            {
+                <a href="@cert.DocumentPath" target="_blank">View</a>
+            }
+        </li>
+    }
+    </ul>
+</div>
+@if (SkillsService.IsEligibleForBadge(techId))
+{
+    <div class="alert alert-info">Congratulations! You have completed all required skill tracks and earned a badge.</div>
+}
+<script src="https://kit.fontawesome.com/7c3b9e2e2a.js" crossorigin="anonymous"></script>

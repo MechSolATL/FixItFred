@@ -1,0 +1,101 @@
+@page
+@model MVP_Core.Pages.Admin.FollowUpQueueModel
+@{
+    ViewData["Title"] = "Follow-Up Queue";
+    Layout = "~/Pages/Admin/_AdminLayout.cshtml";
+}
+<h2>Automated Follow-Up Queue</h2>
+<form method="get" class="row g-2 mb-3">
+    <div class="col-md-3">
+        <label>Follow-Up Type</label>
+        <select name="type" class="form-select">
+            <option value="">All</option>
+            @foreach (var t in Model.TriggerTypes)
+            {
+                <option value="@t" selected="@(Model.FilterType==t?"selected":null)">@t</option>
+            }
+        </select>
+    </div>
+    <div class="col-md-3">
+        <label>Status</label>
+        <select name="status" class="form-select">
+            <option value="">All</option>
+            @foreach (var s in Model.Statuses)
+            {
+                <option value="@s" selected="@(Model.FilterStatus==s?"selected":null)">@s</option>
+            }
+        </select>
+    </div>
+    <div class="col-md-3">
+        <label>Source</label>
+        <select name="source" class="form-select">
+            <option value="">All</option>
+            @foreach (var src in Model.Sources)
+            {
+                <option value="@src" selected="@(Model.FilterSource==src?"selected":null)">@src</option>
+            }
+        </select>
+    </div>
+    <div class="col-md-3 d-grid align-items-end">
+        <button type="submit" class="btn btn-primary">Apply Filters</button>
+    </div>
+</form>
+<div class="card mb-3">
+    <div class="card-body">
+        <table class="table table-bordered table-hover">
+            <thead class="table-light">
+                <tr>
+                    <th>User</th>
+                    <th>Type</th>
+                    <th>Triggered</th>
+                    <th>Status</th>
+                    <th>Escalation</th>
+                    <th>Open</th>
+                    <th>Click</th>
+                    <th>Conversion</th>
+                    <th>Notes</th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach (var log in Model.FollowUpLogs)
+            {
+                <tr>
+                    <td>@log.UserId</td>
+                    <td>@log.TriggerType</td>
+                    <td>@log.TriggeredAt.ToString("g")</td>
+                    <td>@log.Status</td>
+                    <td>@log.EscalationLevel</td>
+                    <td>@log.OpenCount</td>
+                    <td>@log.ClickCount</td>
+                    <td>@log.ConversionCount</td>
+                    <td>@log.Notes</td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">Most Effective Triggers (by Conversion)</div>
+            <div class="card-body">
+                <ul>
+                @foreach (var kv in Model.TriggerEffectiveness.OrderByDescending(x => x.Value).Take(5))
+                {
+                    <li><b>@kv.Key</b>: @kv.Value conversions</li>
+                }
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">Open vs Ignored</div>
+            <div class="card-body">
+                <span class="badge bg-success">Open/Pending: @Model.OpenCount</span>
+                <span class="badge bg-danger ms-2">Ignored: @Model.IgnoredCount</span>
+            </div>
+        </div>
+    </div>
+</div>

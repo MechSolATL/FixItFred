@@ -1,0 +1,77 @@
+@page
+@model MVP_Core.Pages.Admin.DisputeManagerModel
+@using MVP_Core.Data.Models
+@inject MVP_Core.Services.DisputeService DisputeService
+@inject MVP_Core.Services.ServiceRequestService ServiceRequestService
+@{
+    ViewData["Title"] = "Dispute Manager";
+    var disputes = Model.FilteredDisputes;
+    var statusOptions = new[] { "Open", "Under Review", "Resolved", "Rejected" };
+    var reasonOptions = new[] { "Billing", "Technician", "Outcome" };
+}
+<h2>Dispute Manager</h2>
+<form method="get" class="mb-3">
+    <div class="row">
+        <div class="col-md-3">
+            <label>Status</label>
+            <select name="Status" class="form-select">
+                <option value="">All</option>
+                @foreach (var s in statusOptions)
+                {
+                    <option value="@s" selected="@(Model.Status == s)">@s</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label>Reason</label>
+            <select name="Reason" class="form-select">
+                <option value="">All</option>
+                @foreach (var r in reasonOptions)
+                {
+                    <option value="@r" selected="@(Model.Reason == r)">@r</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label>Escalation Level</label>
+            <input type="number" name="EscalationLevel" class="form-control" value="@Model.EscalationLevel" />
+        </div>
+        <div class="col-md-3 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary">Filter</button>
+        </div>
+    </div>
+</form>
+<table class="table table-bordered">
+    <thead><tr><th>ID</th><th>Customer</th><th>Request</th><th>Reason</th><th>Status</th><th>Escalation</th><th>Submitted</th><th>Resolution</th><th>Actions</th></tr></thead>
+    <tbody>
+    @foreach (var d in disputes)
+    {
+        string badgeClass = d.Status == "Resolved" ? "bg-success" : d.Status == "Rejected" ? "bg-danger" : d.Status == "Under Review" ? "bg-warning text-dark" : "bg-secondary";
+        <tr>
+            <td>@d.Id</td>
+            <td>@d.CustomerEmail</td>
+            <td><a href="/Admin/ServiceRequests?requestId=@d.ServiceRequestId" target="_blank">#@d.ServiceRequestId</a></td>
+            <td>@d.Reason</td>
+            <td><span class="badge @badgeClass">@d.Status</span></td>
+            <td>@d.EscalationLevel</td>
+            <td>@d.SubmittedDate.ToString("g")</td>
+            <td>@d.ResolutionNotes</td>
+            <td>
+                <form method="post">
+                    <input type="hidden" name="DisputeId" value="@d.Id" />
+                    <select name="Status" class="form-select form-select-sm mb-1">
+                        @foreach (var s in statusOptions)
+                        {
+                            <option value="@s" selected="@(d.Status == s)">@s</option>
+                        }
+                    </select>
+                    <input type="text" name="ResolutionNotes" class="form-control form-control-sm mb-1" value="@d.ResolutionNotes" placeholder="Resolution notes" />
+                    <input type="text" name="ReviewedBy" class="form-control form-control-sm mb-1" value="@d.ReviewedBy" placeholder="Reviewed by" />
+                    <input type="number" name="EscalationLevel" class="form-control form-control-sm mb-1" value="@d.EscalationLevel" />
+                    <button type="submit" class="btn btn-success btn-sm">Update</button>
+                </form>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>

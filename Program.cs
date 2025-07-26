@@ -60,6 +60,7 @@ builder.Services.AddScoped<CertificationService>();
 builder.Services.AddScoped<LoyaltyRewardService>();
 builder.Services.AddScoped<ReviewService>();
 builder.Services.AddScoped<CustomerPortalService>();
+builder.Services.AddScoped<SkillsTrackerService>();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));

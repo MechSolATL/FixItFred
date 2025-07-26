@@ -11,6 +11,8 @@ namespace MVP_Core.Pages.Customer
         public List<MVP_Core.Data.Models.ServiceRequest> Requests { get; set; } = new();
         public List<MVP_Core.Data.Models.LoyaltyPointTransaction> Loyalty { get; set; } = new();
         public MVP_Core.Data.Models.RewardTier? CurrentTier { get; set; }
+        public bool HasPendingFollowUp { get; set; } = false;
+        public bool ReviewBannerActive { get; set; } = false;
         public PortalModel(CustomerPortalService portalService)
         {
             _portalService = portalService;
@@ -26,6 +28,13 @@ namespace MVP_Core.Pages.Customer
             Loyalty = _portalService.GetLoyaltyTransactions(email);
             Customer = _portalService.GetCustomer(email);
             CurrentTier = _portalService.GetRewardTiers().LastOrDefault(t => Loyalty.Sum(l => l.Points) >= t.PointsRequired);
+            // Sprint 52.0: Check for pending follow-up actions
+            if (Customer != null)
+            {
+                var db = HttpContext.RequestServices.GetService(typeof(MVP_Core.Data.ApplicationDbContext)) as MVP_Core.Data.ApplicationDbContext;
+                HasPendingFollowUp = db?.FollowUpActionLogs.Any(l => l.Status == "Pending" && l.UserId == Customer.Id) ?? false;
+                ReviewBannerActive = db?.FollowUpActionLogs.Any(l => l.Status == "Active" && l.TriggerType == "NoReviewBanner" && l.UserId == Customer.Id) ?? false;
+            }
         }
     }
 }

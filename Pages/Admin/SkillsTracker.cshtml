@@ -1,0 +1,75 @@
+@page
+@model MVP_Core.Pages.Admin.SkillsTrackerModel
+@inject SkillsTrackerService SkillsService
+@inject CertificationService CertService
+@{
+    ViewData["Title"] = "Skills Tracker";
+    var allTracks = Model.AllTracks;
+    var allTechs = Model.AllTechs;
+    var pendingCerts = Model.PendingCerts;
+    var techProgress = Model.TechProgress;
+}
+<h2>Skills Tracker</h2>
+<div class="mb-4">
+    <h4>Assign Skill Track</h4>
+    <form method="post" asp-page-handler="AssignTrackAsync">
+        <select name="techId" class="form-select mb-2">
+            @foreach (var tech in allTechs)
+            {
+                <option value="@tech.Id">@tech.FullName</option>
+            }
+        </select>
+        <select name="trackId" class="form-select mb-2">
+            @foreach (var track in allTracks)
+            {
+                <option value="@track.Id">@track.Name</option>
+            }
+        </select>
+        <button type="submit" class="btn btn-primary">Assign</button>
+    </form>
+</div>
+<div class="mb-4">
+    <h4>Pending Certifications</h4>
+    <table class="table">
+        <thead><tr><th>Technician</th><th>File</th><th>Status</th><th>Action</th></tr></thead>
+        <tbody>
+        @foreach (var cert in pendingCerts)
+        {
+            var tech = allTechs.FirstOrDefault(t => t.Id == cert.TechnicianId);
+            <tr>
+                <td>@tech?.FullName</td>
+                <td>@cert.FilePath</td>
+                <td>@cert.VerificationStatus</td>
+                <td>
+                    <form method="post" asp-page-handler="VerifyCertAsync">
+                        <input type="hidden" name="certId" value="@cert.Id" />
+                        <button type="submit" class="btn btn-success btn-sm">Verify</button>
+                    </form>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>
+<div class="mb-4">
+    <h4>Technician Progress</h4>
+    <table class="table">
+        <thead><tr><th>Technician</th><th>Track</th><th>Status</th><th>Completed</th></tr></thead>
+        <tbody>
+        @foreach (var tech in allTechs)
+        {
+            var progress = techProgress.ContainsKey(tech.Id) ? techProgress[tech.Id] : new List<MVP_Core.Data.Models.SkillProgress>();
+            foreach (var prog in progress)
+            {
+                var track = allTracks.FirstOrDefault(t => t.Id == prog.SkillTrackId);
+                <tr>
+                    <td>@tech.FullName</td>
+                    <td>@track?.Name</td>
+                    <td>@prog.Status</td>
+                    <td>@prog.CompletedDate?.ToShortDateString() ?? "-"</td>
+                </tr>
+            }
+        }
+        </tbody>
+    </table>
+</div>

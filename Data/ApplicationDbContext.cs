@@ -80,6 +80,11 @@ namespace MVP_Core.Data
         public DbSet<LoyaltyPointTransaction> LoyaltyPointTransactions { get; set; } = null!;
         public DbSet<RewardTier> RewardTiers { get; set; } = null!;
         public DbSet<SecondChanceFlagLog> SecondChanceFlagLogs { get; set; } = null!;
+        public DbSet<FollowUpActionLog> FollowUpActionLogs { get; set; } = null!;
+        public DbSet<SkillTrack> SkillTracks { get; set; } = null!;
+        public DbSet<SkillProgress> SkillProgresses { get; set; } = null!;
+        public DbSet<CertificationUpload> CertificationUploads { get; set; } = null!;
+        public DbSet<DisputeRecord> DisputeRecords { get; set; } = null!;
 
         #endregion
 
@@ -129,6 +134,11 @@ namespace MVP_Core.Data
             _ = modelBuilder.Entity<LoyaltyPointTransaction>().ToTable("LoyaltyPointTransactions");
             _ = modelBuilder.Entity<RewardTier>().ToTable("RewardTiers");
             _ = modelBuilder.Entity<SecondChanceFlagLog>().ToTable("SecondChanceFlagLogs");
+            _ = modelBuilder.Entity<FollowUpActionLog>().ToTable("FollowUpActionLogs");
+            _ = modelBuilder.Entity<SkillTrack>().ToTable("SkillTracks");
+            _ = modelBuilder.Entity<SkillProgress>().ToTable("SkillProgresses");
+            _ = modelBuilder.Entity<CertificationUpload>().ToTable("CertificationUploads");
+            _ = modelBuilder.Entity<DisputeRecord>().ToTable("DisputeRecords");
         }
 
         #endregion
