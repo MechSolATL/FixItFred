@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using MVP_Core.Data;
 using MVP_Core.Data.Models;
+using Helpers;
 using Microsoft.EntityFrameworkCore;
 
 namespace Services.Admin
@@ -13,6 +14,24 @@ namespace Services.Admin
         public ReplayEngineService(ApplicationDbContext db)
         {
             _db = db;
+        }
+
+        public async Task<string> CaptureSnapshotAsync(object data, string type, string summary, string createdBy)
+        {
+            var detailsJson = System.Text.Json.JsonSerializer.Serialize(data);
+            var hash = SnapshotHasher.ComputeHash(detailsJson);
+            var snapshot = new SystemSnapshotLog
+            {
+                SnapshotType = type,
+                Summary = summary,
+                DetailsJson = detailsJson,
+                CreatedBy = createdBy,
+                SnapshotHash = hash,
+                CreatedAt = DateTime.UtcNow
+            };
+            _db.SystemSnapshotLogs.Add(snapshot);
+            await _db.SaveChangesAsync();
+            return hash;
         }
 
         public async Task<bool> ReplaySnapshotAsync(string snapshotHash, string triggeredBy, DateTime? overrideTimestamp = null, string notes = null)

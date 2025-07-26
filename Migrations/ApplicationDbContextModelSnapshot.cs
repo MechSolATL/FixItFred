@@ -188,15 +188,25 @@ namespace MVP_Core.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("AlertType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsResolved")
                         .HasColumnType("bit");
 
                     b.Property<string>("Message")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Severity")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("Timestamp")
@@ -1887,13 +1897,18 @@ namespace MVP_Core.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Details")
+                    b.Property<string>("AffectedModule")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Module")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("LoggedAt")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("Summary")
+                    b.Property<int>("OccurrenceCount")
+                        .HasColumnType("int");
+
+                    b.Property<string>("RootCauseLabel")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("Timestamp")
@@ -2386,16 +2401,16 @@ namespace MVP_Core.Migrations
                     b.Property<double>("AverageDriftMinutes")
                         .HasColumnType("float");
 
-                    b.Property<int>("DriftedRequests")
-                        .HasColumnType("int");
-
-                    b.Property<string>("HeatmapJson")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("SnapshotDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<DateTime>("Timestamp")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("TotalRequests")
+                    b.Property<int>("TotalJobs")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ViolatedCount")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -2507,6 +2522,45 @@ namespace MVP_Core.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("SystemDiagnosticLogs", (string)null);
+                });
+
+            modelBuilder.Entity("MVP_Core.Data.Models.SystemSnapshotLog", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DetailsJson")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SnapshotHash")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SnapshotType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Summary")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("Timestamp")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SystemSnapshotLogs", (string)null);
                 });
 
             modelBuilder.Entity("MVP_Core.Data.Models.Technician", b =>
@@ -3453,42 +3507,6 @@ namespace MVP_Core.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("ReplayAuditLogs", (string)null);
-                });
-
-            modelBuilder.Entity("SystemSnapshotLog", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("CreatedBy")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("DetailsJson")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("SnapshotHash")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("SnapshotType")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Summary")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("Timestamp")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("SystemSnapshotLogs", (string)null);
                 });
 
             modelBuilder.Entity("TechnicianMessage", b =>

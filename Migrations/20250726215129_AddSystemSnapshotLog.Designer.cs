@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MVP_Core.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250726202658_AddReplayAndRecoveryLogs")]
-    partial class AddReplayAndRecoveryLogs
+    [Migration("20250726215129_AddSystemSnapshotLog")]
+    partial class AddSystemSnapshotLog
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -191,15 +191,25 @@ namespace MVP_Core.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("AlertType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsResolved")
                         .HasColumnType("bit");
 
                     b.Property<string>("Message")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Severity")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("Timestamp")
@@ -1720,6 +1730,47 @@ namespace MVP_Core.Migrations
                     b.ToTable("QuickBooksIntegrationTokens");
                 });
 
+            modelBuilder.Entity("MVP_Core.Data.Models.RecoveryLearningLog", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("LinkedRequestId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Outcome")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PatternHash")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("RecordedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("SourceModule")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("TriggerContextJson")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<string>("TriggerSignature")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("RecoveryLearningLogs", (string)null);
+                });
+
             modelBuilder.Entity("MVP_Core.Data.Models.ReferralCode", b =>
                 {
                     b.Property<int>("Id")
@@ -1849,13 +1900,18 @@ namespace MVP_Core.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Details")
+                    b.Property<string>("AffectedModule")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Module")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("LoggedAt")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("Summary")
+                    b.Property<int>("OccurrenceCount")
+                        .HasColumnType("int");
+
+                    b.Property<string>("RootCauseLabel")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("Timestamp")
@@ -2348,16 +2404,16 @@ namespace MVP_Core.Migrations
                     b.Property<double>("AverageDriftMinutes")
                         .HasColumnType("float");
 
-                    b.Property<int>("DriftedRequests")
-                        .HasColumnType("int");
-
-                    b.Property<string>("HeatmapJson")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("SnapshotDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<DateTime>("Timestamp")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("TotalRequests")
+                    b.Property<int>("TotalJobs")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ViolatedCount")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -2469,6 +2525,45 @@ namespace MVP_Core.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("SystemDiagnosticLogs", (string)null);
+                });
+
+            modelBuilder.Entity("MVP_Core.Data.Models.SystemSnapshotLog", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DetailsJson")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SnapshotHash")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SnapshotType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Summary")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("Timestamp")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SystemSnapshotLogs", (string)null);
                 });
 
             modelBuilder.Entity("MVP_Core.Data.Models.Technician", b =>
@@ -3342,6 +3437,50 @@ namespace MVP_Core.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("RecoveryScenarioLog", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("Executed")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("ExecutedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Notes")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("OutcomeSummary")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ScenarioName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("ScheduledForUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("ServiceRequestId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SnapshotHash")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TriggeredBy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ServiceRequestId");
+
+                    b.ToTable("RecoveryScenarioLogs", (string)null);
+                });
+
             modelBuilder.Entity("ReplayAuditLog", b =>
                 {
                     b.Property<int>("Id")
@@ -3371,42 +3510,6 @@ namespace MVP_Core.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("ReplayAuditLogs", (string)null);
-                });
-
-            modelBuilder.Entity("SystemSnapshotLog", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("CreatedBy")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("DetailsJson")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("SnapshotHash")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("SnapshotType")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Summary")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("Timestamp")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("SystemSnapshotLogs", (string)null);
                 });
 
             modelBuilder.Entity("TechnicianMessage", b =>
@@ -3601,6 +3704,16 @@ namespace MVP_Core.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("RecoveryScenarioLog", b =>
+                {
+                    b.HasOne("MVP_Core.Data.Models.ServiceRequest", "ServiceRequest")
+                        .WithMany()
+                        .HasForeignKey("ServiceRequestId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("ServiceRequest");
                 });
 
             modelBuilder.Entity("MVP_Core.Data.Models.Question", b =>
