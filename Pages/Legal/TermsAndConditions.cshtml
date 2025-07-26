@@ -1,0 +1,25 @@
+@page
+@model PageModel
+@{
+    ViewData["Title"] = "Terms and Conditions";
+    ViewData["MetaDescription"] = "Terms and Conditions for Service Atlanta. Review our legal terms for service and compliance.";
+    Layout = "/Pages/Shared/_Layout.cshtml";
+    bool isAdmin = User.IsInRole("Admin");
+    bool allowEdit = isAdmin && (ViewData["AllowLegalEdit"] as bool? ?? false);
+}
+<div class="content-wrapper">
+    <h1>Terms and Conditions</h1>
+    <p>By using Service Atlanta, you agree to the following terms and conditions:</p>
+    <ul>
+        <li>All services are subject to local, state, and federal regulations.</li>
+        <li>Invoices and estimates are final upon signature and payment.</li>
+        <li>Disputes must be submitted in writing within 30 days.</li>
+    </ul>
+    @if (allowEdit)
+    {
+        <form method="post">
+            <textarea name="TermsText" rows="10" class="form-control">@Model.TermsText</textarea>
+            <button type="submit" class="btn btn-primary mt-2">Save Changes</button>
+        </form>
+    }
+</div>

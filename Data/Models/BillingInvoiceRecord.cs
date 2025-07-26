@@ -21,5 +21,7 @@ namespace MVP_Core.Data.Models
         public string? CustomerSignaturePath { get; set; }
         public bool WasAccepted { get; set; }
         public DateTime? DecisionDate { get; set; }
+        public string? SignatureAuditLog { get; set; } // Sprint 58.0: JSON audit log of signatures
+        public bool WasExportedForLegalReview { get; set; } // Sprint 58.0: Legal export flag
     }
 }

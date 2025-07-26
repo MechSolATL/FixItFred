@@ -1,0 +1,29 @@
+@page
+@model MVP_Core.Pages.Admin.LegalExportModel
+@{
+    ViewData["Title"] = "Legal PDF Export";
+    Layout = "/Pages/Shared/_Layout.cshtml";
+}
+<div class="content-wrapper">
+    <h1>Legal PDF Export Tool</h1>
+    <form method="post">
+        <div class="mb-3">
+            <label class="form-label">Select Export Type</label>
+            <select name="ExportType" class="form-select">
+                <option value="ServiceRequest">Service Request</option>
+                <option value="Customer">Customer</option>
+            </select>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">ID</label>
+            <input type="text" name="EntityId" class="form-control" />
+        </div>
+        <button type="submit" class="btn btn-primary">Generate Legal PDF Packet</button>
+    </form>
+    @if (Model.DownloadUrl != null)
+    {
+        <div class="alert alert-success mt-3">
+            <strong>Export Complete:</strong> <a href="@Model.DownloadUrl" target="_blank">Download PDF Packet</a>
+        </div>
+    }
+</div>

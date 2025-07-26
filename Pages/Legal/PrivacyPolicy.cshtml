@@ -1,0 +1,25 @@
+@page
+@model PageModel
+@{
+    ViewData["Title"] = "Privacy Policy";
+    ViewData["MetaDescription"] = "Privacy Policy for Service Atlanta. Learn how we protect your data and comply with legal standards.";
+    Layout = "/Pages/Shared/_Layout.cshtml";
+    bool isAdmin = User.IsInRole("Admin");
+    bool allowEdit = isAdmin && (ViewData["AllowLegalEdit"] as bool? ?? false);
+}
+<div class="content-wrapper">
+    <h1>Privacy Policy</h1>
+    <p>Your privacy is important to us. This policy explains how Service Atlanta collects, uses, and protects your information.</p>
+    <ul>
+        <li>We do not sell or share your personal data except as required by law.</li>
+        <li>All data is encrypted and stored securely.</li>
+        <li>For legal requests, contact legal@service-atlanta.com.</li>
+    </ul>
+    @if (allowEdit)
+    {
+        <form method="post">
+            <textarea name="PolicyText" rows="10" class="form-control">@Model.PolicyText</textarea>
+            <button type="submit" class="btn btn-primary mt-2">Save Changes</button>
+        </form>
+    }
+</div>
