@@ -1,14 +1,14 @@
-using MVP_Core.Data.Models;
-using MVP_Core.Services.System;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using MVP_Core.Data.Models;
 using Services.Admin;
 using Services.Diagnostics;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+using MVP_Core.Services.System;
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace MVP_Core.Pages.Admin
 {
@@ -20,6 +20,7 @@ namespace MVP_Core.Pages.Admin
         private readonly RootCauseCorrelationEngine _rootCauseCorrelationEngine;
         private readonly SmartAdminAlertsService _smartAdminAlertsService;
         private readonly ReplayEngineService _replayEngineService;
+        private readonly RecoveryAILearningService _aiService;
 
         public SystemDiagnosticsModel(ApplicationDbContext db, SystemDiagnosticsService diagnosticsService, AutoRepairEngine autoRepairEngine, RootCauseCorrelationEngine rootCauseCorrelationEngine, SmartAdminAlertsService smartAdminAlertsService, ReplayEngineService replayEngineService)
         {
@@ -29,6 +30,7 @@ namespace MVP_Core.Pages.Admin
             _rootCauseCorrelationEngine = rootCauseCorrelationEngine;
             _smartAdminAlertsService = smartAdminAlertsService;
             _replayEngineService = replayEngineService;
+            _aiService = new RecoveryAILearningService(_db);
         }
 
         public List<SystemDiagnosticLog> LatestLogs { get; set; } = new();
@@ -38,9 +40,15 @@ namespace MVP_Core.Pages.Admin
         public List<AdminAlertLog> ActiveAlerts { get; set; } = new();
         public string AdminUserId => User?.Identity?.Name ?? "admin";
         public List<RecoveryScenarioLog> ScheduledScenarios { get; set; } = new();
-        public List<RecoveryLearningLog> TopRecoveryTriggers { get; set; } = new();
+        public List<RecoveryLearningLog> LearnedPatterns { get; set; } = new();
+        [BindProperty]
+        public List<string> SuggestedTriggers { get; set; } = new();
+        public string StatusMessage { get; set; } = string.Empty;
+        public int TotalPatternsLearned { get; set; }
+        public string MostCommonOutcome { get; set; } = "";
+        public RecoveryLearningLog LatestPattern { get; set; }
 
-        public async Task OnGetAsync()
+        public async Task<IActionResult> OnGetAsync(string filterRange)
         {
             LatestLogs = await _db.SystemDiagnosticLogs.OrderByDescending(l => l.Timestamp).Take(20).ToListAsync();
             HealthStatus = (await _autoRepairEngine.DetectCorruptionAsync()) ? "Healthy" : "Corruption Detected";
@@ -48,6 +56,19 @@ namespace MVP_Core.Pages.Admin
             Alerts = await _smartAdminAlertsService.TriggerAlertsAsync() ?? new List<string>();
             ActiveAlerts = await _smartAdminAlertsService.GetActiveAlertsAsync(AdminUserId);
             ScheduledScenarios = await _db.RecoveryScenarioLogs.OrderByDescending(s => s.ScheduledForUtc).ToListAsync();
+
+            var query = _db.RecoveryLearningLogs.AsQueryable();
+            if (filterRange == "24h")
+                query = query.Where(x => x.RecordedAt >= DateTime.UtcNow.AddHours(-24));
+            else if (filterRange == "7d")
+                query = query.Where(x => x.RecordedAt >= DateTime.UtcNow.AddDays(-7));
+            else if (filterRange == "30d")
+                query = query.Where(x => x.RecordedAt >= DateTime.UtcNow.AddDays(-30));
+            LearnedPatterns = await query.OrderByDescending(x => x.RecordedAt).ToListAsync();
+            TotalPatternsLearned = LearnedPatterns.Count;
+            MostCommonOutcome = LearnedPatterns.GroupBy(x => x.Outcome).OrderByDescending(g => g.Count()).FirstOrDefault()?.Key ?? "N/A";
+            LatestPattern = LearnedPatterns.OrderByDescending(x => x.RecordedAt).FirstOrDefault();
+            return Page();
         }
 
         public async Task<IActionResult> OnPostRunDiagnosticsAsync()
@@ -63,31 +84,35 @@ namespace MVP_Core.Pages.Admin
             };
             _db.SystemDiagnosticLogs.Add(log);
             await _db.SaveChangesAsync();
-            return RedirectToPage();
+            await OnGetAsync("");
+            return Page();
         }
 
         public async Task<IActionResult> OnPostRunAutoRepairAsync()
         {
             await _autoRepairEngine.RunAutoRepairAsync(User?.Identity?.Name ?? "admin");
-            return RedirectToPage();
+            await OnGetAsync("");
+            return Page();
         }
 
         public async Task<IActionResult> OnPostRewindToSnapshotAsync(int SnapshotId)
         {
             await _autoRepairEngine.RewindToSnapshotAsync(SnapshotId, User?.Identity?.Name ?? "admin");
-            return RedirectToPage();
+            await OnGetAsync("");
+            return Page();
         }
 
         public async Task<IActionResult> OnPostAcknowledgeAlertAsync(int alertId, string actionTaken)
         {
             await _smartAdminAlertsService.AcknowledgeAlertAsync(alertId, AdminUserId, actionTaken);
-            return RedirectToPage();
+            await OnGetAsync("");
+            return Page();
         }
 
         public async Task<IActionResult> OnPostQueueRecoveryAsync(string ScenarioName, DateTime ScheduledForUtc, string SnapshotHash, string Notes)
         {
             await _replayEngineService.QueueRecoveryScenarioAsync(ScenarioName, AdminUserId, ScheduledForUtc, SnapshotHash, Notes);
-            await OnGetAsync();
+            await OnGetAsync("");
             return Page();
         }
 
@@ -103,15 +128,29 @@ namespace MVP_Core.Pages.Admin
                 _db.RecoveryScenarioLogs.Update(scenario);
                 await _db.SaveChangesAsync();
             }
-            await OnGetAsync();
+            await OnGetAsync("");
             return Page();
         }
 
         public async Task<IActionResult> OnPostAnalyzePatternsAsync()
         {
-            var aiService = new RecoveryAILearningService(_db);
-            TopRecoveryTriggers = await aiService.AnalyzeRecoveryPatternsAsync();
-            await OnGetAsync();
+            StatusMessage = "Analyzing patterns...";
+            var learned = await _aiService.AnalyzeRecoveryPatternsAsync();
+            StatusMessage = "Pattern analysis complete.";
+            LearnedPatterns = learned;
+            TotalPatternsLearned = LearnedPatterns.Count;
+            MostCommonOutcome = LearnedPatterns.GroupBy(x => x.Outcome).OrderByDescending(g => g.Count()).FirstOrDefault()?.Key ?? "N/A";
+            LatestPattern = LearnedPatterns.OrderByDescending(x => x.RecordedAt).FirstOrDefault();
+            await OnGetAsync("");
+            return Page();
+        }
+
+        public async Task<IActionResult> OnPostSuggestTriggersAsync()
+        {
+            StatusMessage = "Suggesting triggers...";
+            SuggestedTriggers = await _aiService.SuggestAutoRepairTriggers();
+            StatusMessage = "Trigger suggestion complete.";
+            await OnGetAsync("");
             return Page();
         }
     }

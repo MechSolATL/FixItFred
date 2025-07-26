@@ -154,6 +154,30 @@
         }
     </tbody>
 </table>
+<!-- Summary Widget -->
+<div class="mb-3">
+    <h4>Recovery Pattern Summary</h4>
+    <ul class="list-group">
+        <li class="list-group-item">Total Patterns Learned: <strong>@Model.TotalPatternsLearned</strong></li>
+        <li class="list-group-item">Most Common Outcome: <strong>@Model.MostCommonOutcome</strong></li>
+        <li class="list-group-item">Latest Recorded Pattern: <strong>@Model.LatestPattern?.TriggerSignature</strong> @Model.LatestPattern?.RecordedAt.ToString("g")</li>
+    </ul>
+</div>
+<!-- Time Filter Dropdown -->
+<form method="get" class="mb-3">
+    <label for="filterRange">Show Patterns From:</label>
+    <select name="filterRange" id="filterRange" onchange="this.form.submit()" class="form-select w-auto d-inline-block ms-2">
+        <option value="">All Time</option>
+        <option value="24h">Last 24 Hours</option>
+        <option value="7d">Last 7 Days</option>
+        <option value="30d">Last 30 Days</option>
+    </select>
+</form>
+<!-- Status Message -->
+@if (!string.IsNullOrEmpty(Model.StatusMessage))
+{
+    <div class="alert alert-info">@Model.StatusMessage</div>
+}
 <!-- Recovery AI Learning Engine Widget -->
 <div class="mb-3">
     <h4>Recovery AI Learning Engine</h4>
@@ -170,9 +194,9 @@
             </tr>
         </thead>
         <tbody>
-            @if (Model.TopRecoveryTriggers != null && Model.TopRecoveryTriggers.Any())
+            @if (Model.LearnedPatterns != null && Model.LearnedPatterns.Any())
             {
-                foreach (var trigger in Model.TopRecoveryTriggers)
+                foreach (var trigger in Model.LearnedPatterns)
                 {
                     <tr>
                         <td>@trigger.TriggerSignature</td>
@@ -188,4 +212,20 @@
             }
         </tbody>
     </table>
+    <!-- Suggest Auto-Repair Triggers Button and Results -->
+    <form method="post" asp-page-handler="SuggestTriggers">
+        <button type="submit" class="btn btn-warning mt-2">Suggest Auto-Repair Triggers</button>
+    </form>
+    @if (Model.SuggestedTriggers != null && Model.SuggestedTriggers.Any())
+    {
+        <div class="suggestions mt-3">
+            <h5>Suggested Triggers:</h5>
+            <ul>
+            @foreach (var trigger in Model.SuggestedTriggers)
+            {
+                <li>@trigger</li>
+            }
+            </ul>
+        </div>
+    }
 </div>
