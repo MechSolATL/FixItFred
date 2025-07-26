@@ -1,0 +1,92 @@
+@page
+@model MVP_Core.Pages.Admin.RoutePlaybackModel
+@{
+    ViewData["Title"] = "Technician GPS Route Playback";
+    Layout = "/Pages/Shared/_AdminLayout.cshtml";
+}
+<head>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        #routeMap { height: 600px; width: 100%; margin-bottom: 1rem; }
+        .route-slider { width: 100%; }
+    </style>
+</head>
+<div class="container-fluid px-2 px-md-4 mt-4">
+    <h2 class="mb-4 text-primary">Technician GPS Route Playback</h2>
+    <form method="get" class="row g-2 mb-3">
+        <div class="col-md-4">
+            <label class="form-label">Technician</label>
+            <select name="TechnicianId" class="form-select" onchange="this.form.submit()">
+                <option value="">Select Technician</option>
+                @foreach (var tech in Model.Technicians)
+                {
+                    <option value="@tech.Id" selected="@(Model.TechnicianId == tech.Id ? "selected" : null)">@tech.FullName</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-4">
+            <label class="form-label">Job</label>
+            <select name="ServiceRequestId" class="form-select" onchange="this.form.submit()">
+                <option value="">Select Job</option>
+                @foreach (var job in Model.Jobs)
+                {
+                    <option value="@job.Id" selected="@(Model.ServiceRequestId == job.Id ? "selected" : null)">@job.ServiceType - @job.Address (@job.CreatedAt.ToShortDateString())</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-4 align-self-end">
+            <button type="submit" class="btn btn-primary">Show Route</button>
+        </div>
+    </form>
+    <div id="routeMap"></div>
+    <div class="mb-3">
+        <label for="routeSlider" class="form-label">Timeline Playback</label>
+        <input type="range" min="0" max="@(Model.TrailLogs.Count - 1)" value="0" class="form-range route-slider" id="routeSlider" />
+        <span id="sliderTimestamp"></span>
+    </div>
+</div>
+@section Scripts {
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        var trailGeoJson = @Html.Raw(Model.TrailGeoJson ?? "null");
+        var trailPoints = @Html.Raw(Model.TrailPointsJson ?? "null");
+        var map = L.map('routeMap').setView([33.7490, -84.3880], 12);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '© OpenStreetMap'
+        }).addTo(map);
+        var routeLayer, startMarker, endMarker, stopMarkers = [];
+        if (trailGeoJson && trailGeoJson.geometry && trailGeoJson.geometry.coordinates.length > 0) {
+            routeLayer = L.geoJSON(trailGeoJson, { style: { color: 'blue', weight: 5 } }).addTo(map);
+            var coords = trailGeoJson.geometry.coordinates;
+            var start = coords[0], end = coords[coords.length - 1];
+            startMarker = L.marker([start[1], start[0]], { icon: L.icon({ iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png', iconSize: [25, 41], iconAnchor: [12, 41] }) }).addTo(map).bindPopup('Start');
+            endMarker = L.marker([end[1], end[0]], { icon: L.icon({ iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png', iconSize: [25, 41], iconAnchor: [12, 41] }) }).addTo(map).bindPopup('End');
+            // Stops/delays
+            trailPoints.forEach(function(p, idx) {
+                if (p.action === 'Note' || p.action === 'DelayNote') {
+                    var marker = L.marker([p.lat, p.lng], { icon: L.icon({ iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-yellow.png', iconSize: [25, 41], iconAnchor: [12, 41] }) }).addTo(map);
+                    marker.bindPopup(`<b>Stop</b><br/>${p.notes || ''}<br/>${p.timestamp}`);
+                    stopMarkers.push(marker);
+                }
+            });
+            map.fitBounds(routeLayer.getBounds());
+        }
+        // Timeline slider
+        var slider = document.getElementById('routeSlider');
+        var sliderTimestamp = document.getElementById('sliderTimestamp');
+        if (slider && trailPoints && trailPoints.length > 0) {
+            slider.max = trailPoints.length - 1;
+            slider.oninput = function() {
+                var idx = parseInt(this.value);
+                var pt = trailPoints[idx];
+                sliderTimestamp.innerText = pt.timestamp + ' (' + pt.action + ')';
+                // Animate marker
+                if (window.playbackMarker) map.removeLayer(window.playbackMarker);
+                window.playbackMarker = L.marker([pt.lat, pt.lng], { icon: L.icon({ iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-purple.png', iconSize: [25, 41], iconAnchor: [12, 41] }) }).addTo(map).bindPopup(pt.notes || pt.action);
+                window.playbackMarker.openPopup();
+            };
+            slider.oninput();
+        }
+    </script>
+}

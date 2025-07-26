@@ -89,10 +89,12 @@ namespace MVP_Core.Data
         public DbSet<ReferralEventLog> ReferralEventLogs { get; set; } = null!;
         public DbSet<NotificationQueue> NotificationQueues { get; set; } = null!; // Sprint 55.0: Notification queue model
         public DbSet<MVP_Core.Data.Models.TechnicianAuditLog> TechnicianAuditLogs { get; set; } = null!;
-        public DbSet<FeedbackSurveyTemplate> FeedbackSurveyTemplates { get; set; } = null!;
-        public DbSet<FeedbackResponse> FeedbackResponses { get; set; } = null!;
         public DbSet<PromotionEvent> PromotionEvents { get; set; } = null!;
         public DbSet<CustomerBonusLog> CustomerBonusLogs { get; set; } = null!;
+        public DbSet<FeedbackSurveyTemplate> FeedbackSurveyTemplates { get; set; } = null!;
+        public DbSet<FeedbackResponse> FeedbackResponses { get; set; } = null!;
+        // Sprint 61.0: RoutePlaybackPath support
+        // Already mapped: ServiceRequests
 
         #endregion
 
@@ -154,6 +156,7 @@ namespace MVP_Core.Data
             _ = modelBuilder.Entity<FeedbackResponse>().ToTable("FeedbackResponses");
             _ = modelBuilder.Entity<PromotionEvent>().ToTable("PromotionEvents");
             _ = modelBuilder.Entity<CustomerBonusLog>().ToTable("CustomerBonusLogs");
+            _ = modelBuilder.Entity<KanbanHistoryLog>().HasKey(k => k.Id);
         }
 
         #endregion

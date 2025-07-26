@@ -1,5 +1,10 @@
 // FixItFred — Sprint 44 Final Model Recovery
+using System;
+using System.ComponentModel.DataAnnotations;
+
 public class KanbanHistoryLog {
+    [Key]
+    public int Id { get; set; }
     public int ServiceRequestId { get; set; }
     public string FromStatus { get; set; } = string.Empty;
     public string ToStatus { get; set; } = string.Empty;

@@ -24,5 +24,6 @@ namespace MVP_Core.Data.Models
         public double? Latitude { get; set; }
         public double? Longitude { get; set; }
         public string? Source { get; set; } // Mobile, Dispatcher, GPS
+        public string? RouteTag { get; set; } // Sprint 61.0: Route block/job/manual tag
     }
 }

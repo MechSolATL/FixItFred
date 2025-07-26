@@ -1,5 +1,9 @@
 // FixItFred — Sprint 44 Final Model Recovery
+using System;
+using System.ComponentModel.DataAnnotations;
+
 public class TechnicianMessage {
+    [Key]
     public int MessageId { get; set; }
     public int TechnicianId { get; set; }
     public int RequestId { get; set; }
