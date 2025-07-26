@@ -88,6 +88,7 @@ namespace MVP_Core.Data
         public DbSet<ReferralCode> ReferralCodes { get; set; } = null!;
         public DbSet<ReferralEventLog> ReferralEventLogs { get; set; } = null!;
         public DbSet<NotificationQueue> NotificationQueues { get; set; } = null!; // Sprint 55.0: Notification queue model
+        public DbSet<MVP_Core.Data.Models.TechnicianAuditLog> TechnicianAuditLogs { get; set; } = null!;
 
         #endregion
 
@@ -144,6 +145,7 @@ namespace MVP_Core.Data
             _ = modelBuilder.Entity<DisputeRecord>().ToTable("DisputeRecords");
             _ = modelBuilder.Entity<ReferralCode>().ToTable("ReferralCodes");
             _ = modelBuilder.Entity<ReferralEventLog>().ToTable("ReferralEventLogs");
+            _ = modelBuilder.Entity<TechnicianAuditLog>().ToTable("TechnicianAuditLogs");
         }
 
         #endregion

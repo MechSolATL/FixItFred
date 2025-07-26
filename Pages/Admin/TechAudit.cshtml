@@ -1,0 +1,54 @@
+@page
+@using MVP_Core.Data.Models
+@using MVP_Core.Services
+@model MVP_Core.Pages.Admin.TechAuditModel
+@{
+    ViewData["Title"] = "Technician Audit Logs";
+}
+<h2>Technician Audit Logs</h2>
+<form method="get">
+    <label>Technician:</label>
+    <select asp-for="TechnicianId">
+        <option value="">All</option>
+        @foreach (var tech in Model.Technicians)
+        {
+            <option value="@tech.Id" selected="@(Model.TechnicianId == tech.Id)">@tech.FullName</option>
+        }
+    </select>
+    <label>Date:</label>
+    <input type="date" asp-for="Date" />
+    <label>Action:</label>
+    <select asp-for="ActionType">
+        <option value="">All</option>
+        @foreach (var action in Enum.GetValues(typeof(TechnicianAuditActionType)))
+        {
+            <option value="@action" selected="@(Model.ActionType?.ToString() == action.ToString())">@action</option>
+        }
+    </select>
+    <button type="submit">Filter</button>
+</form>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Timestamp</th>
+            <th>Technician</th>
+            <th>Action</th>
+            <th>Notes</th>
+            <th>Location</th>
+            <th>Source</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var log in Model.Logs)
+        {
+            <tr>
+                <td>@log.Timestamp.ToString("g")</td>
+                <td>@Model.GetTechnicianName(log.TechnicianId)</td>
+                <td>@log.ActionType</td>
+                <td>@log.Notes</td>
+                <td>@(log.Latitude.HasValue && log.Longitude.HasValue ? $"{log.Latitude:F4}, {log.Longitude:F4}" : "-")</td>
+                <td>@log.Source</td>
+            </tr>
+        }
+    </tbody>
+</table>
