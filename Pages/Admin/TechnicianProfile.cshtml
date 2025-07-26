@@ -4,6 +4,7 @@
 @inject MVP_Core.Services.TechnicianFeedbackService FeedbackService
 @inject MVP_Core.Services.CertificationService CertService
 @inject MVP_Core.Services.TechnicianPayService PayService
+@inject MVP_Core.Services.TechnicianBonusService BonusService
 @model MVP_Core.Pages.Admin.TechnicianProfileModel
 @{
     int techId = Model.TechId;
@@ -12,6 +13,7 @@
     var certs = CertService.GetCertifications(techId);
     var badges = Model.SkillBadges ?? new List<SkillBadge>();
     var payHistory = User.IsInRole("Admin") ? PayService.GetPayHistory(techId) : new List<TechnicianPayRecord>();
+    var bonusHistory = Model.BonusHistory;
 }
 <h2 class="mb-4">Technician Profile</h2>
 @if (profile == null)
@@ -166,6 +168,29 @@ else
                         <td>@pay.PeriodStart.ToShortDateString() - @pay.PeriodEnd.ToShortDateString()</td>
                         <td>@pay.TotalPay</td>
                         <td>@pay.PayType</td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    }
+    @if (bonusHistory.Count > 0)
+    {
+        <div class="mt-4">
+            <h4>Bonus Log</h4>
+            <table class="table table-sm">
+                <thead>
+                    <tr><th>Date</th><th>Type</th><th>Amount</th><th>Source Job</th><th>Reason</th></tr>
+                </thead>
+                <tbody>
+                @foreach (var bonus in bonusHistory)
+                {
+                    <tr>
+                        <td>@bonus.AwardedAt.ToShortDateString()</td>
+                        <td>@bonus.BonusType</td>
+                        <td>$@bonus.Amount</td>
+                        <td>@bonus.SourceJobId</td>
+                        <td>@bonus.ReasonNote</td>
                     </tr>
                 }
                 </tbody>

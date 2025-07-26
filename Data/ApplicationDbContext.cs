@@ -95,6 +95,7 @@ namespace MVP_Core.Data
         public DbSet<FeedbackResponse> FeedbackResponses { get; set; } = null!;
         // Sprint 61.0: RoutePlaybackPath support
         // Already mapped: ServiceRequests
+        public DbSet<TechnicianBonusLog> TechnicianBonusLogs { get; set; } = null!;
 
         #endregion
 
@@ -157,6 +158,7 @@ namespace MVP_Core.Data
             _ = modelBuilder.Entity<PromotionEvent>().ToTable("PromotionEvents");
             _ = modelBuilder.Entity<CustomerBonusLog>().ToTable("CustomerBonusLogs");
             _ = modelBuilder.Entity<KanbanHistoryLog>().HasKey(k => k.Id);
+            _ = modelBuilder.Entity<TechnicianBonusLog>().ToTable("TechnicianBonusLogs");
         }
 
         #endregion

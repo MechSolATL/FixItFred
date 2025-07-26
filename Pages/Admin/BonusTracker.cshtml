@@ -1,0 +1,51 @@
+@page
+@using MVP_Core.Data.Models
+@inject MVP_Core.Services.TechnicianBonusService BonusService
+@model MVP_Core.Pages.Admin.BonusTrackerModel
+@{
+    ViewData["Title"] = "Technician Bonus Leaderboard";
+    var leaderboard = Model.Leaderboard;
+    var bonusChart = Model.BonusChart;
+}
+<h2>Technician Bonus Leaderboard</h2>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Rank</th>
+            <th>Technician</th>
+            <th>Total Bonuses</th>
+            <th>Total Payout</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var entry in leaderboard)
+    {
+        <tr>
+            <td>@entry.Rank</td>
+            <td>@entry.Name</td>
+            <td>@entry.TotalBonuses</td>
+            <td>$@entry.TotalPayout</td>
+        </tr>
+    }
+    </tbody>
+</table>
+<h3 class="mt-4">Bonus Type Chart</h3>
+<table class="table table-sm">
+    <thead>
+        <tr>
+            <th>Bonus Type</th>
+            <th>Count</th>
+            <th>Total Payout</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var chart in bonusChart)
+    {
+        <tr>
+            <td>@chart.BonusType</td>
+            <td>@chart.Count</td>
+            <td>$@chart.TotalPayout</td>
+        </tr>
+    }
+    </tbody>
+</table>

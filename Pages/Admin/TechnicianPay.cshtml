@@ -2,16 +2,28 @@
 @model MVP_Core.Pages.Admin.TechnicianPayModel
 @using MVP_Core.Data.Models
 @inject MVP_Core.Services.TechnicianPayService PayService
+@inject MVP_Core.Services.TechnicianBonusService BonusService
 @{
     ViewData["Title"] = "Technician Pay & Bonus Log";
     var techId = Model.TechId;
     var payHistory = Model.PayHistory;
+    var bonusHistory = Model.BonusHistory;
 }
 <h2>Technician Pay Records</h2>
 <form method="get" class="mb-3">
     <label>Technician ID:</label>
     <input type="number" name="techId" value="@techId" />
-    <button type="submit" class="btn btn-primary">View</button>
+    <label class="ms-2">Bonus Type:</label>
+    <select name="bonusType">
+        <option value="">All</option>
+        @foreach (var type in Enum.GetValues(typeof(TechnicianBonusType)))
+        {
+            <option value="@type">@type</option>
+        }
+    </select>
+    <label class="ms-2">Award Date:</label>
+    <input type="date" name="awardDate" />
+    <button type="submit" class="btn btn-primary ms-2">View</button>
 </form>
 @if (payHistory.Count == 0)
 {
@@ -42,6 +54,33 @@ else
                 <td>@record.HourlyRate</td>
                 <td>@record.TotalPay</td>
                 <td>@record.BonusNotes</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+@if (bonusHistory.Count > 0)
+{
+    <h3 class="mt-4">Bonus Log</h3>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Type</th>
+                <th>Amount</th>
+                <th>Source Job</th>
+                <th>Reason</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var bonus in bonusHistory)
+        {
+            <tr>
+                <td>@bonus.AwardedAt.ToShortDateString()</td>
+                <td>@bonus.BonusType</td>
+                <td>$@bonus.Amount</td>
+                <td>@bonus.SourceJobId</td>
+                <td>@bonus.ReasonNote</td>
             </tr>
         }
         </tbody>

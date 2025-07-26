@@ -14,16 +14,19 @@ namespace MVP_Core.Pages.Admin
     {
         private readonly DispatcherService _dispatcherService;
         private readonly TechnicianFeedbackService _feedbackService;
+        private readonly TechnicianBonusService _bonusService;
         public int TechId { get; private set; }
         public MVP_Core.Models.Admin.TechnicianProfileDto? Profile { get; private set; }
         public double AvgFeedback { get; private set; }
         public List<TechnicianFeedback> RecentReviews { get; private set; } = new();
         public List<SkillBadge> SkillBadges { get; set; } = new();
+        public List<TechnicianBonusLog> BonusHistory { get; set; } = new();
 
-        public TechnicianProfileModel(DispatcherService dispatcherService, TechnicianFeedbackService feedbackService)
+        public TechnicianProfileModel(DispatcherService dispatcherService, TechnicianFeedbackService feedbackService, TechnicianBonusService bonusService)
         {
             _dispatcherService = dispatcherService;
             _feedbackService = feedbackService;
+            _bonusService = bonusService;
         }
 
         public void OnGet()
@@ -33,6 +36,7 @@ namespace MVP_Core.Pages.Admin
             AvgFeedback = _feedbackService.CalculateAverageRating(TechId);
             RecentReviews = _feedbackService.GetFeedbackForTechnician(TechId).Take(3).ToList();
             SkillBadges = new List<SkillBadge>(); // TODO: Load from DB if needed
+            BonusHistory = _bonusService.GetBonuses(TechId);
         }
     }
 }
