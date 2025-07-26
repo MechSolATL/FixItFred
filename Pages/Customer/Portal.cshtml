@@ -131,11 +131,13 @@
     <div class="row mb-3">
         <div class="col-md-12">
             @* Sprint 55.0: Live status banner for technician on the way *@
-            @if (nextJob != null && nextJob.Status == "OnTheWay")
+            @if (nextJob != null && nextJob.Status == "OnTheWay" && nextJob.EstimatedArrival.HasValue)
             {
+                var eta = nextJob.EstimatedArrival.Value.ToLocalTime();
+                var etaEnd = eta.AddMinutes(30); // Show a 30-min window
                 <div class="alert alert-success text-center mb-3">
                     <b>Live Update:</b> Your technician is on the way! Track status in real time.<br />
-                    <span class="fw-bold">ETA:</span> @nextJob.EstimatedArrival?.ToLocalTime().ToString("t")
+                    <span class="fw-bold">Estimated Arrival:</span> @eta:t – @etaEnd:t
                 </div>
             }
         </div>

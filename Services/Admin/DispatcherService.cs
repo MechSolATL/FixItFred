@@ -58,8 +58,8 @@ namespace MVP_Core.Services.Admin
 
         public DispatcherResult AssignTechnician(int requestId)
         {
-            // Stub: validate, assign, log
-            return new DispatcherResult
+            // Assign technician and set ETA
+            var result = new DispatcherResult
             {
                 Message = "Technician assigned.",
                 RequestDetails = $"Request {requestId} details...",
@@ -69,77 +69,163 @@ namespace MVP_Core.Services.Admin
                 RequestSummary = $"Summary for request {requestId}",
                 AssignedTechName = "Tech A"
             };
+            // Patch: Set EstimatedArrival on ServiceRequest
+            var req = _db.ServiceRequests.FirstOrDefault(r => r.Id == requestId);
+            if (req != null)
+            {
+                int etaMinutes = int.TryParse(result.ETA.Replace(" min", ""), out var m) ? m : 30;
+                req.EstimatedArrival = DateTime.UtcNow.AddMinutes(etaMinutes);
+                _db.SaveChanges();
+            }
+            return result;
         }
-        public DispatcherResult MoveUp(int requestId) => new DispatcherResult
+        public DispatcherResult MoveUp(int requestId)
         {
-            Message = "Moved up.",
-            RequestDetails = $"Request {requestId} details...",
-            TechnicianList = new List<string>(),
-            ETA = EstimateArrivalTime(requestId, 1),
-            GeoLink = GetGeoLink(requestId),
-            RequestSummary = $"Summary for request {requestId}",
-            AssignedTechName = "Tech A"
-        };
-        public DispatcherResult MoveDown(int requestId) => new DispatcherResult
+            var result = new DispatcherResult
+            {
+                Message = "Moved up.",
+                RequestDetails = $"Request {requestId} details...",
+                TechnicianList = new List<string>(),
+                ETA = EstimateArrivalTime(requestId, 1),
+                GeoLink = GetGeoLink(requestId),
+                RequestSummary = $"Summary for request {requestId}",
+                AssignedTechName = "Tech A"
+            };
+            var req = _db.ServiceRequests.FirstOrDefault(r => r.Id == requestId);
+            if (req != null)
+            {
+                int etaMinutes = int.TryParse(result.ETA.Replace(" min", ""), out var m) ? m : 30;
+                req.EstimatedArrival = DateTime.UtcNow.AddMinutes(etaMinutes);
+                _db.SaveChanges();
+            }
+            return result;
+        }
+        public DispatcherResult MoveDown(int requestId)
         {
-            Message = "Moved down.",
-            RequestDetails = $"Request {requestId} details...",
-            TechnicianList = new List<string>(),
-            ETA = EstimateArrivalTime(requestId, 1),
-            GeoLink = GetGeoLink(requestId),
-            RequestSummary = $"Summary for request {requestId}",
-            AssignedTechName = "Tech A"
-        };
-        public DispatcherResult Reassign(int requestId) => new DispatcherResult
+            var result = new DispatcherResult
+            {
+                Message = "Moved down.",
+                RequestDetails = $"Request {requestId} details...",
+                TechnicianList = new List<string>(),
+                ETA = EstimateArrivalTime(requestId, 1),
+                GeoLink = GetGeoLink(requestId),
+                RequestSummary = $"Summary for request {requestId}",
+                AssignedTechName = "Tech A"
+            };
+            var req = _db.ServiceRequests.FirstOrDefault(r => r.Id == requestId);
+            if (req != null)
+            {
+                int etaMinutes = int.TryParse(result.ETA.Replace(" min", ""), out var m) ? m : 30;
+                req.EstimatedArrival = DateTime.UtcNow.AddMinutes(etaMinutes);
+                _db.SaveChanges();
+            }
+            return result;
+        }
+        public DispatcherResult Reassign(int requestId)
         {
-            Message = "Reassigned.",
-            RequestDetails = $"Request {requestId} details...",
-            TechnicianList = new List<string>(),
-            ETA = EstimateArrivalTime(requestId, 1),
-            GeoLink = GetGeoLink(requestId),
-            RequestSummary = $"Summary for request {requestId}",
-            AssignedTechName = "Tech A"
-        };
-        public DispatcherResult Cancel(int requestId) => new DispatcherResult
+            var result = new DispatcherResult
+            {
+                Message = "Reassigned.",
+                RequestDetails = $"Request {requestId} details...",
+                TechnicianList = new List<string>(),
+                ETA = EstimateArrivalTime(requestId, 1),
+                GeoLink = GetGeoLink(requestId),
+                RequestSummary = $"Summary for request {requestId}",
+                AssignedTechName = "Tech A"
+            };
+            var req = _db.ServiceRequests.FirstOrDefault(r => r.Id == requestId);
+            if (req != null)
+            {
+                int etaMinutes = int.TryParse(result.ETA.Replace(" min", ""), out var m) ? m : 30;
+                req.EstimatedArrival = DateTime.UtcNow.AddMinutes(etaMinutes);
+                _db.SaveChanges();
+            }
+            return result;
+        }
+        public DispatcherResult Cancel(int requestId)
         {
-            Message = "Cancelled.",
-            RequestDetails = $"Request {requestId} details...",
-            TechnicianList = new List<string>(),
-            ETA = EstimateArrivalTime(requestId, 1),
-            GeoLink = GetGeoLink(requestId),
-            RequestSummary = $"Summary for request {requestId}",
-            AssignedTechName = "Tech A"
-        };
-        public DispatcherResult ResendInstructions(int requestId) => new DispatcherResult
+            var result = new DispatcherResult
+            {
+                Message = "Cancelled.",
+                RequestDetails = $"Request {requestId} details...",
+                TechnicianList = new List<string>(),
+                ETA = EstimateArrivalTime(requestId, 1),
+                GeoLink = GetGeoLink(requestId),
+                RequestSummary = $"Summary for request {requestId}",
+                AssignedTechName = "Tech A"
+            };
+            var req = _db.ServiceRequests.FirstOrDefault(r => r.Id == requestId);
+            if (req != null)
+            {
+                int etaMinutes = int.TryParse(result.ETA.Replace(" min", ""), out var m) ? m : 30;
+                req.EstimatedArrival = DateTime.UtcNow.AddMinutes(etaMinutes);
+                _db.SaveChanges();
+            }
+            return result;
+        }
+        public DispatcherResult ResendInstructions(int requestId)
         {
-            Message = "Instructions resent.",
-            RequestDetails = $"Request {requestId} details...",
-            TechnicianList = new List<string>(),
-            ETA = EstimateArrivalTime(requestId, 1),
-            GeoLink = GetGeoLink(requestId),
-            RequestSummary = $"Summary for request {requestId}",
-            AssignedTechName = "Tech A"
-        };
-        public DispatcherResult Escalate(int requestId) => new DispatcherResult
+            var result = new DispatcherResult
+            {
+                Message = "Instructions resent.",
+                RequestDetails = $"Request {requestId} details...",
+                TechnicianList = new List<string>(),
+                ETA = EstimateArrivalTime(requestId, 1),
+                GeoLink = GetGeoLink(requestId),
+                RequestSummary = $"Summary for request {requestId}",
+                AssignedTechName = "Tech A"
+            };
+            var req = _db.ServiceRequests.FirstOrDefault(r => r.Id == requestId);
+            if (req != null)
+            {
+                int etaMinutes = int.TryParse(result.ETA.Replace(" min", ""), out var m) ? m : 30;
+                req.EstimatedArrival = DateTime.UtcNow.AddMinutes(etaMinutes);
+                _db.SaveChanges();
+            }
+            return result;
+        }
+        public DispatcherResult Escalate(int requestId)
         {
-            Message = "Escalated.",
-            RequestDetails = $"Request {requestId} details...",
-            TechnicianList = new List<string>(),
-            ETA = EstimateArrivalTime(requestId, 1),
-            GeoLink = GetGeoLink(requestId),
-            RequestSummary = $"Summary for request {requestId}",
-            AssignedTechName = "Tech A"
-        };
-        public DispatcherResult ShowMap(int requestId) => new DispatcherResult
+            var result = new DispatcherResult
+            {
+                Message = "Escalated.",
+                RequestDetails = $"Request {requestId} details...",
+                TechnicianList = new List<string>(),
+                ETA = EstimateArrivalTime(requestId, 1),
+                GeoLink = GetGeoLink(requestId),
+                RequestSummary = $"Summary for request {requestId}",
+                AssignedTechName = "Tech A"
+            };
+            var req = _db.ServiceRequests.FirstOrDefault(r => r.Id == requestId);
+            if (req != null)
+            {
+                int etaMinutes = int.TryParse(result.ETA.Replace(" min", ""), out var m) ? m : 30;
+                req.EstimatedArrival = DateTime.UtcNow.AddMinutes(etaMinutes);
+                _db.SaveChanges();
+            }
+            return result;
+        }
+        public DispatcherResult ShowMap(int requestId)
         {
-            Message = "Map shown.",
-            RequestDetails = $"Request {requestId} details...",
-            TechnicianList = new List<string>(),
-            ETA = EstimateArrivalTime(requestId, 1),
-            GeoLink = GetGeoLink(requestId),
-            RequestSummary = $"Summary for request {requestId}",
-            AssignedTechName = "Tech A"
-        };
+            var result = new DispatcherResult
+            {
+                Message = "Map shown.",
+                RequestDetails = $"Request {requestId} details...",
+                TechnicianList = new List<string>(),
+                ETA = EstimateArrivalTime(requestId, 1),
+                GeoLink = GetGeoLink(requestId),
+                RequestSummary = $"Summary for request {requestId}",
+                AssignedTechName = "Tech A"
+            };
+            var req = _db.ServiceRequests.FirstOrDefault(r => r.Id == requestId);
+            if (req != null)
+            {
+                int etaMinutes = int.TryParse(result.ETA.Replace(" min", ""), out var m) ? m : 30;
+                req.EstimatedArrival = DateTime.UtcNow.AddMinutes(etaMinutes);
+                _db.SaveChanges();
+            }
+            return result;
+        }
 
         public List<string> GetSuggestedTechnicians(int requestId)
         {
@@ -780,9 +866,9 @@ namespace MVP_Core.Services.Admin
             // 4. Call Mapbox Directions API for each tech (mock: random values for now)
             double bestScore = double.MaxValue;
             int? bestTechId = null;
+            double bestTravelTime = 30;
             foreach (var tech in techs)
             {
-                // TODO: Replace with real Mapbox API call
                 double travelTime = new Random(tech.TechnicianId + queue.Id).Next(10, 45); // minutes
                 double geoDistance = new Random(tech.TechnicianId + queue.Id).NextDouble() * 20; // km
                 int jobDensityWeight = _db.ScheduleQueues.Count(q => q.Zone == queue.Zone && (q.Status == ScheduleStatus.Pending || q.Status == ScheduleStatus.Dispatched));
@@ -798,6 +884,13 @@ namespace MVP_Core.Services.Admin
                     queue.RouteScore = routeScore;
                     queue.PreferredTechnicianId = tech.TechnicianId;
                 }
+            }
+            // Patch: Set EstimatedArrival on ServiceRequest
+            var req = _db.ServiceRequests.FirstOrDefault(r => r.Id == queue.ServiceRequestId);
+            if (req != null)
+            {
+                req.EstimatedArrival = DateTime.UtcNow.AddMinutes(bestTravelTime);
+                _db.SaveChanges();
             }
             await Task.CompletedTask;
         }
