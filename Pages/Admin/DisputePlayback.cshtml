@@ -1,0 +1,73 @@
+@page
+@model MVP_Core.Pages.Admin.DisputePlaybackModel
+@using MVP_Core.Data.Models
+@inject MVP_Core.Services.Admin.DisputeInsightService DisputeInsightService
+@inject MVP_Core.Services.Admin.SessionPlaybackService SessionPlaybackService
+@inject MVP_Core.Data.ApplicationDbContext Db
+@{
+    ViewData["Title"] = "Dispute Playback & Intelligence";
+    var disputes = Model.Disputes;
+    var selectedDisputeId = Model.SelectedDisputeId;
+    var sessionLogs = Model.SessionLogs;
+    var insightLogs = Model.InsightLogs;
+}
+<h2>Dispute Playback & Intelligence</h2>
+<form method="get" class="mb-3">
+    <label for="dispute">Select Dispute</label>
+    <select id="dispute" name="SelectedDisputeId" class="form-select" onchange="this.form.submit()">
+        <option value="">-- Select --</option>
+        @foreach (var d in disputes)
+        {
+            <option value="@d.Id" selected="@(selectedDisputeId == d.Id)">@d.Id - @d.CustomerEmail (@d.Status)</option>
+        }
+    </select>
+</form>
+@if (selectedDisputeId != null)
+{
+    <h4>Session Playback Logs</h4>
+    <table class="table table-bordered">
+        <thead><tr><th>Time</th><th>User</th><th>Event</th></tr></thead>
+        <tbody>
+        @foreach (var log in sessionLogs)
+        {
+            <tr>
+                <td>@log.RecordedAt.ToString("g")</td>
+                <td>@log.RecordedBy</td>
+                <td><pre>@log.EventDataJson</pre></td>
+            </tr>
+        }
+        </tbody>
+    </table>
+    <h4>Dispute Insights</h4>
+    <table class="table table-bordered">
+        <thead><tr><th>Time</th><th>Type</th><th>Description</th><th>User</th></tr></thead>
+        <tbody>
+        @foreach (var insight in insightLogs)
+        {
+            <tr>
+                <td>@insight.Timestamp.ToString("g")</td>
+                <td>@insight.InsightType</td>
+                <td>@insight.Description</td>
+                <td>@insight.LoggedBy</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+    <h4>Add New Insight</h4>
+    <form method="post">
+        <input type="hidden" name="SelectedDisputeId" value="@selectedDisputeId" />
+        <div class="mb-2">
+            <label>Type</label>
+            <input type="text" name="InsightType" class="form-control" required />
+        </div>
+        <div class="mb-2">
+            <label>Description</label>
+            <textarea name="Description" class="form-control" required></textarea>
+        </div>
+        <div class="mb-2">
+            <label>User</label>
+            <input type="text" name="LoggedBy" class="form-control" required />
+        </div>
+        <button type="submit" class="btn btn-primary">Add Insight</button>
+    </form>
+}
