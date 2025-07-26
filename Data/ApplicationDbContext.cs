@@ -120,6 +120,7 @@ namespace MVP_Core.Data
         public DbSet<TechnicianSkillMatrix> TechnicianSkillMatrices { get; set; } = null!;
         public DbSet<TechnicianWarningLog> TechnicianWarningLogs { get; set; } = null!;
         public DbSet<TechnicianBehaviorLog> TechnicianBehaviorLogs { get; set; } = null!; // Sprint 71.0: Behavior analyzer log
+        public DbSet<TechnicianResponseLog> TechnicianResponseLogs { get; set; } = null!;
 
         #endregion
 
@@ -222,6 +223,7 @@ namespace MVP_Core.Data
                 .WithMany()
                 .HasForeignKey(t => t.TechnicianId);
             _ = modelBuilder.Entity<TechnicianBehaviorLog>().ToTable("TechnicianBehaviorLogs");
+            _ = modelBuilder.Entity<TechnicianResponseLog>().ToTable("TechnicianResponseLogs");
         }
 
         #endregion

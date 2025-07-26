@@ -1,0 +1,56 @@
+@page
+@using MVP_Core.Data.ViewModels
+@model MVP_Core.Pages.Admin.ResponseScoreModel
+@{
+    ViewData["Title"] = "Technician Response Scorecards";
+}
+<h2 class="mb-4">Technician Response Scorecards</h2>
+<form method="get" class="mb-3 row g-2 align-items-end">
+    <div class="col-md-3">
+        <label class="form-label">Start Date</label>
+        <input type="date" name="start" class="form-control" value="@Model.FilterStart?.ToString("yyyy-MM-dd")" />
+    </div>
+    <div class="col-md-3">
+        <label class="form-label">End Date</label>
+        <input type="date" name="end" class="form-control" value="@Model.FilterEnd?.ToString("yyyy-MM-dd")" />
+    </div>
+    <div class="col-md-3">
+        <label class="form-label">Source</label>
+        <select name="source" class="form-select">
+            <option value="">All</option>
+            <option value="Dispatch" selected="@(Model.FilterSource=="Dispatch"?"selected":null)">Dispatch</option>
+            <option value="Message" selected="@(Model.FilterSource=="Message"?"selected":null)">Message</option>
+            <option value="JobStart" selected="@(Model.FilterSource=="JobStart"?"selected":null)">JobStart</option>
+        </select>
+    </div>
+    <div class="col-md-3">
+        <button type="submit" class="btn btn-primary">Filter</button>
+        <a href="?export=csv&start=@Model.FilterStart:yyyy-MM-dd&end=@Model.FilterEnd:yyyy-MM-dd&source=@Model.FilterSource" class="btn btn-outline-secondary ms-2">Export CSV</a>
+    </div>
+</form>
+<table class="table table-bordered table-hover">
+    <thead>
+        <tr>
+            <th>Rank</th>
+            <th>Technician</th>
+            <th>Avg Response (sec)</th>
+            <th>Total</th>
+            <th>Late (%)</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var card in Model.Scorecards)
+        {
+            var fast = card.AverageResponseSeconds <= 60;
+            var slow = card.AverageResponseSeconds > 180;
+            var rowClass = fast ? "table-success" : slow ? "table-danger" : "";
+            <tr class="@rowClass">
+                <td>@card.Rank</td>
+                <td>@card.TechnicianName</td>
+                <td>@card.AverageResponseSeconds</td>
+                <td>@card.TotalResponses</td>
+                <td>@(card.TotalResponses > 0 ? ((double)card.LateCount / card.TotalResponses * 100).ToString("F1") : "0")%</td>
+            </tr>
+        }
+    </tbody>
+</table>
