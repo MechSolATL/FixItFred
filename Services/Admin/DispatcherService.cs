@@ -894,5 +894,40 @@ namespace MVP_Core.Services.Admin
             }
             await Task.CompletedTask;
         }
+
+        // Sprint 62.0 — Dispatcher Load Monitor: Zone Saturation + Congestion Metrics
+        /// <summary>
+        /// Returns zone saturation, SLA collision, and congestion metrics for live heatmap and SmartQueue stress display.
+        /// </summary>
+        public List<ZoneStressStatus> GetZoneStressStatuses(List<string> zones)
+        {
+            var now = DateTime.UtcNow;
+            var result = new List<ZoneStressStatus>();
+            foreach (var zone in zones)
+            {
+                int jobCount = _db.ScheduleQueues.Count(q => q.Zone == zone && (q.Status == ScheduleStatus.Pending || q.Status == ScheduleStatus.Dispatched));
+                int slaRiskJobs = _db.ScheduleQueues.Count(q => q.Zone == zone && q.SLAExpiresAt != null && q.SLAExpiresAt > now && (q.SLAExpiresAt.Value - now).TotalMinutes < 15 && (q.Status == ScheduleStatus.Pending || q.Status == ScheduleStatus.Dispatched));
+                int escalatedJobs = _db.ScheduleQueues.Count(q => q.Zone == zone && q.IsEscalated);
+                int congestionLevel = jobCount >= 8 ? 3 : jobCount >= 5 ? 2 : jobCount >= 2 ? 1 : 0;
+                result.Add(new ZoneStressStatus
+                {
+                    Zone = zone,
+                    JobCount = jobCount,
+                    SlaRiskJobs = slaRiskJobs,
+                    EscalatedJobs = escalatedJobs,
+                    CongestionLevel = congestionLevel
+                });
+            }
+            return result;
+        }
+
+        public class ZoneStressStatus
+        {
+            public string Zone { get; set; } = string.Empty;
+            public int JobCount { get; set; }
+            public int SlaRiskJobs { get; set; }
+            public int EscalatedJobs { get; set; }
+            public int CongestionLevel { get; set; } // 0=Low, 1=Moderate, 2=High, 3=Critical
+        }
     }
 }

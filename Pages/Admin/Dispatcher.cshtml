@@ -806,3 +806,63 @@ function showOptimizedTech(requestId) {
     modal.show();
 }
 </script>
+@* Sprint 62.0 Patch Log: Dispatcher Load Monitor — Live zone heatmap, SLA saturation, congestion, and escalation display. *@
+<div class="row mb-4">
+    <div class="col-12">
+        <h4>Dispatcher Zone Heatmap — Sprint 62.0</h4>
+        <table class="table table-bordered heatmap-table">
+            <thead class="table-light">
+                <tr>
+                    <th>Zone</th>
+                    <th>Jobs</th>
+                    <th>SLA Risk</th>
+                    <th>Escalated</th>
+                    <th>Congestion</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var zone in Model.ServiceZones)
+                {
+                    var status = Model.ZoneStressStatuses?.FirstOrDefault(zs => zs.Zone == zone);
+                    string colorClass = status?.CongestionLevel switch
+                    {
+                        3 => "table-danger",
+                        2 => "table-warning",
+                        1 => "table-info",
+                        _ => "table-success"
+                    };
+                    <tr class="@colorClass">
+                        <td>@zone</td>
+                        <td>@(status?.JobCount ?? 0)</td>
+                        <td>@(status?.SlaRiskJobs ?? 0)</td>
+                        <td>@(status?.EscalatedJobs ?? 0)</td>
+                        <td>
+                            @switch (status?.CongestionLevel)
+                            {
+                                case 3:
+                                    <span class="badge bg-danger">Critical</span>
+                                    break;
+                                case 2:
+                                    <span class="badge bg-warning text-dark">High</span>
+                                    break;
+                                case 1:
+                                    <span class="badge bg-info text-dark">Moderate</span>
+                                    break;
+                                default:
+                                    <span class="badge bg-success">Low</span>
+                                    break;
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        <div class="mt-2">
+            <strong>Live SmartQueue Stress Simulation:</strong>
+            <pre>@Model.ZoneStressChartDataJson</pre>
+        </div>
+        <div class="alert alert-info mt-3">
+            <strong>Sprint 62.0 Patch Log:</strong> Dispatcher Load Monitor launched. Real-time zone heatmap, SLA collision detection, auto-escalation, and SmartQueue congestion display are now active.
+        </div>
+    </div>
+</div>

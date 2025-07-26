@@ -255,6 +255,9 @@ namespace MVP_Core.Pages.Admin
             ServiceZones.Clear();
             ServiceZones.AddRange(new[] { "North", "South", "East", "West" }); // Patch: populate zones for UI
 
+            // Sprint 62.0: Populate ZoneStressStatuses for live heatmap
+            ZoneStressStatuses = _dispatcherService.GetZoneStressStatuses(ServiceZones);
+
             // Sprint 39: Populate AllSkillTags from DB if available
             var dbTags = _db.Technicians
                 .Where(t => t.SkillTags != null && t.SkillTags != "")
@@ -584,5 +587,18 @@ namespace MVP_Core.Pages.Admin
         );
         // Sprint 47.2 – FixItFred Mission Package: Expose WatchdogAlerts for SignalR
         public string WatchdogAlertsJson => Newtonsoft.Json.JsonConvert.SerializeObject(WatchdogAlerts);
+
+        // Sprint 62.0 — Dispatcher Load Monitor: Zone Stress Statuses for Razor UI
+        public List<MVP_Core.Services.Admin.DispatcherService.ZoneStressStatus> ZoneStressStatuses { get; set; } = new();
+
+        public string ZoneStressChartDataJson => Newtonsoft.Json.JsonConvert.SerializeObject(
+            ServiceZones.Select(z => new {
+                Zone = z,
+                JobCount = ZoneStressStatuses?.FirstOrDefault(s => s.Zone == z)?.JobCount ?? 0,
+                SlaRiskJobs = ZoneStressStatuses?.FirstOrDefault(s => s.Zone == z)?.SlaRiskJobs ?? 0,
+                EscalatedJobs = ZoneStressStatuses?.FirstOrDefault(s => s.Zone == z)?.EscalatedJobs ?? 0,
+                CongestionLevel = ZoneStressStatuses?.FirstOrDefault(s => s.Zone == z)?.CongestionLevel ?? 0
+            })
+        );
     }
 }

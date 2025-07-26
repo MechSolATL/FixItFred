@@ -50,6 +50,8 @@ namespace MVP_Core.Data.Models
         public TimeSpan? OptimizedETA { get; set; } // Mapbox-calculated ETA
         public double? RouteScore { get; set; } // Composite score for dispatch optimization
         public int? PreferredTechnicianId { get; set; } // ID of top suggested tech
+        // Sprint 62.0 — Dispatcher Load Monitor: Escalation status
+        public bool IsEscalated { get; set; } // True if job has been auto-escalated due to SLA collision
     }
 
     public class ScheduleHistory
