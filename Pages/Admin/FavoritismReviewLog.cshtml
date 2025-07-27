@@ -1,0 +1,34 @@
+@page
+@using MVP_Core.Data.Models
+@inject MVP_Core.Data.ApplicationDbContext Db
+@model MVP_Core.Pages.Admin.FavoritismReviewLogModel
+@{
+    ViewData["Title"] = "Favoritism Review Log";
+    var alerts = Db.FavoritismAlertLogs.OrderByDescending(x => x.FlaggedAt).ToList();
+}
+<h2>Favoritism Review Log</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Dispatcher</th>
+            <th>Technician</th>
+            <th>Pattern Score</th>
+            <th>Flagged At</th>
+            <th>Admin Reviewed</th>
+            <th>Resolution Notes</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var alert in alerts)
+    {
+        <tr>
+            <td>@alert.DispatcherId</td>
+            <td>@alert.TechnicianId</td>
+            <td>@alert.PatternScore</td>
+            <td>@alert.FlaggedAt</td>
+            <td>@alert.AdminReviewed</td>
+            <td>@alert.ResolutionNotes</td>
+        </tr>
+    }
+    </tbody>
+</table>

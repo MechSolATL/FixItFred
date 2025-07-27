@@ -141,6 +141,8 @@ namespace MVP_Core.Data
         public DbSet<SlaMissAlert> SlaMissAlerts { get; set; } = null!;
         public DbSet<TechnicianSessionTelemetry> TechnicianSessionTelemetries { get; set; } = null!;
         public DbSet<UptimeHeartbeatLog> UptimeHeartbeatLogs { get; set; } = null!;
+        public DbSet<DispatcherAssignmentLog> DispatcherAssignmentLogs { get; set; } = null!;
+        public DbSet<FavoritismAlertLog> FavoritismAlertLogs { get; set; } = null!;
 
         #endregion
 
@@ -259,6 +261,8 @@ namespace MVP_Core.Data
             _ = modelBuilder.Entity<SlaMissAlert>().ToTable("SlaMissAlerts");
             _ = modelBuilder.Entity<TechnicianSessionTelemetry>().ToTable("TechnicianSessionTelemetries");
             _ = modelBuilder.Entity<UptimeHeartbeatLog>().ToTable("UptimeHeartbeatLogs");
+            _ = modelBuilder.Entity<DispatcherAssignmentLog>().ToTable("DispatcherAssignmentLogs");
+            _ = modelBuilder.Entity<FavoritismAlertLog>().ToTable("FavoritismAlertLogs");
         }
 
         #endregion

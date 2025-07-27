@@ -1,0 +1,40 @@
+@page
+@using MVP_Core.Data.Models
+@inject MVP_Core.Data.ApplicationDbContext Db
+@model MVP_Core.Pages.Admin.AssignmentAnomaliesModel
+@{
+    ViewData["Title"] = "Assignment Anomalies";
+    var flaggedAssignments = Db.DispatcherAssignmentLogs.Where(x => x.FlaggedForReview).ToList();
+}
+<h2>Assignment Anomalies</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Dispatcher</th>
+            <th>Technician</th>
+            <th>Service Request</th>
+            <th>Assigned At</th>
+            <th>Distance</th>
+            <th>Priority</th>
+            <th>Value</th>
+            <th>AutoAssigned</th>
+            <th>Justification</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var log in flaggedAssignments)
+    {
+        <tr>
+            <td>@log.DispatcherId</td>
+            <td>@log.TechnicianId</td>
+            <td>@log.ServiceRequestId</td>
+            <td>@log.AssignedAt</td>
+            <td>@log.DistanceToJob</td>
+            <td>@log.JobPriority</td>
+            <td>@log.JobValue</td>
+            <td>@log.AutoAssigned</td>
+            <td>@log.JustificationJson</td>
+        </tr>
+    }
+    </tbody>
+</table>
