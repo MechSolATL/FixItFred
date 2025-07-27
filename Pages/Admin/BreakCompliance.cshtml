@@ -1,0 +1,101 @@
+@page
+@model MVP_Core.Pages.Admin.BreakComplianceModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    ViewData["Title"] = "Break Compliance Enforcement";
+}
+<h2>Break Compliance Enforcement</h2>
+@if (!string.IsNullOrEmpty(Model.HRAlert))
+{
+    <div class="alert alert-warning">@Model.HRAlert</div>
+}
+<h3>Technicians Pending Break Lockout</h3>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Technician</th>
+            <th>Hours Since Last Break</th>
+            <th>Last Break</th>
+            <th>Countdown</th>
+            <th>Override</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var tech in Model.CountdownTechs)
+    {
+        <tr>
+            <td>@tech.TechnicianName</td>
+            <td>@tech.HoursSinceBreak.ToString("F2")</td>
+            <td>@tech.LastBreak.ToString("g")</td>
+            <td>
+                <span class="badge bg-warning">Countdown: @( (60 - ((tech.HoursSinceBreak - 4.5) * 60)).ToString("F0") ) min left</span>
+            </td>
+            <td>
+                @if (User.IsInRole("HR") || User.IsInRole("Admin") || User.IsInRole("Manager"))
+                {
+                    <form method="post" asp-page-handler="Override">
+                        <input type="hidden" name="technicianId" value="@tech.TechnicianId" />
+                        <input type="text" name="justification" placeholder="Justification" required class="form-control mb-1" />
+                        <select name="wasEmergency" class="form-select mb-1">
+                            <option value="false">Non-Emergency</option>
+                            <option value="true">Emergency</option>
+                        </select>
+                        <button type="submit" class="btn btn-danger btn-sm">Override</button>
+                    </form>
+                }
+                else
+                {
+                    <span class="text-muted">(Override: HR/Admin/Manager only)</span>
+                }
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+<h3>Technicians in Lockout</h3>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Technician</th>
+            <th>Hours Since Last Break</th>
+            <th>Last Break</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var tech in Model.PendingBreaks)
+    {
+        <tr>
+            <td>@tech.TechnicianName</td>
+            <td>@tech.HoursSinceBreak.ToString("F2")</td>
+            <td>@tech.LastBreak.ToString("g")</td>
+        </tr>
+    }
+    </tbody>
+</table>
+<h3>Override Audit Dashboard (HR Only)</h3>
+@if (User.IsInRole("HR"))
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Technician</th>
+                <th>Override Count</th>
+                <th>Emergency</th>
+                <th>Auto-Flagged</th>
+                <th>Last Override</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var entry in Model.AuditPanel)
+        {
+            <tr>
+                <td>@entry.TechnicianName</td>
+                <td>@entry.OverrideCount</td>
+                <td>@entry.EmergencyCount</td>
+                <td>@entry.AutoFlaggedCount</td>
+                <td>@entry.LastOverride.ToString("g")</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}

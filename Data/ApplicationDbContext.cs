@@ -160,6 +160,7 @@ namespace MVP_Core.Data
         public DbSet<EgoVectorLog> EgoVectorLogs { get; set; } = null!;
         public DbSet<AnonymousReviewFormLog> AnonymousReviewFormLogs { get; set; } = null!;
         public DbSet<EmployeeConfidenceDecayLog> EmployeeConfidenceDecayLogs { get; set; } = null!;
+        public DbSet<BreakComplianceOverrideLog> BreakComplianceOverrideLogs { get; set; } = null!;
 
         #endregion
 
@@ -297,6 +298,7 @@ namespace MVP_Core.Data
             _ = modelBuilder.Entity<EgoVectorLog>().ToTable("EgoVectorLogs");
             _ = modelBuilder.Entity<AnonymousReviewFormLog>().ToTable("AnonymousReviewFormLogs");
             _ = modelBuilder.Entity<EmployeeConfidenceDecayLog>().ToTable("EmployeeConfidenceDecayLogs");
+            _ = modelBuilder.Entity<BreakComplianceOverrideLog>().ToTable("BreakComplianceOverrideLogs");
 
             modelBuilder.Entity<RoastTemplate>().Property(r => r.Tier).HasConversion<string>();
         }
