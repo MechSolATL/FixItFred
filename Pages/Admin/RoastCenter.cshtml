@@ -1,0 +1,81 @@
+@page
+@model MVP_Core.Pages.Admin.RoastCenterModel
+@{
+    ViewData["Title"] = "Roast Center";
+}
+<h2>Roast Center</h2>
+
+<section>
+    <h3>Pending Roasts</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Employee</th>
+                <th>Roast</th>
+                <th>Level</th>
+                <th>Scheduled</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var roast in Model.PendingRoasts)
+        {
+            <tr>
+                <td>@roast.EmployeeId</td>
+                <td>@roast.RoastMessage</td>
+                <td>@(roast.RoastLevel == 1 ? "Light" : roast.RoastLevel == 2 ? "Medium" : "Savage")</td>
+                <td>@roast.ScheduledFor.ToShortDateString()</td>
+                <td>
+                    <form method="post" asp-page-handler="Deliver" asp-route-id="@roast.Id">
+                        <button type="submit" class="btn btn-danger">?? Hit 'Em!</button>
+                    </form>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</section>
+
+<section>
+    <h3>Schedule a Roast</h3>
+    <form method="post" asp-page-handler="Schedule">
+        <div class="form-group">
+            <label>Employee ID</label>
+            <input type="text" name="EmployeeId" class="form-control" required />
+        </div>
+        <div class="form-group">
+            <label>Roast Level</label>
+            <select name="RoastLevel" class="form-control">
+                <option value="1">Light</option>
+                <option value="2">Medium</option>
+                <option value="3">Savage</option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-warning">Schedule Roast</button>
+    </form>
+</section>
+
+<section>
+    <h3>Roast Vault</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Employee</th>
+                <th>Roast</th>
+                <th>Level</th>
+                <th>Delivered At</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var roast in Model.PastRoasts)
+        {
+            <tr>
+                <td>@roast.EmployeeId</td>
+                <td>@roast.RoastMessage</td>
+                <td>@(roast.RoastLevel == 1 ? "Light" : roast.RoastLevel == 2 ? "Medium" : "Savage")</td>
+                <td>@roast.DeliveredAt?.ToString("g")</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</section>

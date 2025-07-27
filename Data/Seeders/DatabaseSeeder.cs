@@ -71,6 +71,35 @@ namespace MVP_Core.Data.Seeders
                 );
             }
 
+            // Sprint 73.2: RoastNBoost Protocol - Seed RoastTemplates
+            if (!db.RoastTemplates.Any())
+            {
+                db.RoastTemplates.AddRange(new[]
+                {
+                    new RoastTemplate { Message = "Still figuring out the printer, huh? We believe in you.", Level = 1 },
+                    new RoastTemplate { Message = "If enthusiasm paid the bills, you'd still owe rent.", Level = 2 },
+                    new RoastTemplate { Message = "You're like a software update—always promising but never delivering on time.", Level = 3 },
+                    new RoastTemplate { Message = "You bring new meaning to 'learning curve'.", Level = 1 },
+                    new RoastTemplate { Message = "Your coffee runs are legendary—for taking forever.", Level = 1 },
+                    new RoastTemplate { Message = "If only your code ran as fast as you walk to lunch.", Level = 2 },
+                    new RoastTemplate { Message = "You have a bright future—in debugging your own mistakes.", Level = 2 },
+                    new RoastTemplate { Message = "Your onboarding is a Netflix series: dramatic, confusing, and never-ending.", Level = 3 },
+                    new RoastTemplate { Message = "You’re the reason we have a ‘Did you try restarting?’ policy.", Level = 1 },
+                    new RoastTemplate { Message = "If procrastination was a skill, you’d be our MVP.", Level = 2 },
+                    new RoastTemplate { Message = "You’re like a group chat notification—always popping up, rarely useful.", Level = 3 },
+                    new RoastTemplate { Message = "Your badge should say ‘Work in Progress’.", Level = 1 },
+                    new RoastTemplate { Message = "You ask more questions than our FAQ page.", Level = 1 },
+                    new RoastTemplate { Message = "If you were a bug, you’d be a feature request.", Level = 2 },
+                    new RoastTemplate { Message = "You’re the plot twist HR warned us about.", Level = 3 },
+                    new RoastTemplate { Message = "Your meetings are like your code: full of surprises.", Level = 2 },
+                    new RoastTemplate { Message = "You’re the only person who can crash a spreadsheet.", Level = 3 },
+                    new RoastTemplate { Message = "You bring the ‘new’ to ‘new hire’ every day.", Level = 1 },
+                    new RoastTemplate { Message = "If optimism was output, you’d be a compiler error.", Level = 2 },
+                    new RoastTemplate { Message = "You’re the reason we double-check the onboarding checklist.", Level = 3 },
+                    new RoastTemplate { Message = "Your Slack status should be ‘Trying my best’.", Level = 1 },
+                });
+            }
+
             _ = db.SaveChanges(); // Fix: Use discard for assignment, always non-null
         }
 

@@ -146,6 +146,8 @@ namespace MVP_Core.Data
         public DbSet<TechnicianReputationEdge> TechnicianReputationEdges { get; set; } = null!;
         public DbSet<DisputeFusionLog> DisputeFusionLogs { get; set; } = null!;
         public DbSet<EmployeeMilestoneLog> EmployeeMilestoneLogs { get; set; } = null!;
+        public DbSet<NewHireRoastLog> NewHireRoastLogs { get; set; } = null!;
+        public DbSet<RoastTemplate> RoastTemplates { get; set; } = null!;
 
         #endregion
 
@@ -269,6 +271,8 @@ namespace MVP_Core.Data
             _ = modelBuilder.Entity<TechnicianReputationEdge>().ToTable("TechnicianReputationEdges");
             _ = modelBuilder.Entity<DisputeFusionLog>().ToTable("DisputeFusionLogs");
             _ = modelBuilder.Entity<EmployeeMilestoneLog>().ToTable("EmployeeMilestoneLogs");
+            _ = modelBuilder.Entity<NewHireRoastLog>().ToTable("NewHireRoastLogs");
+            _ = modelBuilder.Entity<RoastTemplate>().ToTable("RoastTemplates");
         }
 
         #endregion
