@@ -168,6 +168,8 @@ namespace MVP_Core.Data
         public DbSet<EscalationEvent> EscalationEvents { get; set; } = null!;
         public DbSet<OnboardingStaging> OnboardingStagings { get; set; } = null!; // Sprint 83.3: SmartControlUX Gatekeeper Wizard
         public DbSet<FeatureSuggestion> FeatureSuggestions { get; set; } = null!; // Sprint 83.4: FeatureSuggestion model
+        // Sprint 83.6-RoastRoulette
+        public DbSet<RoastDeliveryLog> RoastDeliveryLogs { get; set; } = null!;
 
         #endregion
 
@@ -313,6 +315,7 @@ namespace MVP_Core.Data
             _ = modelBuilder.Entity<EscalationEvent>().ToTable("EscalationEvents");
             _ = modelBuilder.Entity<OnboardingStaging>().ToTable("OnboardingStaging"); // Sprint 83.3: SmartControlUX Gatekeeper Wizard
             _ = modelBuilder.Entity<FeatureSuggestion>().ToTable("FeatureSuggestions"); // Sprint 83.4: FeatureSuggestion model
+            _ = modelBuilder.Entity<RoastDeliveryLog>().ToTable("RoastDeliveryLogs"); // Sprint 83.6-RoastRoulette
 
             modelBuilder.Entity<RoastTemplate>().Property(r => r.Tier).HasConversion<string>();
         }

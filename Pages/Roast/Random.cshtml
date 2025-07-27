@@ -1,0 +1,41 @@
+@page
+@model MVP_Core.Pages.Roast.RandomModel
+@{
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Roast Roulette";
+}
+<!-- Sprint 83.6-RoastRoulette -->
+<h2>Roast Roulette</h2>
+@if (Model.SelectedRoast != null)
+{
+    <div class="roast-preview">
+        <h4>Tier: @Model.SelectedRoast.Tier</h4>
+        <p>Sentiment: @Model.SelectedRoast.Sentiment</p>
+        <p>Escalation Index: @Model.SelectedRoast.SuggestedEscalationIndex</p>
+        <div class="roast-message">
+            @Model.RoastMessage
+        </div>
+        <div id="countdown" style="font-weight:bold; color:red;">15</div>
+        <form method="post">
+            <input type="hidden" name="RoastTemplateId" value="@Model.SelectedRoast.RoastTemplateId" />
+            <button type="submit" name="action" value="confirm" class="btn btn-success">Confirm Delivery</button>
+            <button type="submit" name="action" value="cancel" class="btn btn-danger">Cancel</button>
+        </form>
+    </div>
+    <script>
+        let seconds = 15;
+        const countdown = document.getElementById('countdown');
+        const timer = setInterval(function() {
+            seconds--;
+            countdown.textContent = seconds;
+            if (seconds <= 0) {
+                clearInterval(timer);
+                document.querySelector('button[value="confirm"]').click();
+            }
+        }, 1000);
+    </script>
+}
+else
+{
+    <p>No roast available. Try again later.</p>
+}
