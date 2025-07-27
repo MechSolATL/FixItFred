@@ -132,6 +132,48 @@ namespace MVP_Core.Services.Email
             await SendEmailAsync(_serviceRequestFromEmail, _adminNotificationEmail, subject, plainText, html);
         }
 
+        // Helper to send certificate email with PDF attachment
+        public async Task SendTierCertificateEmailAsync(string toEmail, string customerName, string tierName, string tierDescription, string dashboardUrl, string pdfPath)
+        {
+            string subject = $"?? You've Unlocked the {tierName} Tier!";
+            string plainText = $"Congratulations {customerName}! You have unlocked the {tierName} tier. {tierDescription}. View your dashboard: {dashboardUrl}";
+            string html = $@"<div style='font-family:Poppins,sans-serif;line-height:1.6;'>
+                <h2>Congratulations, {customerName}!</h2>
+                <p>You have unlocked the <b>{tierName}</b> tier in our loyalty program.</p>
+                <p>{tierDescription}</p>
+                <p><a href='{dashboardUrl}' style='color:#007BFF;'>View your dashboard</a></p>
+                <p>Your certificate is attached. Keep up the great work!</p>
+                <p>- The Team</p>
+            </div>";
+            using (var client = new SmtpClient(_smtpHost, _smtpPort))
+            {
+                client.Credentials = new NetworkCredential(_smtpUsername, _smtpPassword);
+                client.EnableSsl = _useSsl;
+                using (var message = new MailMessage())
+                {
+                    message.From = new MailAddress(_noReplyFromEmail, _fromName);
+                    message.Subject = subject;
+                    message.Body = html;
+                    message.IsBodyHtml = true;
+                    message.To.Add(toEmail);
+                    if (File.Exists(pdfPath))
+                    {
+                        message.Attachments.Add(new Attachment(pdfPath));
+                    }
+                    try
+                    {
+                        await client.SendMailAsync(message);
+                        _logger.LogInformation("Tier certificate email sent to {Email}", toEmail);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Error sending tier certificate email to {Email}", toEmail);
+                        throw;
+                    }
+                }
+            }
+        }
+
         private static bool IsValidEmail(string email)
         {
             string emailRegex = @"^[^@\s]+@[^@\s]+\.[^@\s]+$";

@@ -1,23 +1,15 @@
 @* Sprint 83: SmartControlUX upgrade *@
 @page
 @model MVP_Core.Pages.Customer.DashboardModel
+@inject MVP_Core.Services.CustomerPortalService PortalService
 @{
     ViewData["Title"] = "Customer Dashboard";
-    var ticketCount = Model.Tickets?.Count ?? 0;
+    var ticketCount = Model.TicketCount;
     var avgSatisfaction = Model.AverageSatisfaction;
-    var kpiList = new List<dynamic> // Sprint 83.1: Typed Razor array/list initialization
-    {
-        new { Label = "Total Tickets", Value = ticketCount },
-        new { Label = "Avg Satisfaction", Value = avgSatisfaction.ToString("0.0") },
-        new { Label = "Open Tickets", Value = Model.Tickets?.Count(t => t.Status != "Complete" && t.Status != "Cancelled") ?? 0 },
-        new { Label = "Closed Tickets", Value = Model.Tickets?.Count(t => t.Status == "Complete" || t.Status == "Cancelled") ?? 0 }
-    };
-    // Sprint 83.4: Detection code removed to restore build stability
-    // @using Wangkanai.Detection
-    // @inject IDetectionService Detection
-    // bool isMobile = Detection.Device.Type == DeviceType.Mobile;
-    // bool isTablet = Detection.Device.Type == DeviceType.Tablet;
-    // bool isDesktop = Detection.Device.Type == DeviceType.Desktop;
+    var loyalty = PortalService.GetLoyaltyTransactions(User.Identity?.Name ?? string.Empty) ?? new List<MVP_Core.Data.Models.LoyaltyPointTransaction>();
+    var tiers = PortalService.GetRewardTiers() ?? new List<MVP_Core.Data.Models.RewardTier>();
+    var currentTier = tiers.LastOrDefault(t => loyalty.Sum(l => l.Points) >= t.PointsRequired);
+    var unlockedTiers = tiers.Where(t => loyalty.Sum(l => l.Points) >= t.PointsRequired).ToList();
 }
 
 <!-- Sprint 83: SmartControlUX upgrade -->
@@ -40,6 +32,25 @@
             <div class="text-2xl">@(Model.Tickets?.Count(t => t.Status == "Complete" || t.Status == "Cancelled") ?? 0)</div>
         </div>
     </div>
+    <!-- Reward Milestone Cards -->
+    @if (unlockedTiers.Any())
+    {
+        <div class="grid grid-cols-1 md:grid-cols-@unlockedTiers.Count gap-4 mb-6">
+            @foreach (var tier in unlockedTiers)
+            {
+                <div class="card bg-gradient-to-r from-green-100 to-green-300 shadow p-4 flex flex-col items-center border-2 border-success">
+                    <div class="text-lg font-bold">Milestone Unlocked!</div>
+                    <div class="text-2xl">@tier.Name</div>
+                    <div class="text-sm">@tier.Description</div>
+                    @if (!string.IsNullOrEmpty(tier.BadgeIcon))
+                    {
+                        <img src="@tier.BadgeIcon" alt="@tier.Name Badge" style="height:48px;" />
+                    }
+                    <div class="mt-2 text-success font-bold">?? @loyalty.Sum(l => l.Points) points</div>
+                </div>
+            }
+        </div>
+    }
     <div class="flex flex-col md:flex-row gap-4">
         <div class="flex-1">
             <button class="btn btn-primary mb-2" onclick="toggleSection('ticketTable')">Toggle Ticket Table</button>
@@ -103,6 +114,17 @@
         </div>
     </div>
 </div>
+@section Toasts {
+    @* Sprint 84.3: Live Alert Toasts for unlocked rewards *@
+    <div id="rewardToast" class="toast align-items-center text-bg-success border-0 position-fixed bottom-0 end-0 m-4" role="alert" aria-live="assertive" aria-atomic="true" style="display:none;z-index:9999;min-width:300px;">
+        <div class="d-flex">
+            <div class="toast-body">
+                ?? <b>Reward Unlocked!</b> You've reached a new milestone tier!
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+}
 @section Scripts {
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
@@ -195,6 +217,23 @@
                             return 'Avg. Resolution: ' + avgResolution + ' hrs';
                         }
                     }
+                }
+            }
+        }
+    });
+
+    // Sprint 84.3: Show toast if new tier unlocked
+    document.addEventListener('DOMContentLoaded', function() {
+        var unlockedTiers = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.UnlockedTiers.Select(t => t.Name)));
+        var lastToastTier = localStorage.getItem('lastToastTier');
+        if (unlockedTiers.length > 0) {
+            var latestTier = unlockedTiers[unlockedTiers.length - 1];
+            if (lastToastTier !== latestTier) {
+                var toastEl = document.getElementById('rewardToast');
+                if (toastEl) {
+                    toastEl.style.display = 'block';
+                    setTimeout(function() { toastEl.style.display = 'none'; }, 6000);
+                    localStorage.setItem('lastToastTier', latestTier);
                 }
             }
         }

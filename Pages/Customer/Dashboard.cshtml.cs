@@ -14,10 +14,12 @@ namespace MVP_Core.Pages.Customer
     {
         private readonly ApplicationDbContext _db;
         private readonly CustomerTicketAnalyticsService _analyticsService; // Sprint 46.2 – Customer Ticket Analytics Backend
+        private readonly CustomerPortalService _portalService;
         public DashboardModel(ApplicationDbContext db)
         {
             _db = db;
             _analyticsService = new CustomerTicketAnalyticsService(db); // Sprint 46.2 – Customer Ticket Analytics Backend
+            _portalService = new CustomerPortalService(db);
         }
 
         public List<ServiceRequest> Tickets { get; set; } = new();
@@ -32,6 +34,11 @@ namespace MVP_Core.Pages.Customer
         public int ClosedCount { get; set; }
         public double AvgResolutionHours { get; set; }
         public int[] SatisfactionHeatmap { get; set; } = new int[0];
+        // Sprint 84.3: Add properties for reward automation and UI feedback
+        public List<LoyaltyPointTransaction> Loyalty { get; set; } = new();
+        public List<RewardTier> Tiers { get; set; } = new();
+        public RewardTier? CurrentTier { get; set; }
+        public List<RewardTier> UnlockedTiers { get; set; } = new();
 
         public void OnGet()
         {
@@ -73,6 +80,12 @@ namespace MVP_Core.Pages.Customer
 
             // Sprint 46.3 – Dashboard Analytics: Satisfaction Heatmap
             SatisfactionHeatmap = Tickets.OrderByDescending(t => t.RequestedAt).Take(30).Select(t => t.SatisfactionScore ?? 0).ToArray();
+
+            // Sprint 84.3: Reward automation and UI feedback
+            Loyalty = _portalService.GetLoyaltyTransactions(customerEmail);
+            Tiers = _portalService.GetRewardTiers();
+            CurrentTier = Tiers.LastOrDefault(t => Loyalty.Sum(l => l.Points) >= t.PointsRequired);
+            UnlockedTiers = Tiers.Where(t => Loyalty.Sum(l => l.Points) >= t.PointsRequired).ToList();
         }
 
         public string GetStatusClass(string status)
