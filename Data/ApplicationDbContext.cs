@@ -137,6 +137,8 @@ namespace MVP_Core.Data
         public DbSet<TrustAnomalyLog> TrustAnomalyLogs { get; set; } = null!;
         public DbSet<TechnicianAwardLog> TechnicianAwardLogs { get; set; } = null!;
         public DbSet<RedemptionOpportunity> RedemptionOpportunities { get; set; } = null!;
+        public DbSet<GpsDriftEventLog> GpsDriftEventLogs { get; set; } = null!;
+        public DbSet<SlaMissAlert> SlaMissAlerts { get; set; } = null!;
 
         #endregion
 
@@ -251,6 +253,8 @@ namespace MVP_Core.Data
             modelBuilder.Entity<TrustAnomalyLog>().ToTable("TrustAnomalyLogs");
             modelBuilder.Entity<TechnicianAwardLog>().ToTable("TechnicianAwardLogs");
             modelBuilder.Entity<RedemptionOpportunity>().ToTable("RedemptionOpportunities");
+            _ = modelBuilder.Entity<GpsDriftEventLog>().ToTable("GpsDriftEventLogs");
+            _ = modelBuilder.Entity<SlaMissAlert>().ToTable("SlaMissAlerts");
         }
 
         #endregion

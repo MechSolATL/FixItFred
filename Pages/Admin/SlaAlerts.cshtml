@@ -1,0 +1,50 @@
+@page
+@model MVP_Core.Pages.Admin.SlaAlertsModel
+@{
+    ViewData["Title"] = "SLA Miss Alerts";
+    Layout = "/Pages/Shared/_Layout.cshtml";
+}
+<h2>SLA Miss Alerts</h2>
+<table class="table table-bordered table-hover">
+    <thead>
+        <tr>
+            <th>Technician</th>
+            <th>Scheduled Arrival</th>
+            <th>Actual Arrival</th>
+            <th>Service Request</th>
+            <th>Violation (min)</th>
+            <th>Auto-Flagged</th>
+            <th>Alert Sent</th>
+            <th>Status</th>
+            <th>Resolution</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var alert in Model.Alerts)
+        {
+            <tr>
+                <td>@alert.TechnicianId</td>
+                <td>@alert.ScheduledArrival.ToString("g")</td>
+                <td>@alert.ActualArrival.ToString("g")</td>
+                <td>@alert.ServiceRequestId</td>
+                <td>@alert.ViolationMinutes</td>
+                <td>@(alert.AutoFlagged ? "Yes" : "No")</td>
+                <td>@(alert.AlertSentAt?.ToString("g") ?? "-")</td>
+                <td>@alert.ResolutionStatus</td>
+                <td>
+                    @if (alert.ResolutionStatus == "Unresolved")
+                    {
+                        <form method="post">
+                            <input type="hidden" name="alertId" value="@alert.Id" />
+                            <button type="submit" class="btn btn-success btn-sm" formaction="?handler=Resolve">Resolve</button>
+                        </form>
+                    }
+                    else
+                    {
+                        <span class="badge bg-success">Resolved</span>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
