@@ -161,6 +161,9 @@ namespace MVP_Core.Data
         public DbSet<AnonymousReviewFormLog> AnonymousReviewFormLogs { get; set; } = null!;
         public DbSet<EmployeeConfidenceDecayLog> EmployeeConfidenceDecayLogs { get; set; } = null!;
         public DbSet<BreakComplianceOverrideLog> BreakComplianceOverrideLogs { get; set; } = null!;
+        public DbSet<OvertimeLockoutLog> OvertimeLockoutLogs { get; set; } = null!;
+        public DbSet<GeoBreakValidationLog> GeoBreakValidationLogs { get; set; } = null!;
+        public DbSet<IdleSessionMonitorLog> IdleSessionMonitorLogs { get; set; } = null!;
 
         #endregion
 
@@ -299,6 +302,9 @@ namespace MVP_Core.Data
             _ = modelBuilder.Entity<AnonymousReviewFormLog>().ToTable("AnonymousReviewFormLogs");
             _ = modelBuilder.Entity<EmployeeConfidenceDecayLog>().ToTable("EmployeeConfidenceDecayLogs");
             _ = modelBuilder.Entity<BreakComplianceOverrideLog>().ToTable("BreakComplianceOverrideLogs");
+            _ = modelBuilder.Entity<OvertimeLockoutLog>().ToTable("OvertimeLockoutLogs");
+            _ = modelBuilder.Entity<GeoBreakValidationLog>().ToTable("GeoBreakValidationLogs");
+            _ = modelBuilder.Entity<IdleSessionMonitorLog>().ToTable("IdleSessionMonitorLogs");
 
             modelBuilder.Entity<RoastTemplate>().Property(r => r.Tier).HasConversion<string>();
         }
