@@ -168,137 +168,300 @@ else if (Model.ActivityTimeline.Any())
   <button class="btn btn-sm btn-outline-info me-2" onclick="toggleMute('Info')">Mute Info</button>
   <button class="btn btn-sm btn-outline-danger" onclick="toggleMute('Warning')">Mute Warning</button>
 </div>
+<!-- Sprint 77.1 - LiveSync Analytics Mesh: Chart UI/JS Enhancements -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.1.0"></script>
 <script>
-    window.onload = function() {
-        document.getElementById('loadingSpinner').style.display = 'none';
-        if (typeof Chart !== 'undefined' && @Model.ActivityTimeline.Count > 0) {
-            var ctx = document.getElementById('activityChart').getContext('2d');
-            var chart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.ActivityTimeline.Select(x => x.Timestamp.ToString("MM-dd HH:mm")).ToList())),
-                    datasets: [{
-                        label: 'Activity Events',
-                        data: @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.ActivityTimeline.Select(x => x.Value).ToList())),
-                        borderColor: 'rgba(54, 162, 235, 1)',
-                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                        fill: true
-                    }]
-                },
-                options: { responsive: true }
+const chartConfigs = [
+    { id: 'trustScoreChart', type: 'line', chartType: 'trustScore', label: 'Trust Score', color: 'rgba(54,162,235,1)' },
+    { id: 'idleMinutesChart', type: 'bar', chartType: 'idleMinutes', label: 'Idle Minutes', color: 'rgba(255,193,7,1)' },
+    { id: 'geoBreakChart', type: 'pie', chartType: 'geoBreak', label: 'Geo Validation', color: 'rgba(40,167,69,1)' },
+    { id: 'overtimeChart', type: 'bar', chartType: 'overtime', label: 'Overtime Events', color: 'rgba(220,53,69,1)' },
+    { id: 'confidenceGeoChart', type: 'line', chartType: 'confidenceGeo', label: 'Confidence vs Geo', color: 'rgba(0,123,255,1)' },
+    { id: 'clockinTrustChart', type: 'line', chartType: 'clockinTrust', label: 'Clock-in vs Trust', color: 'rgba(108,117,125,1)' },
+    { id: 'overrideEmergencyChart', type: 'bar', chartType: 'overrideEmergency', label: 'Override vs Emergency', color: 'rgba(23,162,184,1)' }
+];
+// Layout preferences
+function saveLayoutPrefs() {
+    const prefs = chartConfigs.map(cfg => ({ id: cfg.id, visible: document.getElementById(cfg.id + '_toggle').checked }));
+    localStorage.setItem('employeeCentralChartPrefs', JSON.stringify(prefs));
+}
+function loadLayoutPrefs() {
+    const prefs = JSON.parse(localStorage.getItem('employeeCentralChartPrefs') || '[]');
+    prefs.forEach(pref => {
+        const chartDiv = document.getElementById(pref.id + '_container');
+        if (chartDiv) chartDiv.style.display = pref.visible ? '' : 'none';
+        const toggle = document.getElementById(pref.id + '_toggle');
+        if (toggle) toggle.checked = !!pref.visible;
+    });
+}
+function setupLayoutControls() {
+    chartConfigs.forEach(cfg => {
+        const toggle = document.getElementById(cfg.id + '_toggle');
+        if (toggle) toggle.addEventListener('change', () => {
+            document.getElementById(cfg.id + '_container').style.display = toggle.checked ? '' : 'none';
+            saveLayoutPrefs();
+        });
+    });
+    loadLayoutPrefs();
+}
+// Chart annotation logic
+function getDropAnnotations(data, threshold = 0.1) {
+    const annots = [];
+    for (let i = 1; i < data.length; i++) {
+        const drop = (data[i-1] - data[i]) / (data[i-1] || 1);
+        if (drop >= threshold) {
+            annots.push({
+                type: 'label',
+                xValue: i,
+                yValue: data[i],
+                backgroundColor: 'rgba(255,0,0,0.7)',
+                content: ['?? Drop >' + Math.round(drop*100) + '%'],
+                font: { size: 12 },
+                position: 'center',
+                callout: { display: true },
+                tooltip: { enabled: true, callbacks: { label: () => `Drop >${Math.round(drop*100)}% at ${i}` } }
             });
         }
-    };
-    var autoRefreshInterval = null;
-    function toggleAutoRefresh() {
-        var btn = document.getElementById('autoRefreshBtn');
-        if (autoRefreshInterval) {
-            clearInterval(autoRefreshInterval);
-            autoRefreshInterval = null;
-            btn.textContent = 'Start Auto-Refresh';
-            btn.classList.remove('btn-danger');
-            btn.classList.add('btn-success');
-        } else {
-            autoRefreshInterval = setInterval(function() {
-                document.getElementById('loadingSpinner').style.display = 'block';
-                location.reload();
-            }, 60000); // 60 seconds
-            btn.textContent = 'Stop Auto-Refresh';
-            btn.classList.remove('btn-success');
-            btn.classList.add('btn-danger');
-        }
     }
-    // Live notification polling (demo: random alert)
-    setInterval(function() {
-        var area = document.getElementById('notificationArea');
-        if (Math.random() < 0.05) {
-            area.textContent = 'New severe flag detected!';
-            area.classList.remove('d-none');
-        } else {
-            area.classList.add('d-none');
-        }
-    }, 120000);
-    function quickDate(days) {
-        var start = new Date();
-        start.setDate(start.getDate() - parseInt(days));
-        document.querySelector('input[name="StartDate"]').value = start.toISOString().slice(0,10);
-        document.querySelector('input[name="EndDate"]').value = new Date().toISOString().slice(0,10);
+    return annots;
+}
+function renderChart(config, data) {
+    const ctx = document.getElementById(config.id).getContext('2d');
+    if (window[config.id + '_instance']) window[config.id + '_instance'].destroy();
+    let chartData = {};
+    let plugins = [ChartAnnotation];
+    let options = { responsive: true, plugins: { legend: { position: 'bottom' } } };
+    if (config.chartType === 'confidenceGeo') {
+        chartData = {
+            labels: data.labels,
+            datasets: [
+                { label: 'Confidence', data: data.confidence, borderColor: config.color, backgroundColor: config.color, fill: false },
+                { label: 'Geo Flags', data: data.geoFlags, borderColor: 'rgba(255,193,7,1)', backgroundColor: 'rgba(255,193,7,0.2)', fill: false }
+            ]
+        };
+        options.plugins.annotation = { annotations: getDropAnnotations(data.confidence) };
+    } else if (config.chartType === 'clockinTrust') {
+        chartData = {
+            labels: data.labels,
+            datasets: [
+                { label: 'Late Clock-in', data: data.lateClockin, borderColor: config.color, backgroundColor: config.color, fill: false },
+                { label: 'Trust', data: data.trust, borderColor: 'rgba(40,167,69,1)', backgroundColor: 'rgba(40,167,69,0.2)', fill: false }
+            ]
+        };
+        options.plugins.annotation = { annotations: getDropAnnotations(data.trust) };
+    } else if (config.chartType === 'trustScore') {
+        chartData = {
+            labels: data.labels,
+            datasets: [{ label: config.label, data: data.data, borderColor: config.color, backgroundColor: config.color, fill: false }]
+        };
+        options.plugins.annotation = { annotations: getDropAnnotations(data.data) };
+    } else if (config.chartType === 'overrideEmergency') {
+        chartData = {
+            labels: data.labels,
+            datasets: [
+                { label: 'Override', data: data['override'], backgroundColor: config.color },
+                { label: 'Emergency', data: data.emergency, backgroundColor: 'rgba(220,53,69,0.7)' }
+            ]
+        };
+    } else if (config.chartType === 'geoBreak') {
+        chartData = {
+            labels: data.labels,
+            datasets: [{ label: config.label, data: data.data, backgroundColor: [config.color, 'rgba(220,53,69,0.7)', 'rgba(255,193,7,0.7)'] }]
+        };
+    } else if (config.chartType === 'overtime') {
+        chartData = {
+            labels: data.labels,
+            datasets: [{ label: config.label, data: data.data, backgroundColor: [config.color, 'rgba(220,53,69,0.7)', 'rgba(255,193,7,0.7)'] }]
+        };
+    } else {
+        chartData = {
+            labels: data.labels,
+            datasets: [{ label: config.label, data: data.data, borderColor: config.color, backgroundColor: config.color, fill: false }]
+        };
     }
-    function showStatDetail(type) {
-        // AJAX call to get analytics for the stat card
-        fetch(`/Admin/EmployeeCentral?handler=Analytics&metricType=${type}`)
-            .then(response => response.text())
-            .then(html => {
-                document.getElementById('analyticsModalBody').innerHTML = html + '<canvas id="analyticsChart" height="120"></canvas>';
-                var modal = new bootstrap.Modal(document.getElementById('analyticsModal'));
-                modal.show();
-                // Optionally, initialize Chart.js here with returned data
-            });
-    }
-    function openDrilldownModal(ticks) {
-    // AJAX call to get details for the log item
-    fetch(`/Admin/EmployeeCentral?handler=Drilldown&timestampTicks=${ticks}`)
-        .then(response => response.text())
-        .then(html => {
-            document.getElementById('drilldownModalBody').innerHTML = html;
-            var modal = new bootstrap.Modal(document.getElementById('drilldownModal'));
-            modal.show();
-        });
+    window[config.id + '_instance'] = new Chart(ctx, {
+        type: config.type,
+        data: chartData,
+        options,
+        plugins
+    });
 }
-function openProfileModal(employeeName) {
-    // AJAX call to get profile details
-    fetch(`/Admin/EmployeeCentral?handler=Profile&employeeName=${encodeURIComponent(employeeName)}`)
-        .then(response => response.text())
-        .then(html => {
-            document.getElementById('profileModalBody').innerHTML = html + '<canvas id="profileSparkline" height="60"></canvas><canvas id="profileHeatmap" height="120"></canvas>';
-            var modal = new bootstrap.Modal(document.getElementById('profileModal'));
-            modal.show();
-            // Optionally, initialize Chart.js sparkline/heatmap here
-        });
+function loadCharts() {
+    chartConfigs.forEach(config => {
+        fetch(`/Admin/EmployeeCentral?handler=ChartData&chartType=${config.chartType}`)
+            .then(resp => resp.json())
+            .then(data => renderChart(config, data));
+    });
 }
-let mutedTypes = {};
-function showToast(message, severity) {
-    if (mutedTypes[severity]) return;
-    var toastId = 'toast-' + Date.now();
-    var toast = document.createElement('div');
-    toast.className = 'toast align-items-center text-bg-' + (severity === 'Severe' ? 'danger' : severity === 'Info' ? 'info' : 'warning') + ' border-0 show';
-    toast.id = toastId;
-    toast.setAttribute('role', 'alert');
-    toast.setAttribute('aria-live', 'assertive');
-    toast.setAttribute('aria-atomic', 'true');
-    toast.innerHTML = `<div class="d-flex"><div class="toast-body">${message}</div><button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close" onclick="removeToast('${toastId}')"></button></div>`;
-    document.getElementById('toastContainer').appendChild(toast);
-    setTimeout(function() { removeToast(toastId); addToHistory(message, severity); }, 6000);
+// Auto-refresh logic
+let chartAutoRefresh = true;
+function setChartAutoRefresh(enabled) {
+    chartAutoRefresh = enabled;
+    document.getElementById('chartAutoRefreshToggle').checked = enabled;
 }
-function removeToast(id) {
-    var toast = document.getElementById(id);
-    if (toast) toast.remove();
-}
-function addToHistory(message, severity) {
-    var history = document.getElementById('notificationHistory');
-    var entry = document.createElement('div');
-    entry.className = 'border-bottom p-2';
-    entry.innerHTML = `<span class="badge bg-${severity === 'Severe' ? 'danger' : severity === 'Info' ? 'info' : 'warning'} me-2">${severity}</span>${message}`;
-    history.prepend(entry);
-}
-function toggleNotificationHistory() {
-    var history = document.getElementById('notificationHistory');
-    history.style.display = history.style.display === 'none' ? 'block' : 'none';
-}
-function toggleMute(type) {
-    mutedTypes[type] = !mutedTypes[type];
-}
+document.getElementById('chartAutoRefreshToggle').addEventListener('change', function() {
+    setChartAutoRefresh(this.checked);
+});
+setInterval(() => {
+    if (chartAutoRefresh) loadCharts();
+}, 60000);
+window.addEventListener('DOMContentLoaded', () => {
+    loadCharts();
+    setupLayoutControls();
+});
+// SignalR notification highlight
+const chartAlertMap = {};
 const notificationConnection = new signalR.HubConnectionBuilder()
     .withUrl("/notificationHub")
     .configureLogging(signalR.LogLevel.Information)
     .build();
 notificationConnection.on("ReceiveNotification", function (message, severity) {
-    showToast(message, severity);
+    chartConfigs.forEach(cfg => {
+        if (message.includes(cfg.label) || message.includes(cfg.chartType)) {
+            const card = document.getElementById(cfg.id + '_container');
+            if (card) {
+                card.classList.add('border-danger', 'border-3');
+                let icon = document.createElement('span');
+                icon.innerHTML = '??';
+                icon.className = 'ms-2 chart-alert-icon';
+                card.querySelector('.card-header').appendChild(icon);
+                setTimeout(() => {
+                    card.classList.remove('border-danger', 'border-3');
+                    if (icon) icon.remove();
+                }, 4000);
+            }
+        }
+    });
 });
 notificationConnection.start().catch(function (err) {
     console.error("SignalR notification connection error: ", err.toString());
 });
 </script>
+<div class="mb-3">
+    <label class="form-label"><input type="checkbox" id="chartAutoRefreshToggle" checked> Auto-refresh charts every 60s</label>
+    <span class="ms-3">Show/hide charts:</span>
+    <span>
+        <!-- Layout toggles for each chart -->
+        <input type="checkbox" id="trustScoreChart_toggle" checked> Trust Score
+        <input type="checkbox" id="idleMinutesChart_toggle" checked> Idle Minutes
+        <input type="checkbox" id="geoBreakChart_toggle" checked> Geo Validation
+        <input type="checkbox" id="overtimeChart_toggle" checked> Overtime
+        <input type="checkbox" id="confidenceGeoChart_toggle" checked> Confidence/Geo
+        <input type="checkbox" id="clockinTrustChart_toggle" checked> Clock-in/Trust
+        <input type="checkbox" id="overrideEmergencyChart_toggle" checked> Override/Emergency
+    </span>
+</div>
+<!-- Chart containers with IDs for layout control -->
+<div class="row mb-4">
+    <div class="col-md-6 mb-4" id="trustScoreChart_container">
+        <div class="card shadow-sm">
+            <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+                Trust Score Chart
+                <div>
+                    <button class="btn btn-sm btn-outline-secondary export-csv" data-chart="trustScoreChart">CSV</button>
+                    <button class="btn btn-sm btn-outline-secondary export-excel" data-chart="trustScoreChart">Excel</button>
+                    <button class="btn btn-sm btn-outline-secondary export-pdf" data-chart="trustScoreChart">PDF</button>
+                </div>
+            </div>
+            <div class="card-body">
+                <canvas id="trustScoreChart" height="120"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 mb-4" id="idleMinutesChart_container">
+        <div class="card shadow-sm">
+            <div class="card-header bg-warning text-dark d-flex justify-content-between align-items-center">
+                Idle Minutes Chart
+                <div>
+                    <button class="btn btn-sm btn-outline-secondary export-csv" data-chart="idleMinutesChart">CSV</button>
+                    <button class="btn btn-sm btn-outline-secondary export-excel" data-chart="idleMinutesChart">Excel</button>
+                    <button class="btn btn-sm btn-outline-secondary export-pdf" data-chart="idleMinutesChart">PDF</button>
+                </div>
+            </div>
+            <div class="card-body">
+                <canvas id="idleMinutesChart" height="120"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row mb-4">
+    <div class="col-md-6 mb-4" id="geoBreakChart_container">
+        <div class="card shadow-sm">
+            <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                Geo Validation Chart
+                <div>
+                    <button class="btn btn-sm btn-outline-secondary export-csv" data-chart="geoBreakChart">CSV</button>
+                    <button class="btn btn-sm btn-outline-secondary export-excel" data-chart="geoBreakChart">Excel</button>
+                    <button class="btn btn-sm btn-outline-secondary export-pdf" data-chart="geoBreakChart">PDF</button>
+                </div>
+            </div>
+            <div class="card-body">
+                <canvas id="geoBreakChart" height="120"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 mb-4" id="overtimeChart_container">
+        <div class="card shadow-sm">
+            <div class="card-header bg-danger text-white d-flex justify-content-between align-items-center">
+                Overtime Events Chart
+                <div>
+                    <button class="btn btn-sm btn-outline-secondary export-csv" data-chart="overtimeChart">CSV</button>
+                    <button class="btn btn-sm btn-outline-secondary export-excel" data-chart="overtimeChart">Excel</button>
+                    <button class="btn btn-sm btn-outline-secondary export-pdf" data-chart="overtimeChart">PDF</button>
+                </div>
+            </div>
+            <div class="card-body">
+                <canvas id="overtimeChart" height="120"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row mb-4">
+    <div class="col-md-4 mb-4" id="confidenceGeoChart_container">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                Confidence Decay vs Geo
+                <div>
+                    <button class="btn btn-sm btn-outline-secondary export-csv" data-chart="confidenceGeoChart">CSV</button>
+                    <button class="btn btn-sm btn-outline-secondary export-excel" data-chart="confidenceGeoChart">Excel</button>
+                    <button class="btn btn-sm btn-outline-secondary export-pdf" data-chart="confidenceGeoChart">PDF</button>
+                </div>
+            </div>
+            <div class="card-body">
+                <canvas id="confidenceGeoChart" height="120"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-4" id="clockinTrustChart_container">
+        <div class="card shadow-sm">
+            <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center">
+                Clock-in Stats vs Trust
+                <div>
+                    <button class="btn btn-sm btn-outline-secondary export-csv" data-chart="clockinTrustChart">CSV</button>
+                    <button class="btn btn-sm btn-outline-secondary export-excel" data-chart="clockinTrustChart">Excel</button>
+                    <button class="btn btn-sm btn-outline-secondary export-pdf" data-chart="clockinTrustChart">PDF</button>
+                </div>
+            </div>
+            <div class="card-body">
+                <canvas id="clockinTrustChart" height="120"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-4" id="overrideEmergencyChart_container">
+        <div class="card shadow-sm">
+            <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+                Override Use vs Emergencies
+                <div>
+                    <button class="btn btn-sm btn-outline-secondary export-csv" data-chart="overrideEmergencyChart">CSV</button>
+                    <button class="btn btn-sm btn-outline-secondary export-excel" data-chart="overrideEmergencyChart">Excel</button>
+                    <button class="btn btn-sm btn-outline-secondary export-pdf" data-chart="overrideEmergencyChart">PDF</button>
+                </div>
+            </div>
+            <div class="card-body">
+                <canvas id="overrideEmergencyChart" height="120"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Sprint 77.1 Chart UI/JS Enhancements -->

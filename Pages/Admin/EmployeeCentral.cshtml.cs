@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using MVP_Core.Data;
 using MVP_Core.Data.Models;
@@ -6,9 +7,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using MVP_Core.Hubs;
+using Newtonsoft.Json;
 
 namespace MVP_Core.Pages.Admin
 {
@@ -168,5 +169,52 @@ namespace MVP_Core.Pages.Admin
         {
             await _hubContext.Clients.All.SendAsync("ReceiveNotification", message, severity);
         }
-    }
-}
+        // Chart data endpoints for AJAX
+        public JsonResult OnGetChartData(string chartType, int? techId, DateTime? startDate, DateTime? endDate)
+        {
+            switch (chartType)
+            {
+                case "trustScore":
+                    return new JsonResult(new {
+                        labels = Enumerable.Range(0, 7).Select(i => DateTime.Today.AddDays(-i).ToString("MM-dd")).Reverse().ToList(),
+                        data = new List<double> { 7.2, 7.5, 7.1, 7.8, 7.6, 7.4, 7.7 }
+                    });
+                case "idleMinutes":
+                    return new JsonResult(new {
+                        labels = Enumerable.Range(0, 7).Select(i => DateTime.Today.AddDays(-i).ToString("MM-dd")).Reverse().ToList(),
+                        data = new List<int> { 12, 8, 15, 10, 9, 14, 11 }
+                    });
+                case "geoBreak":
+                    return new JsonResult(new {
+                        labels = new List<string> { "Valid", "Invalid", "Override" },
+                        data = new List<int> { 18, 5, 3 }
+                    });
+                case "overtime":
+                    return new JsonResult(new {
+                        labels = new List<string> { "Standard", "Emergency", "Override" },
+                        data = new List<int> { 10, 4, 2 }
+                    });
+                case "confidenceGeo":
+                    return new JsonResult(new {
+                        labels = Enumerable.Range(0, 7).Select(i => DateTime.Today.AddDays(-i).ToString("MM-dd")).Reverse().ToList(),
+                        confidence = new List<double> { 8.1, 7.9, 7.5, 7.2, 7.0, 6.8, 6.5 },
+                        geoFlags = new List<int> { 1, 2, 1, 3, 2, 1, 2 }
+                    });
+                case "clockinTrust":
+                    return new JsonResult(new {
+                        labels = Enumerable.Range(0, 7).Select(i => DateTime.Today.AddDays(-i).ToString("MM-dd")).Reverse().ToList(),
+                        lateClockin = new List<int> { 2, 1, 0, 3, 1, 2, 1 },
+                        trust = new List<double> { 7.2, 7.1, 7.0, 6.8, 7.0, 7.3, 7.4 }
+                    });
+                case "overrideEmergency":
+                    return new JsonResult(new {
+                        labels = Enumerable.Range(0, 7).Select(i => DateTime.Today.AddDays(-i).ToString("MM-dd")).Reverse().ToList(),
+                        @override = new List<int> { 1, 0, 2, 1, 3, 2, 1 },
+                        emergency = new List<int> { 0, 1, 1, 2, 1, 0, 1 }
+                    });
+                default:
+                    return new JsonResult(new { labels = new List<string>(), data = new List<int>() });
+            }
+        }
+    } // End of class
+} // End of namespace
