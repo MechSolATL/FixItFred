@@ -1,6 +1,7 @@
 using MVP_Core.Data.Models;
 using MVP_Core.Services.Admin;
 using MVP_Core.Services.Dispatch;
+using System.Linq;
 
 namespace MVP_Core.Data.Seeders
 {
@@ -548,5 +549,20 @@ namespace MVP_Core.Data.Seeders
             db.SaveChanges();
         }
 #endif
+        public static void SeedOnboardingRoasts(ApplicationDbContext db)
+        {
+            if (!db.RoastTemplates.Any(r => r.Category == "Onboarding"))
+            {
+                var onboardingRoasts = new[]
+                {
+                    new RoastTemplate { Message = "Your onboarding answers are so diplomatic, even Switzerland is jealous.", Tier = RoastTier.Soft, Category = "Onboarding", UseLimit = 10, TimesUsed = 0 },
+                    new RoastTemplate { Message = "You dodged more questions than a politician at a debate.", Tier = RoastTier.Medium, Category = "Onboarding", UseLimit = 10, TimesUsed = 0 },
+                    new RoastTemplate { Message = "Your confidence bias is so strong, the mirrors ask you for advice.", Tier = RoastTier.Savage, Category = "Onboarding", UseLimit = 10, TimesUsed = 0 },
+                    new RoastTemplate { Message = "If self-awareness was a sport, you'd be the referee and the player—at the same time.", Tier = RoastTier.Brutal, Category = "Onboarding", UseLimit = 10, TimesUsed = 0 }
+                };
+                db.RoastTemplates.AddRange(onboardingRoasts);
+                db.SaveChanges();
+            }
+        }
     }
 }

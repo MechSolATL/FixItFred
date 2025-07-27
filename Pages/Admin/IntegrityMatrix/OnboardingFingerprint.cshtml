@@ -1,0 +1,30 @@
+@page
+@using MVP_Core.Data.Models
+@model MVP_Core.Pages.Admin.IntegrityMatrix.OnboardingFingerprintModel
+@{
+    ViewData["Title"] = "Onboarding Fingerprint";
+}
+
+<h2>Onboarding Fingerprint</h2>
+@if (!Model.HasAccess)
+{
+    <div class="alert alert-danger">Access denied. Only system-level HR diagnostic users may view this page.</div>
+}
+else
+{
+    <div>
+        <h4>Employee ID: @Model.Profile?.EmployeeId</h4>
+        <p>Submission Date: @Model.Profile?.SubmissionDate</p>
+        <h5>Trait Scores</h5>
+        <pre>@Model.Profile?.TraitScoresJson</pre>
+        <h5>Raw Answers</h5>
+        <pre>@Model.Profile?.RawAnswersJson</pre>
+        <form method="post">
+            <button type="submit" class="btn btn-warning" asp-page-handler="Flag" asp-route-id="@Model.Profile?.Id">Flag for Review</button>
+        </form>
+        @if (Model.Profile?.ReviewRequired == true)
+        {
+            <div class="alert alert-warning">This profile is flagged for review.</div>
+        }
+    </div>
+}

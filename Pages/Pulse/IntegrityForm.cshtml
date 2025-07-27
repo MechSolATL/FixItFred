@@ -1,0 +1,26 @@
+@page
+@using MVP_Core.Data.Models
+@model MVP_Core.Pages.Pulse.IntegrityFormModel
+@{
+    ViewData["Title"] = "Integrity Intake";
+}
+
+<h2>Integrity Intake Form</h2>
+<p class="lead">Select what feels most like you. Your answers are private and help us build a supportive team culture.</p>
+<form method="post">
+    @for (int i = 0; i < Model.Questions.Count; i++)
+    {
+        <div class="mb-3">
+            <label><strong>@Model.Questions[i]</strong></label><br />
+            @foreach (var option in Model.Options[i])
+            {
+                <input type="radio" name="Answers[@i]" value="@option" required /> @option<br />
+            }
+        </div>
+    }
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+@if (Model.Submitted)
+{
+    <div class="alert alert-success">Thank you for submitting your onboarding profile!</div>
+}

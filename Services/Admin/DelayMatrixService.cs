@@ -39,6 +39,7 @@ namespace MVP_Core.Services.Admin
 
         public async Task<List<TrustCascadeLog>> GetTrustCascadesAsync()
         {
+            // Ensure only CreatedAt is used, not CreatedAtAF
             return await _db.Set<TrustCascadeLog>().OrderByDescending(t => t.CreatedAt).ToListAsync();
         }
         public async Task LogCascadeAsync(TrustCascadeLog log)
