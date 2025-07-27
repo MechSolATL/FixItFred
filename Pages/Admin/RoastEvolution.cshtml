@@ -1,0 +1,105 @@
+@page
+@model MVP_Core.Pages.Admin.RoastEvolutionModel
+@{
+    ViewData["Title"] = "Roast Evolution Vault";
+}
+<h2>Roast Evolution Vault</h2>
+<div>
+    <h3>Vault Review</h3>
+    <div>
+        <canvas id="successRateChart"></canvas>
+    </div>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Message</th>
+                <th>Tier</th>
+                <th>Category</th>
+                <th>Success %</th>
+                <th>Badges</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var roast in Model.RoastTemplates)
+        {
+            <tr>
+                <td>@roast.Message</td>
+                <td>@roast.Tier</td>
+                <td>@roast.Category</td>
+                <td>@roast.SuccessRate</td>
+                <td>
+                    @if (roast.LegacyStatus) { <span class="badge bg-warning">Legacy</span> }
+                    @if (roast.Retired) { <span class="badge bg-danger">Retired</span> }
+                    @if (roast.AIAuthored) { <span class="badge bg-info">AI</span> }
+                </td>
+                <td>
+                    <form method="post" asp-page-handler="Promote" asp-route-id="@roast.Id"><button class="btn btn-success" type="submit">Promote</button></form>
+                    <form method="post" asp-page-handler="Retire" asp-route-id="@roast.Id"><button class="btn btn-danger" type="submit">Retire</button></form>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>
+<div>
+    <h3>Evolution History</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Timestamp</th>
+                <th>EditType</th>
+                <th>Editor</th>
+                <th>Notes</th>
+                <th>Previous</th>
+                <th>New</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var log in Model.EvolutionLogs)
+        {
+            <tr>
+                <td>@log.Timestamp</td>
+                <td>@log.EditType</td>
+                <td>@log.Editor</td>
+                <td>@log.Notes</td>
+                <td>@log.PreviousMessage</td>
+                <td>@log.NewMessage</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>
+<div>
+    <h3>Manual AI Seed Input</h3>
+    <form method="post" asp-page-handler="AISeed">
+        <textarea name="Prompt" rows="3" cols="60" placeholder="Enter AI prompt..."></textarea><br />
+        <button type="submit" class="btn btn-primary">Generate Preview</button>
+    </form>
+    @if (Model.AIPreview != null)
+    {
+        <h4>AI Preview</h4>
+        <ul>
+        @foreach (var roast in Model.AIPreview)
+        {
+            <li>@roast.Message (@roast.Tier, @roast.Category)</li>
+        }
+        </ul>
+    }
+</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Chart.js for success rate chart
+    var ctx = document.getElementById('successRateChart').getContext('2d');
+    var chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.RoastTemplates.Select(r => r.Message).ToList())),
+            datasets: [{
+                label: 'Success %',
+                data: @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.RoastTemplates.Select(r => r.SuccessRate).ToList())),
+                backgroundColor: 'rgba(54, 162, 235, 0.5)'
+            }]
+        }
+    });
+</script>

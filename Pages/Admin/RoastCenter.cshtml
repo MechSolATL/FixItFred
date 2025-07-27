@@ -116,6 +116,7 @@
                 <th>Roast</th>
                 <th>Level</th>
                 <th>Delivered At</th>
+                <th>Badges</th>
             </tr>
         </thead>
         <tbody>
@@ -126,6 +127,11 @@
                 <td>@roast.RoastMessage</td>
                 <td>@(roast.RoastLevel == 1 ? "Light" : roast.RoastLevel == 2 ? "Medium" : "Savage")</td>
                 <td>@roast.DeliveredAt?.ToString("g")</td>
+                <td>
+                    @if (roast.RoastTemplate?.LegacyStatus == true) { <span class="badge bg-warning">Legacy</span> }
+                    @if (roast.RoastTemplate?.Retired == true) { <span class="badge bg-danger">Retired</span> }
+                    @if (roast.RoastTemplate?.AIAuthored == true) { <span class="badge bg-info">AI</span> }
+                </td>
             </tr>
         }
         </tbody>

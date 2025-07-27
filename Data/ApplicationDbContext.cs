@@ -149,6 +149,7 @@ namespace MVP_Core.Data
         public DbSet<NewHireRoastLog> NewHireRoastLogs { get; set; } = null!;
         public DbSet<RoastTemplate> RoastTemplates { get; set; } = null!;
         public DbSet<RoastReactionLog> RoastReactionLogs { get; set; } = null!;
+        public DbSet<RoastEvolutionLog> RoastEvolutionLogs { get; set; } = null!;
 
         #endregion
 
@@ -275,6 +276,7 @@ namespace MVP_Core.Data
             _ = modelBuilder.Entity<NewHireRoastLog>().ToTable("NewHireRoastLogs");
             _ = modelBuilder.Entity<RoastTemplate>().ToTable("RoastTemplates");
             _ = modelBuilder.Entity<RoastReactionLog>().ToTable("RoastReactionLogs");
+            _ = modelBuilder.Entity<RoastEvolutionLog>().ToTable("RoastEvolutionLogs");
 
             modelBuilder.Entity<RoastTemplate>().Property(r => r.Tier).HasConversion<string>();
         }

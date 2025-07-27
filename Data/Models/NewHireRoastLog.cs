@@ -11,4 +11,7 @@ public class NewHireRoastLog
     public int ReactionScore { get; set; } // Aggregate or average score
     public string? ResponseNote { get; set; } // Nullable feedback note
     public DateTime? ReceivedAt { get; set; } // Timestamp when feedback received
+    // Sprint 73.9: Link to RoastTemplate for badge display
+    public int? RoastTemplateId { get; set; }
+    public RoastTemplate? RoastTemplate { get; set; }
 }

@@ -32,8 +32,8 @@ namespace MVP_Core.Pages.Admin
 
         public async Task OnGetAsync()
         {
-            PendingRoasts = await _roastEngine.GetPendingRoastsAsync();
-            PastRoasts = await _db.NewHireRoastLogs.Where(x => x.IsDelivered).OrderByDescending(x => x.DeliveredAt).ToListAsync();
+            PendingRoasts = await _db.NewHireRoastLogs.Include(x => x.RoastTemplate).Where(x => !x.IsDelivered).OrderBy(x => x.ScheduledFor).ToListAsync();
+            PastRoasts = await _db.NewHireRoastLogs.Include(x => x.RoastTemplate).Where(x => x.IsDelivered).OrderByDescending(x => x.DeliveredAt).ToListAsync();
             RoastRankScores = await _roastEngine.GetRoastRankScoresAsync();
             RoastRouletteLog = await _db.NewHireRoastLogs.Where(x => x.IsDelivered && x.RoastMessage.Contains("Roulette")).OrderByDescending(x => x.DeliveredAt).ToListAsync();
         }
