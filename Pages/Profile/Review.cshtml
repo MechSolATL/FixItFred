@@ -1,0 +1,18 @@
+@* Sprint 84.0 — Badge Display *@
+@page
+@model MVP_Core.Pages.Profile.ProfileReviewModel
+@{
+    ViewData["Title"] = "Profile Review";
+    Layout = "/Pages/Shared/_Layout.cshtml";
+    var onboardingStatus = ViewBag.OnboardingStatus as MVP_Core.Data.Models.UserOnboardingStatus; // Use ViewBag for onboarding status
+}
+
+<!-- Profile Review UI -->
+<h2>Profile Review</h2>
+
+@if (onboardingStatus != null && onboardingStatus.IsProsCertified)
+{
+    <span class="badge bg-success" title="P.R.O.S. Certified">? PROS Certified</span>
+}
+
+<!-- ...existing profile review UI... -->

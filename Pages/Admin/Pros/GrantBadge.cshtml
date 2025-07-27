@@ -1,0 +1,27 @@
+@* Sprint 84.0 — Admin Grant Badge UI *@
+@page
+@model MVP_Core.Pages.Admin.Pros.GrantBadgeModel
+@{
+    ViewData["Title"] = "Grant PROS Certification";
+    Layout = "/Pages/Shared/_Layout.cshtml";
+}
+
+<h2>Grant PROS Certification</h2>
+
+<form method="post">
+    <div class="mb-3">
+        <label for="userSelect" class="form-label">Select User to Grant Certification:</label>
+        <select id="userSelect" name="SelectedUserId" class="form-select">
+            @foreach (var user in Model.EligibleUsers)
+            {
+                <option value="@user.UserId">@user.DisplayName (@user.Email)</option>
+            }
+        </select>
+    </div>
+    <button type="submit" class="btn btn-success">Grant PROS Certification</button>
+</form>
+
+@if (Model.GrantResultMessage != null)
+{
+    <div class="alert alert-info mt-3">@Model.GrantResultMessage</div>
+}

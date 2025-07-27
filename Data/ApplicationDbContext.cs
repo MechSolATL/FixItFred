@@ -170,6 +170,7 @@ namespace MVP_Core.Data
         public DbSet<FeatureSuggestion> FeatureSuggestions { get; set; } = null!; // Sprint 83.4: FeatureSuggestion model
         // Sprint 83.6-RoastRoulette
         public DbSet<RoastDeliveryLog> RoastDeliveryLogs { get; set; } = null!;
+        public DbSet<UserOnboardingStatus> UserOnboardingStatuses { get; set; } = null!; // Sprint 84.0 — OnboardingStatus Schema
 
         #endregion
 

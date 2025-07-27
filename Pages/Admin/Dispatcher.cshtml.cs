@@ -34,11 +34,13 @@ using DispatcherAuditLog = MVP_Core.Models.Admin.DispatcherAuditLog;
 using MVP_Core.Data.Models.ViewModels;
 using MVP_Core.Services.Dispatch; // FixItFred: Sprint 30D.2 — Add using for NotificationDispatchEngine to resolve CS0246 2024-07-25
 using MVP_Core.Services; // Sprint 32.2 - Security + Audit Harden
+using MVP_Core.Middleware; // Sprint 84.0 — Feature Access Block Enforcement
 
 namespace MVP_Core.Pages.Admin
 {
     // FixItFred — Sprint 40.4 Authorization Scope Fix
     [Authorize(Roles = "Admin")]
+    [RequireProsCertification]
     public class DispatcherModel : PageModel
     {
         private readonly DispatcherService _dispatcherService; // Sprint 79.2
