@@ -87,6 +87,9 @@ builder.Services.AddScoped<TrustCascadeEngine>();
 builder.Services.AddScoped<AutoEscalationEngine>();
 builder.Services.AddScoped<InactivityHeatmapAgent>();
 builder.Services.AddScoped<GhostDelayAuditor>();
+builder.Services.AddScoped<MVP_Core.Services.Admin.OvertimeDefenseService>();
+builder.Services.AddScoped<MVP_Core.Services.Admin.GeoBreakValidatorService>();
+builder.Services.AddScoped<MVP_Core.Services.Admin.IdleSessionMonitorService>();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));

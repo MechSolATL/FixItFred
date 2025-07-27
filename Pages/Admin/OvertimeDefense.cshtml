@@ -1,0 +1,27 @@
+@page
+@model MVP_Core.Pages.Admin.OvertimeDefenseModel
+@{
+    ViewData["Title"] = "Overtime Defense";
+    Layout = "/Pages/Shared/_Layout.cshtml";
+}
+<h2>Overtime Defense Engine</h2>
+<form method="get">
+    <label>Technician ID:</label>
+    <input type="number" name="TechnicianId" value="@Model.TechnicianId" />
+    <button type="submit">Filter</button>
+</form>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Time</th><th>Tech ID</th><th>Event</th><th>Decision</th><th>Override</th><th>Approver</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var log in Model.Logs)
+    {
+        <tr>
+            <td>@log.EventTime</td><td>@log.TechnicianId</td><td>@log.EventType</td><td>@log.SystemDecision</td><td>@log.IsOverride</td><td>@log.Approver</td>
+        </tr>
+    }
+    </tbody>
+</table>

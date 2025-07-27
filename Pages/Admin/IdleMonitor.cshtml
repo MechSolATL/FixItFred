@@ -1,0 +1,27 @@
+@page
+@model MVP_Core.Pages.Admin.IdleMonitorModel
+@{
+    ViewData["Title"] = "Idle Session Monitor";
+    Layout = "/Pages/Shared/_Layout.cshtml";
+}
+<h2>Idle Session Monitor</h2>
+<form method="get">
+    <label>Technician ID:</label>
+    <input type="number" name="TechnicianId" value="@Model.TechnicianId" />
+    <button type="submit">Filter</button>
+</form>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Idle Start</th><th>Idle End</th><th>Tech ID</th><th>Idle Minutes</th><th>Decision</th><th>Override</th><th>Approver</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var log in Model.Logs)
+    {
+        <tr>
+            <td>@log.IdleStartTime</td><td>@log.IdleEndTime</td><td>@log.TechnicianId</td><td>@log.IdleMinutes</td><td>@log.SystemDecision</td><td>@log.IsOverride</td><td>@log.Approver</td>
+        </tr>
+    }
+    </tbody>
+</table>
