@@ -1,0 +1,52 @@
+@page
+@model MVP_Core.Pages.Admin.IncidentClustersModel
+@{
+    ViewData["Title"] = "Incident Compression Clusters";
+}
+<h2>Incident Compression Clusters</h2>
+<form method="post">
+    <label>Cluster Key:</label>
+    <input type="text" asp-for="ClusterKey" />
+    <label>Occurrences:</label>
+    <input type="number" asp-for="OccurrenceCount" />
+    <label>Equipment Faults:</label>
+    <input type="text" asp-for="EquipmentFaults" />
+    <label>Dispatch Issues:</label>
+    <input type="text" asp-for="DispatchIssues" />
+    <label>Tech Burnout Suspected:</label>
+    <input type="checkbox" asp-for="TechBurnoutSuspected" />
+    <label>Client Abuse Suspected:</label>
+    <input type="checkbox" asp-for="ClientAbuseSuspected" />
+    <label>Notes:</label>
+    <input type="text" asp-for="Notes" />
+    <button type="submit" asp-page-handler="AddCluster">Add Cluster</button>
+</form>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Timestamp</th>
+            <th>Cluster Key</th>
+            <th>Occurrences</th>
+            <th>Equipment Faults</th>
+            <th>Dispatch Issues</th>
+            <th>Burnout</th>
+            <th>Abuse</th>
+            <th>Notes</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var log in Model.IncidentClusters)
+        {
+            <tr>
+                <td>@log.Timestamp</td>
+                <td>@log.ClusterKey</td>
+                <td>@log.OccurrenceCount</td>
+                <td>@log.EquipmentFaults</td>
+                <td>@log.DispatchIssues</td>
+                <td>@log.TechBurnoutSuspected</td>
+                <td>@log.ClientAbuseSuspected</td>
+                <td>@log.Notes</td>
+            </tr>
+        }
+    </tbody>
+</table>

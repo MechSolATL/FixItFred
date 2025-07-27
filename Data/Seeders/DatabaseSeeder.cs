@@ -1,3 +1,4 @@
+using MVP_Core.Data.Models;
 using MVP_Core.Services.Admin;
 using MVP_Core.Services.Dispatch;
 
@@ -107,6 +108,36 @@ namespace MVP_Core.Data.Seeders
                 db.RoastTemplates.AddRange(mediumRoasts);
                 db.RoastTemplates.AddRange(savageRoasts);
                 db.RoastTemplates.AddRange(brutalRoasts);
+            }
+
+            // Sprint 74.0: SanityOps Seeder
+            if (!db.TechnicianSanityLogs.Any())
+            {
+                db.TechnicianSanityLogs.Add(new TechnicianSanityLog
+                {
+                    TechnicianId = db.Technicians.FirstOrDefault()?.Id ?? 1,
+                    Timestamp = DateTime.UtcNow,
+                    EmotionalFatigueFlag = true,
+                    ErrorRateSpike = 7,
+                    BurnoutPatternDetected = false,
+                    AIInterventionTriggered = false,
+                    FalseReportShielded = false,
+                    ShieldingNotes = "Seeded for v2.0.5-SanityOps"
+                });
+            }
+            if (!db.IncidentCompressionLogs.Any())
+            {
+                db.IncidentCompressionLogs.Add(new IncidentCompressionLog
+                {
+                    Timestamp = DateTime.UtcNow,
+                    ClusterKey = "101 Alpha St",
+                    OccurrenceCount = 3,
+                    EquipmentFaults = "Pump Failure",
+                    DispatchIssues = "Improper Routing",
+                    TechBurnoutSuspected = true,
+                    ClientAbuseSuspected = false,
+                    Notes = "Seeded for v2.0.5-SanityOps"
+                });
             }
 
             _ = db.SaveChanges(); // Fix: Use discard for assignment, always non-null

@@ -1,0 +1,38 @@
+@page
+@model MVP_Core.Pages.Admin.SanityShieldModel
+@{
+    ViewData["Title"] = "Technician Sanity Shield";
+}
+<h2>Technician Sanity Shield</h2>
+<form method="post">
+    <label>Technician ID:</label>
+    <input type="number" asp-for="TechnicianId" />
+    <button type="submit" asp-page-handler="Analyze">Analyze & Shield</button>
+</form>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Timestamp</th>
+            <th>Fatigue</th>
+            <th>Error Spike</th>
+            <th>Burnout</th>
+            <th>AI Intervention</th>
+            <th>Shielded</th>
+            <th>Notes</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var log in Model.SanityLogs)
+        {
+            <tr>
+                <td>@log.Timestamp</td>
+                <td>@log.EmotionalFatigueFlag</td>
+                <td>@log.ErrorRateSpike</td>
+                <td>@log.BurnoutPatternDetected</td>
+                <td>@log.AIInterventionTriggered</td>
+                <td>@log.FalseReportShielded</td>
+                <td>@log.ShieldingNotes</td>
+            </tr>
+        }
+    </tbody>
+</table>

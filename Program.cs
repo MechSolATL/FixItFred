@@ -80,6 +80,8 @@ builder.Services.AddScoped<Services.Admin.ScheduledMaintenanceEngine>();
 builder.Services.AddScoped<Services.Admin.AdminDigestMailerService>();
 builder.Services.AddScoped<Services.Admin.ValidationSimulatorService>();
 builder.Services.AddScoped<MVP_Core.Services.Admin.TechnicianBehaviorAnalyzerService>(); // Sprint 71.0: Register behavior analyzer
+builder.Services.AddScoped<SanityShieldService>();
+builder.Services.AddScoped<IncidentCompressionService>();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
