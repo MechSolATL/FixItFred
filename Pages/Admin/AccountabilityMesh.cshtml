@@ -1,0 +1,38 @@
+@page
+@model MVP_Core.Pages.Admin.AccountabilityMeshModel
+@{
+    ViewData["Title"] = "Accountability Mesh Dashboard";
+}
+<h2>Accountability Mesh Dashboard</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Created</th>
+            <th>Employee</th>
+            <th>Delay (hrs)</th>
+            <th>Escalated</th>
+            <th>Flagged</th>
+            <th>Responsible Party</th>
+            <th>Resolution</th>
+            <th>Karma Impact</th>
+            <th>Notes</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var log in Model.MeshLogs)
+        {
+            <tr class="@(log.IsEscalated ? "table-danger" : log.IsFlagged ? "table-warning" : "")">
+                <td>@log.CreatedAt.ToLocalTime().ToString("g")</td>
+                <td>@log.EmployeeId</td>
+                <td>@log.DelayDurationHours</td>
+                <td>@(log.IsEscalated ? "??" : "")</td>
+                <td>@(log.IsFlagged ? "??" : "")</td>
+                <td>@log.ResponsiblePartyId</td>
+                <td>@(log.ResolutionTimestamp.HasValue ? log.ResolutionTimestamp.Value.ToLocalTime().ToString("g") : "Unresolved")</td>
+                <td>@log.AccountabilityMetric</td>
+                <td>@log.Notes</td>
+            </tr>
+        }
+    </tbody>
+</table>

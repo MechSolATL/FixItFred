@@ -2,14 +2,7 @@ using System;
 
 namespace MVP_Core.Data.Models
 {
-    public enum StressLevel
-    {
-        Low = 1,
-        Moderate = 2,
-        High = 3,
-        Severe = 4
-    }
-
+    // Remove duplicate StressLevel enum, now defined in AccountabilityDelayLog.cs
     public class WellBeingPulseLog
     {
         public int Id { get; set; }

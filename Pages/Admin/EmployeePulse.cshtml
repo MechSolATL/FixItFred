@@ -32,7 +32,7 @@
                 <td>@log.Timestamp.ToLocalTime().ToString("g")</td>
                 <td>@log.EmployeeId</td>
                 <td><span title="@log.MoodScore">@(log.MoodScore <= 3 ? "??" : log.MoodScore <= 5 ? "??" : log.MoodScore <= 7 ? "??" : "??")</span></td>
-                <td><span class="badge bg-@(log.StressLevel == MVP_Core.Data.Models.StressLevel.Low ? "success" : log.StressLevel == MVP_Core.Data.Models.StressLevel.Moderate ? "info" : log.StressLevel == MVP_Core.Data.Models.StressLevel.High ? "warning" : "danger")">@log.StressLevel</span></td>
+                <td><span class="badge bg-@(log.StressLevel >= MVP_Core.Data.Models.StressLevel.Level7 ? "danger" : log.StressLevel >= MVP_Core.Data.Models.StressLevel.Level4 ? "warning" : log.StressLevel >= MVP_Core.Data.Models.StressLevel.Level2 ? "info" : "success")">@log.StressLevel</span></td>
                 <td>@log.WorkSatisfactionScore</td>
                 <td>@(log.NeedsFollowUp ? "??" : "")</td>
                 <td>@(log.ManagerReviewed ? "?" : "")</td>

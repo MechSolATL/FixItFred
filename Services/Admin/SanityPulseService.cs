@@ -20,7 +20,7 @@ namespace MVP_Core.Services.Admin
         public async Task SubmitPulseAsync(WellBeingPulseLog pulse)
         {
             pulse.Timestamp = DateTime.UtcNow;
-            pulse.NeedsFollowUp = pulse.MoodScore <= 5 || pulse.WorkSatisfactionScore <= 5 || pulse.StressLevel == StressLevel.High || pulse.StressLevel == StressLevel.Severe;
+            pulse.NeedsFollowUp = pulse.MoodScore <= 5 || pulse.WorkSatisfactionScore <= 5 || (int)pulse.StressLevel >= 7;
             _db.WellBeingPulseLogs.Add(pulse);
             await _db.SaveChangesAsync();
         }
@@ -62,6 +62,33 @@ namespace MVP_Core.Services.Admin
                     log.OpenNote = managerNote;
                 await _db.SaveChangesAsync();
             }
+        }
+
+        public WellBeingPulseLog AcceptPulseEntry(string employeeId, int moodScore, int stressLevel, int workSatisfactionScore, string? note)
+        {
+            var pulse = new WellBeingPulseLog
+            {
+                EmployeeId = employeeId,
+                Timestamp = DateTime.UtcNow,
+                MoodScore = moodScore,
+                StressLevel = (StressLevel)stressLevel,
+                WorkSatisfactionScore = workSatisfactionScore,
+                OpenNote = note,
+                NeedsFollowUp = stressLevel >= (int)StressLevel.Level7,
+                ManagerReviewed = false
+            };
+            _db.WellBeingPulseLogs.Add(pulse);
+            _db.SaveChanges();
+            return pulse;
+        }
+
+        public string GetActionableReview(WellBeingPulseLog pulse)
+        {
+            if ((int)pulse.StressLevel >= 7)
+                return "High stress detected. Recommend manager review and follow-up.";
+            if (pulse.MoodScore <= 3)
+                return "Low mood. Consider support or check-in.";
+            return "Pulse normal.";
         }
     }
 }
