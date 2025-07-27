@@ -3,32 +3,32 @@
 @inject MVP_Core.Services.CustomerPortalService PortalService
 @{
     Layout = "/Pages/Shared/_Layout.cshtml";
-    if (!User.Identity.IsAuthenticated || !User.HasClaim("IsCustomer", "true"))
+    if (!(User.Identity?.IsAuthenticated ?? false) || !(User.HasClaim("IsCustomer", "true") ?? false)) // Sprint 82: RazorViewFortification
     {
         <div class="alert alert-danger">Access denied. Please log in as a customer.</div>
         return;
     }
-    var email = User.Identity.Name ?? string.Empty;
-    var loyalty = PortalService.GetLoyaltyTransactions(email);
-    var tiers = PortalService.GetRewardTiers();
-    var currentTier = tiers.LastOrDefault(t => loyalty.Sum(l => l.Points) >= t.PointsRequired);
+    var email = User.Identity?.Name ?? string.Empty; // Sprint 82: RazorViewFortification
+    var loyalty = PortalService.GetLoyaltyTransactions(email) ?? new List<MVP_Core.Data.Models.LoyaltyPointTransaction>(); // Sprint 82: RazorViewFortification
+    var tiers = PortalService.GetRewardTiers() ?? new List<MVP_Core.Data.Models.RewardTier>(); // Sprint 82: RazorViewFortification
+    var currentTier = (tiers ?? new List<MVP_Core.Data.Models.RewardTier>()).LastOrDefault(t => (loyalty ?? new List<MVP_Core.Data.Models.LoyaltyPointTransaction>()).Sum(l => l.Points) >= t.PointsRequired); // Sprint 82: RazorViewFortification
 }
 <h2>Rewards & Loyalty</h2>
 <div class="mb-3">
-    <strong>Current Tier:</strong> @currentTier?.Name ?? "None"<br />
-    <strong>Total Points:</strong> @loyalty.Sum(l => l.Points)
+    <strong>Current Tier:</strong> @currentTier?.Name ?? "None" // Sprint 82: RazorViewFortification<br />
+    <strong>Total Points:</strong> @(loyalty?.Sum(l => l.Points) ?? 0) // Sprint 82: RazorViewFortification
 </div>
 <h4>Bonus History</h4>
 <table class="table table-striped">
     <thead><tr><th>Date</th><th>Type</th><th>Points</th><th>Description</th></tr></thead>
     <tbody>
-    @foreach (var txn in loyalty)
+    @foreach (var txn in loyalty ?? new List<MVP_Core.Data.Models.LoyaltyPointTransaction>()) // Sprint 82: RazorViewFortification
     {
         <tr>
-            <td>@txn.Timestamp.ToShortDateString()</td>
-            <td>@txn.Type</td>
-            <td>@txn.Points</td>
-            <td>@txn.Description</td>
+            <td>@txn?.Timestamp.ToShortDateString() ?? "-" // Sprint 82: RazorViewFortification</td>
+            <td>@txn?.Type ?? "-" // Sprint 82: RazorViewFortification</td>
+            <td>@txn?.Points ?? 0 // Sprint 82: RazorViewFortification</td>
+            <td>@txn?.Description ?? "-" // Sprint 82: RazorViewFortification</td>
         </tr>
     }
     </tbody>

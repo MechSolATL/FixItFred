@@ -21,15 +21,15 @@
         </tr>
     </thead>
     <tbody>
-    @foreach (var ticket in Model.Tickets)
+    @foreach (var ticket in Model.Tickets ?? new List<MVP_Core.Data.Models.ServiceRequest>()) // Sprint 82: RazorViewFortification
     {
         <tr>
-            <td>@ticket.Id</td>
-            <td>@ticket.ServiceType</td>
-            <td><span class="badge bg-@Model.GetStatusClass(ticket.Status)">@ticket.Status</span></td>
-            <td>@ticket.RequestedAt.ToString("g")</td>
+            <td>@ticket?.Id ?? 0 // Sprint 82: RazorViewFortification</td>
+            <td>@ticket?.ServiceType ?? "-" // Sprint 82: RazorViewFortification</td>
+            <td><span class="badge bg-@Model.GetStatusClass(ticket?.Status ?? "")">@ticket?.Status ?? "-" // Sprint 82: RazorViewFortification</span></td>
+            <td>@(ticket?.RequestedAt.ToString("g") ?? "-") // Sprint 82: RazorViewFortification</td>
             <td>
-                @if (ticket.SatisfactionScore.HasValue)
+                @if (ticket?.SatisfactionScore.HasValue ?? false) // Sprint 82: RazorViewFortification
                 {
                     <span class="text-success">@ticket.SatisfactionScore.Value/5</span>
                 }
@@ -45,8 +45,8 @@
 
 <div class="mt-4">
     <h4>Satisfaction Summary</h4>
-    <p>Average Satisfaction: <b>@Model.AverageSatisfaction.ToString("0.0")</b> / 5</p>
-    <p>Total Tickets: <b>@Model.Tickets.Count</b></p>
+    <p>Average Satisfaction: <b>@(Model.AverageSatisfaction.ToString("0.0"))</b> / 5 // Sprint 82: RazorViewFortification</p>
+    <p>Total Tickets: <b>@(Model.Tickets?.Count ?? 0) // Sprint 82: RazorViewFortification</b></p>
 </div>
 
 <!-- Sprint 46.3 – Dashboard Analytics: Satisfaction Heatmap -->
@@ -70,7 +70,7 @@
 @section Scripts {
 <script>
     // Sprint 46.3 – Dashboard Analytics: Satisfaction Heatmap
-    const satisfactionData = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.Tickets.OrderByDescending(t => t.RequestedAt).Take(30).Select(t => t.SatisfactionScore ?? 0).ToArray()));
+    const satisfactionData = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject((Model.Tickets ?? new List<MVP_Core.Data.Models.ServiceRequest>()).OrderByDescending(t => t.RequestedAt).Take(30).Select(t => t.SatisfactionScore ?? 0).ToArray())); // Sprint 82: RazorViewFortification
     const ctxHeatmap = document.getElementById('satisfactionHeatmap').getContext('2d');
     new Chart(ctxHeatmap, {
         type: 'bar',
@@ -90,7 +90,7 @@
 
     // Sprint 46.3 – Dashboard Analytics: Service Type Breakdown
     const serviceTypeCounts = {};
-    @foreach (var t in Model.Tickets) {
+    @foreach (var t in Model.Tickets ?? new List<MVP_Core.Data.Models.ServiceRequest>()) { // Sprint 82: RazorViewFortification
         <text>serviceTypeCounts['@t.ServiceType'] = (serviceTypeCounts['@t.ServiceType'] || 0) + 1;</text>
     }
     const serviceTypeLabels = Object.keys(serviceTypeCounts);
@@ -109,10 +109,10 @@
     });
 
     // Sprint 46.3 – Dashboard Analytics: Ticket Resolution Chart
-    const openCount = @Model.Tickets.Count(t => t.Status != "Complete" && t.Status != "Cancelled");
-    const closedCount = @Model.Tickets.Count(t => t.Status == "Complete" || t.Status == "Cancelled");
+    const openCount = @(Model.Tickets?.Count(t => t.Status != "Complete" && t.Status != "Cancelled") ?? 0); // Sprint 82: RazorViewFortification
+    const closedCount = @(Model.Tickets?.Count(t => t.Status == "Complete" || t.Status == "Cancelled") ?? 0); // Sprint 82: RazorViewFortification
     const avgResolution = (() => {
-        const closed = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.Tickets.Where(t => t.ClosedAt != null).Select(t => (t.ClosedAt.Value - t.RequestedAt).TotalHours)));
+        const closed = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject((Model.Tickets ?? new List<MVP_Core.Data.Models.ServiceRequest>()).Where(t => t.ClosedAt != null).Select(t => (t.ClosedAt.Value - t.RequestedAt).TotalHours)));
         if (closed.length === 0) return 0;
         return (closed.reduce((a, b) => a + b, 0) / closed.length).toFixed(1);
     })();

@@ -11,8 +11,8 @@
         <div class="card text-center">
             <div class="card-header">Total Service Requests</div>
             <div class="card-body">
-                <h3>@Model.TotalRequests</h3>
-                <div class="small text-muted">Pending: @Model.PendingCount | Dispatched: @Model.DispatchedCount | Cancelled: @Model.CancelledCount | Completed: @Model.CompletedCount</div>
+                <h3>@(Model.TotalRequests) // Sprint 82: RazorViewFortification</h3>
+                <div class="small text-muted">Pending: @(Model.PendingCount) | Dispatched: @(Model.DispatchedCount) | Cancelled: @(Model.CancelledCount) | Completed: @(Model.CompletedCount)</div>
             </div>
         </div>
     </div>
@@ -20,9 +20,9 @@
         <div class="card text-center">
             <div class="card-header">Technician Activity</div>
             <div class="card-body">
-                <div>Active Today: <strong>@Model.ActiveTechsToday</strong></div>
-                <div>GPS Updated: <strong>@Model.GpsUpdatedToday</strong></div>
-                <div>Jobs Assigned: <strong>@Model.JobsAssignedToday</strong></div>
+                <div>Active Today: <strong>@(Model.ActiveTechsToday) // Sprint 82: RazorViewFortification</strong></div>
+                <div>GPS Updated: <strong>@(Model.GpsUpdatedToday) // Sprint 82: RazorViewFortification</strong></div>
+                <div>Jobs Assigned: <strong>@(Model.JobsAssignedToday) // Sprint 82: RazorViewFortification</strong></div>
             </div>
         </div>
     </div>
@@ -30,7 +30,7 @@
         <div class="card text-center">
             <div class="card-header">Avg ETA Accuracy</div>
             <div class="card-body">
-                <h3>@Model.AvgEtaAccuracy min</h3>
+                <h3>@(Model.AvgEtaAccuracy) min // Sprint 82: RazorViewFortification</h3>
                 <div class="small text-muted">(Predicted vs. Actual)</div>
             </div>
         </div>
@@ -39,7 +39,7 @@
         <div class="card text-center">
             <div class="card-header">SignalR Broadcasts (24h)</div>
             <div class="card-body">
-                <h3 id="signalrCount">@Model.SignalRBroadcasts24h</h3>
+                <h3 id="signalrCount">@(Model.SignalRBroadcasts24h) // Sprint 82: RazorViewFortification</h3>
                 <div class="small text-muted">Real-time updates</div>
             </div>
         </div>
@@ -59,11 +59,11 @@
             </button>
             @if (Model.PdfArchiveExists)
             {
-                <a href="/@Model.PdfArchivePath.Replace("\\", "/")" class="btn btn-success ms-2" download>
+                <a href="/@(Model.PdfArchivePath?.Replace("\\", "/") ?? "")" class="btn btn-success ms-2" download>
                     <i class="bi bi-download"></i> Download Sprint 44–46 PDF
                 </a>
             }
-            @if (!string.IsNullOrEmpty(Model.PdfArchiveError))
+            @if (!string.IsNullOrEmpty(Model.PdfArchiveError ?? "")) // Sprint 82: RazorViewFortification
             {
                 <span class="text-danger ms-3">@Model.PdfArchiveError</span>
             }
@@ -75,11 +75,11 @@
             </button>
             @if (Model.Sprint47PdfArchiveExists)
             {
-                <a href="/@Model.Sprint47PdfArchivePath.Replace("\\", "/")" class="btn btn-success ms-2" download>
+                <a href="/@(Model.Sprint47PdfArchivePath?.Replace("\\", "/") ?? "")" class="btn btn-success ms-2" download>
                     <i class="bi bi-download"></i> Download Sprint 47 PDF
                 </a>
             }
-            @if (!string.IsNullOrEmpty(Model.Sprint47PdfArchiveError))
+            @if (!string.IsNullOrEmpty(Model.Sprint47PdfArchiveError ?? "")) // Sprint 82: RazorViewFortification
             {
                 <span class="text-danger ms-3">@Model.Sprint47PdfArchiveError</span>
             }
@@ -89,8 +89,8 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script>
 // Sprint 32.1 - Admin Metrics Reporting
-const weekLabels = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.WeekLabels));
-const weekData = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.WeekCounts));
+const weekLabels = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.WeekLabels ?? new List<string>())); // Sprint 82: RazorViewFortification
+const weekData = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.WeekCounts ?? new List<int>())); // Sprint 82: RazorViewFortification
 const ctx = document.getElementById('scheduleQueueChart').getContext('2d');
 new Chart(ctx, {
     type: 'bar',

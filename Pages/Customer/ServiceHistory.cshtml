@@ -4,19 +4,19 @@
 @inject MVP_Core.Services.ReceiptArchiveService ArchiveService
 @{
     Layout = "/Pages/Shared/_Layout.cshtml";
-    if (!User.Identity.IsAuthenticated || !User.HasClaim("IsCustomer", "true"))
+    if (!(User.Identity?.IsAuthenticated ?? false) || !(User.HasClaim("IsCustomer", "true") ?? false)) // Sprint 82: RazorViewFortification
     {
         <div class="alert alert-danger">Access denied. Please log in as a customer.</div>
         return;
     }
-    var email = User.Identity.Name ?? string.Empty;
-    var requests = Model.Requests;
-    var technicians = Model.Technicians;
+    var email = User.Identity?.Name ?? string.Empty; // Sprint 82: RazorViewFortification
+    var requests = Model.Requests ?? new List<MVP_Core.Data.Models.ServiceRequest>(); // Sprint 82: RazorViewFortification
+    var technicians = Model.Technicians ?? new List<MVP_Core.Data.Models.Technician>(); // Sprint 82: RazorViewFortification
     var filterDate = Request.Query["date"].ToString();
     var filterType = Request.Query["type"].ToString();
     var filterTech = Request.Query["tech"].ToString();
-    var filtered = requests.Where(r => (string.IsNullOrEmpty(filterDate) || r.RequestedAt.ToShortDateString() == filterDate) && (string.IsNullOrEmpty(filterType) || r.ServiceType == filterType) && (string.IsNullOrEmpty(filterTech) || r.AssignedTo == filterTech)).ToList();
-    var grouped = filtered.GroupBy(r => r.RequestedAt.Year).OrderByDescending(g => g.Key);
+    var filtered = (requests ?? new List<MVP_Core.Data.Models.ServiceRequest>()).Where(r => (string.IsNullOrEmpty(filterDate) || r.RequestedAt.ToShortDateString() == filterDate) && (string.IsNullOrEmpty(filterType) || r.ServiceType == filterType) && (string.IsNullOrEmpty(filterTech) || r.AssignedTo == filterTech)).ToList(); // Sprint 82: RazorViewFortification
+    var grouped = filtered.GroupBy(r => r.RequestedAt.Year).OrderByDescending(g => g.Key); // Sprint 82: RazorViewFortification
 }
 <h2>Service History Timeline</h2>
 <form method="get" class="row mb-3">
@@ -26,7 +26,7 @@
     <div class="col"><button type="submit" class="btn btn-primary">Filter</button></div>
 </form>
 <div class="accordion" id="historyAccordion">
-@foreach (var yearGroup in grouped)
+@foreach (var yearGroup in grouped ?? new List<IGrouping<int, MVP_Core.Data.Models.ServiceRequest>>()) // Sprint 82: RazorViewFortification
 {
     <div class="accordion-item">
         <h2 class="accordion-header" id="heading-year-@yearGroup.Key">
@@ -36,15 +36,15 @@
         </h2>
         <div id="collapse-year-@yearGroup.Key" class="accordion-collapse collapse" aria-labelledby="heading-year-@yearGroup.Key" data-bs-parent="#historyAccordion">
             <div class="accordion-body">
-                @foreach (var req in yearGroup.OrderByDescending(r => r.RequestedAt.Month))
+                @foreach (var req in yearGroup.OrderByDescending(r => r.RequestedAt.Month) ?? new List<MVP_Core.Data.Models.ServiceRequest>()) // Sprint 82: RazorViewFortification
                 {
-                    var tech = Model.GetTechnicianById(req.AssignedTechnicianId);
+                    var tech = Model.GetTechnicianById(req?.AssignedTechnicianId ?? 0); // Sprint 82: RazorViewFortification
                     <div class="card mb-2">
                         <div class="card-header">
-                            <strong>@req.RequestedAt.ToString("MMM dd")</strong> - @req.ServiceType
-                            <span class="badge bg-secondary ms-2">@req.Status</span>
-                            @if (req.NeedsFollowUp) { <span class="badge bg-warning text-dark ms-1">Follow-Up Needed</span> }
-                            @if (string.IsNullOrEmpty(req.CustomerFeedback)) { <span class="badge bg-info text-dark ms-1">No Review</span> }
+                            <strong>@(req?.RequestedAt.ToString("MMM dd") ?? "-") // Sprint 82: RazorViewFortification</strong> - @(req?.ServiceType ?? "-") // Sprint 82: RazorViewFortification
+                            <span class="badge bg-secondary ms-2">@(req?.Status ?? "-") // Sprint 82: RazorViewFortification</span>
+                            @if (req?.NeedsFollowUp ?? false) { <span class="badge bg-warning text-dark ms-1">Follow-Up Needed</span> }
+                            @if (string.IsNullOrEmpty(req?.CustomerFeedback ?? "")) { <span class="badge bg-info text-dark ms-1">No Review</span> }
                         </div>
                         <div class="card-body">
                             <div class="row">
@@ -52,15 +52,15 @@
                                     @if (tech != null && !string.IsNullOrEmpty(tech.PhotoUrl)) {
                                         <img src="@tech.PhotoUrl" alt="Tech Avatar" class="rounded-circle" style="width:48px;height:48px;" />
                                     }
-                                    <div>@tech?.FullName</div>
+                                    <div>@tech?.FullName ?? "-" // Sprint 82: RazorViewFortification</div>
                                 </div>
                                 <div class="col-md-10">
-                                    <strong>Details:</strong> @req.Details<br />
-                                    <strong>Notes:</strong> @req.Notes<br />
-                                    <strong>Outcome:</strong> @(req.Status == "Completed" ? "Completed" : req.Status)
+                                    <strong>Details:</strong> @(req?.Details ?? "-") // Sprint 82: RazorViewFortification<br />
+                                    <strong>Notes:</strong> @(req?.Notes ?? "-") // Sprint 82: RazorViewFortification<br />
+                                    <strong>Outcome:</strong> @((req?.Status == "Completed" ? "Completed" : req?.Status) ?? "-") // Sprint 82: RazorViewFortification
                                     <br />
-                                    @if (!string.IsNullOrEmpty(req.FinalizedPDFPath)) {
-                                        <a href="@req.FinalizedPDFPath.Replace("wwwroot", "")" class="btn btn-sm btn-outline-primary" target="_blank">Download Receipt PDF</a>
+                                    @if (!string.IsNullOrEmpty(req?.FinalizedPDFPath ?? "")) {
+                                        <a href="@(req.FinalizedPDFPath.Replace("wwwroot", ""))" class="btn btn-sm btn-outline-primary" target="_blank">Download Receipt PDF</a>
                                     }
                                 </div>
                             </div>

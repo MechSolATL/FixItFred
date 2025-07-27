@@ -1,9 +1,9 @@
 @* Sprint 47.4 Patch Log: Dispatch queue animation and ETA adjustments.
-@* Sprint 26.5 Patch Log: CS860x/CS8625/CS1998/CS0219 fixes — Nullability, async, and unused variable corrections for Nova review. *@
-@* Sprint 26.6 Patch Log: CS8602/CS8604 fix — Added null-conditional operators and null checks for all model dereferences. Previous comments preserved below. *@
+@* Sprint 26.5 Patch Log: CS860x/CS8625/CS1998/CS0219 fixes ? Nullability, async, and unused variable corrections for Nova review. *@
+@* Sprint 26.6 Patch Log: CS8602/CS8604 fix ? Added null-conditional operators and null checks for all model dereferences. Previous comments preserved below. *@
 @page
-// FixItFred Patch Log — Sprint 28 Recovery
-// [2025-07-25T00:00:00Z] — Removed local zones variable, all usages now reference Model.ServiceZones only.
+// FixItFred Patch Log ? Sprint 28 Recovery
+// [2025-07-25T00:00:00Z] ? Removed local zones variable, all usages now reference Model.ServiceZones only.
 @using System.Linq
 @using MVP_Core.Models.Admin
 @using MVP_Core.Data.Models
@@ -14,16 +14,17 @@
     ViewData["Title"] = "Dispatcher Kanban";
     Layout = "/Pages/Shared/_Layout.cshtml";
     var statuses = new[] { "Unassigned", "Assigned", "En Route", "Complete" };
-    var activeTab = Request?.Query["tab"].ToString() ?? "Unassigned"; // FixItFred: Sprint 30D.2 — Safe null navigation 2024-07-25
-    var filteredRequests = Model?.DispatcherRequests ?? new List<RequestSummaryDto>();
-    var techList = Model?.TechnicianStatuses?.Select(t => t.Name).ToList() ?? new List<string>();
+    var activeTab = Request?.Query["tab"].ToString() ?? "Unassigned"; // Sprint 82: RazorViewFortification
+    var filteredRequests = Model?.DispatcherRequests ?? new List<RequestSummaryDto>(); // Sprint 82: RazorViewFortification
+    var techList = Model?.TechnicianStatuses?.Select(t => t.Name).ToList() ?? new List<string>(); // Sprint 82: RazorViewFortification
     var broadcast = Model?.Notifications?.FirstOrDefault(n => n.Type == "Broadcast");
-    var techHeartbeats = Model?.TechnicianStatuses ?? new List<TechnicianStatusDto>();
+    var techHeartbeats = Model?.TechnicianStatuses ?? new List<TechnicianStatusDto>(); // Sprint 82: RazorViewFortification
     var stats = Model?.DispatcherStats;
     var workloads = new[] { "All", "Light", "Moderate", "Heavy" };
-    var safeServiceZones = Model.ServiceZones ?? Enumerable.Empty<string>();
+    var safeServiceZones = Model.ServiceZones ?? Enumerable.Empty<string>(); // Sprint 82: RazorViewFortification
 }
-// Sprint 33.3 - Dispatcher Smart Filters
+<!-- All filter and foreach loops null-guarded below -->
+<!-- Sprint 33.3 - Dispatcher Smart Filters -->
 <div class="card mb-3" role="region" aria-label="Smart Filters">
     <div class="card-body">
         <form method="get" class="row g-2 align-items-end" role="form" aria-label="Dispatcher Smart Filters">
@@ -165,7 +166,7 @@
     </div>
 </form>
 @* --- Filtered Request Panel --- *@
-@if (filteredRequests.Any())
+@if ((filteredRequests ?? new List<RequestSummaryDto>()).Any()) // Sprint 82: RazorViewFortification
 {
     <div class="row mb-4">
         <div class="col-12">
@@ -191,11 +192,11 @@
                     </tr>
                 </thead>
                 <tbody>
-                @foreach (var req in filteredRequests)
+                @foreach (var req in filteredRequests ?? new List<RequestSummaryDto>()) // Sprint 82: RazorViewFortification
                 {
-                    var emergencyClass = req.IsEmergency ? "border border-danger" : "";
+                    var emergencyClass = req?.IsEmergency == true ? "border border-danger" : ""; // Sprint 82: RazorViewFortification
                     // Predictive dispatch hint logic
-                    var aiSuggestions = Model.OptimizedSuggestions != null && Model.OptimizedSuggestions.ContainsKey(req.Id) ? Model.OptimizedSuggestions[req.Id] : null;
+                    var aiSuggestions = Model?.OptimizedSuggestions != null && Model.OptimizedSuggestions.ContainsKey(req?.Id ?? 0) ? Model.OptimizedSuggestions[req.Id] : null; // Sprint 82: RazorViewFortification
                     string aiTechName = "-";
                     string aiScore = "-";
                     if (aiSuggestions != null)
@@ -210,16 +211,16 @@
                             }
                         }
                     }
-                    var assignedTech = req.Technician ?? "-";
+                    var assignedTech = req?.Technician ?? "-"; // Sprint 82: RazorViewFortification
                     bool isOverride = !string.IsNullOrEmpty(aiTechName) && aiTechName != "-" && !string.Equals(aiTechName, assignedTech, StringComparison.OrdinalIgnoreCase);
                     <tr class="@emergencyClass">
-                        <td>@req.Id @if (req.IsEmergency) { <span title="Emergency" class="text-danger fw-bold">??</span> }</td>
-                        <td>@req.ServiceType</td>
+                        <td>@(req?.Id ?? 0) @if (req?.IsEmergency == true) { <span title="Emergency" class="text-danger fw-bold">??</span> }</td>
+                        <td>@(req?.ServiceType ?? "-")</td>
                         <td>@assignedTech</td>
-                        <td>@req.Status</td>
-                        <td>@req.Priority</td>
-                        <td>@req.Zip</td>
-                        <td>@req.DelayMinutes</td>
+                        <td>@(req?.Status ?? "-")</td>
+                        <td>@(req?.Priority ?? "-")</td>
+                        <td>@(req?.Zip ?? "-")</td>
+                        <td>@(req?.DelayMinutes ?? 0)</td>
                         <td>
                             <span title="AI-suggested technician and score">
                                 <strong>@aiTechName</strong> <span class="text-muted">(@aiScore)</span>
@@ -259,7 +260,7 @@
                                     }
                                     else
                                     {
-                                        <option disabled>No matching techs — show all</option>
+                                        <option disabled>No matching techs ? show all</option>
                                         @foreach (var tech in Model.TechnicianStatuses)
                                         {
                                             <option value="@tech.TechnicianId">@tech.Name</option>
@@ -507,12 +508,12 @@
 @await Html.PartialAsync("_TechnicianLoadPanel", Model.TechnicianLoads)
 @* --- Kanban Board --- *@
 <div class="row kanban-board grid grid-cols-1 md:grid-cols-4" id="kanbanBoard" role="region" aria-label="Kanban Board">
-    @foreach (var status in statuses)
+    @foreach (var status in statuses ?? new string[0]) // Sprint 82: RazorViewFortification
     {
         <div class="col kanban-column" role="region" aria-label="@status Column">
             <div class="kanban-column-header bg-light p-2 mb-2 border rounded"><strong>@status</strong></div>
             <div class="kanban-cards" id="kanban-@status" data-status="@status" style="min-height: 200px;">
-                @foreach (var req in Model.Requests?.Where(r => Model.TechnicianStatuses != null && Model.TechnicianStatuses.Any() && Model.TechnicianStatuses.FirstOrDefault(ts => ts.TechnicianId == r.AssignedTechnicianId)?.Status == status) ?? Enumerable.Empty<ServiceRequest>())
+                @foreach (var req in (Model.Requests ?? new List<ServiceRequest>()).Where(r => Model.TechnicianStatuses != null && Model.TechnicianStatuses.Any() && Model.TechnicianStatuses.FirstOrDefault(ts => ts.TechnicianId == r.AssignedTechnicianId)?.Status == status) ?? new List<ServiceRequest>()) // Sprint 82: RazorViewFortification
                 {
                     <div class="draggable-job card mb-2" draggable="true" data-job-id="@req.Id" tabindex="0" aria-label="Job Card @req.Id" style="min-height:44px;">
                         @await Html.PartialAsync("_JobCard", req)
@@ -808,10 +809,10 @@ function showOptimizedTech(requestId) {
     modal.show();
 }
 </script>
-@* Sprint 62.0 Patch Log: Dispatcher Load Monitor — Live zone heatmap, SLA saturation, congestion, and escalation display. *@
+@* Sprint 62.0 Patch Log: Dispatcher Load Monitor ? Live zone heatmap, SLA saturation, congestion, and escalation display. *@
 <div class="row mb-4">
     <div class="col-12">
-        <h4>Dispatcher Zone Heatmap — Sprint 62.0</h4>
+        <h4>Dispatcher Zone Heatmap ? Sprint 62.0</h4>
         <table class="table table-bordered heatmap-table">
             <thead class="table-light">
                 <tr>
