@@ -1,0 +1,40 @@
+@page
+@model MVP_Core.Pages.Admin.DelayMatrixModel
+@{
+    ViewData["Title"] = "Department Delay Matrix";
+}
+<h2>Department Delay Matrix</h2>
+<form method="get">
+    <label>Min Delay (minutes):</label>
+    <input type="number" name="MinMinutes" value="@Model.MinMinutes" />
+    <button type="submit">Filter</button>
+</form>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Department</th>
+            <th>DelayStart</th>
+            <th>DelayEnd</th>
+            <th>EscalationLevel</th>
+            <th>EscalationReason</th>
+            <th>ResolutionTime</th>
+            <th>ResolutionNotes</th>
+            <th>Severity</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var d in Model.Delays)
+        {
+            <tr>
+                <td>@d.Department</td>
+                <td>@d.DelayStart</td>
+                <td>@d.DelayEnd</td>
+                <td>@d.EscalationLevel</td>
+                <td>@d.EscalationReason</td>
+                <td>@d.ResolutionTime</td>
+                <td>@d.ResolutionNotes</td>
+                <td>@d.Severity</td>
+            </tr>
+        }
+    </tbody>
+</table>

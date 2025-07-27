@@ -1,0 +1,35 @@
+@page
+@model MVP_Core.Pages.Admin.TrustCascadeModel
+@{
+    ViewData["Title"] = "Trust Cascade Chains";
+}
+<h2>Trust Cascade Chains</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>TaskId</th>
+            <th>InitialAssigneeId</th>
+            <th>FinalResolverId</th>
+            <th>HopCount</th>
+            <th>TrustDecay</th>
+            <th>DelegationChain</th>
+            <th>CreatedAt</th>
+            <th>ResolvedAt</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var c in Model.Cascades)
+        {
+            <tr>
+                <td>@c.TaskId</td>
+                <td>@c.InitialAssigneeId</td>
+                <td>@c.FinalResolverId</td>
+                <td>@c.HopCount</td>
+                <td>@c.TrustDecay</td>
+                <td>@c.DelegationChain</td>
+                <td>@c.CreatedAt</td>
+                <td>@c.ResolvedAt</td>
+            </tr>
+        }
+    </tbody>
+</table>

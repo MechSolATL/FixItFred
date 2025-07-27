@@ -1,0 +1,41 @@
+@page
+@model MVP_Core.Pages.Admin.EscalationAlertsModel
+@{
+    ViewData["Title"] = "Auto-Escalation Alerts";
+}
+<h2>Auto-Escalation Alerts</h2>
+<form method="get">
+    <label>Threshold (minutes):</label>
+    <input type="number" name="ThresholdMinutes" value="@Model.ThresholdMinutes" />
+    <button type="submit">Filter</button>
+</form>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Department</th>
+            <th>DelayStart</th>
+            <th>EscalationLevel</th>
+            <th>EscalationReason</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var a in Model.Alerts)
+        {
+            <tr>
+                <td>@a.Department</td>
+                <td>@a.DelayStart</td>
+                <td>@a.EscalationLevel</td>
+                <td>@a.EscalationReason</td>
+                <td>
+                    <form method="post">
+                        <input type="hidden" name="delayId" value="@a.Id" />
+                        <input type="number" name="escalationLevel" placeholder="Escalation Level" />
+                        <input type="text" name="reason" placeholder="Reason" />
+                        <button type="submit">Override & Escalate</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

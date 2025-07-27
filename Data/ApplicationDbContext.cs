@@ -154,6 +154,8 @@ namespace MVP_Core.Data
         public DbSet<IncidentCompressionLog> IncidentCompressionLogs { get; set; } = null!;
         public DbSet<WellBeingPulseLog> WellBeingPulseLogs { get; set; } = null!;
         public DbSet<AccountabilityDelayLog> AccountabilityDelayLogs { get; set; } = null!;
+        public DbSet<DepartmentDelayLog> DepartmentDelayLogs { get; set; } = null!;
+        public DbSet<TrustCascadeLog> TrustCascadeLogs { get; set; } = null!;
 
         #endregion
 
@@ -285,6 +287,8 @@ namespace MVP_Core.Data
             _ = modelBuilder.Entity<IncidentCompressionLog>().ToTable("IncidentCompressionLogs");
             _ = modelBuilder.Entity<WellBeingPulseLog>().ToTable("WellBeingPulseLogs");
             _ = modelBuilder.Entity<AccountabilityDelayLog>().ToTable("AccountabilityDelayLogs");
+            _ = modelBuilder.Entity<DepartmentDelayLog>().ToTable("DepartmentDelayLogs");
+            _ = modelBuilder.Entity<TrustCascadeLog>().ToTable("TrustCascadeLogs");
 
             modelBuilder.Entity<RoastTemplate>().Property(r => r.Tier).HasConversion<string>();
         }
