@@ -1,0 +1,59 @@
+@page
+@model MVP_Core.Pages.Admin.LiveFeedModel
+@{
+    ViewData["Title"] = "Real-Time Technician Activity Feed";
+}
+<h2>Real-Time Technician Activity Feed</h2>
+<div class="mb-3">
+    <form method="get">
+        <label>Technician:</label>
+        <input type="number" name="TechnicianId" value="@Model.FilterTechnicianId" />
+        <label>Activity Type:</label>
+        <input type="text" name="ActivityType" value="@Model.FilterActivityType" />
+        <label>Time Range (minutes):</label>
+        <input type="number" name="TimeRange" value="@Model.FilterTimeRange" />
+        <button type="submit">Filter</button>
+        <label><input type="checkbox" name="ReplayMode" value="true" @(Model.IsReplayMode ? "checked" : "") /> Replay Mode</label>
+    </form>
+</div>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Timestamp</th>
+            <th>Technician</th>
+            <th>Activity</th>
+            <th>Location</th>
+            <th>Session</th>
+            <th>Route Tag</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var log in Model.ActivityFeed)
+        {
+            <tr>
+                <td>@log.Timestamp.ToString("g")</td>
+                <td>@log.TechnicianId</td>
+                <td>@log.ActivityType</td>
+                <td>@log.Latitude, @log.Longitude</td>
+                <td>@log.SessionId</td>
+                <td>@log.RouteGroupTag</td>
+            </tr>
+        }
+    </tbody>
+</table>
+@if (Model.GeoTrailLogs.Any())
+{
+    <h3>GeoTrail Playback</h3>
+    <div id="geoTrailMap" style="height:400px;"></div>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script>
+        var geoTrail = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.GeoTrailLogs));
+        var map = L.map('geoTrailMap').setView([geoTrail[0].Latitude, geoTrail[0].Longitude], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
+        var latlngs = geoTrail.map(x => [x.Latitude, x.Longitude]);
+        var color = '#007bff';
+        var polyline = L.polyline(latlngs, { color: color }).addTo(map);
+        map.fitBounds(polyline.getBounds());
+    </script>
+}

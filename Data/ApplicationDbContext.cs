@@ -132,6 +132,7 @@ namespace MVP_Core.Data
         public DbSet<TechnicianScheduleConflictLog> TechnicianScheduleConflictLogs { get; set; } = null!;
         public DbSet<TechnicianHeatmapLog> TechnicianHeatmapLogs { get; set; } = null!;
         public DbSet<RoutingOverlayRegion> RoutingOverlayRegions { get; set; } = null!;
+        public DbSet<TechnicianActivityFeedLog> TechnicianActivityFeedLogs { get; set; } = null!;
 
         #endregion
 
@@ -241,6 +242,7 @@ namespace MVP_Core.Data
             _ = modelBuilder.Entity<TechnicianPatternProfile>().ToTable("TechnicianPatternProfiles");
             _ = modelBuilder.Entity<TechnicianHeatmapLog>().ToTable("TechnicianHeatmapLogs");
             _ = modelBuilder.Entity<RoutingOverlayRegion>().ToTable("RoutingOverlayRegions");
+            modelBuilder.Entity<TechnicianActivityFeedLog>().ToTable("TechnicianActivityFeedLogs");
         }
 
         #endregion
