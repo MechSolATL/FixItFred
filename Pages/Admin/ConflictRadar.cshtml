@@ -1,0 +1,58 @@
+@page
+@model MVP_Core.Pages.Admin.ConflictRadarModel
+@{
+    ViewData["Title"] = "Technician Conflict Radar";
+}
+<h2>Technician Conflict Radar</h2>
+<div class="mb-3">
+    <form method="get">
+        <label>Severity Level:</label>
+        <select name="SeverityFilter">
+            <option value="">All</option>
+            <option value="1">Low</option>
+            <option value="2">Medium</option>
+            <option value="3">High</option>
+        </select>
+        <button type="submit">Filter</button>
+    </form>
+</div>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Occurred At</th>
+            <th>Technician</th>
+            <th>Conflict With</th>
+            <th>Type</th>
+            <th>Severity</th>
+            <th>Trust Impact</th>
+            <th>Resolved</th>
+            <th>Resolution Notes</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var log in Model.ConflictLogs)
+        {
+            <tr>
+                <td>@log.OccurredAt.ToString("g")</td>
+                <td>@log.TechnicianId</td>
+                <td>@log.ConflictWithId</td>
+                <td>@log.ConflictType</td>
+                <td>@log.SeverityLevel</td>
+                <td>@log.TrustImpactScore</td>
+                <td>@(log.Resolved ? "Yes" : "No")</td>
+                <td>@log.ResolutionNotes</td>
+                <td>
+                    @if (!log.Resolved)
+                    {
+                        <form method="post">
+                            <input type="hidden" name="ConflictId" value="@log.Id" />
+                            <input type="text" name="ResolutionNotes" placeholder="Resolution notes" />
+                            <button type="submit">Resolve</button>
+                        </form>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

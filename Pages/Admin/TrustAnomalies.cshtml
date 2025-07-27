@@ -1,0 +1,59 @@
+@page
+@model MVP_Core.Pages.Admin.TrustAnomaliesModel
+@{
+    ViewData["Title"] = "Trust Graph Anomalies";
+}
+<h2>Trust Graph Anomalies</h2>
+<div class="mb-3">
+    <form method="get">
+        <label>Status:</label>
+        <select name="StatusFilter">
+            <option value="">All</option>
+            <option value="Unreviewed">Unreviewed</option>
+            <option value="Reviewed">Reviewed</option>
+        </select>
+        <button type="submit">Filter</button>
+    </form>
+</div>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Detected At</th>
+            <th>Technician</th>
+            <th>Anomaly Type</th>
+            <th>Graph Context</th>
+            <th>Score</th>
+            <th>Status</th>
+            <th>Reviewed By</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var log in Model.AnomalyLogs)
+        {
+            <tr>
+                <td>@log.DetectedAt.ToString("g")</td>
+                <td>@log.TechnicianId</td>
+                <td>@log.AnomalyType</td>
+                <td>@log.GraphNodeContext</td>
+                <td>@log.AnomalyScore</td>
+                <td>@log.Status</td>
+                <td>@log.ReviewedBy</td>
+                <td>
+                    @if (log.Status == "Unreviewed")
+                    {
+                        <form method="post">
+                            <input type="hidden" name="AnomalyId" value="@log.Id" />
+                            <input type="text" name="ReviewedBy" placeholder="Reviewer" />
+                            <button type="submit">Mark Reviewed</button>
+                        </form>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<div class="mt-4">
+    <h3>Trust Graph Visualizer (Stub)</h3>
+    <div style="height:300px; background:#f8f9fa; border:1px solid #ccc; text-align:center; padding-top:120px;">Graph visualizer logic will be implemented in future sprints.</div>
+</div>
