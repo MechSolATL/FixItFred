@@ -5,7 +5,7 @@
 @inject MVP_Core.Services.ServiceRequestService ServiceRequestService
 @{
     ViewData["Title"] = "Dispute Manager";
-    var disputes = Model.FilteredDisputes;
+    var disputes = Model.FilteredDisputes ?? new List<DisputeRecord>(); // Sprint 79.0: Razor null safety sync
     var statusOptions = new[] { "Open", "Under Review", "Resolved", "Rejected" };
     var reasonOptions = new[] { "Billing", "Technician", "Outcome" };
 }
@@ -18,7 +18,7 @@
                 <option value="">All</option>
                 @foreach (var s in statusOptions)
                 {
-                    <option value="@s" selected="@(Model.Status == s)">@s</option>
+                    <option value="@s" selected="@(Model.Status == s)">@s</option> // Sprint 79.0: Razor null safety sync
                 }
             </select>
         </div>
@@ -28,13 +28,13 @@
                 <option value="">All</option>
                 @foreach (var r in reasonOptions)
                 {
-                    <option value="@r" selected="@(Model.Reason == r)">@r</option>
+                    <option value="@r" selected="@(Model.Reason == r)">@r</option> // Sprint 79.0: Razor null safety sync
                 }
             </select>
         </div>
         <div class="col-md-3">
             <label>Escalation Level</label>
-            <input type="number" name="EscalationLevel" class="form-control" value="@Model.EscalationLevel" />
+            <input type="number" name="EscalationLevel" class="form-control" value="@Model.EscalationLevel" /> // Sprint 79.0: Razor null safety sync
         </div>
         <div class="col-md-3 d-flex align-items-end">
             <button type="submit" class="btn btn-primary">Filter</button>
@@ -44,7 +44,7 @@
 <table class="table table-bordered">
     <thead><tr><th>ID</th><th>Customer</th><th>Request</th><th>Reason</th><th>Status</th><th>Escalation</th><th>Submitted</th><th>Resolution</th><th>Actions</th></tr></thead>
     <tbody>
-    @foreach (var d in disputes)
+    @foreach (var d in disputes) // Sprint 79.0: Razor null safety sync
     {
         string badgeClass = d.Status == "Resolved" ? "bg-success" : d.Status == "Rejected" ? "bg-danger" : d.Status == "Under Review" ? "bg-warning text-dark" : "bg-secondary";
         <tr>
@@ -62,7 +62,7 @@
                     <select name="Status" class="form-select form-select-sm mb-1">
                         @foreach (var s in statusOptions)
                         {
-                            <option value="@s" selected="@(d.Status == s)">@s</option>
+                            <option value="@s" selected="@(d.Status == s)">@s</option> // Sprint 79.0: Razor null safety sync
                         }
                     </select>
                     <input type="text" name="ResolutionNotes" class="form-control form-control-sm mb-1" value="@d.ResolutionNotes" placeholder="Resolution notes" />

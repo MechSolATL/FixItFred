@@ -2,6 +2,7 @@
 // FixItFred: Sprint 30D.2 — CS860x nullability audit 2024-07-25
 // Added null checks and safe navigation for all nullable references per CS8601, CS8602, CS8603, CS8604
 // Each change is marked with FixItFred comment and timestamp
+// Sprint 78.2: Hardened for CS860X
 
 using MVP_Core.Services.Admin;
 using MVP_Core.Services.Dispatch;
@@ -68,15 +69,13 @@ namespace MVP_Core.Services
                 Status = "Pending"
             };
 
-            _ = _context.ServiceRequests.Add(request);
-            _ = _context.SaveChanges();
+            _ = _context?.ServiceRequests?.Add(request); // Sprint 78.2: Hardened for CS860X
+            _ = _context?.SaveChanges(); // Sprint 78.2: Hardened for CS860X
 
-            // FixItFred: Sprint 30D.2 — Null check for tech and safe navigation for zone 2024-07-25
             var safeZone = zone ?? string.Empty;
-            var tech = _dispatcherService.FindAvailableTechnicianForZone(safeZone);
+            var tech = _dispatcherService?.FindAvailableTechnicianForZone(safeZone); // Sprint 78.2: Hardened for CS860X
             if (tech == null)
             {
-                // FixItFred: Sprint 30D.2 – Fallback for null tech, skip scheduling if no tech found 2024-07-25
                 return request.Id;
             }
             // Convert Data.Models.TechnicianProfileDto to TechnicianStatusDto for PredictETA
@@ -89,7 +88,7 @@ namespace MVP_Core.Services
                 AssignedJobs = 0,
                 LastUpdate = DateTime.UtcNow
             };
-            var eta = _dispatcherService.PredictETA(techStatus, safeZone, delayMinutes).GetAwaiter().GetResult();
+            var eta = _dispatcherService?.PredictETA(techStatus, safeZone, delayMinutes)?.GetAwaiter().GetResult(); // Sprint 78.2: Hardened for CS860X
             var entry = new ScheduleQueue
             {
                 TechnicianId = tech.Id,
@@ -102,9 +101,9 @@ namespace MVP_Core.Services
                 Status = ScheduleStatus.Pending,
                 CreatedAt = DateTime.UtcNow
             };
-            _context.ScheduleQueues.Add(entry);
-            _context.SaveChanges();
-            _ = _dispatchEngine.BroadcastETAAsync(safeZone, $"Technician {tech.FullName ?? "Unknown"} ETA: {eta:t}"); // FixItFred: Sprint 30D.2 — Safe fallback for FullName 2024-07-25
+            _context?.ScheduleQueues?.Add(entry); // Sprint 78.2: Hardened for CS860X
+            _context?.SaveChanges(); // Sprint 78.2: Hardened for CS860X
+            _ = _dispatchEngine?.BroadcastETAAsync(safeZone, $"Technician {tech.FullName ?? "Unknown"} ETA: {eta:t}"); // Sprint 78.2: Hardened for CS860X
 
             return request.Id;
         }
@@ -114,9 +113,9 @@ namespace MVP_Core.Services
         /// </summary>
         public async Task<ServiceRequest?> GetRequestByIdAsync(int requestId)
         {
-            return await _context.ServiceRequests
+            return await _context?.ServiceRequests?
                 .AsNoTracking()
-                .FirstOrDefaultAsync(r => r.Id == requestId);
+                .FirstOrDefaultAsync(r => r.Id == requestId)!; // Sprint 78.2: Hardened for CS860X
         }
 
         /// <summary>
@@ -124,9 +123,9 @@ namespace MVP_Core.Services
         /// </summary>
         public List<ServiceRequest> GetCompletedRequestsByCustomer(string customerEmail)
         {
-            return _context.ServiceRequests
+            return _context?.ServiceRequests?
                 .Where(r => r.Email == customerEmail && r.CompletedDate != null)
-                .ToList();
+                .ToList() ?? new List<ServiceRequest>(); // Sprint 78.2: Hardened for CS860X
         }
     }
 }

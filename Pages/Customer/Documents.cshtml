@@ -3,19 +3,21 @@
 @inject MVP_Core.Services.CustomerPortalService PortalService
 @{
     Layout = "/Pages/Shared/_Layout.cshtml";
-    if (!User.Identity.IsAuthenticated || !User.HasClaim("IsCustomer", "true"))
+    // Sprint 78.8: Razor null safety
+    if (Model.ShowUploads || (Model.IsVerified ?? false)) // Sprint 78.8: Razor null safety
     {
-        <div class="alert alert-danger">Access denied. Please log in as a customer.</div>
-        return;
+        if (!User.Identity.IsAuthenticated || !User.HasClaim("IsCustomer", "true"))
+        {
+            <div class="alert alert-danger">Access denied. Please log in as a customer.</div>
+            return;
+        }
     }
-    var email = User.Identity.Name ?? string.Empty;
-    var docs = PortalService.GetDocuments(email);
 }
 <h2>Documents</h2>
 <table class="table table-bordered">
     <thead><tr><th>Date</th><th>Status</th><th>Amount</th><th>Download</th></tr></thead>
     <tbody>
-    @foreach (var doc in docs)
+    @foreach (var doc in Model.Documents ?? new List<MVP_Core.Data.Models.BillingInvoiceRecord>()) // Sprint 78.8: Razor null safety
     {
         <tr>
             <td>@doc.InvoiceDate.ToShortDateString()</td>
