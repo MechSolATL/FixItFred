@@ -10,24 +10,28 @@ namespace MVP_Core.Pages.Admin
 {
     public class KarmaCenterModel : PageModel
     {
-        private readonly TechnicianKarmaService _karmaService;
-        private readonly ApplicationDbContext _db;
+        private readonly TechnicianKarmaService _karmaService; // Sprint 79.3: CS8618/CS860X warning cleanup
+        private readonly ApplicationDbContext _db; // Sprint 79.3: CS8618/CS860X warning cleanup
         public KarmaCenterModel(TechnicianKarmaService karmaService, ApplicationDbContext db)
         {
-            _karmaService = karmaService;
-            _db = db;
+            _karmaService = karmaService ?? throw new System.ArgumentNullException(nameof(karmaService)); // Sprint 79.3: CS8618/CS860X warning cleanup
+            _db = db ?? throw new System.ArgumentNullException(nameof(db)); // Sprint 79.3: CS8618/CS860X warning cleanup
+            TechnicianList = new List<MVP_Core.Data.Models.Technician>(); // Sprint 79.3: CS8618/CS860X warning cleanup
+            KarmaHistory = new List<TechnicianKarmaLog>(); // Sprint 79.3: CS8618/CS860X warning cleanup
+            CurrentTrend = string.Empty; // Sprint 79.3: CS8618/CS860X warning cleanup
+            AdminNote = string.Empty; // Sprint 79.3: CS8618/CS860X warning cleanup
         }
         [BindProperty]
-        public int TechnicianId { get; set; }
-        public List<MVP_Core.Data.Models.Technician> TechnicianList;
-        public List<TechnicianKarmaLog> KarmaHistory { get; set; } = new List<TechnicianKarmaLog>();
-        public int? CurrentKarmaScore { get; set; }
-        public string CurrentTrend { get; set; } = "";
+        public int TechnicianId { get; set; } // Sprint 79.3: CS8618/CS860X warning cleanup
+        public List<MVP_Core.Data.Models.Technician> TechnicianList { get; set; } = new List<MVP_Core.Data.Models.Technician>(); // Sprint 79.3: CS8618/CS860X warning cleanup
+        public List<TechnicianKarmaLog> KarmaHistory { get; set; } = new List<TechnicianKarmaLog>(); // Sprint 79.3: CS8618/CS860X warning cleanup
+        public int? CurrentKarmaScore { get; set; } // Sprint 79.3: CS8618/CS860X warning cleanup
+        public string CurrentTrend { get; set; } = string.Empty; // Sprint 79.3: CS8618/CS860X warning cleanup
         [BindProperty]
-        public int ManualScore { get; set; }
+        public int ManualScore { get; set; } // Sprint 79.3: CS8618/CS860X warning cleanup
         [BindProperty]
-        public string AdminNote { get; set; } = "";
-        public string GetKarmaColor() => GetKarmaColor(CurrentKarmaScore ?? 0);
+        public string AdminNote { get; set; } = string.Empty; // Sprint 79.3: CS8618/CS860X warning cleanup
+        public string GetKarmaColor() => GetKarmaColor(CurrentKarmaScore ?? 0); // Sprint 79.3: CS8618/CS860X warning cleanup
         public string GetKarmaColor(int score)
         {
             if (score >= 80) return "green";
@@ -36,28 +40,28 @@ namespace MVP_Core.Pages.Admin
         }
         public async Task OnGetAsync()
         {
-            TechnicianList = await _db.Technicians.ToListAsync();
+            TechnicianList = await _db.Technicians.ToListAsync(); // Sprint 79.3: CS8618/CS860X warning cleanup
         }
         public async Task<IActionResult> OnPostFilterAsync()
         {
-            TechnicianList = await _db.Technicians.ToListAsync();
+            TechnicianList = await _db.Technicians.ToListAsync(); // Sprint 79.3: CS8618/CS860X warning cleanup
             if (TechnicianId > 0)
             {
-                CurrentKarmaScore = await _karmaService.CalculateKarmaAsync(TechnicianId);
-                KarmaHistory = await _karmaService.GetKarmaHistoryAsync(TechnicianId);
-                CurrentTrend = KarmaHistory.FirstOrDefault()?.Trend ?? "Stable";
+                CurrentKarmaScore = await _karmaService.CalculateKarmaAsync(TechnicianId); // Sprint 79.3: CS8618/CS860X warning cleanup
+                KarmaHistory = await _karmaService.GetKarmaHistoryAsync(TechnicianId); // Sprint 79.3: CS8618/CS860X warning cleanup
+                CurrentTrend = KarmaHistory.FirstOrDefault()?.Trend ?? "Stable"; // Sprint 79.3: CS8618/CS860X warning cleanup
             }
             return Page();
         }
         public async Task<IActionResult> OnPostManualOverrideAsync()
         {
-            TechnicianList = await _db.Technicians.ToListAsync();
+            TechnicianList = await _db.Technicians.ToListAsync(); // Sprint 79.3: CS8618/CS860X warning cleanup
             if (TechnicianId > 0)
             {
-                await _karmaService.ApplyManualAdjustment(TechnicianId, ManualScore, AdminNote, User?.Identity?.Name ?? "admin");
-                CurrentKarmaScore = await _karmaService.CalculateKarmaAsync(TechnicianId);
-                KarmaHistory = await _karmaService.GetKarmaHistoryAsync(TechnicianId);
-                CurrentTrend = KarmaHistory.FirstOrDefault()?.Trend ?? "Stable";
+                await _karmaService.ApplyManualAdjustment(TechnicianId, ManualScore, AdminNote, User?.Identity?.Name ?? "admin"); // Sprint 79.3: CS8618/CS860X warning cleanup
+                CurrentKarmaScore = await _karmaService.CalculateKarmaAsync(TechnicianId); // Sprint 79.3: CS8618/CS860X warning cleanup
+                KarmaHistory = await _karmaService.GetKarmaHistoryAsync(TechnicianId); // Sprint 79.3: CS8618/CS860X warning cleanup
+                CurrentTrend = KarmaHistory.FirstOrDefault()?.Trend ?? "Stable"; // Sprint 79.3: CS8618/CS860X warning cleanup
             }
             return Page();
         }

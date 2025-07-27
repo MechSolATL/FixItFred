@@ -10,36 +10,38 @@ namespace MVP_Core.Pages.Admin
 {
     public class PatternProfilerModel : PageModel
     {
-        private readonly TechnicianPatternProfilerService _profilerService;
+        private readonly TechnicianPatternProfilerService _profilerService; // Sprint 79.3: CS8618/CS860X warning cleanup
         public PatternProfilerModel(TechnicianPatternProfilerService profilerService)
         {
-            _profilerService = profilerService;
-            Patterns = new List<TechnicianPatternProfile>();
-            Annotations = new Dictionary<int, string>();
+            _profilerService = profilerService ?? throw new System.ArgumentNullException(nameof(profilerService)); // Sprint 79.3: CS8618/CS860X warning cleanup
+            Patterns = new List<TechnicianPatternProfile>(); // Sprint 79.3: CS8618/CS860X warning cleanup
+            Annotations = new Dictionary<int, string>(); // Sprint 79.3: CS8618/CS860X warning cleanup
+            SelectedRiskLevel = string.Empty; // Sprint 79.3: CS8618/CS860X warning cleanup
+            SelectedPatternType = string.Empty; // Sprint 79.3: CS8618/CS860X warning cleanup
         }
 
         [BindProperty]
-        public string SelectedRiskLevel { get; set; }
+        public string SelectedRiskLevel { get; set; } = string.Empty; // Sprint 79.3: CS8618/CS860X warning cleanup
         [BindProperty]
-        public string SelectedPatternType { get; set; }
-        public List<TechnicianPatternProfile> Patterns { get; set; }
+        public string SelectedPatternType { get; set; } = string.Empty; // Sprint 79.3: CS8618/CS860X warning cleanup
+        public List<TechnicianPatternProfile> Patterns { get; set; } = new List<TechnicianPatternProfile>(); // Sprint 79.3: CS8618/CS860X warning cleanup
         [BindProperty]
-        public Dictionary<int, string> Annotations { get; set; }
+        public Dictionary<int, string> Annotations { get; set; } = new Dictionary<int, string>(); // Sprint 79.3: CS8618/CS860X warning cleanup
 
-        public string GetAnnotation(int id) => Annotations.ContainsKey(id) ? Annotations[id] : "";
+        public string GetAnnotation(int id) => Annotations.ContainsKey(id) ? Annotations[id] : string.Empty; // Sprint 79.3: CS8618/CS860X warning cleanup
 
         public async Task OnGetAsync()
         {
-            Patterns = await _profilerService.AnalyzeEscalationPatternsAsync();
+            Patterns = await _profilerService.AnalyzeEscalationPatternsAsync(); // Sprint 79.3: CS8618/CS860X warning cleanup
         }
 
         public async Task<IActionResult> OnPostRunAnalysisAsync()
         {
-            var allPatterns = await _profilerService.AnalyzeEscalationPatternsAsync();
+            var allPatterns = await _profilerService.AnalyzeEscalationPatternsAsync(); // Sprint 79.3: CS8618/CS860X warning cleanup
             Patterns = allPatterns
                 .Where(p => (string.IsNullOrEmpty(SelectedRiskLevel) || p.RiskLevel == SelectedRiskLevel)
                          && (string.IsNullOrEmpty(SelectedPatternType) || p.PatternType == SelectedPatternType))
-                .ToList();
+                .ToList(); // Sprint 79.3: CS8618/CS860X warning cleanup
             return Page();
         }
     }

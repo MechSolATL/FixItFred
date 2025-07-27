@@ -9,34 +9,35 @@ namespace MVP_Core.Pages.Admin
 {
     public class MoraleCenterModel : PageModel
     {
-        private readonly TechnicianMoraleService _moraleService;
+        private readonly TechnicianMoraleService _moraleService; // Sprint 79.3: CS8618/CS860X warning cleanup
         public MoraleCenterModel(TechnicianMoraleService moraleService)
         {
-            _moraleService = moraleService;
-            MoraleLogs = new List<TechnicianMoraleLog>();
+            _moraleService = moraleService ?? throw new System.ArgumentNullException(nameof(moraleService)); // Sprint 79.3: CS8618/CS860X warning cleanup
+            MoraleLogs = new List<TechnicianMoraleLog>(); // Sprint 79.3: CS8618/CS860X warning cleanup
+            Notes = string.Empty; // Sprint 79.3: CS8618/CS860X warning cleanup
         }
         [BindProperty]
-        public int TechnicianId { get; set; }
+        public int TechnicianId { get; set; } // Sprint 79.3: CS8618/CS860X warning cleanup
         [BindProperty]
-        public int MoraleScore { get; set; }
+        public int MoraleScore { get; set; } // Sprint 79.3: CS8618/CS860X warning cleanup
         [BindProperty]
-        public string Notes { get; set; }
+        public string Notes { get; set; } = string.Empty; // Sprint 79.3: CS8618/CS860X warning cleanup
         [BindProperty]
-        public int TrustImpact { get; set; }
-        public List<TechnicianMoraleLog> MoraleLogs { get; set; }
+        public int TrustImpact { get; set; } // Sprint 79.3: CS8618/CS860X warning cleanup
+        public List<TechnicianMoraleLog> MoraleLogs { get; set; } = new List<TechnicianMoraleLog>(); // Sprint 79.3: CS8618/CS860X warning cleanup
         public async Task OnGetAsync()
         {
-            MoraleLogs = TechnicianId > 0 ? await _moraleService.GetMoraleLogsAsync(TechnicianId) : new List<TechnicianMoraleLog>();
+            MoraleLogs = TechnicianId > 0 ? await _moraleService.GetMoraleLogsAsync(TechnicianId) : new List<TechnicianMoraleLog>(); // Sprint 79.3: CS8618/CS860X warning cleanup
         }
         public async Task<IActionResult> OnPostFilterAsync()
         {
-            MoraleLogs = TechnicianId > 0 ? await _moraleService.GetMoraleLogsAsync(TechnicianId) : new List<TechnicianMoraleLog>();
+            MoraleLogs = TechnicianId > 0 ? await _moraleService.GetMoraleLogsAsync(TechnicianId) : new List<TechnicianMoraleLog>(); // Sprint 79.3: CS8618/CS860X warning cleanup
             return Page();
         }
         public async Task<IActionResult> OnPostAddMoraleAsync()
         {
-            await _moraleService.AddMoraleEntryAsync(TechnicianId, MoraleScore, Notes, TrustImpact);
-            MoraleLogs = await _moraleService.GetMoraleLogsAsync(TechnicianId);
+            await _moraleService.AddMoraleEntryAsync(TechnicianId, MoraleScore, Notes, TrustImpact); // Sprint 79.3: CS8618/CS860X warning cleanup
+            MoraleLogs = await _moraleService.GetMoraleLogsAsync(TechnicianId); // Sprint 79.3: CS8618/CS860X warning cleanup
             return Page();
         }
     }

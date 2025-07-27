@@ -8,14 +8,14 @@
     <label>Technician:</label>
     <select asp-for="TechnicianId">
         <option value="">Select Technician</option>
-        @foreach (var tech in Model.TechnicianList)
+        @foreach (var tech in Model.TechnicianList ?? new List<MVP_Core.Data.Models.Technician>()) // Sprint 79.4: Razor null safety and sync
         {
             <option value="@tech.Id">@tech.FullName</option>
         }
     </select>
     <button type="submit" asp-page-handler="Filter">View Karma</button>
 </form>
-@if (Model.CurrentKarmaScore.HasValue)
+@if ((Model.CurrentKarmaScore ?? 0) > 0) // Sprint 79.4: Razor null safety and sync
 {
     <div>
         <h4>Karma Score: <span style="color:@Model.GetKarmaColor()">@Model.CurrentKarmaScore</span> <span>(@Model.CurrentTrend)</span></h4>
@@ -41,7 +41,7 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var log in Model.KarmaHistory)
+            @foreach (var log in Model.KarmaHistory ?? new List<TechnicianKarmaLog>()) // Sprint 79.4: Razor null safety and sync
             {
                 <tr style="color:@Model.GetKarmaColor(log.KarmaScore)">
                     <td>@log.Timestamp</td>
@@ -55,3 +55,4 @@
         </tbody>
     </table>
 }
+// Sprint 79.4: Razor null safety and sync

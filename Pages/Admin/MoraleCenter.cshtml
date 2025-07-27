@@ -33,7 +33,7 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var log in Model.MoraleLogs)
+        @foreach (var log in Model.MoraleLogs ?? new List<TechnicianMoraleLog>()) // Sprint 79.4: Razor null safety and sync
         {
             <tr>
                 <td>@log.Timestamp</td>
@@ -51,10 +51,10 @@
         var chart = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.MoraleLogs.Select(x => x.Timestamp.ToString("MM/dd HH:mm")))) ,
+                labels: @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject((Model.MoraleLogs ?? new List<TechnicianMoraleLog>()).Select(x => x.Timestamp.ToString("MM/dd HH:mm")))), // Sprint 79.4: Razor null safety and sync
                 datasets: [{
                     label: 'Morale Score',
-                    data: @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.MoraleLogs.Select(x => x.MoraleScore))),
+                    data: @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject((Model.MoraleLogs ?? new List<TechnicianMoraleLog>()).Select(x => x.MoraleScore))), // Sprint 79.4: Razor null safety and sync
                     borderColor: 'blue',
                     fill: false
                 }]
@@ -62,3 +62,4 @@
         });
     </script>
 }
+// Sprint 79.4: Razor null safety and sync

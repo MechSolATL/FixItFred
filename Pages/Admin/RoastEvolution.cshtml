@@ -21,7 +21,7 @@
             </tr>
         </thead>
         <tbody>
-        @foreach (var roast in Model.RoastTemplates)
+        @foreach (var roast in Model.RoastTemplates ?? new List<RoastTemplate>()) // Sprint 79.4: Razor null safety and sync
         {
             <tr>
                 <td>@roast.Message</td>
@@ -29,9 +29,9 @@
                 <td>@roast.Category</td>
                 <td>@roast.SuccessRate</td>
                 <td>
-                    @if (roast.LegacyStatus) { <span class="badge bg-warning">Legacy</span> }
-                    @if (roast.Retired) { <span class="badge bg-danger">Retired</span> }
-                    @if (roast.AIAuthored) { <span class="badge bg-info">AI</span> }
+                    @if (roast.LegacyStatus) { <span class="badge bg-warning">Legacy</span> } <!-- Sprint 79.5: Fixed bool ?? bool misuse -->
+                    @if (roast.Retired) { <span class="badge bg-danger">Retired</span> } <!-- Sprint 79.5: Fixed bool ?? bool misuse -->
+                    @if (roast.AIAuthored) { <span class="badge bg-info">AI</span> } <!-- Sprint 79.5: Fixed bool ?? bool misuse -->
                 </td>
                 <td>
                     <form method="post" asp-page-handler="Promote" asp-route-id="@roast.Id"><button class="btn btn-success" type="submit">Promote</button></form>
@@ -56,7 +56,7 @@
             </tr>
         </thead>
         <tbody>
-        @foreach (var log in Model.EvolutionLogs)
+        @foreach (var log in Model.EvolutionLogs ?? new List<RoastEvolutionLog>()) // Sprint 79.4: Razor null safety and sync
         {
             <tr>
                 <td>@log.Timestamp</td>
@@ -76,11 +76,11 @@
         <textarea name="Prompt" rows="3" cols="60" placeholder="Enter AI prompt..."></textarea><br />
         <button type="submit" class="btn btn-primary">Generate Preview</button>
     </form>
-    @if (Model.AIPreview != null)
+    @if (Model.AIPreview != null && Model.AIPreview.Any()) // Sprint 79.4: Razor null safety and sync
     {
         <h4>AI Preview</h4>
         <ul>
-        @foreach (var roast in Model.AIPreview)
+        @foreach (var roast in Model.AIPreview ?? new List<RoastTemplate>()) // Sprint 79.4: Razor null safety and sync
         {
             <li>@roast.Message (@roast.Tier, @roast.Category)</li>
         }
@@ -94,12 +94,13 @@
     var chart = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.RoastTemplates.Select(r => r.Message).ToList())),
+            labels: @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject((Model.RoastTemplates ?? new List<RoastTemplate>()).Select(r => r.Message).ToList())), // Sprint 79.4: Razor null safety and sync
             datasets: [{
                 label: 'Success %',
-                data: @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.RoastTemplates.Select(r => r.SuccessRate).ToList())),
+                data: @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject((Model.RoastTemplates ?? new List<RoastTemplate>()).Select(r => r.SuccessRate).ToList())), // Sprint 79.4: Razor null safety and sync
                 backgroundColor: 'rgba(54, 162, 235, 0.5)'
             }]
         }
     });
 </script>
+<!-- Sprint 79.5: Fixed bool ?? bool misuse -->

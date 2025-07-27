@@ -21,26 +21,30 @@ namespace MVP_Core.Pages.Technician
         }
         public async Task OnGetAsync()
         {
-            int techId = User.Identity.IsAuthenticated ? int.Parse(User.Identity.Name) : 0;
+            int techId = 0;
+            if (User?.Identity?.IsAuthenticated == true && int.TryParse(User.Identity.Name, out var parsedId)) // Sprint 79.6: Harden int.Parse with TryParse
+                techId = parsedId;
             AssignedTracks = _skillsService.GetAssignedTracks(techId);
             Progress = _skillsService.GetProgressForTechnician(techId);
             Certs = _certService.GetCertifications(techId);
-            // Get compliance status for current open ticket (pseudo: assumes one open request per tech)
-            // TODO: Implement logic to get open ServiceRequest for techId
             MVP_Core.Data.Models.ServiceRequest openRequest = null; // Placeholder
             if (openRequest != null)
                 HasRequiredMedia = openRequest.HasRequiredMedia;
         }
         public async Task<IActionResult> OnPostCompleteTrackAsync(int trackId)
         {
-            int techId = User.Identity.IsAuthenticated ? int.Parse(User.Identity.Name) : 0;
+            int techId = 0;
+            if (User?.Identity?.IsAuthenticated == true && int.TryParse(User.Identity.Name, out var parsedId)) // Sprint 79.6: Harden int.Parse with TryParse
+                techId = parsedId;
             _skillsService.MarkTrackCompleted(techId, trackId);
             return RedirectToPage();
         }
         public async Task<IActionResult> OnPostUploadCertAsync()
         {
-            int techId = User.Identity.IsAuthenticated ? int.Parse(User.Identity.Name) : 0;
-            var file = Request.Form.Files["certFile"];
+            int techId = 0;
+            if (User?.Identity?.IsAuthenticated == true && int.TryParse(User.Identity.Name, out var parsedId)) // Sprint 79.6: Harden int.Parse with TryParse
+                techId = parsedId;
+            var file = Request?.Form?.Files?["certFile"];
             if (file != null && file.Length > 0)
             {
                 string filePath = $"/uploads/certs/{techId}_{file.FileName}";

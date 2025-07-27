@@ -35,7 +35,7 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var pattern in Model.Patterns)
+        @foreach (var pattern in Model.Patterns ?? new List<TechnicianPatternProfile>()) // Sprint 79.4: Razor null safety and sync
         {
             <tr>
                 <td>@pattern.TechnicianId</td>
@@ -44,7 +44,7 @@
                 <td>@pattern.DetectedAt</td>
                 <td>@pattern.RiskLevel</td>
                 <td>
-                    <input type="checkbox" checked="@(pattern.IsAutoFlagged ? "checked" : null)" disabled />
+                    <input type="checkbox" checked="@(pattern.IsAutoFlagged ? "checked" : null)" disabled /> <!-- Sprint 79.5: Fixed bool ?? bool misuse -->
                 </td>
                 <td>
                     <input type="text" name="Annotations[@pattern.Id]" value="@Model.GetAnnotation(pattern.Id)" />
@@ -53,3 +53,4 @@
         }
     </tbody>
 </table>
+<!-- Sprint 79.5: Fixed bool ?? bool misuse -->

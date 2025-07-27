@@ -45,7 +45,7 @@ namespace Services.Admin
                 SnapshotHash = snapshotHash,
                 TriggeredBy = triggeredBy,
                 Success = true, // Assume success for now
-                Notes = notes
+                Notes = notes ?? string.Empty // Sprint 79.6: Null coalescing for notes
             };
             _db.ReplayAuditLogs.Add(replayLog);
             await _db.SaveChangesAsync();
@@ -61,7 +61,7 @@ namespace Services.Admin
                 ScheduledForUtc = scheduledForUtc,
                 Executed = false,
                 SnapshotHash = snapshotHash,
-                Notes = notes
+                Notes = notes ?? string.Empty // Sprint 79.6: Null coalescing for notes
             };
             _db.RecoveryScenarioLogs.Add(scenario);
             await _db.SaveChangesAsync();
@@ -71,7 +71,7 @@ namespace Services.Admin
         public async Task<int> RunScheduledScenariosAsync()
         {
             var now = DateTime.UtcNow;
-            var scenarios = _db.RecoveryScenarioLogs.Where(s => !s.Executed && s.ScheduledForUtc <= now).ToList();
+            var scenarios = await _db.RecoveryScenarioLogs.Where(s => !s.Executed && s.ScheduledForUtc <= now).ToListAsync(); // Sprint 79.6: Await ToListAsync for async compliance
             int executedCount = 0;
             foreach (var scenario in scenarios)
             {

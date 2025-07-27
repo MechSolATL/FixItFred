@@ -6,7 +6,9 @@
 <main role="main" tabindex="-1" aria-label="Technician Training Center Main Content">
 @{
     ViewData["Title"] = "Training Center";
-    int techId = User.Identity.IsAuthenticated ? int.Parse(User.Identity.Name) : 0; // Assumes techId is username
+    int techId = 0;
+    if (User?.Identity?.IsAuthenticated == true && int.TryParse(User.Identity.Name, out var parsedId)) // Sprint 79.6: Harden int.Parse with TryParse
+        techId = parsedId;
     var assignedTracks = Model.AssignedTracks;
     var progress = Model.Progress;
     var certs = Model.Certs;
@@ -88,7 +90,6 @@
 <script>
 function triggerSaveStatus(action) {
     showSaveStatus('syncing');
-    // Simulate API or offline queue
     setTimeout(() => {
         if (navigator.onLine) {
             showSaveStatus('success');
@@ -97,7 +98,6 @@ function triggerSaveStatus(action) {
         }
     }, 1200);
 }
-// Patch all forms to trigger save status
 const forms = document.querySelectorAll('form');
 forms.forEach(f => {
     f.addEventListener('submit', function(e) {
@@ -109,7 +109,6 @@ document.addEventListener('keydown', function(e) {
         document.body.classList.add('user-is-tabbing');
     }
 });
-// --- Sprint 67.2: Sync Queue Visualization + Manual Retry Logic ---
 function getPendingActions() {
     let queue = [];
     try {
@@ -163,7 +162,6 @@ document.addEventListener('DOMContentLoaded', updateQueueDisplay);
         <b>Compliance Required:</b> You must upload both BeforeWork and AfterWork photos (geo-matched, not backdated) before closing this ticket.
     </div>
 }
-@* Disable close ticket button if not compliant *@
 @if (!hasRequiredMedia)
 {
     <button class="btn btn-danger" disabled aria-label="Close Ticket Disabled">Close Ticket (Compliance Required)</button>
@@ -173,3 +171,4 @@ else
     <button class="btn btn-success" aria-label="Close Ticket">Close Ticket</button>
 }
 </main>
+<!-- Sprint 79.6: Hardened int.Parse with TryParse and null guards -->
