@@ -1,0 +1,55 @@
+@page
+@model MVP_Core.Pages.Admin.UptimeHeartbeatsModel
+@{
+    ViewData["Title"] = "Uptime Heartbeats";
+    Layout = "/Pages/Shared/_Layout.cshtml";
+}
+<h2>Uptime Heartbeat Logs</h2>
+<form method="get" class="mb-3">
+    <div class="row g-2">
+        <div class="col-md-3">
+            <input type="number" name="TechnicianId" value="@Model.FilterTechnicianId" class="form-control" placeholder="Technician ID" />
+        </div>
+        <div class="col-md-3">
+            <input type="text" name="SessionId" value="@Model.FilterSessionId" class="form-control" placeholder="Session ID" />
+        </div>
+        <div class="col-md-3">
+            <input type="text" name="Region" value="@Model.FilterRegion" class="form-control" placeholder="Region" />
+        </div>
+        <div class="col-md-3">
+            <button type="submit" class="btn btn-primary">Filter</button>
+            <button type="submit" class="btn btn-secondary ms-2" formaction="?handler=ExportCsv">Export CSV</button>
+        </div>
+    </div>
+</form>
+<table class="table table-bordered table-hover">
+    <thead>
+        <tr>
+            <th>Technician</th>
+            <th>Heartbeat At</th>
+            <th>Active</th>
+            <th>Battery</th>
+            <th>Network</th>
+            <th>Session</th>
+            <th>Region</th>
+            <th>Geo Confidence</th>
+            <th>Log Source</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var log in Model.Heartbeats)
+        {
+            <tr>
+                <td>@log.TechnicianId</td>
+                <td>@log.HeartbeatAt.ToString("g")</td>
+                <td>@(log.IsActive ? "Yes" : "No")</td>
+                <td>@log.BatteryLevel</td>
+                <td>@log.NetworkType</td>
+                <td>@log.SessionId</td>
+                <td>@log.Region</td>
+                <td>@log.GeoConfidence</td>
+                <td>@log.LogSource</td>
+            </tr>
+        }
+    </tbody>
+</table>

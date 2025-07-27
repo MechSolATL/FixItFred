@@ -1,0 +1,61 @@
+@page
+@model MVP_Core.Pages.Admin.TelemetryCenterModel
+@{
+    ViewData["Title"] = "Telemetry Center";
+    Layout = "/Pages/Shared/_Layout.cshtml";
+}
+<h2>Live Session Telemetry</h2>
+<form method="get" class="mb-3">
+    <div class="row g-2">
+        <div class="col-md-3">
+            <input type="number" name="TechnicianId" value="@Model.FilterTechnicianId" class="form-control" placeholder="Technician ID" />
+        </div>
+        <div class="col-md-3">
+            <input type="text" name="SessionId" value="@Model.FilterSessionId" class="form-control" placeholder="Session ID" />
+        </div>
+        <div class="col-md-3">
+            <input type="text" name="Region" value="@Model.FilterRegion" class="form-control" placeholder="Region" />
+        </div>
+        <div class="col-md-3">
+            <button type="submit" class="btn btn-primary">Filter</button>
+        </div>
+    </div>
+</form>
+<table class="table table-bordered table-hover">
+    <thead>
+        <tr>
+            <th>Technician</th>
+            <th>Session</th>
+            <th>Start</th>
+            <th>End</th>
+            <th>Duration (min)</th>
+            <th>Interruptions</th>
+            <th>Device</th>
+            <th>GPS Accuracy</th>
+            <th>Signal</th>
+            <th>Uptime</th>
+            <th>Status</th>
+            <th>Notes</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var tele in Model.Telemetries)
+        {
+            var statusClass = tele.UptimeStatus == "Green" ? "bg-success" : tele.UptimeStatus == "Yellow" ? "bg-warning" : "bg-danger";
+            <tr>
+                <td>@tele.TechnicianId</td>
+                <td>@tele.SessionId</td>
+                <td>@tele.StartTime.ToString("g")</td>
+                <td>@tele.EndTime?.ToString("g")</td>
+                <td>@tele.TotalDurationMinutes</td>
+                <td>@tele.Interruptions</td>
+                <td>@tele.DeviceType</td>
+                <td>@tele.GpsAccuracyAvg</td>
+                <td>@tele.SignalStrength</td>
+                <td>@tele.UptimeStatus</td>
+                <td><span class="badge @statusClass">@tele.UptimeStatus</span></td>
+                <td>@tele.Notes</td>
+            </tr>
+        }
+    </tbody>
+</table>

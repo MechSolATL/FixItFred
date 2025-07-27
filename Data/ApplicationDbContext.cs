@@ -139,6 +139,8 @@ namespace MVP_Core.Data
         public DbSet<RedemptionOpportunity> RedemptionOpportunities { get; set; } = null!;
         public DbSet<GpsDriftEventLog> GpsDriftEventLogs { get; set; } = null!;
         public DbSet<SlaMissAlert> SlaMissAlerts { get; set; } = null!;
+        public DbSet<TechnicianSessionTelemetry> TechnicianSessionTelemetries { get; set; } = null!;
+        public DbSet<UptimeHeartbeatLog> UptimeHeartbeatLogs { get; set; } = null!;
 
         #endregion
 
@@ -255,6 +257,8 @@ namespace MVP_Core.Data
             modelBuilder.Entity<RedemptionOpportunity>().ToTable("RedemptionOpportunities");
             _ = modelBuilder.Entity<GpsDriftEventLog>().ToTable("GpsDriftEventLogs");
             _ = modelBuilder.Entity<SlaMissAlert>().ToTable("SlaMissAlerts");
+            _ = modelBuilder.Entity<TechnicianSessionTelemetry>().ToTable("TechnicianSessionTelemetries");
+            _ = modelBuilder.Entity<UptimeHeartbeatLog>().ToTable("UptimeHeartbeatLogs");
         }
 
         #endregion
