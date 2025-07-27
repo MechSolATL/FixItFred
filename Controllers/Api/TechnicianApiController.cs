@@ -21,17 +21,15 @@ namespace MVP_Core.Controllers.Api
         private readonly IAuditTrailLogger _auditLogger;
         public TechnicianApiController(IAuditTrailLogger auditLogger) { _auditLogger = auditLogger; }
 
-        // Sprint 26.5 Patch Log: CS0019 fix — Null-coalescing operator type mismatch resolved. Now projects both lists to TechnicianViewModel before fallback. Nova review.
         [HttpGet("/api/technicians/active")]
         public async Task<IActionResult> GetActiveTechnicians([FromServices] ITechnicianService techService)
         {
             if (techService == null) throw new ArgumentNullException(nameof(techService)); // CS8604 fix
             var techs = await techService.GetAllAsync(); // Returns List<TechnicianViewModel>
             var activeTechs = techs?.Where(t => t.IsActive).ToList() ?? new List<TechnicianViewModel>();
-            return Ok(activeTechs);
+            return Ok(activeTechs ?? new List<TechnicianViewModel>()); // Sprint 79.7: TechnicianApiController cleanup
         }
 
-        // Sprint 30E - Secure Technician GPS API
         [Authorize(Roles = "Technician")]
         [HttpPost("/api/tech/update-location")]
         public async Task<IActionResult> UpdateLocation(
@@ -40,14 +38,12 @@ namespace MVP_Core.Controllers.Api
             [FromServices] NotificationDispatchEngine dispatchEngine,
             [FromBody] TechnicianLocationUpdateDto dto)
         {
-            // Extract TechnicianId from JWT/claims
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
             if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int techId))
                 return Unauthorized();
-            if (dto.TechnicianId != techId)
+            if (dto == null || dto.TechnicianId != techId) // Sprint 79.7: TechnicianApiController cleanup
                 return Forbid();
 
-            // Anti-spam debounce: block if last update < 15s ago
             var lastLog = db.TechTrackingLogs
                 .Where(l => l.TechnicianId == techId)
                 .OrderByDescending(l => l.Timestamp)
@@ -55,7 +51,6 @@ namespace MVP_Core.Controllers.Api
             if (lastLog != null && (DateTime.UtcNow - lastLog.Timestamp).TotalSeconds < 15)
                 return StatusCode(429, new { error = "Too many updates. Please wait before sending again." });
 
-            // Log attempt
             var ip = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
             var userAgent = Request.Headers["User-Agent"].ToString();
             db.TechTrackingLogs.Add(new MVP_Core.Data.TechTrackingLog {
@@ -74,7 +69,6 @@ namespace MVP_Core.Controllers.Api
             tech.Longitude = dto.Longitude;
             await db.SaveChangesAsync();
 
-            // FixItFred: Sprint 30E.3 — Dynamic ETA prediction and broadcast
             var queues = db.ScheduleQueues.Where(q => q.TechnicianId == tech.Id && q.Status == ScheduleStatus.Pending).ToList();
             foreach (var queue in queues)
             {
@@ -85,24 +79,23 @@ namespace MVP_Core.Controllers.Api
                     techProfile.Longitude = dto.Longitude;
                     var techStatus = new MVP_Core.Models.Admin.TechnicianStatusDto {
                         TechnicianId = techProfile.Id,
-                        Name = techProfile.FullName,
-                        Status = techProfile.Specialty,
+                        Name = techProfile.FullName ?? string.Empty, // Sprint 79.7: TechnicianApiController cleanup
+                        Status = techProfile.Specialty ?? string.Empty, // Sprint 79.7: TechnicianApiController cleanup
                         DispatchScore = 100,
                         LastPing = DateTime.UtcNow,
                         AssignedJobs = 0,
                         LastUpdate = DateTime.UtcNow
                     };
-                    var eta = dispatcherService.PredictETA(techStatus, queue.Zone, 0).GetAwaiter().GetResult();
+                    var eta = dispatcherService.PredictETA(techStatus, queue.Zone ?? string.Empty, 0).GetAwaiter().GetResult(); // Sprint 79.7: TechnicianApiController cleanup
                     queue.EstimatedArrival = eta;
                     await db.SaveChangesAsync();
-                    await dispatchEngine.BroadcastETAAsync(queue.Zone, $"Technician {tech.FullName} ETA: {eta:t}");
+                    await dispatchEngine.BroadcastETAAsync(queue.Zone ?? string.Empty, $"Technician {tech.FullName ?? "Unknown"} ETA: {eta:t}"); // Sprint 79.7: TechnicianApiController cleanup
                 }
             }
             await _auditLogger.LogAsync(User?.Identity?.Name ?? "unknown", "TechLocationUpdate", HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown", $"Lat={dto.Latitude};Lng={dto.Longitude}");
             return Ok(new { success = true });
         }
 
-        // Sprint 30E.5 - Technician Mobile Tracking View UI
         [HttpGet("/api/tech/active-jobs")]
         public IActionResult GetActiveJobs([FromServices] ApplicationDbContext db, int techId)
         {
@@ -111,20 +104,20 @@ namespace MVP_Core.Controllers.Api
                 .Select(q => new {
                     id = q.Id,
                     serviceRequestId = q.ServiceRequestId,
-                    zone = q.Zone,
+                    zone = q.Zone ?? string.Empty, // Sprint 79.7: TechnicianApiController cleanup
                     estimatedArrival = q.EstimatedArrival,
                     status = q.Status.ToString()
                 }).ToList();
-            return Ok(jobs);
+            return Ok(jobs ?? new List<object>()); // Sprint 79.7: TechnicianApiController cleanup
         }
 
-        // Sprint 31.1 - Technician Schedule Acceptance Workflow
         [HttpPost("/api/tech/respond-to-schedule")]
         public async Task<IActionResult> RespondToSchedule(
             [FromServices] ApplicationDbContext db,
             [FromServices] IHubContext<ETAHub> hubContext,
             [FromBody] ScheduleResponseDto dto)
         {
+            if (dto == null) return BadRequest(); // Sprint 79.7: TechnicianApiController cleanup
             var entry = await db.ScheduleQueues.FindAsync(dto.ScheduleQueueId);
             if (entry == null) return NotFound();
             if (dto.Response == "Accepted")
@@ -145,7 +138,6 @@ namespace MVP_Core.Controllers.Api
         }
     }
 
-    // FixItFred: Sprint 30E.2 - GPS Update Logic
     public class TechnicianLocationUpdateDto
     {
         public int TechnicianId { get; set; }

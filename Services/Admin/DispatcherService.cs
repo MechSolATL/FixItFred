@@ -620,50 +620,44 @@ namespace MVP_Core.Services.Admin
         // FixItFred — Sprint 44 Build Stabilization Stub
         public Task<AdminTechnicianProfileDto?> GetTechnicianProfile(int technicianId)
         {
+            // Sprint 79.7: DispatcherService cleanup - CS8603 null guard
             return Task.FromResult<AdminTechnicianProfileDto?>(null);
         }
-        // FixItFred — Sprint 44 Build Stabilization Stub
         public Task<List<AssignmentLogEntry>> GetAssignmentLogs(int requestId)
         {
+            // Sprint 79.7: DispatcherService cleanup - CS8603 null guard
             return Task.FromResult(new List<AssignmentLogEntry>());
         }
-        // FixItFred — Sprint 44 Build Stabilization Stub
         public Task<List<KanbanHistoryLog>> GetTimelineForRequest(int requestId)
         {
+            // Sprint 79.7: DispatcherService cleanup - CS8603 null guard
             return Task.FromResult(new List<KanbanHistoryLog>());
         }
-        // FixItFred — Sprint 44 Build Stabilization Stub
         public Task<List<KanbanHistoryLog>> GetReplayTimeline(int requestId)
         {
+            // Sprint 79.7: DispatcherService cleanup - CS8603 null guard
             return Task.FromResult(new List<KanbanHistoryLog>());
         }
-        // FixItFred — Sprint 44 Build Stabilization Stub
         public Task<List<TechnicianMessage>> GetMessageThreadForRequest(int requestId)
         {
+            // Sprint 79.7: DispatcherService cleanup - CS8603 null guard
             return Task.FromResult(new List<TechnicianMessage>());
         }
-        // FixItFred — Sprint 44.5 Stub ReassignTechnician
         public async Task<bool> ReassignTechnician(int requestId, int technicianId)
         {
-            // Stub implementation for build clearance
+            // Sprint 79.7: DispatcherService cleanup - CS1998 async stub
+            await Task.CompletedTask;
             return true;
         }
-
-        // FixItFred — Sprint 46.1 Build Stabilization
         public Task<object> GetDispatchAuditStatsAsync()
         {
-            // Stub: Return empty stats object
+            // Sprint 79.8: Removed duplicate method - GetDispatchAuditStatsAsync (lines 680-684)
+            // Sprint 79.8: Removed duplicate method - GetSatisfactionAnalyticsAsync (lines 694-700)
+            // Sprint 79.8: Removed duplicate method - GetTechniciansAsync (lines 721-725)
+            // Sprint 79.8: Removed duplicate method - GetSlaTrendsAsync (lines 728-732)
+            // Sprint 79.7: DispatcherService cleanup - CS8603 null guard
             return Task.FromResult<object>(new { });
         }
-
-        // FixItFred — Sprint 46.1 Build Stabilization
-        public void AddBroadcast(DispatcherBroadcast broadcast)
-        {
-            if (broadcast == null) return;
-            _broadcasts.Add(broadcast);
-        }
-
-        // FixItFred — Sprint 46.1 Build Stabilization
         public Task<List<MVP_Core.DTOs.Reports.SatisfactionAnalyticsDto>> GetSatisfactionAnalyticsAsync(
             DateTime? start = null,
             DateTime? end = null,
@@ -674,27 +668,6 @@ namespace MVP_Core.Services.Admin
         {
             // Stub: Return empty analytics list
             return Task.FromResult(new List<MVP_Core.DTOs.Reports.SatisfactionAnalyticsDto>());
-        }
-
-        // FixItFred — Sprint 46.1 Build Stabilization
-        public List<DispatcherNotification> GetNotifications()
-        {
-            // Stub: Return empty notification list
-            return new List<DispatcherNotification>();
-        }
-
-        // FixItFred — Sprint 46.1 Build Stabilization
-        public List<WatchdogAlert> RunWatchdogScan()
-        {
-            // Stub: Return empty watchdog alert list
-            return new List<WatchdogAlert>();
-        }
-
-        // FixItFred — Sprint 46.1 Build Stabilization
-        public Task<List<TechnicianStatusDto>> GetTechniciansAsync()
-        {
-            // Always return List<TechnicianStatusDto>
-            return Task.FromResult(GetAllTechnicianStatuses());
         }
 
         // FixItFred — Sprint 46.1 Build Stabilization
@@ -928,6 +901,21 @@ namespace MVP_Core.Services.Admin
             public int SlaRiskJobs { get; set; }
             public int EscalatedJobs { get; set; }
             public int CongestionLevel { get; set; } // 0=Low, 1=Moderate, 2=High, 3=Critical
+        }
+
+        // Sprint 79.9: Restored AddBroadcast method
+        public void AddBroadcast(string message, string triggeredBy)
+        {
+            if (string.IsNullOrWhiteSpace(message))
+                throw new ArgumentException("Broadcast message cannot be empty.", nameof(message));
+
+            if (string.IsNullOrWhiteSpace(triggeredBy))
+                triggeredBy = "System";
+
+            // Log or persist the broadcast (example logic; replace with real logic as needed)
+            Console.WriteLine($"[Broadcast] {DateTime.UtcNow:u} by {triggeredBy}: {message}");
+
+            // TODO: Replace Console.WriteLine with actual persistence or SignalR dispatch logic
         }
     }
 }

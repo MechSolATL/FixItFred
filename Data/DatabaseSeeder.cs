@@ -28,12 +28,13 @@ namespace MVP_Core.Data
                 _ = context.Questions.Add(question);
                 _ = context.SaveChanges(); // Required to get generated Id
 
-                List<QuestionOption> options =
-                [
-                    new QuestionOption { QuestionId = question.Id, OptionText = "Estimate for new system" },
-                    new QuestionOption { QuestionId = question.Id, OptionText = "Repair an existing system" },
-                    new QuestionOption { QuestionId = question.Id, OptionText = "Maintenance or filter change" }
-                ];
+                var questionId = question.Id; // Sprint 79.7: DatabaseSeeder cleanup - ensure non-nullable
+                List<QuestionOption> options = new()
+                {
+                    new QuestionOption { QuestionId = questionId, OptionText = "Estimate for new system" },
+                    new QuestionOption { QuestionId = questionId, OptionText = "Repair an existing system" },
+                    new QuestionOption { QuestionId = questionId, OptionText = "Maintenance or filter change" }
+                };
 
                 context.QuestionOptions.AddRange(options);
                 _ = context.SaveChanges();

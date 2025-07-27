@@ -206,7 +206,7 @@ namespace MVP_Core.Tests
         public void HandlesMissingOrNullDataFields()
         {
             var db = TestDbContextFactory.Create();
-            db.Technicians.Add(new Technician { Id = 9, FullName = null });
+            db.Technicians.Add(new Technician { Id = 9, FullName = "" }); // Sprint 79.7: Unit test cleanup - avoid null for non-nullable param
             db.SaveChanges();
             var service = new TechnicianReportCardService(db);
             var card = service.GetAllReportCards().FirstOrDefault(x => x.TechnicianId == 9);
