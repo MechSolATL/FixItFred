@@ -1,0 +1,38 @@
+@page
+@model MVP_Core.Pages.Admin.CelebrationBoardModel
+@{
+    ViewData["Title"] = "Celebration Board";
+}
+<h2>Employee Milestones</h2>
+<div class="mb-3">
+    <form method="post">
+        <button type="submit" class="btn btn-success" name="surprise" value="true">?? Surprise Me</button>
+    </form>
+</div>
+@if (Model.SurpriseMessage != null)
+{
+    <div class="alert alert-success">@Model.SurpriseMessage</div>
+}
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Employee</th>
+            <th>Milestone</th>
+            <th>Date</th>
+            <th>Broadcasted</th>
+            <th>Custom Message</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var log in Model.Milestones)
+        {
+            <tr>
+                <td>@log.EmployeeId</td>
+                <td>@log.MilestoneType</td>
+                <td>@log.DateRecognized.ToString("d")</td>
+                <td>@log.Broadcasted</td>
+                <td>@log.CustomMessage</td>
+            </tr>
+        }
+    </tbody>
+</table>
