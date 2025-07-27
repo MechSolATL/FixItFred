@@ -22,9 +22,13 @@ namespace MVP_Core.Services
         }
         public bool SaveMediaUpload(IFormFile file, int technicianId, int requestId, string uploadedBy, string notesOrTags)
         {
-            // Validate file type and size
+            // Sprint 80: IFormFile and parameter hardening
+            if (file == null || string.IsNullOrWhiteSpace(uploadedBy) || string.IsNullOrWhiteSpace(notesOrTags))
+                return false;
+            uploadedBy = uploadedBy ?? "System";
+            notesOrTags = notesOrTags ?? string.Empty;
             var allowedTypes = new[] { ".jpg", ".jpeg", ".png", ".gif", ".pdf", ".mp4" };
-            var ext = Path.GetExtension(file.FileName).ToLowerInvariant();
+            var ext = Path.GetExtension(file.FileName ?? string.Empty).ToLowerInvariant();
             if (!allowedTypes.Contains(ext) || file.Length > 10 * 1024 * 1024)
                 return false;
             var fileType = ext switch
@@ -38,8 +42,15 @@ namespace MVP_Core.Services
             Directory.CreateDirectory(requestDir);
             var safeFileName = Guid.NewGuid().ToString("N") + ext;
             var filePath = Path.Combine(requestDir, safeFileName);
-            using (var stream = new FileStream(filePath, FileMode.Create))
-                file.CopyTo(stream);
+            try
+            {
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                    file.CopyTo(stream);
+            }
+            catch
+            {
+                return false;
+            }
             var media = new TechnicianMedia
             {
                 TechnicianId = technicianId,

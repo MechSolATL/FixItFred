@@ -42,9 +42,10 @@ namespace MVP_Core.Pages.Admin
 
         public async Task<IActionResult> OnPostAsync()
         {
-            var techId = int.TryParse(Request?.Form["TechnicianId"], out var tId) ? tId : 0;
-            var requestId = int.TryParse(Request?.Form["RequestId"], out var rId) ? rId : 0;
-            var notes = Request?.Form["NotesOrTags"];
+            // Sprint 80: Razor ? backend sync for media uploads
+            var techId = int.TryParse(Request?.Form["TechnicianId"].ToString(), out var tId) ? tId : 0;
+            var requestId = int.TryParse(Request?.Form["RequestId"].ToString(), out var rId) ? rId : 0;
+            var notes = Request?.Form["NotesOrTags"].ToString() ?? string.Empty;
             var file = Request?.Form.Files["MediaFile"];
             if (file == null || techId == 0 || requestId == 0)
             {
@@ -52,8 +53,7 @@ namespace MVP_Core.Pages.Admin
                 await Task.CompletedTask;
                 return Page();
             }
-            notes = notes?.ToString() ?? string.Empty;
-            var username = User?.Identity?.Name ?? "system";
+            var username = User?.Identity?.Name?.ToString() ?? "system";
             var success = _mediaService.SaveMediaUpload(file, techId, requestId, username, notes);
             TempData["MediaStatus"] = success ? "Media uploaded successfully." : "Upload failed (invalid file or size).";
             await Task.CompletedTask;

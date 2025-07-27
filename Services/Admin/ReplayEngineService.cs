@@ -36,16 +36,18 @@ namespace Services.Admin
 
         public async Task<bool> ReplaySnapshotAsync(string snapshotHash, string triggeredBy, DateTime? overrideTimestamp = null, string notes = null)
         {
+            // Sprint 80: Null safety hardening for ReplayEngineService
+            triggeredBy = string.IsNullOrWhiteSpace(triggeredBy) ? "System" : triggeredBy;
+            notes = notes ?? string.Empty;
             var snapshot = await _db.SystemSnapshotLogs.FirstOrDefaultAsync(s => s.SnapshotHash == snapshotHash);
             if (snapshot == null) return false;
-            // Simulate replay logic
             var replayLog = new ReplayAuditLog
             {
                 Timestamp = overrideTimestamp ?? DateTime.UtcNow,
                 SnapshotHash = snapshotHash,
                 TriggeredBy = triggeredBy,
-                Success = true, // Assume success for now
-                Notes = notes ?? string.Empty // Sprint 79.6: Null coalescing for notes
+                Success = true,
+                Notes = notes
             };
             _db.ReplayAuditLogs.Add(replayLog);
             await _db.SaveChangesAsync();
@@ -54,6 +56,9 @@ namespace Services.Admin
 
         public async Task<int> QueueRecoveryScenarioAsync(string scenarioName, string triggeredBy, DateTime scheduledForUtc, string snapshotHash, string? notes = null)
         {
+            // Sprint 80: Null safety hardening for ReplayEngineService
+            triggeredBy = string.IsNullOrWhiteSpace(triggeredBy) ? "System" : triggeredBy;
+            notes = notes ?? string.Empty;
             var scenario = new RecoveryScenarioLog
             {
                 ScenarioName = scenarioName,
@@ -61,7 +66,7 @@ namespace Services.Admin
                 ScheduledForUtc = scheduledForUtc,
                 Executed = false,
                 SnapshotHash = snapshotHash,
-                Notes = notes ?? string.Empty // Sprint 79.6: Null coalescing for notes
+                Notes = notes
             };
             _db.RecoveryScenarioLogs.Add(scenario);
             await _db.SaveChangesAsync();
@@ -70,12 +75,13 @@ namespace Services.Admin
 
         public async Task<int> RunScheduledScenariosAsync()
         {
+            // Sprint 80: Null safety hardening for ReplayEngineService
             var now = DateTime.UtcNow;
-            var scenarios = await _db.RecoveryScenarioLogs.Where(s => !s.Executed && s.ScheduledForUtc <= now).ToListAsync(); // Sprint 79.6: Await ToListAsync for async compliance
+            var scenarios = await _db.RecoveryScenarioLogs.Where(s => !s.Executed && s.ScheduledForUtc <= now).ToListAsync();
             int executedCount = 0;
             foreach (var scenario in scenarios)
             {
-                var success = await ReplaySnapshotAsync(scenario.SnapshotHash, scenario.TriggeredBy, now, scenario.Notes);
+                var success = await ReplaySnapshotAsync(scenario.SnapshotHash, scenario.TriggeredBy ?? "System", now, scenario.Notes ?? string.Empty);
                 scenario.Executed = true;
                 scenario.ExecutedAtUtc = now;
                 scenario.OutcomeSummary = success ? "Replay succeeded" : "Replay failed";
