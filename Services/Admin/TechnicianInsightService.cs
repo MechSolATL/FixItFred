@@ -12,7 +12,7 @@ namespace MVP_Core.Services.Admin
         private readonly ApplicationDbContext _db;
         public TechnicianInsightService(ApplicationDbContext db)
         {
-            _db = db;
+            _db = db ?? throw new ArgumentNullException(nameof(db));
         }
 
         public async Task<List<TechnicianKPIViewModel>> GetTechnicianKPIsAsync()
@@ -38,7 +38,7 @@ namespace MVP_Core.Services.Admin
                 kpis.Add(new TechnicianKPIViewModel
                 {
                     TechnicianId = tech.Id,
-                    TechnicianName = tech.Name,
+                    TechnicianName = tech.Name ?? string.Empty,
                     AvgResponseTime = avgResponseTime,
                     CompletionRate = completionRate,
                     TotalEarnings = totalEarnings,
@@ -54,8 +54,8 @@ namespace MVP_Core.Services.Admin
             var log = new TechnicianInsightLog
             {
                 TechnicianId = technicianId,
-                InsightType = type,
-                InsightDetail = detail,
+                InsightType = type ?? string.Empty,
+                InsightDetail = detail ?? string.Empty,
                 LoggedAt = DateTime.UtcNow
             };
             _db.TechnicianInsightLogs.Add(log);

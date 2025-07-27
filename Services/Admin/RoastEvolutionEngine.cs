@@ -14,8 +14,8 @@ namespace MVP_Core.Services.Admin
         private readonly RoastFeedbackService _feedbackService;
         public RoastEvolutionEngine(ApplicationDbContext db, RoastFeedbackService feedbackService)
         {
-            _db = db;
-            _feedbackService = feedbackService;
+            _db = db ?? throw new ArgumentNullException(nameof(db));
+            _feedbackService = feedbackService ?? throw new ArgumentNullException(nameof(feedbackService));
         }
 
         // Analyze feedback trends, auto-retire low scorers, promote top-performers
@@ -106,7 +106,6 @@ namespace MVP_Core.Services.Admin
             var tones = new[] { "Soft", "Medium", "Savage" };
             var themes = new[] { "Tech tardy", "GPS ghosting", "Chatty Cathy" };
             var results = new List<RoastTemplate>();
-            int id = 1;
             foreach (var tone in tones)
             {
                 foreach (var theme in themes)
@@ -140,7 +139,7 @@ namespace MVP_Core.Services.Admin
                     Timestamp = DateTime.UtcNow,
                     Notes = "AI-generated seed.",
                     IsAIAuthored = true,
-                    PreviousMessage = "",
+                    PreviousMessage = string.Empty,
                     NewMessage = roast.Message
                 });
             }
@@ -151,9 +150,9 @@ namespace MVP_Core.Services.Admin
         // Enforce cooldown, duplication, safety checks
         public bool IsSafeRoast(RoastTemplate template)
         {
-            // Example: block inappropriate or overused content
+            if (template == null) return false;
             if (template.Retired || template.TimesUsed > template.UseLimit) return false;
-            if (template.Message.Contains("inappropriate", StringComparison.OrdinalIgnoreCase)) return false;
+            if (string.IsNullOrEmpty(template.Message) || template.Message.Contains("inappropriate", StringComparison.OrdinalIgnoreCase)) return false;
             return true;
         }
     }

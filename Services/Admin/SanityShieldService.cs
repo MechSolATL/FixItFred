@@ -8,12 +8,13 @@ using System.Linq;
 
 namespace MVP_Core.Services.Admin
 {
+    // Sprint 81: Null safety hardening for SanityShieldService.cs
     public class SanityShieldService
     {
         private readonly ApplicationDbContext _db;
         public SanityShieldService(ApplicationDbContext db)
         {
-            _db = db;
+            _db = db ?? throw new ArgumentNullException(nameof(db));
         }
 
         public async Task<List<TechnicianSanityLog>> GetSanityLogsAsync(int technicianId)
@@ -26,15 +27,13 @@ namespace MVP_Core.Services.Admin
 
         public async Task AnalyzeAndShieldAsync(int technicianId)
         {
-            // Example logic: error streaks, rapid login/logout, conflicting dispatches, escalations, roast impact
             var logs = await _db.TechnicianSanityLogs.Where(s => s.TechnicianId == technicianId).OrderByDescending(s => s.Timestamp).ToListAsync();
             var recentLog = logs.FirstOrDefault();
             bool shieldRoast = false;
             bool softenEscalation = false;
             bool alertSupervisor = false;
-            string notes = "";
+            string notes = string.Empty;
 
-            // Dummy logic for illustration
             if (recentLog != null && recentLog.EmotionalFatigueFlag)
             {
                 shieldRoast = true;
@@ -51,7 +50,6 @@ namespace MVP_Core.Services.Admin
                 notes += "Alert sent to dispatcher supervisor. ";
             }
 
-            // Log shielding decision
             if (recentLog != null)
             {
                 recentLog.ShieldingNotes = notes;

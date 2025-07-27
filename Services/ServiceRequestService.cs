@@ -3,6 +3,7 @@
 // Added null checks and safe navigation for all nullable references per CS8601, CS8602, CS8603, CS8604
 // Each change is marked with FixItFred comment and timestamp
 // Sprint 78.2: Hardened for CS860X
+// Sprint 81: Null safety hardening for ServiceRequestService.cs
 
 using MVP_Core.Services.Admin;
 using MVP_Core.Services.Dispatch;
@@ -17,9 +18,9 @@ namespace MVP_Core.Services
 
         public ServiceRequestService(ApplicationDbContext context, DispatcherService dispatcherService, NotificationDispatchEngine dispatchEngine)
         {
-            _context = context;
-            _dispatcherService = dispatcherService;
-            _dispatchEngine = dispatchEngine;
+            _context = context ?? throw new ArgumentNullException(nameof(context));
+            _dispatcherService = dispatcherService ?? throw new ArgumentNullException(nameof(dispatcherService));
+            _dispatchEngine = dispatchEngine ?? throw new ArgumentNullException(nameof(dispatchEngine));
         }
 
         /// <summary>
@@ -69,11 +70,11 @@ namespace MVP_Core.Services
                 Status = "Pending"
             };
 
-            _ = _context?.ServiceRequests?.Add(request); // Sprint 78.2: Hardened for CS860X
-            _ = _context?.SaveChanges(); // Sprint 78.2: Hardened for CS860X
+            _context.ServiceRequests.Add(request);
+            _context.SaveChanges();
 
             var safeZone = zone ?? string.Empty;
-            var tech = _dispatcherService?.FindAvailableTechnicianForZone(safeZone); // Sprint 78.2: Hardened for CS860X
+            var tech = _dispatcherService.FindAvailableTechnicianForZone(safeZone);
             if (tech == null)
             {
                 return request.Id;
@@ -81,14 +82,14 @@ namespace MVP_Core.Services
             // Convert Data.Models.TechnicianProfileDto to TechnicianStatusDto for PredictETA
             var techStatus = new MVP_Core.Models.Admin.TechnicianStatusDto {
                 TechnicianId = tech.Id,
-                Name = tech.FullName,
-                Status = tech.Specialty,
+                Name = tech.FullName ?? string.Empty,
+                Status = tech.Specialty ?? string.Empty,
                 DispatchScore = 100, // Default/mock value
                 LastPing = DateTime.UtcNow,
                 AssignedJobs = 0,
                 LastUpdate = DateTime.UtcNow
             };
-            var eta = _dispatcherService?.PredictETA(techStatus, safeZone, delayMinutes)?.GetAwaiter().GetResult(); // Sprint 78.2: Hardened for CS860X
+            var eta = _dispatcherService.PredictETA(techStatus, safeZone, delayMinutes)?.GetAwaiter().GetResult();
             var entry = new ScheduleQueue
             {
                 TechnicianId = tech.Id,
@@ -101,9 +102,9 @@ namespace MVP_Core.Services
                 Status = ScheduleStatus.Pending,
                 CreatedAt = DateTime.UtcNow
             };
-            _context?.ScheduleQueues?.Add(entry); // Sprint 78.2: Hardened for CS860X
-            _context?.SaveChanges(); // Sprint 78.2: Hardened for CS860X
-            _ = _dispatchEngine?.BroadcastETAAsync(safeZone, $"Technician {tech.FullName ?? "Unknown"} ETA: {eta:t}"); // Sprint 78.2: Hardened for CS860X
+            _context.ScheduleQueues.Add(entry);
+            _context.SaveChanges();
+            _dispatchEngine.BroadcastETAAsync(safeZone, $"Technician {tech.FullName ?? "Unknown"} ETA: {eta:t}");
 
             return request.Id;
         }
@@ -113,9 +114,9 @@ namespace MVP_Core.Services
         /// </summary>
         public async Task<ServiceRequest?> GetRequestByIdAsync(int requestId)
         {
-            return await _context?.ServiceRequests?
+            return await _context.ServiceRequests
                 .AsNoTracking()
-                .FirstOrDefaultAsync(r => r.Id == requestId)!; // Sprint 78.2: Hardened for CS860X
+                .FirstOrDefaultAsync(r => r.Id == requestId);
         }
 
         /// <summary>
@@ -123,9 +124,9 @@ namespace MVP_Core.Services
         /// </summary>
         public List<ServiceRequest> GetCompletedRequestsByCustomer(string customerEmail)
         {
-            return _context?.ServiceRequests?
+            return _context.ServiceRequests
                 .Where(r => r.Email == customerEmail && r.CompletedDate != null)
-                .ToList() ?? new List<ServiceRequest>(); // Sprint 78.2: Hardened for CS860X
+                .ToList();
         }
     }
 }
