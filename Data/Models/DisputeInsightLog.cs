@@ -4,9 +4,9 @@ public class DisputeInsightLog
 {
     public int Id { get; set; }
     public int DisputeId { get; set; }
-    public string InsightType { get; set; }  // e.g., "Customer Input Delay", "Agent Retry"
-    public string Description { get; set; }
-    public string LoggedBy { get; set; }
+    public string InsightType { get; set; } = string.Empty;  // e.g., "Customer Input Delay", "Agent Retry"
+    public string Description { get; set; } = string.Empty;
+    public string LoggedBy { get; set; } = string.Empty;
     public DateTime Timestamp { get; set; }
 }
 

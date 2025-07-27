@@ -13,7 +13,7 @@ namespace MVP_Core.Data.Models
         public decimal CommissionEarned { get; set; }
         public decimal HourlyRate { get; set; }
         public decimal TotalPay { get; set; }
-        public string PayType { get; set; } // "Hourly" or "Commission"
+        public string PayType { get; set; } = string.Empty; // Sprint 78.1: Initialized to prevent CS8618 warning
         public string? BonusNotes { get; set; }
         public DateTime CreatedAt { get; set; }
     }

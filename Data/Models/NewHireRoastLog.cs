@@ -1,8 +1,8 @@
 public class NewHireRoastLog
 {
     public int Id { get; set; }
-    public string EmployeeId { get; set; }
-    public string RoastMessage { get; set; }
+    public string EmployeeId { get; set; } = string.Empty; // Sprint 78.1: Initialized to prevent CS8618 warning
+    public string RoastMessage { get; set; } = string.Empty; // Sprint 78.1: Initialized to prevent CS8618 warning
     public DateTime ScheduledFor { get; set; }
     public bool IsDelivered { get; set; }
     public DateTime? DeliveredAt { get; set; }

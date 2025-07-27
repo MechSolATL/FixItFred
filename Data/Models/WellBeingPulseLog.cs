@@ -6,7 +6,7 @@ namespace MVP_Core.Data.Models
     public class WellBeingPulseLog
     {
         public int Id { get; set; }
-        public string EmployeeId { get; set; }
+        public string EmployeeId { get; set; } = string.Empty; // Sprint 78.1: Initialized to prevent CS8618 warning
         public DateTime Timestamp { get; set; }
         public int MoodScore { get; set; } // 1 to 10
         public StressLevel StressLevel { get; set; } // Enum

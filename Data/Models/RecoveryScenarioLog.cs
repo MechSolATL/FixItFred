@@ -1,8 +1,8 @@
 public class RecoveryScenarioLog
 {
     public int Id { get; set; }
-    public string ScenarioName { get; set; }
-    public string TriggeredBy { get; set; }
+    public string ScenarioName { get; set; } = string.Empty; // Sprint 78.1: Initialized to prevent CS8618 warning
+    public string TriggeredBy { get; set; } = string.Empty; // Sprint 78.1: Initialized to prevent CS8618 warning
     public DateTime ScheduledForUtc { get; set; }
     public bool Executed { get; set; }
     public DateTime? ExecutedAtUtc { get; set; }
