@@ -6,6 +6,7 @@ public enum RoastTier
     Brutal
 }
 
+// Sprint 83.7-Hardening: Removed legacy RoastStatus reference
 public class RoastTemplate
 {
     public int Id { get; set; }

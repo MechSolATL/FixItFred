@@ -15,5 +15,7 @@ namespace MVP_Core.Data.Models
         public bool AIInterventionTriggered { get; set; }
         public bool FalseReportShielded { get; set; }
         public string? ShieldingNotes { get; set; }
+        // Sprint 83.7-Hardening: Added missing 'SanityCategory' column to TechnicianSanityLogs
+        public string? SanityCategory { get; set; }
     }
 }

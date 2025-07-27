@@ -1,10 +1,9 @@
-// Sprint 83.6-RoastRoulette
+// Sprint 83.7-Hardening: Removed legacy RoastStatus reference
 using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace MVP_Core.Data.Models
 {
-    // Sprint 83.6-RoastRoulette
     public class RoastDeliveryLog
     {
         [Key]

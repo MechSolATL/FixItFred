@@ -566,3 +566,5 @@ namespace MVP_Core.Data.Seeders
         }
     }
 }
+
+// Sprint 83.7-Hardening: Removed legacy RoastStatus reference
