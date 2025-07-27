@@ -1,0 +1,52 @@
+@page
+@model MVP_Core.Pages.Admin.ScheduleConflictModel
+@{
+    ViewData["Title"] = "Schedule Conflict Intelligence";
+}
+<h2>Schedule Conflict Intelligence</h2>
+<form method="post">
+    <button type="submit" asp-page-handler="Detect">Detect Conflicts</button>
+</form>
+@if (Model.Conflicts.Any())
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Technician</th>
+                <th>Job</th>
+                <th>Type</th>
+                <th>Details</th>
+                <th>Detected At</th>
+                <th>Acknowledged</th>
+                <th>Resolved</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var conflict in Model.Conflicts)
+            {
+                <tr>
+                    <td>@conflict.TechnicianId</td>
+                    <td>@conflict.JobId</td>
+                    <td>@conflict.ConflictType</td>
+                    <td>@conflict.Details</td>
+                    <td>@conflict.ConflictDetectedAt</td>
+                    <td>@conflict.IsAcknowledged</td>
+                    <td>@conflict.IsResolved</td>
+                    <td>
+                        <form method="post" style="display:inline">
+                            <input type="hidden" name="conflictId" value="@conflict.Id" />
+                            <input type="text" name="note" placeholder="Override note" />
+                            <button type="submit" asp-page-handler="Acknowledge">Acknowledge</button>
+                        </form>
+                        <form method="post" style="display:inline">
+                            <input type="hidden" name="conflictId" value="@conflict.Id" />
+                            <input type="text" name="suggestion" placeholder="Resolution suggestion" />
+                            <button type="submit" asp-page-handler="Resolve">Resolve</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
