@@ -1,0 +1,46 @@
+@page
+@model MVP_Core.Pages.Admin.ClockInDiagnosticsModel
+@{
+    ViewData["Title"] = "Clock-In Diagnostics";
+    Layout = "~/Pages/Admin/_AdminLayout.cshtml";
+}
+
+<h2 class="mb-4">Technician Clock-In Diagnostics</h2>
+<div class="table-responsive">
+    <table class="table table-bordered table-hover align-middle">
+        <thead class="table-light">
+            <tr>
+                <th>Tech Name</th>
+                <th>Date</th>
+                <th>Scheduled Start</th>
+                <th>Clock-In Time</th>
+                <th>Delay (min)</th>
+                <th>Severity</th>
+                <th>Escalation Triggered?</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var log in Model.ClockInLogs)
+        {
+            var tech = Model.Technicians.FirstOrDefault(t => t.Id == log.TechnicianId);
+            var color = log.Severity switch
+            {
+                "Severe" => "table-danger",
+                "Moderate" => "table-warning",
+                "Warning" => "table-info",
+                _ => ""
+            };
+            var escalated = Model.EscalatedTechIds.Contains(log.TechnicianId);
+            <tr class="@color">
+                <td>@(tech?.FullName ?? $"Tech #{log.TechnicianId}")</td>
+                <td>@log.Date.ToString("yyyy-MM-dd")</td>
+                <td>@log.ScheduledStart.ToString("HH:mm")</td>
+                <td>@log.ActualStart.ToString("HH:mm")</td>
+                <td>@log.DelayMinutes</td>
+                <td><span class="badge bg-@(log.Severity == "Severe" ? "danger" : log.Severity == "Moderate" ? "warning text-dark" : log.Severity == "Warning" ? "info text-dark" : "secondary")">@log.Severity</span></td>
+                <td class="text-center">@(escalated ? "?" : "?")</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>

@@ -1,0 +1,219 @@
+@page
+@model MVP_Core.Pages.Admin.EmployeeCentralModel
+@{
+    ViewData["Title"] = "Employee Centralized Activity Hub";
+}
+<h2 class="mb-3">Employee Centralized Activity Hub</h2>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <button type="button" class="btn btn-outline-secondary" onclick="window.location.href='/Admin/Dashboard'">Back to Dashboard</button>
+    <div>
+        <button type="button" class="btn btn-info" id="refreshBtn" onclick="location.reload();">Refresh</button>
+        <button type="button" class="btn btn-success" id="autoRefreshBtn" onclick="toggleAutoRefresh()">Start Auto-Refresh</button>
+    </div>
+</div>
+<div id="notificationArea" class="alert alert-warning d-none mb-3"></div>
+<div id="loadingSpinner" style="display:none;" class="text-center mb-3">
+    <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+</div>
+<form method="get" class="mb-3 rounded shadow-sm p-3 bg-light" onsubmit="document.getElementById('loadingSpinner').style.display='block';">
+    <div class="row g-2 align-items-center">
+        <div class="col-md-3">
+            <label class="form-label">Employee(s):</label>
+            <select name="TechId" class="form-select" multiple>
+                @foreach (var tech in Model.TechnicianList)
+                {
+                    <option value="@tech.Id">@tech.FullName</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-4">
+            <label class="form-label">Date Range:</label>
+            <div class="input-group">
+                <input type="date" name="StartDate" class="form-control" value="@(Model.StartDate.HasValue ? Model.StartDate.Value.ToString("yyyy-MM-dd") : "")" />
+                <input type="date" name="EndDate" class="form-control" value="@(Model.EndDate.HasValue ? Model.EndDate.Value.ToString("yyyy-MM-dd") : "")" />
+                <button type="button" class="btn btn-outline-secondary ms-2" onclick="quickDate('7')">Last 7 Days</button>
+                <button type="button" class="btn btn-outline-secondary ms-2" onclick="quickDate('30')">This Month</button>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">Log Type:</label>
+            <select name="LogType" class="form-select" multiple>
+                <option value="Idle">Idle</option>
+                <option value="ClockIn">Clock-In</option>
+                <option value="BreakCompliance">Break Compliance</option>
+                <option value="Overtime">Overtime</option>
+                <option value="Geo">Geo Validation</option>
+                <option value="Review">Anonymous Review</option>
+                <option value="Confidence">Confidence Decay</option>
+                <option value="Behavior">Behavioral Detection</option>
+            </select>
+        </div>
+        <div class="col-md-2 d-flex align-items-end">
+            <input type="text" name="Keyword" class="form-control me-2" placeholder="Search keyword..." />
+            <button type="submit" class="btn btn-primary w-100">Filter</button>
+            <button type="submit" name="export" value="csv" class="btn btn-secondary ms-2">Export CSV</button>
+            <button type="submit" name="export" value="pdf" class="btn btn-secondary ms-2">Export PDF</button>
+            <button type="submit" name="export" value="excel" class="btn btn-secondary ms-2">Export Excel</button>
+        </div>
+    </div>
+</form>
+@if (!Model.ActivityTimeline.Any() && string.IsNullOrEmpty(Model.ErrorMessage))
+{
+    <div class="alert alert-info">No activity found. Try adjusting your filters.</div>
+}
+else if (Model.ActivityTimeline.Any())
+{
+    <div class="row mb-3">
+        <div class="col-md-3">
+            <div class="card text-bg-danger mb-2" onclick="showStatDetail('severe')" style="cursor:pointer;">
+                <div class="card-body">
+                    <h5 class="card-title">Severe Flags</h5>
+                    <p class="card-text fs-4 fw-bold">@Model.SevereFlagCount</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-bg-info mb-2" onclick="showStatDetail('trust')" style="cursor:pointer;">
+                <div class="card-body">
+                    <h5 class="card-title">Avg Trust Score</h5>
+                    <p class="card-text fs-4 fw-bold">@Model.AvgTrustScore</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-bg-warning mb-2" onclick="showStatDetail('idle')" style="cursor:pointer;">
+                <div class="card-body">
+                    <h5 class="card-title">Idle Minutes (7d)</h5>
+                    <p class="card-text fs-4 fw-bold">@Model.TotalIdleMinutes</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-bg-success mb-2" onclick="showStatDetail('pulse')" style="cursor:pointer;">
+                <div class="card-body">
+                    <h5 class="card-title">Avg Pulse Score</h5>
+                    <p class="card-text fs-4 fw-bold">@Model.AvgPulseScore</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="mb-4">
+        <canvas id="activityChart" height="120"></canvas>
+    </div>
+    <div class="timeline">
+        @foreach (var log in Model.ActivityTimeline)
+        {
+            <div class="timeline-item mb-2 p-2 border rounded bg-white shadow-sm" onclick="openDrilldownModal(@log.Timestamp.Ticks)">
+                <div class="d-flex justify-content-between">
+                    <span class="fw-bold">@log.Timestamp.ToString("g")</span>
+                    <span class="badge bg-secondary">@log.LogType</span>
+                </div>
+                <div><b>@log.EmployeeName</b>: @log.Description</div>
+                <div class="small text-muted">@log.Details</div>
+            </div>
+        }
+    </div>
+}
+<div id="drilldownModal" class="modal fade" tabindex="-1" aria-labelledby="drilldownModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="drilldownModalLabel">Activity Details</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="drilldownModalBody">
+        <!-- Details will be loaded here -->
+      </div>
+    </div>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
+<script>
+    window.onload = function() {
+        document.getElementById('loadingSpinner').style.display = 'none';
+        if (typeof Chart !== 'undefined' && @Model.ActivityTimeline.Count > 0) {
+            var ctx = document.getElementById('activityChart').getContext('2d');
+            var chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.ActivityTimeline.Select(x => x.Timestamp.ToString("MM-dd HH:mm")).ToList())),
+                    datasets: [{
+                        label: 'Activity Events',
+                        data: @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.ActivityTimeline.Select(x => x.Value).ToList())),
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        fill: true
+                    }]
+                },
+                options: { responsive: true }
+            });
+        }
+    };
+    var autoRefreshInterval = null;
+    function toggleAutoRefresh() {
+        var btn = document.getElementById('autoRefreshBtn');
+        if (autoRefreshInterval) {
+            clearInterval(autoRefreshInterval);
+            autoRefreshInterval = null;
+            btn.textContent = 'Start Auto-Refresh';
+            btn.classList.remove('btn-danger');
+            btn.classList.add('btn-success');
+        } else {
+            autoRefreshInterval = setInterval(function() {
+                document.getElementById('loadingSpinner').style.display = 'block';
+                location.reload();
+            }, 60000); // 60 seconds
+            btn.textContent = 'Stop Auto-Refresh';
+            btn.classList.remove('btn-success');
+            btn.classList.add('btn-danger');
+        }
+    }
+    // Live notification polling (demo: random alert)
+    setInterval(function() {
+        var area = document.getElementById('notificationArea');
+        if (Math.random() < 0.05) {
+            area.textContent = 'New severe flag detected!';
+            area.classList.remove('d-none');
+        } else {
+            area.classList.add('d-none');
+        }
+    }, 120000);
+    function quickDate(days) {
+        var start = new Date();
+        start.setDate(start.getDate() - parseInt(days));
+        document.querySelector('input[name="StartDate"]').value = start.toISOString().slice(0,10);
+        document.querySelector('input[name="EndDate"]').value = new Date().toISOString().slice(0,10);
+    }
+    function showStatDetail(type) {
+        alert('Showing details for ' + type);
+    }
+    function openDrilldownModal(ticks) {
+    // AJAX call to get details for the log item
+    fetch(`/Admin/EmployeeCentral?handler=Drilldown&timestampTicks=${ticks}`)
+        .then(response => response.text())
+        .then(html => {
+            document.getElementById('drilldownModalBody').innerHTML = html;
+            var modal = new bootstrap.Modal(document.getElementById('drilldownModal'));
+            modal.show();
+        });
+}
+const notificationConnection = new signalR.HubConnectionBuilder()
+    .withUrl("/notificationHub")
+    .configureLogging(signalR.LogLevel.Information)
+    .build();
+notificationConnection.on("ReceiveNotification", function (message, severity) {
+    var area = document.getElementById('notificationArea');
+    area.textContent = message;
+    area.classList.remove('d-none');
+    area.classList.remove('alert-warning', 'alert-danger', 'alert-info');
+    area.classList.add(severity === 'Severe' ? 'alert-danger' : severity === 'Info' ? 'alert-info' : 'alert-warning');
+    setTimeout(function() { area.classList.add('d-none'); }, 10000);
+});
+notificationConnection.start().catch(function (err) {
+    console.error("SignalR notification connection error: ", err.toString());
+});
+</script>

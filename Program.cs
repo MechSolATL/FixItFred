@@ -10,6 +10,7 @@ using MVP_Core.Services.Admin;
 using MVP_Core.Services.Dispatch;
 using MVP_Core.Services.System;
 using MVP_Core.Services.FollowUp;
+using MVP_Core.Data.Seeders;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -163,6 +164,7 @@ app.MapHub<MVP_Core.Hubs.ETAHub>("/etahub");
 // Sprint 41.3 – Real-Time Message Broadcast
 app.MapHub<MVP_Core.Hubs.JobMessageHub>("/hubs/jobmessages");
 app.MapHub<MVP_Core.Hubs.RewardNotificationHub>("/hubs/rewardnotifications");
+app.MapHub<MVP_Core.Hubs.NotificationHub>("/notificationHub"); // Register NotificationHub for SignalR
 
 // DB Seeding
 using (var scope = app.Services.CreateScope())
@@ -191,6 +193,8 @@ using (var scope = app.Services.CreateScope())
         var logger = scope.ServiceProvider.GetRequiredService<ILoggerFactory>().CreateLogger("Startup");
         logger.LogError(ex, "Error seeding background image.");
     }
+
+    ClockInTestSeeder.Seed(db);
 }
 
 app.Run();

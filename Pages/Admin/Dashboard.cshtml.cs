@@ -7,6 +7,7 @@ using MVP_Core.Data.Models;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using MVP_Core.Services.Admin;
 
 namespace MVP_Core.Pages.Admin
 {
@@ -35,6 +36,7 @@ namespace MVP_Core.Pages.Admin
         public List<string> Alerts { get; set; } = new();
         public List<AdminAlertLog> ActiveAlerts { get; set; } = new();
         public string AdminUserId => User?.Identity?.Name ?? "admin";
+        public int PendingEscalationCount { get; set; }
 
         public async Task OnGetAsync()
         {
@@ -48,6 +50,9 @@ namespace MVP_Core.Pages.Admin
             StorageChart = await _storageMonitorService.MonitorStorageAsync() ?? "No data";
             Alerts = await _smartAdminAlertsService.TriggerAlertsAsync() ?? new List<string>();
             ActiveAlerts = await _smartAdminAlertsService.GetActiveAlertsAsync(AdminUserId);
+            // Inject escalation count
+            var escalationMatrix = new MVP_Core.Services.Admin.DispatcherEscalationMatrix(_context);
+            PendingEscalationCount = escalationMatrix.GetPendingEscalationCount();
         }
 
         public async Task<IActionResult> OnPostAcknowledgeAlertAsync(int alertId, string actionTaken)

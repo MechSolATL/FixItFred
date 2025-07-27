@@ -164,6 +164,8 @@ namespace MVP_Core.Data
         public DbSet<OvertimeLockoutLog> OvertimeLockoutLogs { get; set; } = null!;
         public DbSet<GeoBreakValidationLog> GeoBreakValidationLogs { get; set; } = null!;
         public DbSet<IdleSessionMonitorLog> IdleSessionMonitorLogs { get; set; } = null!;
+        public DbSet<LateClockInLog> LateClockInLogs { get; set; } = null!;
+        public DbSet<EscalationEvent> EscalationEvents { get; set; } = null!;
 
         #endregion
 
@@ -305,6 +307,8 @@ namespace MVP_Core.Data
             _ = modelBuilder.Entity<OvertimeLockoutLog>().ToTable("OvertimeLockoutLogs");
             _ = modelBuilder.Entity<GeoBreakValidationLog>().ToTable("GeoBreakValidationLogs");
             _ = modelBuilder.Entity<IdleSessionMonitorLog>().ToTable("IdleSessionMonitorLogs");
+            _ = modelBuilder.Entity<LateClockInLog>().ToTable("LateClockInLogs");
+            _ = modelBuilder.Entity<EscalationEvent>().ToTable("EscalationEvents");
 
             modelBuilder.Entity<RoastTemplate>().Property(r => r.Tier).HasConversion<string>();
         }

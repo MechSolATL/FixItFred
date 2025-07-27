@@ -102,3 +102,34 @@ connection.on("ReceiveETA", function (zoneId, message) {
     history.prepend(historyItem);
 });
 // /FixItFred
+
+// FixItFred Patch Log — Sprint 77.1: SignalR NotificationHub connection for real-time alerts
+const notificationConnection = new signalR.HubConnectionBuilder()
+    .withUrl("/notificationHub")
+    .configureLogging(signalR.LogLevel.Information)
+    .build();
+
+notificationConnection.on("ReceiveNotification", function (message, severity) {
+    var area = document.getElementById('notificationArea');
+    if (area) {
+        area.textContent = message;
+        area.classList.remove('d-none', 'alert-warning', 'alert-danger', 'alert-info');
+        area.classList.add(severity === 'Severe' ? 'alert-danger' : severity === 'Info' ? 'alert-info' : 'alert-warning');
+        setTimeout(function() { area.classList.add('d-none'); }, 10000);
+    }
+});
+
+async function startNotificationConnection() {
+    try {
+        await notificationConnection.start();
+        console.log("SignalR NotificationHub connected.");
+    } catch (err) {
+        console.warn("SignalR NotificationHub connection failed. Retrying...", err);
+        setTimeout(startNotificationConnection, 2000);
+    }
+}
+notificationConnection.onclose(() => {
+    startNotificationConnection();
+});
+startNotificationConnection();
+// /FixItFred

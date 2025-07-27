@@ -72,6 +72,15 @@
         </div>
     </div>
 
+    <!-- Escalation Alert Pill -->
+    @if (Model.PendingEscalationCount > 0)
+    {
+        <div class="alert alert-danger d-flex align-items-center mb-3">
+            <span class="me-2">??</span>
+            <span><strong>@Model.PendingEscalationCount Tech Escalations Pending Review</strong></span>
+        </div>
+    }
+
     <!-- ?? Filters -->
     <div class="card mb-4 p-4 shadow-sm">
         <form method="get" class="row g-3 align-items-end">

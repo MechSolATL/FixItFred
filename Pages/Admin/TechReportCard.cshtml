@@ -1,0 +1,219 @@
+@page
+@model MVP_Core.Pages.Admin.TechReportCardModel
+@{
+    ViewData["Title"] = "Technician Behavior Report Card";
+}
+<h2 class="mb-3">Technician Behavior Report Card</h2>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <button type="button" class="btn btn-outline-secondary" onclick="window.location.href='/Admin/Dashboard'">Back to Dashboard</button>
+    <div>
+        <button type="button" class="btn btn-info" id="refreshBtn" onclick="location.reload();">Refresh</button>
+        <button type="button" class="btn btn-success" id="autoRefreshBtn" onclick="toggleAutoRefresh()">Start Auto-Refresh</button>
+    </div>
+</div>
+<div id="notificationArea" class="alert alert-warning d-none mb-3"></div>
+<div id="loadingSpinner" style="display:none;" class="text-center mb-3">
+    <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+</div>
+@if (!string.IsNullOrEmpty(Model.ErrorMessage))
+{
+    <div class="alert alert-danger">@Model.ErrorMessage</div>
+}
+<form method="get" class="mb-3 rounded shadow-sm p-3 bg-light" onsubmit="document.getElementById('loadingSpinner').style.display='block';">
+    <div class="row g-2 align-items-center">
+        <div class="col-md-3">
+            <label class="form-label">Technician(s):</label>
+            <select name="TechId" class="form-select" multiple>
+                @foreach (var tech in Model.TechnicianList)
+                {
+                    <option value="@tech.Id">@tech.FullName</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-4">
+            <label class="form-label">Date Range:</label>
+            <div class="input-group">
+                <input type="date" name="StartDate" class="form-control" value="@(Model.StartDate.HasValue ? Model.StartDate.Value.ToString("yyyy-MM-dd") : "")" />
+                <input type="date" name="EndDate" class="form-control" value="@(Model.EndDate.HasValue ? Model.EndDate.Value.ToString("yyyy-MM-dd") : "")" />
+                <button type="button" class="btn btn-outline-secondary ms-2" onclick="quickDate('7')">Last 7 Days</button>
+                <button type="button" class="btn btn-outline-secondary ms-2" onclick="quickDate('30')">This Month</button>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">Severity:</label>
+            <select name="Severity" class="form-select" multiple>
+                <option value="Severe">Severe</option>
+                <option value="Warning">Warning</option>
+                <option value="Moderate">Moderate</option>
+            </select>
+            <div class="mt-2">
+                <button type="button" class="btn btn-outline-danger btn-sm" onclick="quickSeverity('Severe')">Show Only Severe</button>
+                <button type="button" class="btn btn-outline-warning btn-sm" onclick="quickIdle()">Idle > 60 min</button>
+            </div>
+        </div>
+        <div class="col-md-2 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary w-100">Filter</button>
+            <button type="submit" name="export" value="csv" class="btn btn-secondary ms-2">Export CSV</button>
+            <button type="submit" name="export" value="pdf" class="btn btn-secondary ms-2">Export PDF</button>
+            <button type="submit" name="export" value="excel" class="btn btn-secondary ms-2">Export Excel</button>
+        </div>
+    </div>
+</form>
+@if (!Model.ReportCards.Any() && string.IsNullOrEmpty(Model.ErrorMessage))
+{
+    <div class="alert alert-info">No results found. Try adjusting your filters.</div>
+}
+else if (Model.ReportCards.Any())
+{
+    <div class="row mb-3">
+        <div class="col-md-3">
+            <div class="card text-bg-danger mb-2" onclick="showStatDetail('severe')" style="cursor:pointer;">
+                <div class="card-body">
+                    <h5 class="card-title">Severe Flags</h5>
+                    <p class="card-text fs-4 fw-bold">@Model.ReportCards.Sum(x => x.SevereLateClockInCount)</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-bg-info mb-2" onclick="showStatDetail('trust')" style="cursor:pointer;">
+                <div class="card-body">
+                    <h5 class="card-title">Avg Trust Score</h5>
+                    <p class="card-text fs-4 fw-bold">@(Model.ReportCards.Any() ? Model.ReportCards.Average(x => x.TrustScore).ToString("F2") : "N/A")</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-bg-warning mb-2" onclick="showStatDetail('idle')" style="cursor:pointer;">
+                <div class="card-body">
+                    <h5 class="card-title">Idle Minutes (7d)</h5>
+                    <p class="card-text fs-4 fw-bold">@Model.ReportCards.Sum(x => x.IdleMinutesWeek)</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-bg-success mb-2" onclick="showStatDetail('pulse')" style="cursor:pointer;">
+                <div class="card-body">
+                    <h5 class="card-title">Avg Pulse Score</h5>
+                    <p class="card-text fs-4 fw-bold">@(Model.ReportCards.Any() ? Model.ReportCards.Average(x => x.PulseScore).ToString("F2") : "N/A")</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Technician</th>
+                    <th>Late Clock-Ins</th>
+                    <th>Severe Late</th>
+                    <th>Idle Minutes (7d)</th>
+                    <th>Ego Score</th>
+                    <th>Confidence Shift</th>
+                    <th>Pulse</th>
+                    <th>Trust</th>
+                    <th>Notes</th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach (var card in Model.ReportCards)
+            {
+                <tr>
+                    <td><a href="/Admin/TechReportCard?TechId=@card.TechnicianId" class="text-decoration-none fw-bold">@card.TechnicianName</a></td>
+                    <td>@card.LateClockInCount</td>
+                    <td class="@(card.SevereLateClockInCount > 0 ? "table-danger" : "")">@card.SevereLateClockInCount</td>
+                    <td>@card.IdleMinutesWeek</td>
+                    <td><span class="badge @(card.EgoInfluenceScore > 10 ? "bg-danger" : card.EgoInfluenceScore > 5 ? "bg-warning" : "bg-success")">@card.EgoInfluenceScore</span></td>
+                    <td>@card.ConfidenceShift</td>
+                    <td><span class="badge @(card.PulseScore < 5 ? "bg-danger" : card.PulseScore < 7 ? "bg-warning" : "bg-success")">@card.PulseScore</span></td>
+                    <td><span class="badge @(card.TrustScore < 5 ? "bg-danger" : card.TrustScore < 7 ? "bg-warning" : "bg-success")">@card.TrustScore</span></td>
+                    <td>@card.Notes</td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+    @if (Model.TotalPages > 1)
+    {
+        <nav>
+            <ul class="pagination justify-content-center">
+                @for (int i = 1; i <= Model.TotalPages; i++)
+                {
+                    <li class="page-item @(Model.PageNumber == i ? "active" : "")">
+                        <a class="page-link" href="?PageNumber=@i">@i</a>
+                    </li>
+                }
+            </ul>
+        </nav>
+    }
+}
+@if (Model.AlertTechnicians.Any())
+{
+    <div class="alert alert-danger mt-3">
+        <strong>Alert:</strong> The following technicians have multiple severe flags or low trust scores:
+        <ul>
+        @foreach (var tech in Model.AlertTechnicians)
+        {
+            <li>@tech.TechnicianName</li>
+        }
+        </ul>
+    </div>
+}
+<script>
+    window.onload = function() {
+        document.getElementById('loadingSpinner').style.display = 'none';
+    };
+    var autoRefreshInterval = null;
+    function toggleAutoRefresh() {
+        var btn = document.getElementById('autoRefreshBtn');
+        if (autoRefreshInterval) {
+            clearInterval(autoRefreshInterval);
+            autoRefreshInterval = null;
+            btn.textContent = 'Start Auto-Refresh';
+            btn.classList.remove('btn-danger');
+            btn.classList.add('btn-success');
+        } else {
+            autoRefreshInterval = setInterval(function() {
+                document.getElementById('loadingSpinner').style.display = 'block';
+                location.reload();
+            }, 60000); // 60 seconds
+            btn.textContent = 'Stop Auto-Refresh';
+            btn.classList.remove('btn-success');
+            btn.classList.add('btn-danger');
+        }
+    }
+    // Live notification polling (demo: random alert)
+    setInterval(function() {
+        // Replace with AJAX call to get new notifications
+        var area = document.getElementById('notificationArea');
+        // Example: show a random notification every 2 min
+        if (Math.random() < 0.05) {
+            area.textContent = 'New severe flag detected!';
+            area.classList.remove('d-none');
+        } else {
+            area.classList.add('d-none');
+        }
+    }, 120000);
+    // Quick filter helpers
+    function quickDate(days) {
+        var start = new Date();
+        start.setDate(start.getDate() - parseInt(days));
+        document.querySelector('input[name="StartDate"]').value = start.toISOString().slice(0,10);
+        document.querySelector('input[name="EndDate"]').value = new Date().toISOString().slice(0,10);
+    }
+    function quickSeverity(sev) {
+        var sel = document.querySelector('select[name="Severity"]');
+        for (var i = 0; i < sel.options.length; i++) {
+            sel.options[i].selected = (sel.options[i].value === sev);
+        }
+    }
+    function quickIdle() {
+        // This would trigger a filter for idle > 60 min (server-side logic needed)
+        alert('Idle > 60 min filter will be applied (requires backend support)');
+    }
+    function showStatDetail(type) {
+        // Show modal or redirect to deeper details (demo: alert)
+        alert('Showing details for ' + type);
+    }
+</script>
