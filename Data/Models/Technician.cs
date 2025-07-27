@@ -53,6 +53,12 @@ namespace MVP_Core.Data.Models
         [MaxLength(50)]
         public string? OnboardingStatus { get; set; } // Onboarding status (e.g., Pending, Approved, Blocked)
 
+        // Sprint 84.5: Leaderboard enhancements
+        public int TierLevel { get; set; } = 0; // Leaderboard tier
+        public int TotalPoints { get; set; } = 0; // Leaderboard points
+        [MaxLength(100)]
+        public string City { get; set; } = string.Empty; // Leaderboard city
+
         public string Name => FullName;
     }
 }
