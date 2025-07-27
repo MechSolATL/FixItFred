@@ -1,0 +1,81 @@
+@page
+@model MVP_Core.Pages.Admin.RedemptionPathModel
+@{
+    ViewData["Title"] = "Redemption Pathways";
+}
+<h2>Redemption Pathways</h2>
+<form method="get" class="mb-3">
+    <label>Technician:</label>
+    <select name="TechnicianId">
+        <option value="">All</option>
+        @foreach (var tech in Model.Technicians)
+        {
+            <option value="@tech.Id" selected="@(Model.FilterTechnicianId == tech.Id ? "selected" : null)">@tech.FullName</option>
+        }
+    </select>
+    <label>Status:</label>
+    <select name="Status">
+        <option value="">All</option>
+        <option value="Open" selected="@(Model.FilterStatus == "Open" ? "selected" : null)">Open</option>
+        <option value="Resolved" selected="@(Model.FilterStatus == "Resolved" ? "selected" : null)">Resolved</option>
+    </select>
+    <button type="submit">Filter</button>
+</form>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Technician</th>
+            <th>Opportunity Type</th>
+            <th>Description</th>
+            <th>Status</th>
+            <th>Created At</th>
+            <th>Resolved At</th>
+            <th>Points Required</th>
+            <th>Resolution Notes</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var opp in Model.Opportunities)
+        {
+            <tr>
+                <td>@Model.Technicians.FirstOrDefault(t => t.Id == opp.TechnicianId)?.FullName</td>
+                <td>@opp.OpportunityType</td>
+                <td>@opp.Description</td>
+                <td>@opp.Status</td>
+                <td>@opp.CreatedAt.ToString("g")</td>
+                <td>@opp.ResolvedAt?.ToString("g")</td>
+                <td>@opp.PointsRequired</td>
+                <td>@opp.ResolutionNotes</td>
+                <td>
+                    @if (opp.Status == "Open")
+                    {
+                        <form method="post">
+                            <input type="hidden" name="ResolveOpportunityId" value="@opp.Id" />
+                            <input name="ResolutionNotes" placeholder="Resolution notes..." required />
+                            <button type="submit">Resolve</button>
+                        </form>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<h3>Log Redemption Opportunity</h3>
+<form method="post">
+    <label>Technician:</label>
+    <select name="NewTechnicianId" required>
+        <option value="">Select</option>
+        @foreach (var tech in Model.Technicians)
+        {
+            <option value="@tech.Id">@tech.FullName</option>
+        }
+    </select>
+    <label>Opportunity Type:</label>
+    <input name="NewOpportunityType" required />
+    <label>Description:</label>
+    <input name="NewDescription" />
+    <label>Points Required:</label>
+    <input name="NewPointsRequired" type="number" value="0" />
+    <button type="submit">Log Opportunity</button>
+</form>

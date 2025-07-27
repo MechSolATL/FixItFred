@@ -1,0 +1,76 @@
+@page
+@model MVP_Core.Pages.Admin.AwardCenterModel
+@{
+    ViewData["Title"] = "Technician Award Center";
+}
+<h2>Technician Award Center</h2>
+<form method="get" class="mb-3">
+    <label>Technician:</label>
+    <select name="TechnicianId">
+        <option value="">All</option>
+        @foreach (var tech in Model.Technicians)
+        {
+            <option value="@tech.Id" selected="@(Model.FilterTechnicianId == tech.Id ? "selected" : null)">@tech.FullName</option>
+        }
+    </select>
+    <label>Award Type:</label>
+    <input name="AwardType" value="@Model.FilterAwardType" />
+    <label>Date From:</label>
+    <input type="date" name="From" value="@Model.FilterFrom?.ToString("yyyy-MM-dd")" />
+    <label>Date To:</label>
+    <input type="date" name="To" value="@Model.FilterTo?.ToString("yyyy-MM-dd")" />
+    <button type="submit">Filter</button>
+</form>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Technician</th>
+            <th>Award Type</th>
+            <th>Issued At</th>
+            <th>Reason</th>
+            <th>Issuer</th>
+            <th>Trust Boost</th>
+            <th>Karma Boost</th>
+            <th>Award Level</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var award in Model.Awards)
+        {
+            <tr>
+                <td>@Model.Technicians.FirstOrDefault(t => t.Id == award.TechnicianId)?.FullName</td>
+                <td>@award.AwardType</td>
+                <td>@award.IssuedAt.ToString("g")</td>
+                <td>@award.Reason</td>
+                <td>@award.Issuer</td>
+                <td>@award.TrustBoostScore</td>
+                <td>@award.KarmaBoostScore</td>
+                <td>@award.AwardLevel</td>
+            </tr>
+        }
+    </tbody>
+</table>
+<h3>Issue New Award</h3>
+<form method="post">
+    <label>Technician:</label>
+    <select name="NewTechnicianId" required>
+        <option value="">Select</option>
+        @foreach (var tech in Model.Technicians)
+        {
+            <option value="@tech.Id">@tech.FullName</option>
+        }
+    </select>
+    <label>Award Type:</label>
+    <input name="NewAwardType" required />
+    <label>Reason:</label>
+    <input name="NewReason" />
+    <label>Issuer:</label>
+    <input name="NewIssuer" required />
+    <label>Trust Boost:</label>
+    <input name="NewTrustBoost" type="number" value="0" />
+    <label>Karma Boost:</label>
+    <input name="NewKarmaBoost" type="number" value="0" />
+    <label>Award Level:</label>
+    <input name="NewAwardLevel" />
+    <button type="submit">Issue Award</button>
+</form>
