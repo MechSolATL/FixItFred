@@ -97,6 +97,7 @@ builder.Services.AddScoped<GhostDelayAuditor>();
 builder.Services.AddScoped<MVP_Core.Services.Admin.OvertimeDefenseService>();
 builder.Services.AddScoped<MVP_Core.Services.Admin.GeoBreakValidatorService>();
 builder.Services.AddScoped<MVP_Core.Services.Admin.IdleSessionMonitorService>();
+builder.Services.AddScoped<RewardTriggerService>();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));

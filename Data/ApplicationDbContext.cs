@@ -318,6 +318,12 @@ namespace MVP_Core.Data
             _ = modelBuilder.Entity<FeatureSuggestion>().ToTable("FeatureSuggestions"); // Sprint 83.4: FeatureSuggestion model
             _ = modelBuilder.Entity<RoastDeliveryLog>().ToTable("RoastDeliveryLogs"); // Sprint 83.6-RoastRoulette
 
+            modelBuilder.Entity<LoyaltyPointTransaction>()
+                .HasOne(l => l.Technician)
+                .WithMany()
+                .HasForeignKey(l => l.TechnicianId)
+                .OnDelete(DeleteBehavior.SetNull);
+
             modelBuilder.Entity<RoastTemplate>().Property(r => r.Tier).HasConversion<string>();
         }
 

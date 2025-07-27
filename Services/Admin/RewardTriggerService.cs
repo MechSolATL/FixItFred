@@ -52,6 +52,13 @@ namespace MVP_Core.Services.Admin
                     LastRewardSentAt = DateTime.UtcNow
                 });
             }
+            _db.LoyaltyPointTransactions.Add(new LoyaltyPointTransaction {
+                TechnicianId = technicianId,
+                Points = 0, // Set actual reward points as needed
+                Type = "Reward",
+                Timestamp = DateTime.UtcNow,
+                Description = $"Tier unlock reward for technician {technicianId}"
+            });
             await _db.SaveChangesAsync();
             // Trigger PDF README packet (static utility call)
             // TODO: PDFPacketComposer.GenerateReadmePdf(...)
