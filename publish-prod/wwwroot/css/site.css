@@ -1,0 +1,351 @@
+/* ========================================
+   Global Base Styles
+========================================= */
+
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+
+:root {
+    --primary-color: #007bff;
+    --primary-dark: #004080;
+    --danger-color: #dc3545;
+    --danger-dark: #a71d2a;
+    --success-color: #28a745;
+    --success-dark: #1e7e34;
+    --font-main: 'Poppins', sans-serif;
+}
+
+/* Reset and Base */
+html, body {
+    font-family: var(--font-main);
+    font-size: 15px;
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    background-color: #f9fafb;
+    color: #222;
+}
+
+@media (min-width: 768px) {
+    html {
+        font-size: 16px;
+    }
+}
+
+/* Accessibility: Focus outlines */
+a:focus, button:focus, input:focus, textarea:focus, select:focus {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
+/* ========================================
+   Typography
+========================================= */
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 600;
+    margin: 0.5rem 0;
+}
+
+h1 {
+    font-size: 2.5rem;
+}
+
+h2 {
+    font-size: 2rem;
+}
+
+h3 {
+    font-size: 1.75rem;
+}
+
+p {
+    margin: 1rem 0;
+    line-height: 1.6;
+}
+
+/* ========================================
+   Links
+========================================= */
+a {
+    color: var(--primary-color);
+    text-decoration: none;
+}
+
+    a:hover {
+        text-decoration: underline;
+    }
+
+/* ========================================
+   Buttons
+========================================= */
+button, .btn {
+    font-family: var(--font-main);
+    font-weight: 600;
+    padding: 10px 20px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    display: inline-block;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    color: #fff;
+}
+
+    .btn-primary:hover {
+        background-color: var(--primary-dark);
+    }
+
+.btn-danger {
+    background-color: var(--danger-color);
+    color: #fff;
+}
+
+    .btn-danger:hover {
+        background-color: var(--danger-dark);
+    }
+
+/* ========================================
+   Form Inputs
+========================================= */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+textarea,
+select,
+.input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    margin: 6px 0 16px;
+    font-family: var(--font-main);
+    font-size: 1rem;
+    box-sizing: border-box;
+    background-color: #fff;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+    input:focus,
+    textarea:focus,
+    select:focus,
+    .input:focus {
+        border-color: var(--primary-color);
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+    }
+
+/* ========================================
+   Layout
+========================================= */
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.content-wrapper {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 20px;
+    padding: 30px;
+    margin-top: 30px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+/* ========================================
+   Header & Footer
+========================================= */
+header, footer {
+    background: url('/stream/background?v=1') no-repeat center center;
+    background-size: cover;
+    background-color: #003366;
+    color: #fff;
+}
+
+footer {
+    background-color: rgba(0, 0, 0, 0.5);
+    text-align: center;
+    padding: 1rem 0;
+    font-size: 0.9rem;
+}
+
+    footer a {
+        color: #fff !important;
+        text-decoration: none;
+        font-size: 8pt;
+    }
+
+        footer a:hover {
+            color: #ccc !important;
+            text-decoration: underline;
+        }
+
+    footer small {
+        font-size: 8pt;
+        color: #fff;
+    }
+
+/* ========================================
+   Progress Bar
+========================================= */
+.progress-container {
+    width: 100%;
+    background-color: #e0e0e0;
+    height: 22px;
+    border-radius: 12px;
+    margin: 20px 0;
+}
+
+.progress-bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #00c6ff, #0072ff);
+    transition: width 0.6s ease;
+    border-radius: 12px;
+}
+
+/* ========================================
+   Alerts
+========================================= */
+.alert-success {
+    background-color: #d4edda;
+    color: #155724;
+    padding: 10px 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.alert-error,
+.alert-danger {
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 10px 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.alert-warning {
+    background-color: #fff3cd;
+    color: #856404;
+    padding: 10px 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+/* FixItFred: Responsive ETA layout */
+.eta-grid div {
+  padding: 8px;
+  margin-bottom: 5px;
+  background-color: #f0f8ff;
+  border-left: 3px solid #0078D7;
+  font-size: 0.95rem;
+}
+
+/* FixItFred: CSS animation refactored for Razor compatibility. */
+.sla-blink {
+    animation: sla-blink 1s linear infinite;
+}
+
+@keyframes sla-blink {
+    0% { opacity: 1; }
+    50% { opacity: 0.3; }
+    100% { opacity: 1; }
+}
+
+/* FixItFred: CSS animation refactored for Razor compatibility. */
+.escalation-border {
+    border-width: 3px !important;
+    border-color: #dc3545 !important;
+}
+
+/* FixItFred: CSS animation refactored for Razor compatibility. */
+.pulse-marker {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #dc3545;
+    position: relative;
+    box-shadow: 0 0 0 0 rgba(220,53,69,0.7);
+    animation: pulse-marker 1.5s infinite;
+}
+
+@keyframes pulse-marker {
+    0% {
+        box-shadow: 0 0 0 0 rgba(220,53,69,0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(220,53,69,0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(220,53,69,0);
+    }
+}
+
+/* Offline Banner Styles */
+.offline-banner {
+  background: #ffcc00;
+  color: #000;
+  text-align: center;
+  padding: 10px;
+  font-weight: bold;
+  display: none;
+  z-index: 2000;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+}
+.offline-banner.active {
+  display: block;
+}
+
+/* Sprint 68.3 - Save Tracker UX Styles */
+.save-status-chip {
+    position: fixed;
+    top: 18px;
+    right: 18px;
+    z-index: 9999;
+    min-width: 120px;
+    padding: 8px 18px;
+    border-radius: 18px;
+    font-weight: 600;
+    font-size: 1rem;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.10);
+    background: #f5f5f5;
+    color: #333;
+    opacity: 0;
+    transition: opacity 0.3s, background 0.3s, color 0.3s;
+    pointer-events: none;
+}
+.save-status-chip.syncing {
+    background: #e3f2fd;
+    color: #1976d2;
+    opacity: 1;
+}
+.save-status-chip.success {
+    background: #e8f5e9;
+    color: #388e3c;
+    opacity: 1;
+}
+.save-status-chip.error {
+    background: #ffebee;
+    color: #d32f2f;
+    opacity: 1;
+}
+.save-status-chip.offline {
+    background: #fffde7;
+    color: #fbc02d;
+    opacity: 1;
+}
+
+/* Sync Champion Animation for Razor Partial */
+@keyframes championBounce {
+    0% { transform: scale(1); }
+    100% { transform: scale(1.15); }
+}
+
+.sync-champion-widget .badge {
+    animation: championBounce 1s infinite alternate;
+}

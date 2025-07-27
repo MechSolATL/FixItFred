@@ -1,0 +1,27 @@
+/* Heatmap.css - Sprint 48.1
+   Styles for technician load heatmap, SLA risk, and pulse animation */
+.heatmap-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.heatmap-table th, .heatmap-table td {
+    padding: 8px;
+    border: 1px solid #ddd;
+    text-align: center;
+}
+.heatmap-ok {
+    background: linear-gradient(90deg, #e0ffe0 60%, #b2f7b2 100%);
+    transition: background 0.5s;
+}
+.heatmap-risk {
+    background: linear-gradient(90deg, #ffe0e0 60%, #ffb2b2 100%);
+    transition: background 0.5s;
+}
+.pulse {
+    animation: pulse 1.5s infinite;
+}
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(255,0,0,0.4); }
+    70% { box-shadow: 0 0 10px 10px rgba(255,0,0,0.1); }
+    100% { box-shadow: 0 0 0 0 rgba(255,0,0,0); }
+}

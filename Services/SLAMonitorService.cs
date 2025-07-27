@@ -1,4 +1,5 @@
 // Sprint 26.6 Patch Log: CS8601/CS8602/CS8629 fixes — Added null checks and .GetValueOrDefault() for nullable value types. Ensured safe navigation for all nullable references. Previous comments preserved below.
+// Sprint 83.7-Hardening: Fixed scoped DbContext usage in hosted service
 using System;
 using System.Linq;
 using System.Threading;
@@ -13,14 +14,14 @@ using MVP_Core.Services.Dispatch;
 // Sprint 34.3 - SLA Monitoring Loop
 public class SLAMonitorService : BackgroundService
 {
-    private readonly IServiceProvider _serviceProvider;
+    private readonly IServiceScopeFactory _scopeFactory;
     private readonly NotificationDispatchEngine _notificationDispatchEngine;
     private readonly DispatcherService _dispatcherService;
     private readonly bool _enableFallback;
 
-    public SLAMonitorService(IServiceProvider serviceProvider, NotificationDispatchEngine notificationDispatchEngine, DispatcherService dispatcherService, bool enableFallback = true)
+    public SLAMonitorService(IServiceScopeFactory scopeFactory, NotificationDispatchEngine notificationDispatchEngine, DispatcherService dispatcherService, bool enableFallback = true)
     {
-        _serviceProvider = serviceProvider;
+        _scopeFactory = scopeFactory;
         _notificationDispatchEngine = notificationDispatchEngine;
         _dispatcherService = dispatcherService;
         _enableFallback = enableFallback;
@@ -30,7 +31,7 @@ public class SLAMonitorService : BackgroundService
     {
         while (!stoppingToken.IsCancellationRequested)
         {
-            using (var scope = _serviceProvider.CreateScope())
+            using (var scope = _scopeFactory.CreateScope())
             {
                 var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                 var now = DateTime.UtcNow;

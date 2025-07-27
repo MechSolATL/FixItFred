@@ -1,0 +1,36 @@
+/* Sprint 49.0 Patch Log: Mobile Dispatcher CSS */
+.dispatcher-mobile-queue {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+.job-card-mobile {
+    border: 1px solid #dee2e6;
+    border-radius: 0.5rem;
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    overflow: hidden;
+}
+.card-header {
+    padding: 0.75rem 1rem;
+    background: #f8f9fa;
+    cursor: pointer;
+}
+.card-body {
+    padding: 1rem;
+    background: #fdfdfd;
+}
+.toggle-card-btn {
+    font-size: 1.2rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+@media (max-width: 600px) {
+    .container-fluid {
+        padding: 0.5rem;
+    }
+    .card-header, .card-body {
+        padding: 0.5rem 0.75rem;
+    }
+}

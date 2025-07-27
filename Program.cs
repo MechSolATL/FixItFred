@@ -46,7 +46,13 @@ builder.Services.AddScoped<AuditLogger>();
 builder.Services.AddScoped<EmailVerificationService>();
 builder.Services.AddHostedService<BackupReminderService>();
 builder.Services.AddHostedService<MVP_Core.Services.SlaEscalationService>();
-builder.Services.AddHostedService<SLAMonitorService>();
+builder.Services.AddHostedService<SLAMonitorService>(provider =>
+{
+    var scopeFactory = provider.GetRequiredService<IServiceScopeFactory>();
+    var notificationDispatchEngine = provider.GetRequiredService<NotificationDispatchEngine>();
+    var dispatcherService = provider.GetRequiredService<DispatcherService>();
+    return new SLAMonitorService(scopeFactory, notificationDispatchEngine, dispatcherService);
+});
 builder.Services.AddScoped<ITechnicianService, TechnicianService>();
 builder.Services.AddScoped<MVP_Core.Services.IDeviceResolver, MVP_Core.Services.DeviceResolver>();
 builder.Services.AddScoped<MVP_Core.Services.INotificationService, MVP_Core.Services.NotificationService>();
