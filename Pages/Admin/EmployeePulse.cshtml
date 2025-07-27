@@ -1,0 +1,65 @@
+@page
+@model MVP_Core.Pages.Admin.EmployeePulseModel
+@{
+    ViewData["Title"] = "Employee Well-being Pulse";
+}
+<h2>Employee Well-being Pulse</h2>
+
+<form method="get">
+    <label>Show only unresolved:</label>
+    <input type="checkbox" name="unresolved" value="true" @(Model.ShowUnresolved ? "checked" : "") />
+    <button type="submit">Filter</button>
+</form>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>Employee</th>
+            <th>Mood</th>
+            <th>Stress</th>
+            <th>Work Satisfaction</th>
+            <th>Needs Follow-Up?</th>
+            <th>Manager Reviewed</th>
+            <th>Notes</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var log in Model.PulseLogs)
+        {
+            <tr class="@(log.NeedsFollowUp && !log.ManagerReviewed ? "table-danger" : "")">
+                <td>@log.Timestamp.ToLocalTime().ToString("g")</td>
+                <td>@log.EmployeeId</td>
+                <td><span title="@log.MoodScore">@(log.MoodScore <= 3 ? "??" : log.MoodScore <= 5 ? "??" : log.MoodScore <= 7 ? "??" : "??")</span></td>
+                <td><span class="badge bg-@(log.StressLevel == MVP_Core.Data.Models.StressLevel.Low ? "success" : log.StressLevel == MVP_Core.Data.Models.StressLevel.Moderate ? "info" : log.StressLevel == MVP_Core.Data.Models.StressLevel.High ? "warning" : "danger")">@log.StressLevel</span></td>
+                <td>@log.WorkSatisfactionScore</td>
+                <td>@(log.NeedsFollowUp ? "??" : "")</td>
+                <td>@(log.ManagerReviewed ? "?" : "")</td>
+                <td>@log.OpenNote</td>
+                <td>
+                    @if (log.NeedsFollowUp && !log.ManagerReviewed)
+                    {
+                        <form method="post">
+                            <input type="hidden" name="id" value="@log.Id" />
+                            <input type="text" name="managerNote" placeholder="Resolution notes" />
+                            <button type="submit" formaction="?handler=Resolve">Mark Resolved</button>
+                        </form>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@if (Model.PulseLogs.Any(x => x.NeedsFollowUp && !x.ManagerReviewed))
+{
+    <div class="alert alert-warning mt-3">
+        <strong>Follow-Up Encouragement:</strong>
+        <ul>
+            <li>Would you like to offer a shift in workload?</li>
+            <li>Would time off or check-in help?</li>
+            <li>Consider offering access to trust path or loyalty rewards.</li>
+        </ul>
+    </div>
+}
