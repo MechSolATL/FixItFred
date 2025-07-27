@@ -1,9 +1,38 @@
+@using MVP_Core.Data.Models
 @page
 @model MVP_Core.Pages.Admin.RoastCenterModel
 @{
     ViewData["Title"] = "Roast Center";
 }
 <h2>Roast Center</h2>
+
+<section>
+    <h3>Roast Roulette Log</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Employee</th>
+                <th>Roast</th>
+                <th>Tier</th>
+                <th>Delivered At</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var roast in Model.RoastRouletteLog)
+        {
+            <tr>
+                <td>@roast.EmployeeId</td>
+                <td>@roast.RoastMessage</td>
+                <td>@((RoastTier)roast.RoastLevel)</td>
+                <td>@roast.DeliveredAt?.ToString("g")</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+    <form method="post" asp-page-handler="ManualRouletteDrop">
+        <button type="submit" class="btn btn-primary">Trigger Manual Roast Roulette Drop</button>
+    </form>
+</section>
 
 <section>
     <h3>Pending Roasts</h3>

@@ -6,5 +6,5 @@ public class NewHireRoastLog
     public DateTime ScheduledFor { get; set; }
     public bool IsDelivered { get; set; }
     public DateTime? DeliveredAt { get; set; }
-    public int RoastLevel { get; set; } // 1 = Light, 2 = Medium, 3 = Savage
+    public int RoastLevel { get; set; } // 0 = Soft, 1 = Medium, 2 = Savage, 3 = Brutal
 }
