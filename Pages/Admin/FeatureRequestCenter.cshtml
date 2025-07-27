@@ -1,0 +1,55 @@
+@page
+@model MVP_Core.Pages.Admin.FeatureRequestCenterModel
+@using MVP_Core.Data.Models
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@{
+    ViewData["Title"] = "Feature Request Center";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+    var userName = HttpContextAccessor.HttpContext?.User?.Identity?.Name ?? "Unknown";
+    var role = HttpContextAccessor.HttpContext?.User?.IsInRole("Admin") == true ? "Admin" : "User";
+}
+<!-- Sprint 83.4: Feedback center -->
+<div class="container mt-5">
+    <h2 class="mb-4">Feature Request & Feedback Center</h2>
+    <form method="post" enctype="multipart/form-data">
+        <div class="mb-3">
+            <label class="form-label">Feedback Category</label>
+            <select asp-for="FeedbackCategory" class="form-select">
+                <option value="General">General</option>
+                <option value="UI/UX">UI/UX</option>
+                <option value="Performance">Performance</option>
+                <option value="Bug">Bug</option>
+                <option value="Other">Other</option>
+            </select>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Suggestion / Feedback</label>
+            <textarea asp-for="SuggestionText" class="form-control" rows="4"></textarea>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Urgency Level</label>
+            <select asp-for="UrgencyLevel" class="form-select">
+                <option value="Low">Low</option>
+                <option value="Medium">Medium</option>
+                <option value="High">High</option>
+                <option value="Critical">Critical</option>
+            </select>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Attachment (optional)</label>
+            <input type="file" asp-for="Attachment" class="form-control" />
+        </div>
+        <input type="hidden" asp-for="UserName" value="@userName" />
+        <input type="hidden" asp-for="Role" value="@role" />
+        <button type="submit" class="btn btn-primary">Submit Feedback</button>
+    </form>
+    @if (Model.SubmitSuccess)
+    {
+        <div class="alert alert-success mt-3">Thank you for your feedback!</div>
+    }
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <div class="alert alert-danger mt-3">@Model.ErrorMessage</div>
+    }
+</div>
+<!-- Sprint 83.4: Feedback center -->

@@ -9,8 +9,8 @@ namespace MVP_Core.Models.Admin
         public DateTime LastUpdate { get; set; }
         public int DispatchScore { get; set; }
         public DateTime LastPing { get; set; }
-        // Sprint83.4-IsOnlineFix: Made IsOnline assignable via object initializer for dispatcher UI binding.
-        public bool IsOnline { get; init; }
+        // Sprint 83.4-TraceFix: Resolved CS0200 — IsOnline now read/write for dispatcher UI binding
+        public bool IsOnline { get; set; }
         public string DispatchTier => DispatchScore switch
         {
             >= 80 => "?? Ready",

@@ -4,13 +4,35 @@
 @inject global::Services.Storage.StorageMonitorService StorageMonitorService
 @inject global::Services.Admin.ComplianceReportService ComplianceReportService
 @inject global::Services.Admin.SmartAdminAlertsService SmartAdminAlertsService
+@inject MVP_Core.Data.ApplicationDbContext Db
 @{
     ViewData["Title"] = "Admin Dashboard";
     Layout = "~/Pages/Shared/_Layout.cshtml";
+    // Sprint 83.4-TraceFix: Resolved CS8072 — Refactored expression tree to avoid ?. operator
+    var onboarding = Db.OnboardingStagings.FirstOrDefault(o => o.UserId == (User != null && User.Identity != null ? User.Identity.Name : null));
 }
 
 <div class="container mt-5">
     <h1 class="text-center mb-4">?? Service Requests Dashboard</h1>
+
+    <!-- P.R.O.S. Certified Badge -->
+    @if (onboarding != null && onboarding.IsVerified)
+    {
+        <div class="mb-3">
+            <span class="badge bg-success" title="P.R.O.S. Certified since @onboarding.CreatedOn.ToShortDateString()">P.R.O.S. Certified since @onboarding.CreatedOn.ToShortDateString()</span>
+        </div>
+    }
+    else
+    {
+        <div class="mb-3">
+            <span class="badge bg-danger" title="Certification required">Dispatch tools are locked until onboarding is verified.</span>
+        </div>
+    }
+
+    <!-- Feedback Feature Request Button -->
+    <div class="mb-3">
+        <a href="/Admin/FeatureRequestCenter" class="btn btn-outline-primary">Submit Feature Request / Feedback</a>
+    </div>
 
     <!-- SLA Drift Heatmap Widget -->
     <div class="mb-4">

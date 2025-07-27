@@ -314,11 +314,13 @@ namespace MVP_Core.Pages.Admin
             SmartAssignmentScores.Clear();
             foreach (var req in DispatcherRequests)
             {
+#pragma warning disable CS8604 // Possible null reference argument.
                 var scores = scoringEngine.GetScores(
                     _db.ServiceRequests.FirstOrDefault(r => r.Id == req.Id),
                     TechnicianStatuses,
                     _db
                 );
+#pragma warning restore CS8604 // Possible null reference argument.
                 SmartAssignmentScores[req.Id] = scores;
             }
 
