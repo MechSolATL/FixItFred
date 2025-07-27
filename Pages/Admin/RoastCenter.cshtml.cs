@@ -15,18 +15,20 @@ namespace MVP_Core.Pages.Admin
         private readonly RoastEngineService _roastEngine;
         private readonly RoastRouletteEngine _rouletteEngine;
         private readonly ILogger<RoastCenterModel> _logger;
-        public RoastCenterModel(ApplicationDbContext db, ILogger<RoastCenterModel> logger, RoastRouletteEngine rouletteEngine)
+        public RoastCenterModel(ApplicationDbContext db, ILogger<RoastCenterModel> logger, RoastRouletteEngine rouletteEngine, RoastFeedbackService roastFeedbackService)
         {
             _db = db;
             _roastEngine = new RoastEngineService(db);
             _rouletteEngine = rouletteEngine;
             _logger = logger;
+            RoastFeedbackService = roastFeedbackService;
         }
 
         public List<NewHireRoastLog> PendingRoasts { get; set; } = new();
         public List<NewHireRoastLog> PastRoasts { get; set; } = new();
         public Dictionary<string, double> RoastRankScores { get; set; } = new();
         public List<NewHireRoastLog> RoastRouletteLog { get; set; } = new();
+        public RoastFeedbackService RoastFeedbackService { get; set; }
 
         public async Task OnGetAsync()
         {
@@ -63,6 +65,15 @@ namespace MVP_Core.Pages.Admin
                 delivered++;
             }
             _logger.LogInformation($"Manual Roast Roulette Drop: {delivered} roasts delivered.");
+            return RedirectToPage();
+        }
+
+        public async Task<IActionResult> OnPostFeedbackAsync(int id, string reactionType)
+        {
+            // Log feedback reaction
+            await RoastFeedbackService.LogReactionAsync(id, User.Identity?.Name ?? "Anonymous", reactionType);
+            // Check for legendary promotion
+            await RoastFeedbackService.PromoteRoastToLegendaryTier(id);
             return RedirectToPage();
         }
     }

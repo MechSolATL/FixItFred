@@ -1,5 +1,7 @@
-@using MVP_Core.Data.Models
 @page
+@using MVP_Core.Data.Models
+@using MVP_Core.Services.Admin
+@inject RoastFeedbackService RoastFeedbackService
 @model MVP_Core.Pages.Admin.RoastCenterModel
 @{
     ViewData["Title"] = "Roast Center";
@@ -15,16 +17,37 @@
                 <th>Roast</th>
                 <th>Tier</th>
                 <th>Delivered At</th>
+                <th>Feedback</th>
+                <th>Legendary</th>
             </tr>
         </thead>
         <tbody>
         @foreach (var roast in Model.RoastRouletteLog)
         {
+            var avgScore = RoastFeedbackService.CalculateAverageReactions(roast.Id).GetAwaiter().GetResult();
+            var count = RoastFeedbackService.GetReactionCountAsync(roast.Id).GetAwaiter().GetResult();
+            bool isLegendary = avgScore > 4.8 && count >= 10;
             <tr>
                 <td>@roast.EmployeeId</td>
                 <td>@roast.RoastMessage</td>
                 <td>@((RoastTier)roast.RoastLevel)</td>
                 <td>@roast.DeliveredAt?.ToString("g")</td>
+                <td>
+                    <form method="post" asp-page-handler="Feedback" asp-route-id="@roast.Id">
+                        <span>Rate:</span>
+                        <button name="reactionType" value="star1" type="submit" class="btn btn-light">??</button>
+                        <button name="reactionType" value="star2" type="submit" class="btn btn-light">??</button>
+                        <button name="reactionType" value="star3" type="submit" class="btn btn-light">??</button>
+                        <button name="reactionType" value="star4" type="submit" class="btn btn-light">??</button>
+                        <button name="reactionType" value="star5" type="submit" class="btn btn-warning">??</button>
+                    </form>
+                </td>
+                <td>
+                    @if (isLegendary)
+                    {
+                        <span class="badge bg-warning text-dark">Legendary ??</span>
+                    }
+                </td>
             </tr>
         }
         </tbody>
