@@ -79,3 +79,24 @@
         </tbody>
     </table>
 </section>
+
+<section>
+    <h3>RoastRank Leaderboard</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Employee</th>
+                <th>RoastRank Score</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var kvp in Model.RoastRankScores.OrderByDescending(x => x.Value).Take(10))
+        {
+            <tr>
+                <td>@kvp.Key</td>
+                <td>@kvp.Value</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</section>

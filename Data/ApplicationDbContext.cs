@@ -273,6 +273,8 @@ namespace MVP_Core.Data
             _ = modelBuilder.Entity<EmployeeMilestoneLog>().ToTable("EmployeeMilestoneLogs");
             _ = modelBuilder.Entity<NewHireRoastLog>().ToTable("NewHireRoastLogs");
             _ = modelBuilder.Entity<RoastTemplate>().ToTable("RoastTemplates");
+
+            modelBuilder.Entity<RoastTemplate>().Property(r => r.Tier).HasConversion<string>();
         }
 
         #endregion

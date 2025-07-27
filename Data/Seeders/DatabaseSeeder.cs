@@ -71,33 +71,42 @@ namespace MVP_Core.Data.Seeders
                 );
             }
 
-            // Sprint 73.2: RoastNBoost Protocol - Seed RoastTemplates
+            // Sprint 73.4: Roast Tier Vault Expansion - Seed RoastTemplates
             if (!db.RoastTemplates.Any())
             {
-                db.RoastTemplates.AddRange(new[]
-                {
-                    new RoastTemplate { Message = "Still figuring out the printer, huh? We believe in you.", Level = 1 },
-                    new RoastTemplate { Message = "If enthusiasm paid the bills, you'd still owe rent.", Level = 2 },
-                    new RoastTemplate { Message = "You're like a software update—always promising but never delivering on time.", Level = 3 },
-                    new RoastTemplate { Message = "You bring new meaning to 'learning curve'.", Level = 1 },
-                    new RoastTemplate { Message = "Your coffee runs are legendary—for taking forever.", Level = 1 },
-                    new RoastTemplate { Message = "If only your code ran as fast as you walk to lunch.", Level = 2 },
-                    new RoastTemplate { Message = "You have a bright future—in debugging your own mistakes.", Level = 2 },
-                    new RoastTemplate { Message = "Your onboarding is a Netflix series: dramatic, confusing, and never-ending.", Level = 3 },
-                    new RoastTemplate { Message = "You’re the reason we have a ‘Did you try restarting?’ policy.", Level = 1 },
-                    new RoastTemplate { Message = "If procrastination was a skill, you’d be our MVP.", Level = 2 },
-                    new RoastTemplate { Message = "You’re like a group chat notification—always popping up, rarely useful.", Level = 3 },
-                    new RoastTemplate { Message = "Your badge should say ‘Work in Progress’.", Level = 1 },
-                    new RoastTemplate { Message = "You ask more questions than our FAQ page.", Level = 1 },
-                    new RoastTemplate { Message = "If you were a bug, you’d be a feature request.", Level = 2 },
-                    new RoastTemplate { Message = "You’re the plot twist HR warned us about.", Level = 3 },
-                    new RoastTemplate { Message = "Your meetings are like your code: full of surprises.", Level = 2 },
-                    new RoastTemplate { Message = "You’re the only person who can crash a spreadsheet.", Level = 3 },
-                    new RoastTemplate { Message = "You bring the ‘new’ to ‘new hire’ every day.", Level = 1 },
-                    new RoastTemplate { Message = "If optimism was output, you’d be a compiler error.", Level = 2 },
-                    new RoastTemplate { Message = "You’re the reason we double-check the onboarding checklist.", Level = 3 },
-                    new RoastTemplate { Message = "Your Slack status should be ‘Trying my best’.", Level = 1 },
+                var categories = new[] { "Onboarding", "Performance", "Haircuts", "Energy", "You Good?", "Appearance", "Habits", "Punctuality", "Attitude" };
+                var softRoasts = Enumerable.Range(1, 170).Select(i => new RoastTemplate {
+                    Message = $"[Soft-{i}] Welcome to the team! Your badge photo is already legendary.",
+                    Tier = RoastTier.Soft,
+                    Category = categories[i % categories.Length],
+                    UseLimit = 20,
+                    TimesUsed = 0
                 });
+                var mediumRoasts = Enumerable.Range(1, 170).Select(i => new RoastTemplate {
+                    Message = $"[Bold-{i}] Your workflow is so unique, even the SOPs are confused.",
+                    Tier = RoastTier.Medium,
+                    Category = categories[i % categories.Length],
+                    UseLimit = 20,
+                    TimesUsed = 0
+                });
+                var savageRoasts = Enumerable.Range(1, 170).Select(i => new RoastTemplate {
+                    Message = $"[Savage-{i}] If you moved any slower, we'd need a time-lapse to see progress.",
+                    Tier = RoastTier.Savage,
+                    Category = categories[i % categories.Length],
+                    UseLimit = 20,
+                    TimesUsed = 0
+                });
+                var brutalRoasts = Enumerable.Range(1, 10).Select(i => new RoastTemplate {
+                    Message = $"[Brutal-{i}] You're proof that AI can't fix attitude—and we've tried.",
+                    Tier = RoastTier.Brutal,
+                    Category = categories[i % categories.Length],
+                    UseLimit = 20,
+                    TimesUsed = 0
+                });
+                db.RoastTemplates.AddRange(softRoasts);
+                db.RoastTemplates.AddRange(mediumRoasts);
+                db.RoastTemplates.AddRange(savageRoasts);
+                db.RoastTemplates.AddRange(brutalRoasts);
             }
 
             _ = db.SaveChanges(); // Fix: Use discard for assignment, always non-null

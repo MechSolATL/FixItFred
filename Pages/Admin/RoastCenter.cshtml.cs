@@ -19,11 +19,13 @@ namespace MVP_Core.Pages.Admin
 
         public List<NewHireRoastLog> PendingRoasts { get; set; } = new();
         public List<NewHireRoastLog> PastRoasts { get; set; } = new();
+        public Dictionary<string, double> RoastRankScores { get; set; } = new();
 
         public async Task OnGetAsync()
         {
             PendingRoasts = await _roastEngine.GetPendingRoastsAsync();
             PastRoasts = await _db.NewHireRoastLogs.Where(x => x.IsDelivered).OrderByDescending(x => x.DeliveredAt).ToListAsync();
+            RoastRankScores = await _roastEngine.GetRoastRankScoresAsync();
         }
 
         public async Task<IActionResult> OnPostDeliverAsync(int id)
@@ -32,9 +34,9 @@ namespace MVP_Core.Pages.Admin
             return RedirectToPage();
         }
 
-        public async Task<IActionResult> OnPostScheduleAsync(string EmployeeId, int RoastLevel)
+        public async Task<IActionResult> OnPostScheduleAsync(string EmployeeId, RoastTier Tier)
         {
-            await _roastEngine.ScheduleRoastAsync(EmployeeId, RoastLevel);
+            await _roastEngine.ScheduleRoastAsync(EmployeeId, Tier);
             return RedirectToPage();
         }
     }
