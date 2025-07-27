@@ -16,51 +16,45 @@ namespace MVP_Core.Pages.Admin
     [Authorize(Roles = "Admin")]
     public class StatsModel : PageModel
     {
-        private readonly ApplicationDbContext _db;
-        public int TotalRequests { get; set; }
-        public int PendingCount { get; set; }
-        public int DispatchedCount { get; set; }
-        public int CancelledCount { get; set; }
-        public int CompletedCount { get; set; }
-        public int ActiveTechsToday { get; set; }
-        public int GpsUpdatedToday { get; set; }
-        public int JobsAssignedToday { get; set; }
-        public double AvgEtaAccuracy { get; set; }
-        public int SignalRBroadcasts24h { get; set; }
-        public List<string> WeekLabels { get; set; } = new();
-        public List<int> WeekCounts { get; set; } = new();
-        // Sprint 47.3 – PDF Archive UI Trigger
-        public string? PdfArchivePath { get; set; }
-        public bool PdfArchiveExists => System.IO.File.Exists(PdfArchivePath ?? "");
-        public string? PdfArchiveError { get; set; }
-        public string? Sprint47PdfArchivePath { get; set; }
-        public bool Sprint47PdfArchiveExists => System.IO.File.Exists(Sprint47PdfArchivePath ?? "");
-        public string? Sprint47PdfArchiveError { get; set; }
+        private readonly ApplicationDbContext _db; // Sprint 79.2
+        public int TotalRequests { get; set; } // Sprint 79.2
+        public int PendingCount { get; set; } // Sprint 79.2
+        public int DispatchedCount { get; set; } // Sprint 79.2
+        public int CancelledCount { get; set; } // Sprint 79.2
+        public int CompletedCount { get; set; } // Sprint 79.2
+        public int ActiveTechsToday { get; set; } // Sprint 79.2
+        public int GpsUpdatedToday { get; set; } // Sprint 79.2
+        public int JobsAssignedToday { get; set; } // Sprint 79.2
+        public double AvgEtaAccuracy { get; set; } // Sprint 79.2
+        public int SignalRBroadcasts24h { get; set; } // Sprint 79.2
+        public List<string> WeekLabels { get; set; } = new(); // Sprint 79.2
+        public List<int> WeekCounts { get; set; } = new(); // Sprint 79.2
+        public string? PdfArchivePath { get; set; } // Sprint 79.2
+        public bool PdfArchiveExists => System.IO.File.Exists(PdfArchivePath ?? string.Empty); // Sprint 79.2
+        public string? PdfArchiveError { get; set; } // Sprint 79.2
+        public string? Sprint47PdfArchivePath { get; set; } // Sprint 79.2
+        public bool Sprint47PdfArchiveExists => System.IO.File.Exists(Sprint47PdfArchivePath ?? string.Empty); // Sprint 79.2
+        public string? Sprint47PdfArchiveError { get; set; } // Sprint 79.2
 
-        public StatsModel(ApplicationDbContext db) { _db = db; }
+        public StatsModel(ApplicationDbContext db) { _db = db ?? throw new ArgumentNullException(nameof(db)); } // Sprint 79.2
 
         public void OnGet()
         {
             var now = DateTime.UtcNow;
-            // Service Request Metrics
-            var requests = _db.ServiceRequests.ToList();
+            var requests = _db?.ServiceRequests?.ToList() ?? new List<ServiceRequest>(); // Sprint 79.2
             TotalRequests = requests.Count;
             PendingCount = requests.Count(r => r.Status == "Pending");
             DispatchedCount = requests.Count(r => r.Status == "Dispatched");
             CancelledCount = requests.Count(r => r.Status == "Cancelled");
             CompletedCount = requests.Count(r => r.Status == "Completed");
-            // Technician Activity
-            ActiveTechsToday = _db.Technicians.Count(t => t.IsActive && t.EmploymentDate != null && t.EmploymentDate.Value.Date <= now.Date);
-            GpsUpdatedToday = _db.TechTrackingLogs.Count(l => l.Timestamp > now.Date);
-            JobsAssignedToday = _db.ScheduleQueues.Count(q => q.CreatedAt > now.Date);
-            // ETA Accuracy
-            var etaEntries = _db.ETAHistoryEntries.Where(e => e.PredictedETA.HasValue && e.ActualArrival.HasValue).ToList(); // Fix: Use .HasValue for nullable DateTime
-            AvgEtaAccuracy = etaEntries.Any() ? Math.Round(etaEntries.Average(e => Math.Abs((e.PredictedETA!.Value - e.ActualArrival!.Value).TotalMinutes)), 1) : 0;
-            // Weekly ScheduleQueue Volume
+            ActiveTechsToday = _db?.Technicians?.Count(t => t.IsActive && t.EmploymentDate != null && t.EmploymentDate.Value.Date <= now.Date) ?? 0; // Sprint 79.2
+            GpsUpdatedToday = _db?.TechTrackingLogs?.Count(l => l.Timestamp > now.Date) ?? 0; // Sprint 79.2
+            JobsAssignedToday = _db?.ScheduleQueues?.Count(q => q.CreatedAt > now.Date) ?? 0; // Sprint 79.2
+            var etaEntries = _db?.ETAHistoryEntries?.Where(e => e.PredictedETA.HasValue && e.ActualArrival.HasValue).ToList() ?? new List<ETAHistoryEntry>(); // Sprint 79.2
+            AvgEtaAccuracy = etaEntries.Any() ? Math.Round(etaEntries.Average(e => Math.Abs((e.PredictedETA!.Value - e.ActualArrival!.Value).TotalMinutes)), 1) : 0; // Sprint 79.2
             WeekLabels = Enumerable.Range(0, 7).Select(i => now.AddDays(-6 + i).ToString("ddd")).ToList();
-            WeekCounts = Enumerable.Range(0, 7).Select(i => _db.ScheduleQueues.Count(q => q.CreatedAt.Date == now.AddDays(-6 + i).Date)).ToList();
-            // SignalR Broadcasts (assume NotificationDispatchEngine logs to NotificationsSent)
-            SignalRBroadcasts24h = _db.NotificationsSent.Count(n => n.CreatedAt > now.AddHours(-24));
+            WeekCounts = Enumerable.Range(0, 7).Select(i => _db?.ScheduleQueues?.Count(q => q.CreatedAt.Date == now.AddDays(-6 + i).Date) ?? 0).ToList(); // Sprint 79.2
+            SignalRBroadcasts24h = _db?.NotificationsSent?.Count(n => n.CreatedAt > now.AddHours(-24)) ?? 0; // Sprint 79.2
             PdfArchivePath = Path.Combine("Docs", "SprintLogs", "Sprint_44_46_ChangeLog.pdf");
             Sprint47PdfArchivePath = Path.Combine("Docs", "SprintLogs", "Sprint_47_ChangeLog.pdf");
         }

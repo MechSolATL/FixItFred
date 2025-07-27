@@ -39,24 +39,43 @@ namespace MVP_Core.Pages.Admin
     [Authorize(Roles = "Admin")]
     public class DispatcherModel : PageModel
     {
-        private readonly DispatcherService _dispatcherService;
-        private readonly ApplicationDbContext _db;
-        private readonly IHubContext<RequestHub> _hubContext;
-        private readonly IOptions<LoadBalancingConfig> _lbConfig;
-
-        // FixItFred: Sprint 30D.1 - Live ETA Routing & Broadcast
-        // NotificationDispatchEngine is injected for live ETA SignalR updates
-        private readonly NotificationDispatchEngine _dispatchEngine;
-        private readonly IAuditTrailLogger _auditLogger;
+        private readonly DispatcherService _dispatcherService; // Sprint 79.2
+        private readonly ApplicationDbContext _db; // Sprint 79.2
+        private readonly IHubContext<RequestHub> _hubContext; // Sprint 79.2
+        private readonly IOptions<LoadBalancingConfig> _lbConfig; // Sprint 79.2
+        private readonly NotificationDispatchEngine _dispatchEngine; // Sprint 79.2
+        private readonly IAuditTrailLogger _auditLogger; // Sprint 79.2
 
         public DispatcherModel(DispatcherService dispatcherService, ApplicationDbContext db, IHubContext<RequestHub> hubContext, IOptions<LoadBalancingConfig> lbConfig, NotificationDispatchEngine dispatchEngine, IAuditTrailLogger auditLogger)
         {
-            _dispatcherService = dispatcherService;
-            _db = db;
-            _hubContext = hubContext;
-            _lbConfig = lbConfig;
-            _dispatchEngine = dispatchEngine;
-            _auditLogger = auditLogger;
+            _dispatcherService = dispatcherService ?? throw new ArgumentNullException(nameof(dispatcherService)); // Sprint 79.2
+            _db = db ?? throw new ArgumentNullException(nameof(db)); // Sprint 79.2
+            _hubContext = hubContext ?? throw new ArgumentNullException(nameof(hubContext)); // Sprint 79.2
+            _lbConfig = lbConfig ?? throw new ArgumentNullException(nameof(lbConfig)); // Sprint 79.2
+            _dispatchEngine = dispatchEngine ?? throw new ArgumentNullException(nameof(dispatchEngine)); // Sprint 79.2
+            _auditLogger = auditLogger ?? throw new ArgumentNullException(nameof(auditLogger)); // Sprint 79.2
+            DispatcherRequests = new(); // Sprint 79.2
+            TechnicianStatuses = new(); // Sprint 79.2
+            DispatcherStats = new DispatcherStatsDto { TotalActiveRequests = 0, TechsInTransit = 0, FollowUps = 0, Delays = 0, TopServiceType = string.Empty }; // Sprint 79.2
+            Notifications = new(); // Sprint 79.2
+            WatchdogAlerts = new(); // Sprint 79.2
+            Requests = new(); // Sprint 79.2
+            ServiceTypes = new(); // Sprint 79.2
+            KanbanHistory = new(); // Sprint 79.2
+            SlaSettings = new(); // Sprint 79.2
+            TechnicianLoads = new(); // Sprint 79.2
+            SuggestedTechnicians = new(); // Sprint 79.2
+            SuggestedScores = new(); // Sprint 79.2
+            SuggestedTech = new(); // Sprint 79.2
+            OptimizedSuggestions = new(); // Sprint 79.2
+            OptimizerFallbackReasons = new(); // Sprint 79.2
+            AllSkillTags = new List<string> { "Tankless", "Mini Split", "Backflow Cert", "Plumbing", "Heating", "Air Conditioning", "Water Filtration" }; // Sprint 79.2
+            SkillTags = new(); // Sprint 79.2
+            ServiceZones = new(); // Sprint 79.2
+            TechnicianDropdownViewModel = new MVP_Core.Data.Models.ViewModels.TechnicianDropdownViewModel(); // Sprint 79.2
+            ZoneLoadStatuses = new(); // Sprint 79.2
+            ZoneStressStatuses = new(); // Sprint 79.2
+            SmartAssignmentScores = new(); // Sprint 79.2
         }
 
         public List<RequestSummaryDto> DispatcherRequests { get; set; } = new();

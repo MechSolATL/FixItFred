@@ -14,39 +14,49 @@ namespace MVP_Core.Pages.Admin
 {
     public class SystemDiagnosticsModel : PageModel
     {
-        private readonly ApplicationDbContext _db;
-        private readonly SystemDiagnosticsService _diagnosticsService;
-        private readonly AutoRepairEngine _autoRepairEngine;
-        private readonly RootCauseCorrelationEngine _rootCauseCorrelationEngine;
-        private readonly SmartAdminAlertsService _smartAdminAlertsService;
-        private readonly ReplayEngineService _replayEngineService;
-        private readonly RecoveryAILearningService _aiService;
+        private readonly ApplicationDbContext _db; // Sprint 79.2
+        private readonly SystemDiagnosticsService _diagnosticsService; // Sprint 79.2
+        private readonly AutoRepairEngine _autoRepairEngine; // Sprint 79.2
+        private readonly RootCauseCorrelationEngine _rootCauseCorrelationEngine; // Sprint 79.2
+        private readonly SmartAdminAlertsService _smartAdminAlertsService; // Sprint 79.2
+        private readonly ReplayEngineService _replayEngineService; // Sprint 79.2
+        private readonly RecoveryAILearningService _aiService; // Sprint 79.2
 
         public SystemDiagnosticsModel(ApplicationDbContext db, SystemDiagnosticsService diagnosticsService, AutoRepairEngine autoRepairEngine, RootCauseCorrelationEngine rootCauseCorrelationEngine, SmartAdminAlertsService smartAdminAlertsService, ReplayEngineService replayEngineService)
         {
-            _db = db;
-            _diagnosticsService = diagnosticsService;
-            _autoRepairEngine = autoRepairEngine;
-            _rootCauseCorrelationEngine = rootCauseCorrelationEngine;
-            _smartAdminAlertsService = smartAdminAlertsService;
-            _replayEngineService = replayEngineService;
-            _aiService = new RecoveryAILearningService(_db);
+            _db = db ?? throw new ArgumentNullException(nameof(db)); // Sprint 79.2
+            _diagnosticsService = diagnosticsService ?? throw new ArgumentNullException(nameof(diagnosticsService)); // Sprint 79.2
+            _autoRepairEngine = autoRepairEngine ?? throw new ArgumentNullException(nameof(autoRepairEngine)); // Sprint 79.2
+            _rootCauseCorrelationEngine = rootCauseCorrelationEngine ?? throw new ArgumentNullException(nameof(rootCauseCorrelationEngine)); // Sprint 79.2
+            _smartAdminAlertsService = smartAdminAlertsService ?? throw new ArgumentNullException(nameof(smartAdminAlertsService)); // Sprint 79.2
+            _replayEngineService = replayEngineService ?? throw new ArgumentNullException(nameof(replayEngineService)); // Sprint 79.2
+            _aiService = new RecoveryAILearningService(_db); // Sprint 79.2
+            LatestLogs = new(); // Sprint 79.2
+            HealthStatus = "Unknown"; // Sprint 79.2
+            RootCauseSummary = "No summary"; // Sprint 79.2
+            Alerts = new(); // Sprint 79.2
+            ActiveAlerts = new(); // Sprint 79.2
+            ScheduledScenarios = new(); // Sprint 79.2
+            LearnedPatterns = new(); // Sprint 79.2
+            SuggestedTriggers = new(); // Sprint 79.2
+            StatusMessage = string.Empty; // Sprint 79.2
+            MostCommonOutcome = ""; // Sprint 79.2
         }
 
-        public List<SystemDiagnosticLog> LatestLogs { get; set; } = new();
-        public string HealthStatus { get; set; } = "Unknown";
-        public string RootCauseSummary { get; set; } = "No summary";
-        public List<string> Alerts { get; set; } = new();
-        public List<AdminAlertLog> ActiveAlerts { get; set; } = new();
-        public string AdminUserId => User?.Identity?.Name ?? "admin";
-        public List<RecoveryScenarioLog> ScheduledScenarios { get; set; } = new();
-        public List<RecoveryLearningLog> LearnedPatterns { get; set; } = new();
+        public List<SystemDiagnosticLog> LatestLogs { get; set; } = new(); // Sprint 79.2
+        public string HealthStatus { get; set; } = "Unknown"; // Sprint 79.2
+        public string RootCauseSummary { get; set; } = "No summary"; // Sprint 79.2
+        public List<string> Alerts { get; set; } = new(); // Sprint 79.2
+        public List<AdminAlertLog> ActiveAlerts { get; set; } = new(); // Sprint 79.2
+        public string AdminUserId => User?.Identity?.Name ?? "admin"; // Sprint 79.2
+        public List<RecoveryScenarioLog> ScheduledScenarios { get; set; } = new(); // Sprint 79.2
+        public List<RecoveryLearningLog> LearnedPatterns { get; set; } = new(); // Sprint 79.2
         [BindProperty]
-        public List<string> SuggestedTriggers { get; set; } = new();
-        public string StatusMessage { get; set; } = string.Empty;
-        public int TotalPatternsLearned { get; set; }
-        public string MostCommonOutcome { get; set; } = "";
-        public RecoveryLearningLog LatestPattern { get; set; }
+        public List<string> SuggestedTriggers { get; set; } = new(); // Sprint 79.2
+        public string StatusMessage { get; set; } = string.Empty; // Sprint 79.2
+        public int TotalPatternsLearned { get; set; } // Sprint 79.2
+        public string MostCommonOutcome { get; set; } = ""; // Sprint 79.2
+        public RecoveryLearningLog LatestPattern { get; set; } = new RecoveryLearningLog(); // Sprint 79.2
 
         public async Task<IActionResult> OnGetAsync(string filterRange)
         {
