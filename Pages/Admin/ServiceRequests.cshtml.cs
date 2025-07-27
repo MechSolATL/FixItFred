@@ -1,5 +1,9 @@
+using MVP_Core.Middleware;
+
 namespace MVP_Core.Pages.Admin
 {
+    // Sprint 84.2 — Tier Enforcement
+    [RequireLoyaltyTier("Bronze")]
     public class ServiceRequestsModel : PageModel
     {
         private readonly ApplicationDbContext _db;
