@@ -36,12 +36,10 @@ namespace MVP_Core.Pages.Admin
             }
             return RedirectToPage(new { techId = TechId });
         }
-        public IActionResult OnPostBulkReject(int[] selectedCertIds)
+        public async Task<IActionResult> OnPostBulkReject(int[] selectedCertIds)
         {
-            foreach (var id in selectedCertIds)
-            {
-                _certService.RejectCertificationAsync(id, "Bulk Rejected");
-            }
+            var tasks = selectedCertIds.Select(id => _certService.RejectCertificationAsync(id, "Bulk Rejected"));
+            await Task.WhenAll(tasks);
             return RedirectToPage(new { techId = TechId });
         }
         public IActionResult OnPostExportCsv(int[] selectedCertIds)

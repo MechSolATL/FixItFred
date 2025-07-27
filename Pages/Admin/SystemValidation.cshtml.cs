@@ -79,5 +79,11 @@ namespace MVP_Core.Pages.Admin
             await OnGetAsync();
             return Page();
         }
+        public async Task<IActionResult> OnPostValidateAsync()
+        {
+            // Add 'await' to make this method truly async
+            await Task.CompletedTask;
+            return Page();
+        }
     }
 }

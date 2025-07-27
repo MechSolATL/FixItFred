@@ -1,0 +1,68 @@
+@page
+@model MVP_Core.Pages.Admin.LoyaltyCenterModel
+@{
+    ViewData["Title"] = "Technician Loyalty Center";
+}
+<h2>Technician Loyalty Center</h2>
+<form method="post">
+    <label>Filter by Tier:</label>
+    <select asp-for="FilterTier">
+        <option value="">All</option>
+        <option value="Bronze">Bronze</option>
+        <option value="Silver">Silver</option>
+        <option value="Gold">Gold</option>
+        <option value="Platinum">Platinum</option>
+    </select>
+    <button type="submit" asp-page-handler="Filter">Apply</button>
+</form>
+<form method="post">
+    <label>Sort by:</label>
+    <select asp-for="SortBy">
+        <option value="">Default</option>
+        <option value="MostImproved">Most Improved</option>
+    </select>
+    <button type="submit" asp-page-handler="Sort">Sort</button>
+</form>
+@if (Model.LoyaltyLogs.Any())
+{
+    <div>
+        <h4>Loyalty Visualization</h4>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Technician</th>
+                    <th>Tier</th>
+                    <th>Points</th>
+                    <th>Milestone</th>
+                    <th>AwardedAt</th>
+                    <th>Notes</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var log in Model.LoyaltyLogs)
+                {
+                    <tr>
+                        <td>@log.TechnicianId</td>
+                        <td>@log.Tier</td>
+                        <td>@log.Points</td>
+                        <td>@log.Milestone</td>
+                        <td>@log.AwardedAt</td>
+                        <td>@log.Notes</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+<h5>Award New Milestone</h5>
+<form method="post">
+    <label>TechnicianId:</label>
+    <input type="number" asp-for="AwardTechnicianId" />
+    <label>Points:</label>
+    <input type="number" asp-for="AwardPoints" />
+    <label>Milestone:</label>
+    <input type="text" asp-for="AwardMilestone" />
+    <label>Notes:</label>
+    <input type="text" asp-for="AwardNotes" />
+    <button type="submit" asp-page-handler="Award">Award</button>
+</form>
