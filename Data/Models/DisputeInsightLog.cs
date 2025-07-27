@@ -9,3 +9,25 @@ public class DisputeInsightLog
     public string LoggedBy { get; set; }
     public DateTime Timestamp { get; set; }
 }
+
+public class TechnicianReputationEdge
+{
+    public int Id { get; set; }
+    public int SourceTechnicianId { get; set; } // Technician initiating influence
+    public int TargetTechnicianId { get; set; } // Technician receiving influence
+    public double TrustWeight { get; set; } // Positive/negative trust value
+    public string? InfluenceType { get; set; } // e.g., "Peer Review", "Conflict", "Collaboration"
+    public DateTime CreatedAt { get; set; }
+}
+
+public class DisputeFusionLog
+{
+    public int Id { get; set; }
+    public int DisputeId { get; set; }
+    public int? TriggerTechnicianId { get; set; } // Technician linked to trigger
+    public string? TriggerType { get; set; } // e.g., "Conflict", "Favoritism", "SLA Breach"
+    public string? SourceTag { get; set; } // e.g., "Dispatcher Bias", "Peer Friction"
+    public string? TracebackJson { get; set; } // Serialized traceback info
+    public bool AutoResolved { get; set; }
+    public DateTime LoggedAt { get; set; }
+}

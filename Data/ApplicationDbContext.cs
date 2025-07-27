@@ -143,6 +143,8 @@ namespace MVP_Core.Data
         public DbSet<UptimeHeartbeatLog> UptimeHeartbeatLogs { get; set; } = null!;
         public DbSet<DispatcherAssignmentLog> DispatcherAssignmentLogs { get; set; } = null!;
         public DbSet<FavoritismAlertLog> FavoritismAlertLogs { get; set; } = null!;
+        public DbSet<TechnicianReputationEdge> TechnicianReputationEdges { get; set; } = null!;
+        public DbSet<DisputeFusionLog> DisputeFusionLogs { get; set; } = null!;
 
         #endregion
 
@@ -263,6 +265,8 @@ namespace MVP_Core.Data
             _ = modelBuilder.Entity<UptimeHeartbeatLog>().ToTable("UptimeHeartbeatLogs");
             _ = modelBuilder.Entity<DispatcherAssignmentLog>().ToTable("DispatcherAssignmentLogs");
             _ = modelBuilder.Entity<FavoritismAlertLog>().ToTable("FavoritismAlertLogs");
+            _ = modelBuilder.Entity<TechnicianReputationEdge>().ToTable("TechnicianReputationEdges");
+            _ = modelBuilder.Entity<DisputeFusionLog>().ToTable("DisputeFusionLogs");
         }
 
         #endregion

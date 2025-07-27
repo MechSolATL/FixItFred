@@ -1,0 +1,20 @@
+@page
+@model MVP_Core.Pages.Admin.ReputationWebModel
+@{
+    ViewData["Title"] = "Reputation Graph";
+}
+<h2>Reputation Graph Visualization (Stub)</h2>
+<div class="mb-3">
+    <form method="get">
+        <label>Mode:</label>
+        <select name="GraphMode">
+            <option value="influence">Influence</option>
+            <option value="alerts">Alerts</option>
+        </select>
+        <button type="submit">Toggle</button>
+    </form>
+</div>
+<div class="mt-4">
+    <h3>Node Relations & Trigger Overlays</h3>
+    <div style="height:300px; background:#f8f9fa; border:1px solid #ccc; text-align:center; padding-top:120px;">Graph visualization logic will be implemented in future sprints.</div>
+</div>

@@ -1,0 +1,48 @@
+@page
+@model MVP_Core.Pages.Admin.FusedDisputesModel
+@{
+    ViewData["Title"] = "Fused Disputes";
+}
+<h2>Fused Disputes Review (Stub)</h2>
+<div class="mb-3">
+    <form method="get">
+        <label>Auto-Resolution:</label>
+        <select name="AutoResolvedFilter">
+            <option value="">All</option>
+            <option value="true">Auto-Resolved</option>
+            <option value="false">Manual Review</option>
+        </select>
+        <button type="submit">Filter</button>
+    </form>
+</div>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Dispute ID</th>
+            <th>Trigger Technician</th>
+            <th>Trigger Type</th>
+            <th>Source Tag</th>
+            <th>Traceback</th>
+            <th>Auto-Resolved</th>
+            <th>Logged At</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var log in Model.FusedDisputes)
+        {
+            <tr>
+                <td>@log.DisputeId</td>
+                <td>@log.TriggerTechnicianId</td>
+                <td>@log.TriggerType</td>
+                <td>@log.SourceTag</td>
+                <td>@log.TracebackJson</td>
+                <td>@log.AutoResolved</td>
+                <td>@log.LoggedAt.ToString("g")</td>
+            </tr>
+        }
+    </tbody>
+</table>
+<div class="mt-4">
+    <h3>Auto-Resolution Logic (Stub)</h3>
+    <div style="height:120px; background:#f8f9fa; border:1px solid #ccc; text-align:center; padding-top:40px;">Auto-resolution logic will be implemented in future sprints.</div>
+</div>
