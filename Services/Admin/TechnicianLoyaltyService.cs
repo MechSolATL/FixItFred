@@ -47,7 +47,7 @@ namespace MVP_Core.Services.Admin
             // Example: sum points from morale, response, service logs
             int moralePoints = await _db.TechnicianMoraleLogs.Where(x => x.TechnicianId == technicianId).SumAsync(x => x.MoraleScore);
             int responsePoints = await _db.TechnicianResponseLogs.Where(x => x.TechnicianId == technicianId).CountAsync() * 2;
-            int servicePoints = await _db.ServiceRequests.Where(x => x.TechnicianId == technicianId && x.Status == "Completed").CountAsync() * 5;
+            int servicePoints = await _db.ServiceRequests.Where(x => x.AssignedTechnicianId == technicianId && x.Status == "Completed").CountAsync() * 5;
             int totalPoints = moralePoints + responsePoints + servicePoints;
             string tier = "None";
             if (totalPoints >= 1000) tier = "Platinum";

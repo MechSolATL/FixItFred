@@ -1,0 +1,54 @@
+@page
+@model MVP_Core.Pages.Admin.HeatmapCenterModel
+@{
+    ViewData["Title"] = "Technician Heatmap Center";
+}
+
+<h2>Technician Heatmap Center</h2>
+<div>
+    <form method="get">
+        <label>Technician ID:</label>
+        <input type="text" name="TechId" value="@Model.TechId" />
+        <label>Service Type:</label>
+        <input type="text" name="ServiceType" value="@Model.ServiceType" />
+        <label>Job Count:</label>
+        <input type="number" name="JobCount" value="@Model.JobCount" />
+        <button type="submit">Filter</button>
+    </form>
+</div>
+<div id="map-container" style="height:500px;width:100%;border:1px solid #ccc;">
+    <!-- Map will be rendered here -->
+</div>
+<div>
+    <h4>Region Overlays</h4>
+    <ul>
+        @foreach (var region in Model.OverlayRegions)
+        {
+            <li>
+                <strong>@region.RegionName</strong> (Priority: @region.ZonePriority)
+                <br />Techs: @region.PreferredTechIds
+            </li>
+        }
+    </ul>
+</div>
+<div>
+    <h4>Congestion Patterns</h4>
+    <ul>
+        @foreach (var gap in Model.CoverageGaps)
+        {
+            <li>Dead Zone: @gap</li>
+        }
+    </ul>
+</div>
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css" />
+    <script>
+        // Basic Leaflet map setup
+        var map = L.map('map-container').setView([33.7490, -84.3880], 11); // Atlanta default
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+        }).addTo(map);
+        // TODO: Overlay heatmap and region boundaries from Model
+    </script>
+}

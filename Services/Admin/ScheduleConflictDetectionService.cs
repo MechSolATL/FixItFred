@@ -17,14 +17,15 @@ namespace MVP_Core.Services.Admin
         }
         public async Task<List<TechnicianScheduleConflictLog>> DetectConflictsAsync(int technicianId)
         {
-            var jobs = await _db.ServiceRequests.Where(x => x.TechnicianId == technicianId).OrderBy(x => x.ScheduledStart).ToListAsync();
+            // Corrected property: AssignedTechnicianId
+            var jobs = await _db.ServiceRequests.Where(x => x.AssignedTechnicianId == technicianId).OrderBy(x => x.ScheduledAt).ToListAsync();
             var conflicts = new List<TechnicianScheduleConflictLog>();
             for (int i = 0; i < jobs.Count - 1; i++)
             {
                 var current = jobs[i];
                 var next = jobs[i + 1];
                 // Overlap
-                if (current.ScheduledEnd > next.ScheduledStart)
+                if (current.EstimatedArrival.HasValue && next.ScheduledAt.HasValue && current.EstimatedArrival > next.ScheduledAt)
                 {
                     conflicts.Add(new TechnicianScheduleConflictLog
                     {
@@ -38,7 +39,7 @@ namespace MVP_Core.Services.Admin
                     });
                 }
                 // Impossible travel window (assume 30 min travel required)
-                if ((next.ScheduledStart - current.ScheduledEnd).TotalMinutes < 30)
+                if (current.EstimatedArrival.HasValue && next.ScheduledAt.HasValue && (next.ScheduledAt.Value - current.EstimatedArrival.Value).TotalMinutes < 30)
                 {
                     conflicts.Add(new TechnicianScheduleConflictLog
                     {

@@ -130,6 +130,8 @@ namespace MVP_Core.Data
         public DbSet<TechnicianKarmaLog> TechnicianKarmaLogs { get; set; } = null!;
         public DbSet<TechnicianLoyaltyLog> TechnicianLoyaltyLogs { get; set; } = null!;
         public DbSet<TechnicianScheduleConflictLog> TechnicianScheduleConflictLogs { get; set; } = null!;
+        public DbSet<TechnicianHeatmapLog> TechnicianHeatmapLogs { get; set; } = null!;
+        public DbSet<RoutingOverlayRegion> RoutingOverlayRegions { get; set; } = null!;
 
         #endregion
 
@@ -237,6 +239,8 @@ namespace MVP_Core.Data
             _ = modelBuilder.Entity<TechnicianEscalationLog>().ToTable("TechnicianEscalationLogs");
             _ = modelBuilder.Entity<TechnicianIncidentReplay>().ToTable("TechnicianIncidentReplays");
             _ = modelBuilder.Entity<TechnicianPatternProfile>().ToTable("TechnicianPatternProfiles");
+            _ = modelBuilder.Entity<TechnicianHeatmapLog>().ToTable("TechnicianHeatmapLogs");
+            _ = modelBuilder.Entity<RoutingOverlayRegion>().ToTable("RoutingOverlayRegions");
         }
 
         #endregion

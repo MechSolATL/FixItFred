@@ -1,0 +1,53 @@
+@page
+@model MVP_Core.Pages.Admin.RoutingOverlaysModel
+@{
+    ViewData["Title"] = "Routing Overlay Regions";
+}
+<h2>Routing Overlay Regions</h2>
+<div>
+    <form method="post">
+        <label>Region Name:</label>
+        <input type="text" name="RegionName" />
+        <label>GeoBoundary (JSON):</label>
+        <textarea name="GeoBoundaryJson"></textarea>
+        <label>Preferred Tech IDs (comma separated):</label>
+        <input type="text" name="PreferredTechIds" />
+        <label>Zone Priority:</label>
+        <input type="number" name="ZonePriority" />
+        <button type="submit">Create Overlay</button>
+    </form>
+</div>
+<div>
+    <h4>Existing Regions</h4>
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Boundary</th>
+                <th>Techs</th>
+                <th>Priority</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var region in Model.OverlayRegions)
+        {
+            <tr>
+                <td>@region.RegionName</td>
+                <td><pre>@region.GeoBoundaryJson</pre></td>
+                <td>@region.PreferredTechIds</td>
+                <td>@region.ZonePriority</td>
+                <td>
+                    <form method="post">
+                        <input type="hidden" name="RegionId" value="@region.Id" />
+                        <input type="number" name="NewPriority" placeholder="Set Priority" />
+                        <button type="submit" formaction="?handler=UpdatePriority">Update Priority</button>
+                        <input type="text" name="NewTechIds" placeholder="Assign Techs" />
+                        <button type="submit" formaction="?handler=AssignTechs">Assign Techs</button>
+                    </form>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>
