@@ -1,0 +1,34 @@
+@page
+@model MVP_Core.Pages.Admin.HR.EgoVectorsModel
+@{
+    ViewData["Title"] = "Ego Vector Logs";
+}
+<!-- Sprint 76.1 Patch: Ego Vector Log display for manager review -->
+<h2>Ego Vector Logs</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Manager</th>
+            <th>Week Start</th>
+            <th>Override Commands</th>
+            <th>Trust Delays</th>
+            <th>Dispute Reversals</th>
+            <th>Ego Influence Score</th>
+            <th>Notes</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var log in Model.EgoVectorLogs)
+    {
+        <tr>
+            <td>@log.ManagerId</td>
+            <td>@log.WeekStart.ToShortDateString()</td>
+            <td>@log.OverrideCommandCount</td>
+            <td>@log.TrustDelayCount</td>
+            <td>@log.DisputeReversalCount</td>
+            <td>@log.EgoInfluenceScore</td>
+            <td>@log.Notes</td>
+        </tr>
+    }
+    </tbody>
+</table>

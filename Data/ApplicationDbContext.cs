@@ -157,6 +157,9 @@ namespace MVP_Core.Data
         public DbSet<DepartmentDelayLog> DepartmentDelayLogs { get; set; } = null!;
         public DbSet<TrustCascadeLog> TrustCascadeLogs { get; set; } = null!;
         public DbSet<EmployeeOnboardingProfile> EmployeeOnboardingProfiles { get; set; } = null!;
+        public DbSet<EgoVectorLog> EgoVectorLogs { get; set; } = null!;
+        public DbSet<AnonymousReviewFormLog> AnonymousReviewFormLogs { get; set; } = null!;
+        public DbSet<EmployeeConfidenceDecayLog> EmployeeConfidenceDecayLogs { get; set; } = null!;
 
         #endregion
 
@@ -291,6 +294,9 @@ namespace MVP_Core.Data
             _ = modelBuilder.Entity<DepartmentDelayLog>().ToTable("DepartmentDelayLogs");
             _ = modelBuilder.Entity<TrustCascadeLog>().ToTable("TrustCascadeLogs");
             _ = modelBuilder.Entity<EmployeeOnboardingProfile>().ToTable("EmployeeOnboardingProfiles");
+            _ = modelBuilder.Entity<EgoVectorLog>().ToTable("EgoVectorLogs");
+            _ = modelBuilder.Entity<AnonymousReviewFormLog>().ToTable("AnonymousReviewFormLogs");
+            _ = modelBuilder.Entity<EmployeeConfidenceDecayLog>().ToTable("EmployeeConfidenceDecayLogs");
 
             modelBuilder.Entity<RoastTemplate>().Property(r => r.Tier).HasConversion<string>();
         }

@@ -1,0 +1,30 @@
+@page
+@model MVP_Core.Pages.Admin.HR.AnonymousReviewsModel
+@{
+    ViewData["Title"] = "Anonymous Review Triggers";
+}
+<!-- Sprint 76.1 Patch: Anonymous Review Trigger log for HR panel -->
+<h2>Anonymous Review Triggers</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Manager</th>
+            <th>Triggered At</th>
+            <th>Initiator Count</th>
+            <th>Context Hash</th>
+            <th>Resolution Status</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var log in Model.AnonymousReviewFormLogs)
+    {
+        <tr>
+            <td>@log.ManagerId</td>
+            <td>@log.TriggeredAt.ToString("g")</td>
+            <td>@log.InitiatorCount</td>
+            <td>@log.ContextHash</td>
+            <td>@log.ResolutionStatus</td>
+        </tr>
+    }
+    </tbody>
+</table>

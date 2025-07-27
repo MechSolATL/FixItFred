@@ -1,0 +1,32 @@
+@page
+@model MVP_Core.Pages.Admin.HR.ConfidenceDecayModel
+@{
+    ViewData["Title"] = "Employee Confidence Decay";
+}
+<!-- Sprint 76.1 Patch: Confidence Bounce Chart log for HR portal -->
+<h2>Employee Confidence Decay Logs</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Manager</th>
+            <th>Week Start</th>
+            <th>Confidence Shift</th>
+            <th>Pulse Score</th>
+            <th>Interaction Matrix</th>
+            <th>Notes</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var log in Model.EmployeeConfidenceDecayLogs)
+    {
+        <tr>
+            <td>@log.ManagerId</td>
+            <td>@log.WeekStart.ToShortDateString()</td>
+            <td>@log.ConfidenceShift</td>
+            <td>@log.PulseScore</td>
+            <td>@log.InteractionMatrixScore</td>
+            <td>@log.Notes</td>
+        </tr>
+    }
+    </tbody>
+</table>
