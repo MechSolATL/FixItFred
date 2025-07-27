@@ -15,21 +15,23 @@ namespace MVP_Core.Pages.Customer
         public List<BillingInvoiceRecordModel> Documents { get; set; } = new(); // Sprint 78.4: Razor/backend context sync for property access
         public bool ShowUploads { get; set; } = false; // Sprint 78.4: Razor/backend context sync for property access
         public bool? IsVerified { get; set; } = null; // Sprint 78.4: Razor/backend context sync for property access
+        // Sprint 83.4-FinalFix: Migration blocker resolution.
         public void OnGet()
         {
-            // Sprint 78.4: Razor/backend context sync for property access
-            if (this.ShowUploads || (this.IsVerified ?? false))
+            // Sprint 83.4-FinalFix: Migration blocker resolution.
+            if ((IsVerified ?? false) || ShowUploads)
             {
-                if (!User?.Identity?.IsAuthenticated ?? false || !User?.HasClaim("IsCustomer", "true") ?? false)
+                if (!(User?.Identity?.IsAuthenticated ?? false) || !(User?.HasClaim("IsCustomer", "true") ?? false))
                 {
                     return;
                 }
-                var email = User?.Identity?.Name ?? string.Empty; // Sprint 78.2: Hardened for CS860X
-                if (_portalService != null) // Sprint 78.2: Hardened for CS860X
+                var email = User?.Identity?.Name ?? string.Empty;
+                if (_portalService != null)
                 {
-                    this.Documents = _portalService.GetDocuments(email); // Sprint 78.4: Razor/backend context sync for property access
+                    this.Documents = _portalService.GetDocuments(email);
                 }
             }
         }
+        // Sprint83.4-MigrationBlockerFixes
     }
 }

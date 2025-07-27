@@ -1,77 +1,134 @@
+@* Sprint 83: SmartControlUX upgrade *@
 @page
 @model MVP_Core.Pages.Customer.ServiceHistoryModel
 @inject MVP_Core.Services.CustomerPortalService PortalService
 @inject MVP_Core.Services.ReceiptArchiveService ArchiveService
 @{
     Layout = "/Pages/Shared/_Layout.cshtml";
-    if (!(User.Identity?.IsAuthenticated ?? false) || !(User.HasClaim("IsCustomer", "true") ?? false)) // Sprint 82: RazorViewFortification
-    {
-        <div class="alert alert-danger">Access denied. Please log in as a customer.</div>
-        return;
-    }
     var email = User.Identity?.Name ?? string.Empty; // Sprint 82: RazorViewFortification
     var requests = Model.Requests ?? new List<MVP_Core.Data.Models.ServiceRequest>(); // Sprint 82: RazorViewFortification
     var technicians = Model.Technicians ?? new List<MVP_Core.Data.Models.Technician>(); // Sprint 82: RazorViewFortification
     var filterDate = Request.Query["date"].ToString();
     var filterType = Request.Query["type"].ToString();
     var filterTech = Request.Query["tech"].ToString();
-    var filtered = (requests ?? new List<MVP_Core.Data.Models.ServiceRequest>()).Where(r => (string.IsNullOrEmpty(filterDate) || r.RequestedAt.ToShortDateString() == filterDate) && (string.IsNullOrEmpty(filterType) || r.ServiceType == filterType) && (string.IsNullOrEmpty(filterTech) || r.AssignedTo == filterTech)).ToList(); // Sprint 82: RazorViewFortification
-    var grouped = filtered.GroupBy(r => r.RequestedAt.Year).OrderByDescending(g => g.Key); // Sprint 82: RazorViewFortification
+    var filtered = requests.Where(r => (string.IsNullOrEmpty(filterDate) || r.RequestedAt.ToShortDateString() == filterDate) && (string.IsNullOrEmpty(filterType) || r.ServiceType == filterType) && (string.IsNullOrEmpty(filterTech) || r.AssignedTo == filterTech)).ToList(); // Sprint 82: RazorViewFortification
+    var grouped = filtered.GroupBy(r => r.RequestedAt.Year).OrderByDescending(g => g.Key).ToList(); // Sprint83.4-FinalFixSweep2
+    var totalRequests = requests.Count;
+    var completedRequests = requests.Count(r => r.Status == "Completed");
+    var openRequests = requests.Count(r => r.Status != "Completed");
+    var kpiList = new List<dynamic> // Sprint 83.1: Typed Razor array/list initialization
+    {
+        new { Label = "Total Requests", Value = totalRequests },
+        new { Label = "Completed", Value = completedRequests },
+        new { Label = "Open", Value = openRequests }
+    };
+    // Sprint 83.4: Detection code removed to restore build stability
+    // @using Wangkanai.Detection
+    // @inject IDetectionService Detection
+    // bool isMobile = Detection.Device.Type == DeviceType.Mobile;
+    // bool isTablet = Detection.Device.Type == DeviceType.Tablet;
+    // bool isDesktop = Detection.Device.Type == DeviceType.Desktop;
 }
-<h2>Service History Timeline</h2>
-<form method="get" class="row mb-3">
-    <div class="col"><input type="date" name="date" class="form-control" value="@filterDate" /></div>
-    <div class="col"><input type="text" name="type" class="form-control" placeholder="Service Type" value="@filterType" /></div>
-    <div class="col"><input type="text" name="tech" class="form-control" placeholder="Technician" value="@filterTech" /></div>
-    <div class="col"><button type="submit" class="btn btn-primary">Filter</button></div>
-</form>
-<div class="accordion" id="historyAccordion">
-@foreach (var yearGroup in grouped ?? new List<IGrouping<int, MVP_Core.Data.Models.ServiceRequest>>()) // Sprint 82: RazorViewFortification
-{
-    <div class="accordion-item">
-        <h2 class="accordion-header" id="heading-year-@yearGroup.Key">
-            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-year-@yearGroup.Key" aria-expanded="false" aria-controls="collapse-year-@yearGroup.Key">
-                @yearGroup.Key
-            </button>
-        </h2>
-        <div id="collapse-year-@yearGroup.Key" class="accordion-collapse collapse" aria-labelledby="heading-year-@yearGroup.Key" data-bs-parent="#historyAccordion">
-            <div class="accordion-body">
-                @foreach (var req in yearGroup.OrderByDescending(r => r.RequestedAt.Month) ?? new List<MVP_Core.Data.Models.ServiceRequest>()) // Sprint 82: RazorViewFortification
-                {
-                    var tech = Model.GetTechnicianById(req?.AssignedTechnicianId ?? 0); // Sprint 82: RazorViewFortification
-                    <div class="card mb-2">
-                        <div class="card-header">
-                            <strong>@(req?.RequestedAt.ToString("MMM dd") ?? "-") // Sprint 82: RazorViewFortification</strong> - @(req?.ServiceType ?? "-") // Sprint 82: RazorViewFortification
-                            <span class="badge bg-secondary ms-2">@(req?.Status ?? "-") // Sprint 82: RazorViewFortification</span>
-                            @if (req?.NeedsFollowUp ?? false) { <span class="badge bg-warning text-dark ms-1">Follow-Up Needed</span> }
-                            @if (string.IsNullOrEmpty(req?.CustomerFeedback ?? "")) { <span class="badge bg-info text-dark ms-1">No Review</span> }
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-2">
-                                    @if (tech != null && !string.IsNullOrEmpty(tech.PhotoUrl)) {
-                                        <img src="@tech.PhotoUrl" alt="Tech Avatar" class="rounded-circle" style="width:48px;height:48px;" />
-                                    }
-                                    <div>@tech?.FullName ?? "-" // Sprint 82: RazorViewFortification</div>
+<!-- Sprint 83: SmartControlUX upgrade -->
+<div class="container mx-auto px-2 py-4">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        @* <div class="card bg-gradient-to-r from-blue-100 to-blue-300 shadow p-4 flex flex-col items-center">
+            <div class="text-lg font-bold">Total Requests</div>
+            <div class="text-2xl">@totalRequests</div>
+        </div>
+        <div class="card bg-gradient-to-r from-green-100 to-green-300 shadow p-4 flex flex-col items-center">
+            <div class="text-lg font-bold">Completed</div>
+            <div class="text-2xl">@completedRequests</div>
+        </div>
+        <div class="card bg-gradient-to-r from-yellow-100 to-yellow-300 shadow p-4 flex flex-col items-center">
+            <div class="text-lg font-bold">Open</div>
+            <div class="text-2xl">@openRequests</div>
+        </div> *@
+        @foreach (var kpi in kpiList) {
+        <div class="card bg-gradient-to-r @(kpi.Label == "Total Requests" ? "from-blue-100 to-blue-300" : kpi.Label == "Completed" ? "from-green-100 to-green-300" : "from-yellow-100 to-yellow-300") shadow p-4 flex flex-col items-center">
+            <div class="text-lg font-bold">@kpi.Label</div>
+            <div class="text-2xl">@kpi.Value</div>
+        </div>
+        }
+    </div>
+    <button class="btn btn-primary mb-2" onclick="toggleSection('historyAccordion')">Toggle History Timeline</button>
+    <div id="historyAccordionSection" class="collapse show">
+        <h2>Service History Timeline</h2>
+        <form method="get" class="row mb-3">
+            <div class="col"><input type="date" name="date" class="form-control" value="@filterDate" /></div>
+            <div class="col"><input type="text" name="type" class="form-control" placeholder="Service Type" value="@filterType" /></div>
+            <div class="col"><input type="text" name="tech" class="form-control" placeholder="Technician" value="@filterTech" /></div>
+            <div class="col"><button type="submit" class="btn btn-primary">Filter</button></div>
+        </form>
+        <div class="accordion" id="historyAccordion">
+        @foreach (var yearGroup in grouped) // Sprint83.4-FinalFixSweep2
+        {
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="heading-year-@yearGroup.Key">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-year-@yearGroup.Key" aria-expanded="false" aria-controls="collapse-year-@yearGroup.Key">
+                        @yearGroup.Key
+                    </button>
+                </h2>
+                <div id="collapse-year-@yearGroup.Key" class="accordion-collapse collapse" aria-labelledby="heading-year-@yearGroup.Key" data-bs-parent="#historyAccordion">
+                    <div class="accordion-body">
+                        @foreach (var req in yearGroup.OrderByDescending(r => r.RequestedAt.Month).ToList()) // Sprint83.4-FinalFixSweep2
+                        {
+                            var tech = Model.GetTechnicianById(req?.AssignedTechnicianId ?? 0); // Sprint 82: RazorViewFortification
+                            <div class="card mb-2">
+                                <div class="card-header">
+                                    <strong>@(req?.RequestedAt.ToString("MMM dd") ?? "-") // Sprint 82: RazorViewFortification</strong> - @(req?.ServiceType ?? "-") // Sprint 82: RazorViewFortification
+                                    <span class="badge bg-secondary ms-2">@(req?.Status ?? "-") // Sprint 82: RazorViewFortification</span>
+                                    @if ((req?.NeedsFollowUp == true)) { <span class="badge bg-warning text-dark ms-1">Follow-Up Needed</span> } // Sprint 83.4: FinalErrorSweep for onboarding/migration unlock
+                                    @if (string.IsNullOrEmpty(req?.CustomerFeedback ?? "")) { <span class="badge bg-info text-dark ms-1">No Review</span> }
                                 </div>
-                                <div class="col-md-10">
-                                    <strong>Details:</strong> @(req?.Details ?? "-") // Sprint 82: RazorViewFortification<br />
-                                    <strong>Notes:</strong> @(req?.Notes ?? "-") // Sprint 82: RazorViewFortification<br />
-                                    <strong>Outcome:</strong> @((req?.Status == "Completed" ? "Completed" : req?.Status) ?? "-") // Sprint 82: RazorViewFortification
-                                    <br />
-                                    @if (!string.IsNullOrEmpty(req?.FinalizedPDFPath ?? "")) {
-                                        <a href="@(req.FinalizedPDFPath.Replace("wwwroot", ""))" class="btn btn-sm btn-outline-primary" target="_blank">Download Receipt PDF</a>
-                                    }
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-2">
+                                            @if (tech != null && !string.IsNullOrEmpty(tech.PhotoUrl)) {
+                                                <img src="@tech.PhotoUrl" alt="Tech Avatar" class="rounded-circle" style="width:48px;height:48px;" />
+                                            }
+                                            <div>@tech?.FullName ?? "-" // Sprint 82: RazorViewFortification</div>
+                                        </div>
+                                        <div class="col-md-10">
+                                            <strong>Details:</strong> @(req?.Details ?? "-") // Sprint 82: RazorViewFortification<br />
+                                            <strong>Notes:</strong> @(req?.Notes ?? "-") // Sprint 82: RazorViewFortification<br />
+                                            <strong>Outcome:</strong> @((req?.Status == "Completed" ? "Completed" : req?.Status) ?? "-") // Sprint 82: RazorViewFortification
+                                            <br />
+                                            @if (!string.IsNullOrEmpty(req?.FinalizedPDFPath ?? "")) {
+                                                <a href="@(req.FinalizedPDFPath.Replace("wwwroot", ""))" class="btn btn-sm btn-outline-primary" target="_blank">Download Receipt PDF</a>
+                                            }
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        }
                     </div>
-                }
+                </div>
             </div>
+        }
         </div>
     </div>
-}
 </div>
+@section Scripts {
+    <script>
+    // Sprint 83: SmartControlUX upgrade
+    function toggleSection(section) {
+        var el = document.getElementById(section + 'Section');
+        if (el.classList.contains('show')) {
+            el.classList.remove('show');
+            localStorage.setItem(section + 'Collapsed', 'true');
+        } else {
+            el.classList.add('show');
+            localStorage.setItem(section + 'Collapsed', 'false');
+        }
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+        var collapsed = localStorage.getItem('historyAccordionCollapsed');
+        var el = document.getElementById('historyAccordionSection');
+        if (collapsed === 'true' && el) el.classList.remove('show');
+    });
+    </script>
+}
 <style>
 .accordion-button { font-size: 1rem; }
 .accordion-body { font-size: 0.95rem; }

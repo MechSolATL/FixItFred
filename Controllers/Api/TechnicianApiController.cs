@@ -108,7 +108,8 @@ namespace MVP_Core.Controllers.Api
                     estimatedArrival = q.EstimatedArrival,
                     status = q.Status.ToString()
                 }).ToList();
-            return Ok(jobs ?? new List<object>()); // Sprint 79.7: TechnicianApiController cleanup
+            // Sprint 83.4-FinalFix: Migration blocker resolution.
+            return Ok(jobs.Cast<object>().ToList()); // Sprint83.4-MigrationBlockerFixes
         }
 
         [HttpPost("/api/tech/respond-to-schedule")]

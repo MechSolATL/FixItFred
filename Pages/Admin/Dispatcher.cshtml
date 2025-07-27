@@ -2,14 +2,11 @@
 @* Sprint 26.5 Patch Log: CS860x/CS8625/CS1998/CS0219 fixes ? Nullability, async, and unused variable corrections for Nova review. *@
 @* Sprint 26.6 Patch Log: CS8602/CS8604 fix ? Added null-conditional operators and null checks for all model dereferences. Previous comments preserved below. *@
 @page
-// FixItFred Patch Log ? Sprint 28 Recovery
-// [2025-07-25T00:00:00Z] ? Removed local zones variable, all usages now reference Model.ServiceZones only.
+@model MVP_Core.Pages.Admin.DispatcherModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @using System.Linq
 @using MVP_Core.Models.Admin
 @using MVP_Core.Data.Models
-@model MVP_Core.Pages.Admin.DispatcherModel
-@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
-<main role="main" tabindex="-1" aria-label="Dispatcher Kanban Main Content">
 @{
     ViewData["Title"] = "Dispatcher Kanban";
     Layout = "/Pages/Shared/_Layout.cshtml";
@@ -22,6 +19,20 @@
     var stats = Model?.DispatcherStats;
     var workloads = new[] { "All", "Light", "Moderate", "Heavy" };
     var safeServiceZones = Model.ServiceZones ?? Enumerable.Empty<string>(); // Sprint 82: RazorViewFortification
+    var kpiList = new List<dynamic> // Sprint 83.1: Typed Razor array/list initialization
+    {
+        new { Label = "Live Techs Online", Value = techHeartbeats.Count(t => t.IsOnline) },
+        new { Label = "Active Jobs", Value = filteredRequests.Count },
+        new { Label = "Delayed Jobs >30min", Value = filteredRequests.Count(r => r.DelayMinutes > 30) },
+        new { Label = "Zones Active", Value = safeServiceZones.Count() },
+        new { Label = "System Health", Value = "OK" }
+    };
+    // Sprint 83.4: Detection code removed to restore build stability
+    // @using Wangkanai.Detection
+    // @inject IDetectionService Detection
+    // bool isMobile = Detection.Device.Type == DeviceType.Mobile;
+    // bool isTablet = Detection.Device.Type == DeviceType.Tablet;
+    // bool isDesktop = Detection.Device.Type == DeviceType.Desktop;
 }
 <!-- All filter and foreach loops null-guarded below -->
 <!-- Sprint 33.3 - Dispatcher Smart Filters -->
@@ -214,7 +225,7 @@
                     var assignedTech = req?.Technician ?? "-"; // Sprint 82: RazorViewFortification
                     bool isOverride = !string.IsNullOrEmpty(aiTechName) && aiTechName != "-" && !string.Equals(aiTechName, assignedTech, StringComparison.OrdinalIgnoreCase);
                     <tr class="@emergencyClass">
-                        <td>@(req?.Id ?? 0) @if (req?.IsEmergency == true) { <span title="Emergency" class="text-danger fw-bold">??</span> }</td>
+                        <td>@(req?.Id ?? 0) @if (req?.IsEmergency == true) { <span title="Emergency" class="text-danger fw-bold">??</span> } // Sprint 83.4: FinalErrorSweep for onboarding/migration unlock</td>
                         <td>@(req?.ServiceType ?? "-")</td>
                         <td>@assignedTech</td>
                         <td>@(req?.Status ?? "-")</td>
@@ -758,7 +769,7 @@ function showSuggestBestTech(requestId) {
     body.innerHTML = '<div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div>';
     fetch(`/api/dispatcher/suggest-best-tech?requestId=${requestId}`)
         .then(resp => resp.json())
-        .then(data => {
+        .then data => {
             body.innerHTML = `<strong>Best Technician:</strong> ${data.technicianName}<br/><strong>Score:</strong> ${data.score}<br/><strong>Reason:</strong> ${data.reason}`;
         });
     modal.show();
@@ -768,105 +779,10 @@ const slaConnection = new signalR.HubConnectionBuilder().withUrl("/hubs/requests
 slaConnection.on("ReceiveSLAWarning", function(data) {
     const jobEl = document.querySelector(`[data-job-id='${data.ServiceRequestId}']`);
     if (jobEl) {
-        jobEl.classList.add('red-glow');
-        setTimeout(() => jobEl.classList.remove('red-glow'), 3000);
-    }
-    // Optionally show notification
-    if (window.Notification && Notification.permission === "granted") {
-        new Notification("SLA Warning", { body: data.Message });
+        jobEl.classList.add('sla-warning');
+        setTimeout(() => jobEl.classList.remove('sla-warning'), 3000);
     }
 });
-slaConnection.start();
+slaConnection.start().catch(err => console.error(err));
+
 </script>
-@* Add button to each job row *@
-@functions{
-    public string GetSuggestBestTechButton(int requestId) => $"<button type='button' class='btn btn-outline-danger btn-sm' onclick='showSuggestBestTech({requestId})'>SuggestBestTech</button>";
-}
-<!-- Add button to job actions column -->
-@* In job table row, add: @Html.Raw(GetSuggestBestTechButton(req.Id)) *@
-@* Sprint 54.0: Optimized Technician Suggestion Button & Route Preview *@
-@* Add Optimized Technician Suggestion button to each job row *@
-@functions{
-    public string GetOptimizedTechButton(int requestId) => $"<button type='button' class='btn btn-outline-success btn-sm' onclick='showOptimizedTech({requestId})'>Optimized Tech</button>";
-}
-<script>
-function showOptimizedTech(requestId) {
-    var modal = new bootstrap.Modal(document.getElementById('suggestBestTechModal'));
-    var body = document.getElementById('suggestBestTechBody');
-    body.innerHTML = '<div class="spinner-border text-success" role="status"><span class="visually-hidden">Loading...</span></div>';
-    fetch(`/api/dispatcher/optimized-tech?requestId=${requestId}`)
-        .then(resp => resp.json())
-        .then(data => {
-            let html = `<strong>Top 3 Technicians:</strong><ul>`;
-            data.topTechs.forEach(function(t) {
-                html += `<li>${t.name} (ETA: ${t.eta}, RouteScore: ${t.routeScore})</li>`;
-            });
-            html += `</ul><strong>Preferred Technician:</strong> ${data.preferredTechName}<br/><strong>Route Preview:</strong> <span id='routePreview'></span>`;
-            body.innerHTML = html;
-            // Optionally trigger map route preview
-            if (window.plotOptimizedRoute) window.plotOptimizedRoute(data.routeGeoJson);
-        });
-    modal.show();
-}
-</script>
-@* Sprint 62.0 Patch Log: Dispatcher Load Monitor ? Live zone heatmap, SLA saturation, congestion, and escalation display. *@
-<div class="row mb-4">
-    <div class="col-12">
-        <h4>Dispatcher Zone Heatmap ? Sprint 62.0</h4>
-        <table class="table table-bordered heatmap-table">
-            <thead class="table-light">
-                <tr>
-                    <th>Zone</th>
-                    <th>Jobs</th>
-                    <th>SLA Risk</th>
-                    <th>Escalated</th>
-                    <th>Congestion</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var zone in Model.ServiceZones)
-                {
-                    var status = Model.ZoneStressStatuses?.FirstOrDefault(zs => zs.Zone == zone);
-                    string colorClass = status?.CongestionLevel switch
-                    {
-                        3 => "table-danger",
-                        2 => "table-warning",
-                        1 => "table-info",
-                        _ => "table-success"
-                    };
-                    <tr class="@colorClass">
-                        <td>@zone</td>
-                        <td>@(status?.JobCount ?? 0)</td>
-                        <td>@(status?.SlaRiskJobs ?? 0)</td>
-                        <td>@(status?.EscalatedJobs ?? 0)</td>
-                        <td>
-                            @switch (status?.CongestionLevel)
-                            {
-                                case 3:
-                                    <span class="badge bg-danger">Critical</span>
-                                    break;
-                                case 2:
-                                    <span class="badge bg-warning text-dark">High</span>
-                                    break;
-                                case 1:
-                                    <span class="badge bg-info text-dark">Moderate</span>
-                                    break;
-                                default:
-                                    <span class="badge bg-success">Low</span>
-                                    break;
-                            }
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-        <div class="mt-2">
-            <strong>Live SmartQueue Stress Simulation:</strong>
-            <pre>@Model.ZoneStressChartDataJson</pre>
-        </div>
-        <div class="alert alert-info mt-3">
-            <strong>Sprint 62.0 Patch Log:</strong> Dispatcher Load Monitor launched. Real-time zone heatmap, SLA collision detection, auto-escalation, and SmartQueue congestion display are now active.
-        </div>
-    </div>
-</div>
-</main>

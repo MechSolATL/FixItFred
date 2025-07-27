@@ -40,12 +40,7 @@ namespace MVP_Core.Pages.Admin
             DateTime? expiresAt = null;
             if (!string.IsNullOrWhiteSpace(ExpiresAt) && DateTime.TryParse(ExpiresAt, out var dt))
                 expiresAt = dt;
-            _dispatcherService.AddBroadcast(new DispatcherBroadcast
-            {
-                Message = Message,
-                IssuedBy = User?.Identity?.Name ?? "system",
-                ExpiresAt = expiresAt
-            });
+            _dispatcherService.AddBroadcast(Message, User?.Identity?.Name ?? "system"); // Sprint 83.4: CS7036 fix – required parameter added
             SuccessMessage = "Broadcast sent.";
             return Page();
         }

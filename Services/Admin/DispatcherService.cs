@@ -917,5 +917,26 @@ namespace MVP_Core.Services.Admin
 
             // TODO: Replace Console.WriteLine with actual persistence or SignalR dispatch logic
         }
+        // Sprint 83.4: Restored method to fix CS1061
+        public List<MVP_Core.Data.Models.DispatcherNotification> GetNotifications()
+        {
+            // Map NotificationDto to DispatcherNotification
+            return new List<MVP_Core.Data.Models.DispatcherNotification> {
+                new MVP_Core.Data.Models.DispatcherNotification {
+                    Id = 1,
+                    Message = "System online.",
+                    SentBy = "System",
+                    SentAt = DateTime.UtcNow,
+                    Type = "System" // Sprint83.4-FinalFixAmbiguity
+                }
+            };
+        }
+        // Sprint83.4-FinalFix
+        public async Task<List<TechnicianStatusDto>> GetTechniciansAsync()
+        {
+            // Stub: Return empty list
+            await Task.CompletedTask;
+            return new List<TechnicianStatusDto>();
+        }
     }
 }

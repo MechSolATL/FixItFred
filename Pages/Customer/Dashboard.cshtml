@@ -1,76 +1,132 @@
-@* Sprint 26.5 Patch Log: CS860x/CS8625/CS1998/CS0219 fixes — Nullability, async, and unused variable corrections for Nova review. *@
+@* Sprint 83: SmartControlUX upgrade *@
 @page
 @model MVP_Core.Pages.Customer.DashboardModel
 @{
     ViewData["Title"] = "Customer Dashboard";
+    var ticketCount = Model.Tickets?.Count ?? 0;
+    var avgSatisfaction = Model.AverageSatisfaction;
+    var kpiList = new List<dynamic> // Sprint 83.1: Typed Razor array/list initialization
+    {
+        new { Label = "Total Tickets", Value = ticketCount },
+        new { Label = "Avg Satisfaction", Value = avgSatisfaction.ToString("0.0") },
+        new { Label = "Open Tickets", Value = Model.Tickets?.Count(t => t.Status != "Complete" && t.Status != "Cancelled") ?? 0 },
+        new { Label = "Closed Tickets", Value = Model.Tickets?.Count(t => t.Status == "Complete" || t.Status == "Cancelled") ?? 0 }
+    };
+    // Sprint 83.4: Detection code removed to restore build stability
+    // @using Wangkanai.Detection
+    // @inject IDetectionService Detection
+    // bool isMobile = Detection.Device.Type == DeviceType.Mobile;
+    // bool isTablet = Detection.Device.Type == DeviceType.Tablet;
+    // bool isDesktop = Detection.Device.Type == DeviceType.Desktop;
 }
 
-<!-- Sprint 46.3 – Dashboard Analytics -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<h2>My Tickets</h2>
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>Ticket #</th>
-            <th>Service Type</th>
-            <th>Status</th>
-            <th>Requested</th>
-            <th>Satisfaction</th>
-        </tr>
-    </thead>
-    <tbody>
-    @foreach (var ticket in Model.Tickets ?? new List<MVP_Core.Data.Models.ServiceRequest>()) // Sprint 82: RazorViewFortification
-    {
-        <tr>
-            <td>@ticket?.Id ?? 0 // Sprint 82: RazorViewFortification</td>
-            <td>@ticket?.ServiceType ?? "-" // Sprint 82: RazorViewFortification</td>
-            <td><span class="badge bg-@Model.GetStatusClass(ticket?.Status ?? "")">@ticket?.Status ?? "-" // Sprint 82: RazorViewFortification</span></td>
-            <td>@(ticket?.RequestedAt.ToString("g") ?? "-") // Sprint 82: RazorViewFortification</td>
-            <td>
-                @if (ticket?.SatisfactionScore.HasValue ?? false) // Sprint 82: RazorViewFortification
-                {
-                    <span class="text-success">@ticket.SatisfactionScore.Value/5</span>
-                }
-                else
-                {
-                    <span class="text-muted">N/A</span>
-                }
-            </td>
-        </tr>
-    }
-    </tbody>
-</table>
-
-<div class="mt-4">
-    <h4>Satisfaction Summary</h4>
-    <p>Average Satisfaction: <b>@(Model.AverageSatisfaction.ToString("0.0"))</b> / 5 // Sprint 82: RazorViewFortification</p>
-    <p>Total Tickets: <b>@(Model.Tickets?.Count ?? 0) // Sprint 82: RazorViewFortification</b></p>
+<!-- Sprint 83: SmartControlUX upgrade -->
+<div class="container mx-auto px-2 py-4">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        <div class="card bg-gradient-to-r from-blue-100 to-blue-300 shadow p-4 flex flex-col items-center">
+            <div class="text-lg font-bold">Total Tickets</div>
+            <div class="text-2xl">@ticketCount</div>
+        </div>
+        <div class="card bg-gradient-to-r from-green-100 to-green-300 shadow p-4 flex flex-col items-center">
+            <div class="text-lg font-bold">Avg Satisfaction</div>
+            <div class="text-2xl">@avgSatisfaction.ToString("0.0")</div>
+        </div>
+        <div class="card bg-gradient-to-r from-yellow-100 to-yellow-300 shadow p-4 flex flex-col items-center">
+            <div class="text-lg font-bold">Open Tickets</div>
+            <div class="text-2xl">@(Model.Tickets?.Count(t => t.Status != "Complete" && t.Status != "Cancelled") ?? 0)</div>
+        </div>
+        <div class="card bg-gradient-to-r from-purple-100 to-purple-300 shadow p-4 flex flex-col items-center">
+            <div class="text-lg font-bold">Closed Tickets</div>
+            <div class="text-2xl">@(Model.Tickets?.Count(t => t.Status == "Complete" || t.Status == "Cancelled") ?? 0)</div>
+        </div>
+    </div>
+    <div class="flex flex-col md:flex-row gap-4">
+        <div class="flex-1">
+            <button class="btn btn-primary mb-2" onclick="toggleSection('ticketTable')">Toggle Ticket Table</button>
+            <div id="ticketTableSection" class="collapse show">
+                <h2>My Tickets</h2>
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Ticket #</th>
+                            <th>Service Type</th>
+                            <th>Status</th>
+                            <th>Requested</th>
+                            <th>Satisfaction</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var ticket in Model.Tickets ?? Enumerable.Empty<MVP_Core.Data.Models.ServiceRequest>()) // Sprint 82: RazorViewFortification
+                    {
+                        <tr>
+                            <td>@ticket?.Id ?? 0 // Sprint 82: RazorViewFortification</td>
+                            <td>@ticket?.ServiceType ?? "-" // Sprint 82: RazorViewFortification</td>
+                            <td><span class="badge bg-@Model.GetStatusClass(ticket?.Status ?? "")">@ticket?.Status ?? "-" // Sprint 82: RazorViewFortification</span></td>
+                            <td>@(ticket?.RequestedAt.ToString("g") ?? "-") // Sprint 82: RazorViewFortification</td>
+                            <td>
+                                @if (ticket?.SatisfactionScore.HasValue ?? false) // Sprint 82: RazorViewFortification
+                                {
+                                    <span class="text-success">@ticket.SatisfactionScore.Value/5</span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">N/A</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="flex-1">
+            <button class="btn btn-secondary mb-2" onclick="toggleSection('charts')">Toggle Charts</button>
+            <div id="chartsSection" class="collapse show">
+                <div class="mt-4">
+                    <h4>Satisfaction Summary</h4>
+                    <p>Average Satisfaction: <b>@avgSatisfaction</b> / 5 // Sprint 82: RazorViewFortification</p>
+                    <p>Total Tickets: <b>@ticketCount // Sprint 82: RazorViewFortification</b></p>
+                </div>
+                <div class="mt-5">
+                    <h4>Satisfaction Heatmap (Last 30 Tickets)</h4>
+                    <canvas id="satisfactionHeatmap" height="60"></canvas>
+                </div>
+                <div class="mt-5">
+                    <h4>Service Type Breakdown</h4>
+                    <canvas id="serviceTypeChart" height="60"></canvas>
+                </div>
+                <div class="mt-5">
+                    <h4>Ticket Resolution</h4>
+                    <canvas id="resolutionChart" height="60"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
-
-<!-- Sprint 46.3 – Dashboard Analytics: Satisfaction Heatmap -->
-<div class="mt-5">
-    <h4>Satisfaction Heatmap (Last 30 Tickets)</h4>
-    <canvas id="satisfactionHeatmap" height="60"></canvas>
-</div>
-
-<!-- Sprint 46.3 – Dashboard Analytics: Service Type Breakdown -->
-<div class="mt-5">
-    <h4>Service Type Breakdown</h4>
-    <canvas id="serviceTypeChart" height="60"></canvas>
-</div>
-
-<!-- Sprint 46.3 – Dashboard Analytics: Ticket Resolution Chart -->
-<div class="mt-5">
-    <h4>Ticket Resolution</h4>
-    <canvas id="resolutionChart" height="60"></canvas>
-</div>
-
 @section Scripts {
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
+    // Sprint 83: SmartControlUX upgrade
+    function toggleSection(section) {
+        var el = document.getElementById(section + 'Section');
+        if (el.classList.contains('show')) {
+            el.classList.remove('show');
+            localStorage.setItem(section + 'Collapsed', 'true');
+        } else {
+            el.classList.add('show');
+            localStorage.setItem(section + 'Collapsed', 'false');
+        }
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+        ['ticketTable', 'charts'].forEach(function(section) {
+            var collapsed = localStorage.getItem(section + 'Collapsed');
+            var el = document.getElementById(section + 'Section');
+            if (collapsed === 'true' && el) el.classList.remove('show');
+        });
+    });
+
     // Sprint 46.3 – Dashboard Analytics: Satisfaction Heatmap
-    const satisfactionData = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject((Model.Tickets ?? new List<MVP_Core.Data.Models.ServiceRequest>()).OrderByDescending(t => t.RequestedAt).Take(30).Select(t => t.SatisfactionScore ?? 0).ToArray())); // Sprint 82: RazorViewFortification
+    const satisfactionData = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject((Model.Tickets ?? Enumerable.Empty<MVP_Core.Data.Models.ServiceRequest>()).OrderByDescending(t => t.RequestedAt).Take(30).Select(t => t.SatisfactionScore ?? 0).ToArray())); // Sprint 82: RazorViewFortification
     const ctxHeatmap = document.getElementById('satisfactionHeatmap').getContext('2d');
     new Chart(ctxHeatmap, {
         type: 'bar',
@@ -90,7 +146,7 @@
 
     // Sprint 46.3 – Dashboard Analytics: Service Type Breakdown
     const serviceTypeCounts = {};
-    @foreach (var t in Model.Tickets ?? new List<MVP_Core.Data.Models.ServiceRequest>()) { // Sprint 82: RazorViewFortification
+    @foreach (var t in Model.Tickets ?? Enumerable.Empty<MVP_Core.Data.Models.ServiceRequest>()) { // Sprint 82: RazorViewFortification
         <text>serviceTypeCounts['@t.ServiceType'] = (serviceTypeCounts['@t.ServiceType'] || 0) + 1;</text>
     }
     const serviceTypeLabels = Object.keys(serviceTypeCounts);
@@ -112,7 +168,7 @@
     const openCount = @(Model.Tickets?.Count(t => t.Status != "Complete" && t.Status != "Cancelled") ?? 0); // Sprint 82: RazorViewFortification
     const closedCount = @(Model.Tickets?.Count(t => t.Status == "Complete" || t.Status == "Cancelled") ?? 0); // Sprint 82: RazorViewFortification
     const avgResolution = (() => {
-        const closed = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject((Model.Tickets ?? new List<MVP_Core.Data.Models.ServiceRequest>()).Where(t => t.ClosedAt != null).Select(t => (t.ClosedAt.Value - t.RequestedAt).TotalHours)));
+        const closed = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject((Model.Tickets ?? Enumerable.Empty<MVP_Core.Data.Models.ServiceRequest>()).Where(t => t.ClosedAt != null).Select(t => (t.ClosedAt.Value - t.RequestedAt).TotalHours)));
         if (closed.length === 0) return 0;
         return (closed.reduce((a, b) => a + b, 0) / closed.length).toFixed(1);
     })();
@@ -126,11 +182,15 @@
                 backgroundColor: ['#ff9800', '#4caf50']
             }]
         },
-        options: {
-            plugins: {
+        options:
+        {
+            plugins:
+            {
                 legend: { position: 'bottom' },
-                tooltip: {
-                    callbacks: {
+                tooltip:
+                {
+                    callbacks:
+                    {
                         afterBody: function() {
                             return 'Avg. Resolution: ' + avgResolution + ' hrs';
                         }

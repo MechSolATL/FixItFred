@@ -1,54 +1,47 @@
-@* Sprint 26.5 Patch Log: CS860x/CS8625/CS1998/CS0219 fixes — Nullability, async, and unused variable corrections for Nova review. *@
+@* Sprint 83: SmartControlUX upgrade *@
 @page
 @model MVP_Core.Pages.Admin.StatsModel
 @{
     ViewData["Title"] = "Admin Dashboard Metrics";
+    var kpiList = new List<dynamic> // Sprint 83.1: Typed Razor array/list initialization
+    {
+        new { Label = "Total Requests", Value = Model.TotalRequests },
+        new { Label = "Pending", Value = Model.PendingCount },
+        new { Label = "Dispatched", Value = Model.DispatchedCount },
+        new { Label = "Cancelled", Value = Model.CancelledCount },
+        new { Label = "Completed", Value = Model.CompletedCount },
+        new { Label = "Active Techs Today", Value = Model.ActiveTechsToday },
+        new { Label = "GPS Updated", Value = Model.GpsUpdatedToday },
+        new { Label = "Jobs Assigned", Value = Model.JobsAssignedToday },
+        new { Label = "Avg ETA Accuracy", Value = Model.AvgEtaAccuracy },
+        new { Label = "SignalR Broadcasts (24h)", Value = Model.SignalRBroadcasts24h }
+    };
+    // Sprint 83.4: Detection code removed to restore build stability
+    // @using Wangkanai.Detection
+    // @inject IDetectionService Detection
+    // bool isMobile = Detection.Device.Type == DeviceType.Mobile;
+    // bool isTablet = Detection.Device.Type == DeviceType.Tablet;
+    // bool isDesktop = Detection.Device.Type == DeviceType.Desktop;
 }
-<!-- Sprint 32.1 - Admin Metrics Reporting -->
-<h2>Admin Dashboard Metrics</h2>
-<div class="row mb-4">
-    <div class="col-md-3">
-        <div class="card text-center">
-            <div class="card-header">Total Service Requests</div>
-            <div class="card-body">
-                <h3>@(Model.TotalRequests) // Sprint 82: RazorViewFortification</h3>
-                <div class="small text-muted">Pending: @(Model.PendingCount) | Dispatched: @(Model.DispatchedCount) | Cancelled: @(Model.CancelledCount) | Completed: @(Model.CompletedCount)</div>
+<!-- Sprint 83: SmartControlUX upgrade -->
+<div class="container mx-auto px-2 py-4">
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+        @foreach (var kpi in kpiList)
+        {
+            <div class="card bg-gradient-to-r from-gray-100 to-gray-300 shadow p-4 flex flex-col items-center">
+                <div class="text-lg font-bold">@kpi.Label</div>
+                <div class="text-2xl">@kpi.Value</div>
+            </div>
+        }
+    </div>
+    <button class="btn btn-primary mb-2" onclick="toggleSection('metricsChart')">Toggle Weekly Volume Chart</button>
+    <div id="metricsChartSection" class="collapse show">
+        <div class="row">
+            <div class="col-md-12">
+                <h4>Weekly ScheduleQueue Volume</h4>
+                <canvas id="scheduleQueueChart" height="120"></canvas>
             </div>
         </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card text-center">
-            <div class="card-header">Technician Activity</div>
-            <div class="card-body">
-                <div>Active Today: <strong>@(Model.ActiveTechsToday) // Sprint 82: RazorViewFortification</strong></div>
-                <div>GPS Updated: <strong>@(Model.GpsUpdatedToday) // Sprint 82: RazorViewFortification</strong></div>
-                <div>Jobs Assigned: <strong>@(Model.JobsAssignedToday) // Sprint 82: RazorViewFortification</strong></div>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card text-center">
-            <div class="card-header">Avg ETA Accuracy</div>
-            <div class="card-body">
-                <h3>@(Model.AvgEtaAccuracy) min // Sprint 82: RazorViewFortification</h3>
-                <div class="small text-muted">(Predicted vs. Actual)</div>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card text-center">
-            <div class="card-header">SignalR Broadcasts (24h)</div>
-            <div class="card-body">
-                <h3 id="signalrCount">@(Model.SignalRBroadcasts24h) // Sprint 82: RazorViewFortification</h3>
-                <div class="small text-muted">Real-time updates</div>
-            </div>
-        </div>
-    </div>
-</div>
-<div class="row">
-    <div class="col-md-12">
-        <h4>Weekly ScheduleQueue Volume</h4>
-        <canvas id="scheduleQueueChart" height="120"></canvas>
     </div>
 </div>
 <div class="row mb-4">
@@ -86,28 +79,46 @@
         </form>
     </div>
 </div>
+@section Scripts {
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script>
-// Sprint 32.1 - Admin Metrics Reporting
-const weekLabels = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.WeekLabels ?? new List<string>())); // Sprint 82: RazorViewFortification
-const weekData = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.WeekCounts ?? new List<int>())); // Sprint 82: RazorViewFortification
-const ctx = document.getElementById('scheduleQueueChart').getContext('2d');
-new Chart(ctx, {
-    type: 'bar',
-    data: {
-        labels: weekLabels,
-        datasets: [{
-            label: 'ScheduleQueue Volume',
-            data: weekData,
-            backgroundColor: '#0d6efd'
-        }]
-    },
-    options: { plugins: { legend: { display: false } } }
-});
-// Real-time SignalR broadcast count update (optional, if endpoint exists)
-setInterval(function() {
-    fetch('/api/admin/signalr-broadcasts-24h').then(r => r.json()).then(data => {
-        document.getElementById('signalrCount').textContent = data.count;
+    // Sprint 83: SmartControlUX upgrade
+    function toggleSection(section) {
+        var el = document.getElementById(section + 'Section');
+        if (el.classList.contains('show')) {
+            el.classList.remove('show');
+            localStorage.setItem(section + 'Collapsed', 'true');
+        } else {
+            el.classList.add('show');
+            localStorage.setItem(section + 'Collapsed', 'false');
+        }
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+        var collapsed = localStorage.getItem('metricsChartCollapsed');
+        var el = document.getElementById('metricsChartSection');
+        if (collapsed === 'true' && el) el.classList.remove('show');
     });
-}, 10000);
+    // Sprint 32.1 - Admin Metrics Reporting
+    const weekLabels = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.WeekLabels ?? new List<string>())); // Sprint 82: RazorViewFortification
+    const weekData = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.WeekCounts ?? new List<int>())); // Sprint 82: RazorViewFortification
+    const ctx = document.getElementById('scheduleQueueChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: weekLabels,
+            datasets: [{
+                label: 'ScheduleQueue Volume',
+                data: weekData,
+                backgroundColor: '#0d6efd'
+            }]
+        },
+        options: { plugins: { legend: { display: false } } }
+    });
+    // Real-time SignalR broadcast count update (optional, if endpoint exists)
+    setInterval(function() {
+        fetch('/api/admin/signalr-broadcasts-24h').then(r => r.json()).then(data => {
+            document.getElementById('signalrCount').textContent = data.count;
+        });
+    }, 10000);
 </script>
+}

@@ -1,9 +1,10 @@
+@* Sprint 83.4: Detection code removed to restore build stability *@
 @page
 @model MVP_Core.Pages.Customer.RewardsModel
 @inject MVP_Core.Services.CustomerPortalService PortalService
 @{
     Layout = "/Pages/Shared/_Layout.cshtml";
-    if (!(User.Identity?.IsAuthenticated ?? false) || !(User.HasClaim("IsCustomer", "true") ?? false)) // Sprint 82: RazorViewFortification
+    if (!(User.Identity?.IsAuthenticated == true) || !User.HasClaim("IsCustomer", "true")) // Sprint 82: RazorViewFortification
     {
         <div class="alert alert-danger">Access denied. Please log in as a customer.</div>
         return;
@@ -11,25 +12,116 @@
     var email = User.Identity?.Name ?? string.Empty; // Sprint 82: RazorViewFortification
     var loyalty = PortalService.GetLoyaltyTransactions(email) ?? new List<MVP_Core.Data.Models.LoyaltyPointTransaction>(); // Sprint 82: RazorViewFortification
     var tiers = PortalService.GetRewardTiers() ?? new List<MVP_Core.Data.Models.RewardTier>(); // Sprint 82: RazorViewFortification
-    var currentTier = (tiers ?? new List<MVP_Core.Data.Models.RewardTier>()).LastOrDefault(t => (loyalty ?? new List<MVP_Core.Data.Models.LoyaltyPointTransaction>()).Sum(l => l.Points) >= t.PointsRequired); // Sprint 82: RazorViewFortification
+    var currentTier = tiers.LastOrDefault(t => loyalty.Sum(l => l.Points) >= t.PointsRequired); // Sprint 82: RazorViewFortification
+    var totalPoints = loyalty.Sum(l => l.Points);
+    // Sprint 83.4: Detection code removed to restore build stability
+    // @using Wangkanai.Detection
+    // @inject IDetectionService Detection
+    // bool isMobile = Detection.Device.Type == DeviceType.Mobile;
+    // bool isTablet = Detection.Device.Type == DeviceType.Tablet;
+    // bool isDesktop = Detection.Device.Type == DeviceType.Desktop;
 }
-<h2>Rewards & Loyalty</h2>
-<div class="mb-3">
-    <strong>Current Tier:</strong> @currentTier?.Name ?? "None" // Sprint 82: RazorViewFortification<br />
-    <strong>Total Points:</strong> @(loyalty?.Sum(l => l.Points) ?? 0) // Sprint 82: RazorViewFortification
+
+<!-- Sprint 83: SmartControlUX upgrade -->
+<div class="container mx-auto px-2 py-4">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div class="card bg-gradient-to-r from-blue-100 to-blue-300 shadow p-4 flex flex-col items-center">
+            <div class="text-lg font-bold">Current Tier</div>
+            <div class="text-2xl">@currentTier?.Name ?? "None"</div>
+        </div>
+        <div class="card bg-gradient-to-r from-green-100 to-green-300 shadow p-4 flex flex-col items-center">
+            <div class="text-lg font-bold">Total Points</div>
+            <div class="text-2xl">@totalPoints</div>
+        </div>
+        <div class="card bg-gradient-to-r from-yellow-100 to-yellow-300 shadow p-4 flex flex-col items-center">
+            <div class="text-lg font-bold">Reward Progress</div>
+            <canvas id="rewardProgressRing" width="80" height="80"></canvas>
+        </div>
+    </div>
+    <div class="flex flex-col md:flex-row gap-4">
+        <div class="flex-1">
+            <button class="btn btn-primary mb-2" onclick="toggleSection('bonusHistory')">Toggle Bonus History</button>
+            <div id="bonusHistorySection" class="collapse show">
+                <h4>Bonus History</h4>
+                <table class="table table-striped">
+                    <thead><tr><th>Date</th><th>Type</th><th>Points</th><th>Description</th></tr></thead>
+                    <tbody>
+                    @foreach (var txn in loyalty ?? new List<MVP_Core.Data.Models.LoyaltyPointTransaction>()) // Sprint 82: RazorViewFortification
+                    {
+                        <tr>
+                            <td>@txn?.Timestamp.ToShortDateString() ?? "-" // Sprint 82: RazorViewFortification</td>
+                            <td>@txn?.Type ?? "-" // Sprint 82: RazorViewFortification</td>
+                            <td>@txn?.Points ?? 0 // Sprint 82: RazorViewFortification</td>
+                            <td>@txn?.Description ?? "-" // Sprint 82: RazorViewFortification</td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="flex-1">
+            <button class="btn btn-secondary mb-2" onclick="toggleSection('tierChart')">Toggle Tier Chart</button>
+            <div id="tierChartSection" class="collapse show">
+                <h4>Tier Progression</h4>
+                <canvas id="tierChart" height="120"></canvas>
+            </div>
+        </div>
+    </div>
 </div>
-<h4>Bonus History</h4>
-<table class="table table-striped">
-    <thead><tr><th>Date</th><th>Type</th><th>Points</th><th>Description</th></tr></thead>
-    <tbody>
-    @foreach (var txn in loyalty ?? new List<MVP_Core.Data.Models.LoyaltyPointTransaction>()) // Sprint 82: RazorViewFortification
-    {
-        <tr>
-            <td>@txn?.Timestamp.ToShortDateString() ?? "-" // Sprint 82: RazorViewFortification</td>
-            <td>@txn?.Type ?? "-" // Sprint 82: RazorViewFortification</td>
-            <td>@txn?.Points ?? 0 // Sprint 82: RazorViewFortification</td>
-            <td>@txn?.Description ?? "-" // Sprint 82: RazorViewFortification</td>
-        </tr>
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script>
+    // Sprint 83: SmartControlUX upgrade
+    function toggleSection(section) {
+        var el = document.getElementById(section + 'Section');
+        if (el.classList.contains('show')) {
+            el.classList.remove('show');
+            localStorage.setItem(section + 'Collapsed', 'true');
+        } else {
+            el.classList.add('show');
+            localStorage.setItem(section + 'Collapsed', 'false');
+        }
     }
-    </tbody>
-</table>
+    document.addEventListener('DOMContentLoaded', function() {
+        ['bonusHistory', 'tierChart'].forEach(function(section) {
+            var collapsed = localStorage.getItem(section + 'Collapsed');
+            var el = document.getElementById(section + 'Section');
+            if (collapsed === 'true' && el) el.classList.remove('show');
+        });
+        // Progress ring for total points
+        var ctxRing = document.getElementById('rewardProgressRing').getContext('2d');
+        var points = @totalPoints;
+        var maxPoints = @((tiers.LastOrDefault()?.PointsRequired ?? 100));
+        new Chart(ctxRing, {
+            type: 'doughnut',
+            data: {
+                datasets: [{
+                    data: [points, Math.max(0, maxPoints - points)],
+                    backgroundColor: ['#4caf50', '#e0e0e0'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                cutout: '80%',
+                plugins: { legend: { display: false } }
+            }
+        });
+        // Tier progression chart
+        var ctxTier = document.getElementById('tierChart').getContext('2d');
+        var tierLabels = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(tiers.Select(t => t.Name)));
+        var tierPoints = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(tiers.Select(t => t.PointsRequired)));
+        new Chart(ctxTier, {
+            type: 'bar',
+            data: {
+                labels: tierLabels,
+                datasets: [{
+                    label: 'Points Required',
+                    data: tierPoints,
+                    backgroundColor: '#2196f3'
+                }]
+            },
+            options: { plugins: { legend: { display: false } } }
+        });
+    });
+    </script>
+}

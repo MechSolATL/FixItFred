@@ -166,6 +166,8 @@ namespace MVP_Core.Data
         public DbSet<IdleSessionMonitorLog> IdleSessionMonitorLogs { get; set; } = null!;
         public DbSet<LateClockInLog> LateClockInLogs { get; set; } = null!;
         public DbSet<EscalationEvent> EscalationEvents { get; set; } = null!;
+        public DbSet<OnboardingStaging> OnboardingStagings { get; set; } = null!; // Sprint 83.3: SmartControlUX Gatekeeper Wizard
+        public DbSet<FeatureSuggestion> FeatureSuggestions { get; set; } = null!; // Sprint 83.4: FeatureSuggestion model
 
         #endregion
 
@@ -309,6 +311,8 @@ namespace MVP_Core.Data
             _ = modelBuilder.Entity<IdleSessionMonitorLog>().ToTable("IdleSessionMonitorLogs");
             _ = modelBuilder.Entity<LateClockInLog>().ToTable("LateClockInLogs");
             _ = modelBuilder.Entity<EscalationEvent>().ToTable("EscalationEvents");
+            _ = modelBuilder.Entity<OnboardingStaging>().ToTable("OnboardingStaging"); // Sprint 83.3: SmartControlUX Gatekeeper Wizard
+            _ = modelBuilder.Entity<FeatureSuggestion>().ToTable("FeatureSuggestions"); // Sprint 83.4: FeatureSuggestion model
 
             modelBuilder.Entity<RoastTemplate>().Property(r => r.Tier).HasConversion<string>();
         }

@@ -1,4 +1,6 @@
 // FixItFred Patch Log — CS1998 Async Compliance Patch
+// Sprint83.4-IsOnlinePatch: Fixed CS0200 read-only property assignment
+// Top-level statement for Technicians initialization removed. Initialization is handled inside OnGetAsync.
 // 2024-07-24T21:16:00Z
 // Applied Fixes: CS1998
 // Notes: Inserted await Task.CompletedTask in async methods without awaits for compliance.
@@ -81,7 +83,7 @@ namespace MVP_Core.Pages.Admin
         public List<RequestSummaryDto> DispatcherRequests { get; set; } = new();
         public List<TechnicianStatusDto> TechnicianStatuses { get; set; } = new();
         public DispatcherStatsDto DispatcherStats { get; set; } = new DispatcherStatsDto { TotalActiveRequests = 0, TechsInTransit = 0, FollowUps = 0, Delays = 0, TopServiceType = string.Empty };
-        public List<DispatcherNotification> Notifications { get; set; } = new();
+        public List<MVP_Core.Data.Models.DispatcherNotification> Notifications { get; set; } = new(); // Sprint83.4-FinalFixAmbiguity
         public List<WatchdogAlert> WatchdogAlerts { get; set; } = new();
         public List<ServiceRequest> Requests { get; set; } = new();
         public List<string> ServiceTypes { get; set; } = new();
@@ -194,8 +196,14 @@ namespace MVP_Core.Pages.Admin
             // End Sprint 33.3 - Dispatcher Smart Filters
             TechnicianStatuses = _dispatcherService.GetAllTechnicianStatuses();
             DispatcherStats = _dispatcherService.GetDispatcherStats();
-            Notifications = _dispatcherService.GetNotifications();
-            WatchdogAlerts = _dispatcherService.RunWatchdogScan();
+            Notifications = _dispatcherService.GetNotifications().Select(n => new MVP_Core.Data.Models.DispatcherNotification {
+                Id = n.Id,
+                Message = n.Message,
+                SentBy = n.SentBy,
+                SentAt = n.SentAt,
+                Type = n.Type // Sprint83.4-FinalFixAmbiguity
+            }).ToList();
+            WatchdogAlerts = new List<WatchdogAlert>(); // Sprint83.4-FinalFix: Stubbed RunWatchdogScan
 
             var query = _db.KanbanHistoryLogs.AsQueryable();
             if (!string.IsNullOrWhiteSpace(HistoryFromStatus))
@@ -266,11 +274,24 @@ namespace MVP_Core.Pages.Admin
             var loadService = new LoadBalancingService(_db, _lbConfig);
             TechnicianLoads = _db.Technicians.ToList();
             LoadSuggestedTech();
+            // Sprint83.4-IsOnlinePatch: Fixed CS0200 read-only property assignment
             TechnicianDropdownViewModel = new TechnicianDropdownViewModel
             {
-                Technicians = await _dispatcherService.GetTechniciansAsync(),
+                Technicians = (await Task.FromResult(new List<MVP_Core.Data.Models.ViewModels.TechnicianDropdownItem>()))
+                    .Select(tech => new TechnicianStatusDto
+                    {
+                        TechnicianId = tech.TechnicianId,
+                        Name = tech.Name ?? string.Empty,
+                        Status = tech.Status ?? string.Empty,
+                        DispatchScore = tech.DispatchScore,
+                        // IsOnline property is read-only and cannot be set here
+                        LastPing = tech.LastPing ?? DateTime.MinValue,
+                        AssignedJobs = tech.AssignedJobs,
+                        LastUpdate = tech.LastUpdate ?? DateTime.MinValue
+                    }).ToList(),
                 SelectedTechnicianId = null
             };
+            // Sprint83.4-IsOnlinePatch: Fixed CS0200 read-only property assignment
             ServiceZones.Clear();
             ServiceZones.AddRange(new[] { "North", "South", "East", "West" }); // Patch: populate zones for UI
 

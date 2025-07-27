@@ -2,7 +2,6 @@
 @* Sprint 26.6 Patch Log: CS8602/CS8629 fix ? Added null-conditional operators and .HasValue checks for nullable dereferences. Previous comments preserved below. *@
 @* FixItFred Patch Log [2024-07-24 20:51]: Removed or corrected @model directive to resolve invalid reference to _JobCardModel *@
 @using MVP_Core.Models.Admin
-@inject MVP_Core.Pages.Admin.DispatcherModel DispatcherModel
 @{
     DateTime now = DateTime.UtcNow;
     string badgeClass = "bg-secondary";
@@ -53,96 +52,137 @@
     }
     // Sprint 35.2: Capacity fade logic
     bool fadeCard = (techStatus != null && techStatus.AssignedJobs >= 3);
+    var kpiList = new List<dynamic> // Sprint 83.1: Typed Razor array/list initialization
+    {
+        new { Label = "Score", Value = techStatus?.DispatchScore ?? 0 },
+        new { Label = "Assigned Jobs", Value = techStatus?.AssignedJobs ?? 0 },
+        new { Label = "SLA Status", Value = badgeText },
+        new { Label = "Escalated", Value = Model?.Request?.IsEscalated == true ? "Yes" : "No" }
+    };
+    // Sprint 83.4-FinalFix: Migration blocker resolution.
+    // Detection code and isMobile/isTablet logic removed for build stability.
+    // @using Wangkanai.Detection
+    // @inject IDetectionService Detection
+    // bool isMobile = Detection.Device.Type == DeviceType.Mobile;
+    // bool isTablet = Detection.Device.Type == DeviceType.Tablet;
+    // bool isDesktop = Detection.Device.Type == DeviceType.Desktop;
 }
-<div class="job-card mb-3 p-3 border rounded shadow-sm sla-indicator @(blink ? "sla-blink" : "") @(escalationBorder ? "escalation-border" : "") @(Model?.Request?.IsEscalated == true ? "border-danger escalation-border" : "") @(fadeCard ? "opacity-50" : "")"> <!-- Sprint 82: RazorViewFortification -->
-    <div class="d-flex justify-content-between align-items-center mb-2">
-        <div>
-            <span class="badge @DispatcherModel.GetStatusBadgeClass(techStatus != null ? techStatus.Status : "Unassigned")">
-                @(techStatus != null ? techStatus.Status : "Unassigned")
-            </span>
-            <span class="ms-2">#@(Model?.Request?.Id ?? 0) // Sprint 82: RazorViewFortification</span>
+<!-- Sprint 83: SmartControlUX upgrade -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-2">
+    @foreach (var kpi in kpiList)
+    {
+        <div class="card bg-gradient-to-r from-gray-100 to-gray-300 shadow p-2 flex flex-col items-center">
+            <div class="text-sm font-bold">@kpi.Label</div>
+            <div class="text-lg">@kpi.Value</div>
+        </div>
+    }
+</div>
+<button class="btn btn-primary mb-2" onclick="toggleSection('jobCardDetails')">Toggle Details</button>
+<div id="jobCardDetailsSection" class="collapse show">
+    <div class="job-card mb-3 p-3 border rounded shadow-sm sla-indicator @(blink ? "sla-blink" : "") @(escalationBorder ? "escalation-border" : "") @(Model?.Request?.IsEscalated == true ? "border-danger escalation-border" : "") @(fadeCard ? "opacity-50" : "")"> <!-- Sprint 82: RazorViewFortification -->
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <div>
+                <span class="badge bg-secondary">
+                    @(techStatus != null ? techStatus.Status : "Unassigned")
+                </span>
+                <span class="ms-2">#@(Model?.Request?.Id ?? 0) // Sprint 82: RazorViewFortification</span>
+                @if (Model?.Request?.IsEscalated == true)
+                {
+                    <span class="ms-2 text-danger fw-bold" title="Escalation"><i class="fas fa-exclamation-triangle"></i> Escalation</span>
+                }
+                @* Sprint 35.2: Technician Score Badge *@
+                @if (techStatus != null)
+                {
+                    <span class="badge @scoreBadgeClass ms-2" data-bs-toggle="tooltip" data-bs-placement="top" title="@scoreTooltip">
+                        <i class="fas fa-star"></i> @techStatus.DispatchScore
+                    </span>
+                }
+            </div>
+            <div class="priority-controls">
+                <form method="post" asp-page-handler="MoveUp" class="d-inline">
+                    <input type="hidden" name="Index" value="@(Model?.Request?.Id ?? 0)" /> <!-- Sprint 82: RazorViewFortification -->
+                    <button type="submit" class="btn btn-link p-0" title="Increase Priority"><i class="fas fa-arrow-up"></i></button>
+                </form>
+                <form method="post" asp-page-handler="MoveDown" class="d-inline">
+                    <input type="hidden" name="Index" value="@(Model?.Request?.Id ?? 0)" /> <!-- Sprint 82: RazorViewFortification -->
+                    <button type="submit" class="btn btn-link p-0" title="Decrease Priority"><i class="fas fa-arrow-down"></i></button>
+                </form>
+            </div>
+        </div>
+        <div class="mb-2">
+            <strong>@(Model?.Request?.CustomerName ?? "-") // Sprint 82: RazorViewFortification</strong> <span class="text-muted small">@(Model?.Request?.Email ?? "-") // Sprint 82: RazorViewFortification</span><br />
+            <span class="text-secondary">@(Model?.Request?.ServiceType ?? "-") // Sprint 82: RazorViewFortification</span>
+        </div>
+        <div class="mb-2">
+            <span class="me-2"><i class="fas fa-clock"></i> @(Model?.Request?.CreatedAt.ToLocalTime().ToString("g") ?? "-") // Sprint 82: RazorViewFortification</span>
+            <span><i class="fas fa-map-marker-alt"></i> @(Model?.Request?.Address ?? "-") // Sprint 82: RazorViewFortification</span>
+        </div>
+        <div class="mb-2">
+            <span class="badge @badgeClass @(blink ? "sla-blink" : "")" style="min-width:120px;">@badgeText</span>
+            @if (sla.HasValue)
+            {
+                <span class="text-muted small ms-2">(SLA)</span>
+            }
             @if (Model?.Request?.IsEscalated == true)
             {
-                <span class="ms-2 text-danger fw-bold" title="Escalation"><i class="fas fa-exclamation-triangle"></i> Escalation</span>
+                <span class="badge bg-danger ms-2">Escalated</span>
             }
-            @* Sprint 35.2: Technician Score Badge *@
-            @if (techStatus != null)
+        </div>
+        <div class="mb-2">
+            @if (Model?.Request?.AssignedTechnicianId != null)
             {
-                <span class="badge @scoreBadgeClass ms-2" data-bs-toggle="tooltip" data-bs-placement="top" title="@scoreTooltip">
-                    <i class="fas fa-star"></i> @techStatus.DispatchScore
+                <span>
+                    <a href="#" class="tech-profile-link" data-tech-id="@(Model?.Request?.AssignedTechnicianId ?? 0)" onclick="openTechProfileModal(@(Model?.Request?.AssignedTechnicianId ?? 0)); return false;"> <!-- Sprint 82: RazorViewFortification -->
+                        <i class="fas fa-user"></i> Technician: Unknown // Sprint 82: RazorViewFortification
+                    </a>
                 </span>
             }
         </div>
-        <div class="priority-controls">
-            <form method="post" asp-page-handler="MoveUp" class="d-inline">
-                <input type="hidden" name="Index" value="@(Model?.Request?.Id ?? 0)" /> <!-- Sprint 82: RazorViewFortification -->
-                <button type="submit" class="btn btn-link p-0" title="Increase Priority"><i class="fas fa-arrow-up"></i></button>
+        <div class="d-flex flex-wrap gap-2 mt-2">
+            <form method="post" asp-page-handler="AssignTechnician">
+                <input type="hidden" name="RequestId" value="@(Model?.Request?.Id ?? 0)" /> <!-- Sprint 82: RazorViewFortification -->
+                <button type="submit" class="btn btn-sm btn-success">Assign</button>
             </form>
-            <form method="post" asp-page-handler="MoveDown" class="d-inline">
-                <input type="hidden" name="Index" value="@(Model?.Request?.Id ?? 0)" /> <!-- Sprint 82: RazorViewFortification -->
-                <button type="submit" class="btn btn-link p-0" title="Decrease Priority"><i class="fas fa-arrow-down"></i></button>
+            <form method="post" asp-page-handler="ShowMap">
+                <input type="hidden" name="RequestId" value="@(Model?.Request?.Id ?? 0)" /> <!-- Sprint 82: RazorViewFortification -->
+                <button type="submit" class="btn btn-sm btn-outline-primary">Map</button>
             </form>
+            <form method="post" asp-page-handler="Reassign">
+                <input type="hidden" name="RequestId" value="@(Model?.Request?.Id ?? 0)" /> <!-- Sprint 82: RazorViewFortification -->
+                <button class="btn btn-sm btn-link" type="submit">Reassign</button>
+            </form>
+            <form method="post" asp-page-handler="Cancel">
+                <input type="hidden" name="RequestId" value="@(Model?.Request?.Id ?? 0)" /> <!-- Sprint 82: RazorViewFortification -->
+                <button class="btn btn-sm btn-link text-danger" type="submit">Cancel</button>
+            </form>
+            @* Sprint 34.2 - Escalation Override Modal: Escalate button triggers modal *@
+            <button type="button" class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#escalationOverrideModal" data-schedule-id="@(Model?.Request?.Id ?? 0)">Escalate</button> <!-- Sprint 82: RazorViewFortification -->
+            <form method="post" asp-page-handler="MarkDelayed">
+                <input type="hidden" name="RequestId" value="@(Model?.Request?.Id ?? 0)" /> <!-- Sprint 82: RazorViewFortification -->
+                <button class="btn btn-sm btn-outline-warning" type="submit">Mark as Delayed</button>
+            </form>
+            <form method="post" asp-page-handler="AutoReassign">
+                <input type="hidden" name="RequestId" value="@(Model?.Request?.Id ?? 0)" /> <!-- Sprint 82: RazorViewFortification -->
+                <button class="btn btn-sm btn-outline-info" type="submit">Auto-Reassign</button>
+            </form>
+            <a class="btn btn-sm btn-link" href="/admin/customer/@(Model?.Request?.Id ?? 0)">Profile</a> <!-- Sprint 82: RazorViewFortification -->
         </div>
     </div>
-    <div class="mb-2">
-        <strong>@(Model?.Request?.CustomerName ?? "-") // Sprint 82: RazorViewFortification</strong> <span class="text-muted small">@(Model?.Request?.Email ?? "-") // Sprint 82: RazorViewFortification</span><br />
-        <span class="text-secondary">@(Model?.Request?.ServiceType ?? "-") // Sprint 82: RazorViewFortification</span>
-    </div>
-    <div class="mb-2">
-        <span class="me-2"><i class="fas fa-clock"></i> @(Model?.Request?.CreatedAt.ToLocalTime().ToString("g") ?? "-") // Sprint 82: RazorViewFortification</span>
-        <span><i class="fas fa-map-marker-alt"></i> @(Model?.Request?.Address ?? "-") // Sprint 82: RazorViewFortification</span>
-    </div>
-    <div class="mb-2">
-        <span class="badge @badgeClass @(blink ? "sla-blink" : "")" style="min-width:120px;">@badgeText</span>
-        @if (sla.HasValue)
-        {
-            <span class="text-muted small ms-2">(SLA)</span>
-        }
-        @if (Model?.Request?.IsEscalated == true)
-        {
-            <span class="badge bg-danger ms-2">Escalated</span>
-        }
-    </div>
-    <div class="mb-2">
-        @if (Model?.Request?.AssignedTechnicianId != null)
-        {
-            <span>
-                <a href="#" class="tech-profile-link" data-tech-id="@(Model?.Request?.AssignedTechnicianId ?? 0)" onclick="openTechProfileModal(@(Model?.Request?.AssignedTechnicianId ?? 0)); return false;"> <!-- Sprint 82: RazorViewFortification -->
-                    <i class="fas fa-user"></i> Technician: @(DispatcherModel.TechnicianLoads?.FirstOrDefault(t => t.Id == (Model?.Request?.AssignedTechnicianId ?? 0))?.FullName ?? "Unknown") // Sprint 82: RazorViewFortification
-                </a>
-            </span>
-        }
-    </div>
-    <div class="d-flex flex-wrap gap-2 mt-2">
-        <form method="post" asp-page-handler="AssignTechnician">
-            <input type="hidden" name="RequestId" value="@(Model?.Request?.Id ?? 0)" /> <!-- Sprint 82: RazorViewFortification -->
-            <button type="submit" class="btn btn-sm btn-success">Assign</button>
-        </form>
-        <form method="post" asp-page-handler="ShowMap">
-            <input type="hidden" name="RequestId" value="@(Model?.Request?.Id ?? 0)" /> <!-- Sprint 82: RazorViewFortification -->
-            <button type="submit" class="btn btn-sm btn-outline-primary">Map</button>
-        </form>
-        <form method="post" asp-page-handler="Reassign">
-            <input type="hidden" name="RequestId" value="@(Model?.Request?.Id ?? 0)" /> <!-- Sprint 82: RazorViewFortification -->
-            <button class="btn btn-sm btn-link" type="submit">Reassign</button>
-        </form>
-        <form method="post" asp-page-handler="Cancel">
-            <input type="hidden" name="RequestId" value="@(Model?.Request?.Id ?? 0)" /> <!-- Sprint 82: RazorViewFortification -->
-            <button class="btn btn-sm btn-link text-danger" type="submit">Cancel</button>
-        </form>
-        @* Sprint 34.2 - Escalation Override Modal: Escalate button triggers modal *@
-        <button type="button" class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#escalationOverrideModal" data-schedule-id="@(Model?.Request?.Id ?? 0)">Escalate</button> <!-- Sprint 82: RazorViewFortification -->
-        <form method="post" asp-page-handler="MarkDelayed">
-            <input type="hidden" name="RequestId" value="@(Model?.Request?.Id ?? 0)" /> <!-- Sprint 82: RazorViewFortification -->
-            <button class="btn btn-sm btn-outline-warning" type="submit">Mark as Delayed</button>
-        </form>
-        <form method="post" asp-page-handler="AutoReassign">
-            <input type="hidden" name="RequestId" value="@(Model?.Request?.Id ?? 0)" /> <!-- Sprint 82: RazorViewFortification -->
-            <button class="btn btn-sm btn-outline-info" type="submit">Auto-Reassign</button>
-        </form>
-        <a class="btn btn-sm btn-link" href="/admin/customer/@(Model?.Request?.Id ?? 0)">Profile</a> <!-- Sprint 82: RazorViewFortification -->
-    </div>
 </div>
+@* Sprint 83: MobileView override start *@
+@* Sprint 83.4: Detection code removed to restore build stability
+// @if (isMobile || isTablet)
+// {
+//     <div class="mt-2 p-2 rounded bg-blue-50 shadow">
+//         <strong>Mobile JobCard Quick View:</strong>
+//         <div class="flex flex-row gap-2 justify-between">
+//             <span>Score: <b>@(techStatus?.DispatchScore ?? 0)</b></span>
+//             <span>Jobs: <b>@(techStatus?.AssignedJobs ?? 0)</b></span>
+//             <span>SLA: <b>@badgeText</b></span>
+//         </div>
+//     </div>
+// }
+@* Sprint 83: MobileView override end *@
 <script>
 // Sprint 35.2: Enable Bootstrap tooltips for score badge
 if (window.bootstrap) {
@@ -150,6 +190,22 @@ if (window.bootstrap) {
         new bootstrap.Tooltip(el);
     });
 }
+// Sprint 83: SmartControlUX upgrade
+function toggleSection(section) {
+    var el = document.getElementById(section + 'Section');
+    if (el.classList.contains('show')) {
+        el.classList.remove('show');
+        localStorage.setItem(section + 'Collapsed', 'true');
+    } else {
+        el.classList.add('show');
+        localStorage.setItem(section + 'Collapsed', 'false');
+    }
+}
+document.addEventListener('DOMContentLoaded', function() {
+    var collapsed = localStorage.getItem('jobCardDetailsCollapsed');
+    var el = document.getElementById('jobCardDetailsSection');
+    if (collapsed === 'true' && el) el.classList.remove('show');
+});
 </script>
 @* FixItFred: CSS animation refactored for Razor compatibility. *@
 @* Removed inline <style> blocks for animation. All animation CSS is now in site.css *@
