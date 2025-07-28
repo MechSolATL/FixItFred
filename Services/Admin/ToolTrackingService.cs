@@ -15,35 +15,39 @@ namespace MVP_Core.Services.Admin
             _context = context;
         }
 
+        // Get all tools with assignment and transferability info
         public async Task<List<ToolDto>> GetAllToolsAsync()
         {
             return await _context.ToolInventories
                 .Include(t => t.AssignedTechnician)
                 .Select(t => new ToolDto
                 {
-                    ToolId = new Guid(t.ToolId.ToString()), // Convert int ToolId to Guid for DTO compatibility
+                    ToolId = GuidFromInt(t.ToolId),
                     Name = t.Name,
                     ToolType = t.ConditionStatus, // No ToolType in model, using ConditionStatus as placeholder
                     Status = t.IsActive ? (t.AssignedTechId != null ? "InUse" : "Available") : "Inactive",
-                    AssignedTechnicianId = t.AssignedTechId != null ? new Guid(t.AssignedTechId.Value.ToString()) : (Guid?)null,
+                    AssignedTechnicianId = t.AssignedTechId != null ? GuidFromInt(t.AssignedTechId.Value) : (Guid?)null,
                     AssignedTechnicianName = t.AssignedTechnician != null ? t.AssignedTechnician.FullName : null,
-                    LastTransferDate = null, // Not tracked in ToolInventory, could be added
+                    LastTransferDate = GetLastTransferDate(t.ToolId),
                     IsTransferable = t.IsActive
                 }).ToListAsync();
         }
 
-        public async Task<bool> AssignToolAsync(int toolId, int technicianId)
+        // Assign a tool to a technician (initial assignment)
+        public async Task<bool> AssignToolAsync(Guid toolId, Guid technicianId)
         {
-            var tool = await _context.ToolInventories.FindAsync(toolId);
+            int toolIntId = IntFromGuid(toolId);
+            int techIntId = IntFromGuid(technicianId);
+            var tool = await _context.ToolInventories.FindAsync(toolIntId);
             if (tool == null || !tool.IsActive) return false;
 
-            tool.AssignedTechId = technicianId;
-            // No LastTransferDate in model, could be added
+            tool.AssignedTechId = techIntId;
+            // Log assignment
             _context.ToolTransferLogs.Add(new ToolTransferLog
             {
-                ToolId = toolId,
+                ToolId = toolIntId,
                 FromTechId = 0, // 0 = system/initial assignment
-                ToTechId = technicianId,
+                ToTechId = techIntId,
                 Timestamp = DateTime.UtcNow,
                 Notes = "Initial Assignment",
                 ConfirmedByReceiver = false
@@ -53,20 +57,25 @@ namespace MVP_Core.Services.Admin
             return true;
         }
 
-        public async Task<bool> TransferToolAsync(int toolId, int fromTechId, int toTechId, string? notes = null)
+        // Transfer a tool between technicians
+        public async Task<bool> TransferToolAsync(ToolTransferRequestDto dto)
         {
-            var tool = await _context.ToolInventories.FindAsync(toolId);
+            int toolIntId = IntFromGuid(dto.ToolId);
+            int fromTechIntId = IntFromGuid(dto.FromTechnicianId);
+            int toTechIntId = IntFromGuid(dto.ToTechnicianId);
+            var tool = await _context.ToolInventories.FindAsync(toolIntId);
             if (tool == null || !tool.IsActive) return false;
-            if (tool.AssignedTechId != fromTechId) return false;
+            if (tool.AssignedTechId != fromTechIntId) return false;
 
-            tool.AssignedTechId = toTechId;
+            tool.AssignedTechId = toTechIntId;
+            // Log transfer
             _context.ToolTransferLogs.Add(new ToolTransferLog
             {
-                ToolId = toolId,
-                FromTechId = fromTechId,
-                ToTechId = toTechId,
-                Timestamp = DateTime.UtcNow,
-                Notes = notes,
+                ToolId = toolIntId,
+                FromTechId = fromTechIntId,
+                ToTechId = toTechIntId,
+                Timestamp = dto.TransferInitiatedAt,
+                Notes = dto.TransferNotes,
                 ConfirmedByReceiver = false
             });
 
@@ -74,12 +83,35 @@ namespace MVP_Core.Services.Admin
             return true;
         }
 
-        public async Task<List<ToolTransferLog>> GetTransferHistoryAsync(int toolId)
+        // Get transfer history for a tool
+        public async Task<List<ToolTransferLog>> GetTransferHistoryAsync(Guid toolId)
         {
+            int toolIntId = IntFromGuid(toolId);
             return await _context.ToolTransferLogs
-                .Where(log => log.ToolId == toolId)
+                .Where(log => log.ToolId == toolIntId)
                 .OrderByDescending(log => log.Timestamp)
                 .ToListAsync();
+        }
+
+        // --- Helper methods for Guid <-> int mapping (for legacy int PKs) ---
+        private static Guid GuidFromInt(int id)
+        {
+            var bytes = new byte[16];
+            BitConverter.GetBytes(id).CopyTo(bytes, 0);
+            return new Guid(bytes);
+        }
+        private static int IntFromGuid(Guid guid)
+        {
+            var bytes = guid.ToByteArray();
+            return BitConverter.ToInt32(bytes, 0);
+        }
+        private DateTime? GetLastTransferDate(int toolId)
+        {
+            var lastLog = _context.ToolTransferLogs
+                .Where(l => l.ToolId == toolId)
+                .OrderByDescending(l => l.Timestamp)
+                .FirstOrDefault();
+            return lastLog?.Timestamp;
         }
     }
 }
