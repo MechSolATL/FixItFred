@@ -139,7 +139,7 @@ namespace MVP_Core.Services.Dispatch
         }
 
         // Sprint 55.0: Estimate notification triggers
-        public void TriggerEstimateAcknowledged(string customerEmail, int estimateId)
+        public void TriggerEstimateAcknowledged(string customerEmail, Guid estimateId)
         {
             // Example logic: log, send email, or push notification
             var estimate = _db.BillingInvoiceRecords.FirstOrDefault(e => e.Id == estimateId);
@@ -154,7 +154,7 @@ namespace MVP_Core.Services.Dispatch
             }
         }
 
-        public void TriggerEstimateDecision(string customerEmail, int estimateId, bool wasAccepted)
+        public void TriggerEstimateDecision(string customerEmail, Guid estimateId, bool wasAccepted)
         {
             var estimate = _db.BillingInvoiceRecords.FirstOrDefault(e => e.Id == estimateId);
             if (estimate != null)

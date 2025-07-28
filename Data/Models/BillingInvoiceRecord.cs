@@ -54,5 +54,8 @@ namespace MVP_Core.Data.Models
         public DateTime? ArchivedAt { get; set; }
         [MaxLength(500)]
         public string? DownloadUrl { get; set; }
+
+        [NotMapped]
+        public decimal AmountDue => AmountTotal - (AmountPaid ?? 0);
     }
 }

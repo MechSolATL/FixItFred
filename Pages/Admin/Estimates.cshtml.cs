@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using MVP_Core.Data.Models;
 using System.Collections.Generic;
 using System.Linq;
+using System;
 
 namespace MVP_Core.Pages.Admin
 {
@@ -15,8 +16,8 @@ namespace MVP_Core.Pages.Admin
             // TODO: Replace with actual data source
             Estimates = new List<BillingInvoiceRecord>
             {
-                new BillingInvoiceRecord { Id = 1, CustomerName = "Alice", CustomerEmail = "alice@example.com", AmountDue = 350.00M, Status = "Open" },
-                new BillingInvoiceRecord { Id = 2, CustomerName = "Bob", CustomerEmail = "bob@example.com", AmountDue = 420.00M, Status = "Paid" }
+                new BillingInvoiceRecord { Id = Guid.NewGuid(), CustomerName = "Alice", CustomerEmail = "alice@example.com", AmountTotal = 350.00M, AmountPaid = 0, Status = "Open", InvoiceDate = DateTime.UtcNow },
+                new BillingInvoiceRecord { Id = Guid.NewGuid(), CustomerName = "Bob", CustomerEmail = "bob@example.com", AmountTotal = 420.00M, AmountPaid = 420.00M, Status = "Paid", InvoiceDate = DateTime.UtcNow }
             };
         }
     }

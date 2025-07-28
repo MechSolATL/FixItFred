@@ -30,7 +30,7 @@ namespace MVP_Core.Services.Admin
                 {
                     Year = g.Key.Year,
                     Month = g.Key.Month,
-                    TotalRevenue = g.Sum(x => x.AmountDue)
+                    TotalRevenue = g.Sum(x => x.AmountTotal - (x.AmountPaid ?? 0))
                 }).OrderBy(x => x.Year).ThenBy(x => x.Month).ToListAsync();
             return result;
         }

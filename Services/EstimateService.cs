@@ -26,7 +26,7 @@ namespace MVP_Core.Services
             await SprintPdfArchive.GenerateBrandedEstimatePdfAsync(invoice, outputPath, logoPath, contactInfo, disclaimers, terms, invoice.Status, lineItems, invoice.CustomerSignaturePath);
             return outputPath;
         }
-        public void SaveSignature(int invoiceId, string signaturePath, string acknowledgedBy)
+        public void SaveSignature(Guid invoiceId, string signaturePath, string acknowledgedBy)
         {
             var invoice = _db.BillingInvoiceRecords.Find(invoiceId);
             if (invoice == null) return;
@@ -37,7 +37,7 @@ namespace MVP_Core.Services
             _db.SaveChanges();
             _dispatchEngine.TriggerEstimateAcknowledged(invoice.CustomerEmail, invoiceId);
         }
-        public void SaveDecision(int invoiceId, bool accepted)
+        public void SaveDecision(Guid invoiceId, bool accepted)
         {
             var invoice = _db.BillingInvoiceRecords.Find(invoiceId);
             if (invoice == null) return;
