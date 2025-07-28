@@ -117,7 +117,7 @@ namespace MVP_Core.Data.Models
 
         // Sprint 60.0: Timeline PDF archive and visibility
         [MaxLength(500)]
-        public string? FinalizedPDFPath { get; set; } // Path to finalized PDF receipt
+        public string? FinalizedPDFPath { get; set; // Path to finalized PDF receipt
         public bool ShowInTimeline { get; set; } = true; // Show in customer timeline
 
         [MaxLength(8000)]
@@ -126,6 +126,11 @@ namespace MVP_Core.Data.Models
         // Sprint 69.0: Sync Compliance Enforcer
         public bool HasRequiredMedia { get; set; } = false; // True if required media is present
         public DateTime? SyncComplianceCheckedAt { get; set; } // Last time compliance was checked
+
+        // Sprint 86.0: Dispatcher assignment and ETA fields
+        public int? AssignedTechId { get; set; }
+        public DateTime? DispatchTime { get; set; }
+        public DateTime? ArrivalETA { get; set; }
     }
 
     public class SlaSetting
