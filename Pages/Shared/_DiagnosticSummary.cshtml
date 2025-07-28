@@ -1,0 +1,10 @@
+@* Sprint 89.2 — Summary diagnostic rendering *@
+@model DiagnosticResultsViewModel
+<div class='diagnostic-card'>
+    <h3>@Model.TenantName — Compliance Check</h3>
+    <p>Licenses: @Model.LicenseStatus</p>
+    <p>Insurance: @Model.InsuranceStatus</p>
+    <p>Certifications: @Model.CertStatus</p>
+    <p>PRO Badge: <strong>@Model.ProBadgeStatus</strong></p>
+    <p>Override Status: @Model.OverrideEligible</p>
+</div>
