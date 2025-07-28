@@ -64,5 +64,10 @@ namespace MVP_Core.Data.Models
 
         // Sprint 84.7.2 — Live Filter + UI Overlay
         public int TrustScore { get; set; } = 100;
+
+        // Sprint 84.8 — Technician Heat Score + Map Overlay
+        public int HeatScore { get; set; } = 100;
+        public string ZipCode { get; set; } = string.Empty;
+        public DateTime? LastReviewedAt { get; set; }
     }
 }
