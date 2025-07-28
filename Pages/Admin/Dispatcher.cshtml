@@ -6,45 +6,49 @@
     ViewData["Title"] = "Dispatcher Panel";
     Layout = "_AdminLayout";
 }
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-4 py-4">
-    <!-- Technicians List -->
-    <div class="col-span-1 bg-white rounded shadow p-3">
-        <h3 class="font-bold mb-2">Available Technicians</h3>
-        <div id="tech-list">
-            @foreach (var tech in Model.ViewModel.Technicians)
-            {
-                <div class="tech-card mb-2 p-2 border rounded cursor-move bg-blue-50" draggable="true" data-tech-id="@tech.Id">
-                    <span class="font-semibold">@tech.FullName</span>
-                    <span class="ml-2 badge bg-green-200 text-green-800">@tech.Specialty</span>
-                    <span class="ml-2 badge bg-gray-200 text-gray-800">Jobs: @tech.CurrentJobCount/@tech.MaxJobCapacity</span>
-                </div>
-            }
+@if (Model.PermissionService.CanAccess(Model.AdminUser, "Dispatcher")) {
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 py-4">
+        <!-- Technicians List -->
+        <div class="col-span-1 bg-white rounded shadow p-3">
+            <h3 class="font-bold mb-2">Available Technicians</h3>
+            <div id="tech-list">
+                @foreach (var tech in Model.ViewModel.Technicians)
+                {
+                    <div class="tech-card mb-2 p-2 border rounded cursor-move bg-blue-50" draggable="true" data-tech-id="@tech.Id">
+                        <span class="font-semibold">@tech.FullName</span>
+                        <span class="ml-2 badge bg-green-200 text-green-800">@tech.Specialty</span>
+                        <span class="ml-2 badge bg-gray-200 text-gray-800">Jobs: @tech.CurrentJobCount/@tech.MaxJobCapacity</span>
+                    </div>
+                }
+            </div>
+        </div>
+        <!-- Service Requests List -->
+        <div class="col-span-1 bg-white rounded shadow p-3">
+            <h3 class="font-bold mb-2">Unassigned Jobs</h3>
+            <div id="job-list">
+                @foreach (var job in Model.ViewModel.ServiceRequests)
+                {
+                    <div class="job-card mb-2 p-2 border rounded bg-yellow-50 drop-target" data-job-id="@job.Id">
+                        <span class="font-semibold">@job.ServiceType</span>
+                        <span class="ml-2">@job.Address</span>
+                        <span class="ml-2 badge bg-red-200 text-red-800">@job.Priority</span>
+                    </div>
+                }
+            </div>
+        </div>
+        <!-- Map Panel -->
+        <div class="col-span-1 bg-white rounded shadow p-3">
+            <h3 class="font-bold mb-2">Live Technician Map</h3>
+            <div id="zoneMap" style="height:350px;"></div>
         </div>
     </div>
-    <!-- Service Requests List -->
-    <div class="col-span-1 bg-white rounded shadow p-3">
-        <h3 class="font-bold mb-2">Unassigned Jobs</h3>
-        <div id="job-list">
-            @foreach (var job in Model.ViewModel.ServiceRequests)
-            {
-                <div class="job-card mb-2 p-2 border rounded bg-yellow-50 drop-target" data-job-id="@job.Id">
-                    <span class="font-semibold">@job.ServiceType</span>
-                    <span class="ml-2">@job.Address</span>
-                    <span class="ml-2 badge bg-red-200 text-red-800">@job.Priority</span>
-                </div>
-            }
-        </div>
-    </div>
-    <!-- Map Panel -->
-    <div class="col-span-1 bg-white rounded shadow p-3">
-        <h3 class="font-bold mb-2">Live Technician Map</h3>
-        <div id="zoneMap" style="height:350px;"></div>
-    </div>
-</div>
-<!-- ??? Sprint 86.1: SmartAssign Modal now receives correct model -->
-<partial name="_SmartAssignModal" model="Model.ViewModel" />
-@section Scripts {
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="/js/dispatcher-map.js"></script>
-    <script src="/js/dispatcher-dragdrop.js"></script>
+    <!-- ??? Sprint 86.1: SmartAssign Modal now receives correct model -->
+    <partial name="_SmartAssignModal" model="Model.ViewModel" />
+    @section Scripts {
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+        <script src="/js/dispatcher-map.js"></script>
+        <script src="/js/dispatcher-dragdrop.js"></script>
+    }
+} else {
+    <div class="text-yellow-500 font-semibold">Access restricted based on role permissions.</div>
 }

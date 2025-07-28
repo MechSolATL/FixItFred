@@ -3,44 +3,47 @@
 @model MVP_Core.Pages.Admin.FlagReviewQueueModel
 @{
     ViewData["Title"] = "Flag Review Queue";
-    var logs = Model.FlaggedLogs;
 }
-<h2>Flag Review Queue</h2>
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>Technician</th>
-            <th>Service Request</th>
-            <th>Violation</th>
-            <th>Notes</th>
-            <th>Timestamp</th>
-            <th>Status</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-    @foreach (var log in logs)
-    {
-        <tr class="@(log.Status == "Flagged" ? "table-warning" : log.Status == "Escalated" ? "table-danger" : "")">
-            <td>@log.TechnicianId</td>
-            <td>@log.ServiceRequestId</td>
-            <td>@log.ViolationType</td>
-            <td>@log.Notes</td>
-            <td>@log.Timestamp.ToString("g")</td>
-            <td>@log.Status</td>
-            <td>
-                <form method="post" asp-page-handler="Clear" asp-route-id="@log.Id" style="display:inline">
-                    <button class="btn btn-success btn-sm">Clear</button>
-                </form>
-                <form method="post" asp-page-handler="Escalate" asp-route-id="@log.Id" style="display:inline">
-                    <button class="btn btn-danger btn-sm">Escalate</button>
-                </form>
-                <form method="post" asp-page-handler="AddNote" asp-route-id="@log.Id" style="display:inline">
-                    <input type="text" name="note" placeholder="Notes to File" class="form-control form-control-sm d-inline w-auto" />
-                    <button class="btn btn-secondary btn-sm">Add Note</button>
-                </form>
-            </td>
-        </tr>
-    }
-    </tbody>
-</table>
+@if (Model.PermissionService.CanAccess(Model.AdminUser, "FlagReviewQueue")) {
+    <h2>Flag Review Queue</h2>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Technician</th>
+                <th>Service Request</th>
+                <th>Violation</th>
+                <th>Notes</th>
+                <th>Timestamp</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var log in Model.FlaggedLogs)
+        {
+            <tr class="@(log.Status == "Flagged" ? "table-warning" : log.Status == "Escalated" ? "table-danger" : "")">
+                <td>@log.TechnicianId</td>
+                <td>@log.ServiceRequestId</td>
+                <td>@log.ViolationType</td>
+                <td>@log.Notes</td>
+                <td>@log.Timestamp.ToString("g")</td>
+                <td>@log.Status</td>
+                <td>
+                    <form method="post" asp-page-handler="Clear" asp-route-id="@log.Id" style="display:inline">
+                        <button class="btn btn-success btn-sm">Clear</button>
+                    </form>
+                    <form method="post" asp-page-handler="Escalate" asp-route-id="@log.Id" style="display:inline">
+                        <button class="btn btn-danger btn-sm">Escalate</button>
+                    </form>
+                    <form method="post" asp-page-handler="AddNote" asp-route-id="@log.Id" style="display:inline">
+                        <input type="text" name="note" placeholder="Notes to File" class="form-control form-control-sm d-inline w-auto" />
+                        <button class="btn btn-secondary btn-sm">Add Note</button>
+                    </form>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+} else {
+    <div class="text-yellow-500 font-semibold">Access restricted based on role permissions.</div>
+}

@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using DomainTechnicianBehaviorLog = MVP_Core.Models.TechnicianBehaviorLog;
+using MVP_Core.Services.Admin;
+using MVP_Core.Data.Models;
 
 namespace MVP_Core.Pages.Admin
 {
@@ -13,12 +15,16 @@ namespace MVP_Core.Pages.Admin
     {
         private readonly MVP_Core.Services.Admin.TechnicianAuditService _auditService;
         private readonly ApplicationDbContext _db;
+        public PermissionService PermissionService { get; }
+        public AdminUser AdminUser { get; }
         public List<DomainTechnicianBehaviorLog> BehaviorLogs { get; set; } = new();
         public ComplianceStatsViewModel ComplianceStats { get; set; } = new();
-        public TechnicianStatusReportModel(MVP_Core.Services.Admin.TechnicianAuditService auditService, ApplicationDbContext db)
+        public TechnicianStatusReportModel(MVP_Core.Services.Admin.TechnicianAuditService auditService, ApplicationDbContext db, PermissionService permissionService)
         {
             _auditService = auditService;
             _db = db;
+            PermissionService = permissionService;
+            AdminUser = HttpContext?.Items["AdminUser"] as AdminUser ?? new AdminUser { EnabledModules = new List<string>() };
         }
         public async Task OnGetAsync()
         {

@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using MVP_Core.Models;
+using MVP_Core.Services.Admin;
+using MVP_Core.Data.Models;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
@@ -11,6 +13,14 @@ namespace MVP_Core.Pages.Admin
     [Authorize(Roles = "Admin")]
     public class LeaderboardModel : PageModel
     {
+        public PermissionService PermissionService { get; }
+        public AdminUser AdminUser { get; }
+        public LeaderboardModel(PermissionService permissionService)
+        {
+            PermissionService = permissionService;
+            AdminUser = HttpContext?.Items["AdminUser"] as AdminUser ?? new AdminUser { EnabledModules = new List<string>() };
+        }
+
         public List<LeaderboardEntryViewModel> Leaderboard { get; set; } = new();
         public string Filter { get; set; } = "all";
 

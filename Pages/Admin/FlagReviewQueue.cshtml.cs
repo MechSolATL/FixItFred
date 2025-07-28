@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 // FixItFred: Remove all ambiguous using for TechnicianAuditService, use fully qualified name
 using DomainTechnicianBehaviorLog = MVP_Core.Models.TechnicianBehaviorLog;
+using MVP_Core.Services.Admin;
+using MVP_Core.Data.Models;
 
 namespace MVP_Core.Pages.Admin
 {
@@ -12,10 +14,14 @@ namespace MVP_Core.Pages.Admin
     public class FlagReviewQueueModel : PageModel
     {
         private readonly MVP_Core.Services.Admin.TechnicianAuditService _auditService;
+        public PermissionService PermissionService { get; }
+        public AdminUser AdminUser { get; }
         public List<DomainTechnicianBehaviorLog> FlaggedLogs { get; set; } = new();
-        public FlagReviewQueueModel(MVP_Core.Services.Admin.TechnicianAuditService auditService)
+        public FlagReviewQueueModel(MVP_Core.Services.Admin.TechnicianAuditService auditService, PermissionService permissionService)
         {
             _auditService = auditService;
+            PermissionService = permissionService;
+            AdminUser = HttpContext?.Items["AdminUser"] as AdminUser ?? new AdminUser { EnabledModules = new List<string>() };
         }
         public async Task OnGetAsync()
         {

@@ -7,6 +7,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System;
 using System.IO;
+using MVP_Core.Services.Admin;
+using MVP_Core.Data.Models;
 
 namespace MVP_Core.Pages.Admin
 {
@@ -15,6 +17,8 @@ namespace MVP_Core.Pages.Admin
     {
         private readonly ApplicationDbContext _db;
         private readonly IMemoryCache _cache;
+        public PermissionService PermissionService { get; }
+        public AdminUser AdminUser { get; }
         private static readonly string QuoteCacheKey = "DailyQuote";
         private static readonly string AudioCacheKey = "DailyAudio";
         private static readonly string SpotlightCacheKey = "TechSpotlight";
@@ -25,10 +29,12 @@ namespace MVP_Core.Pages.Admin
         public string? TechSpotlight { get; set; }
         public List<PulseSummaryDto> PulseSummary { get; set; } = new();
 
-        public CommunityBoardModel(ApplicationDbContext db, IMemoryCache cache)
+        public CommunityBoardModel(ApplicationDbContext db, IMemoryCache cache, PermissionService permissionService)
         {
             _db = db;
             _cache = cache;
+            PermissionService = permissionService;
+            AdminUser = HttpContext?.Items["AdminUser"] as AdminUser ?? new AdminUser { EnabledModules = new List<string>() };
         }
 
         public void OnGet()

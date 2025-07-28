@@ -6,6 +6,7 @@
     ViewData["Title"] = "Community Board";
 }
 <div class="container mx-auto py-6">
+@if (Model.PermissionService.CanAccess(Model.AdminUser, "CommunityBoard")) {
     <h2 class="text-2xl font-bold mb-4">Community Board</h2>
     <div class="mb-4 flex flex-col md:flex-row gap-4">
         <div class="flex-1">
@@ -67,4 +68,7 @@
             }
         </div>
     </div>
+} else {
+    <div class="text-yellow-500 font-semibold">Access restricted based on role permissions.</div>
+}
 </div>

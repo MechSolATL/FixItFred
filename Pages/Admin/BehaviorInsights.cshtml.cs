@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using MVP_Core.Models;
 using MVP_Core.Services.Admin;
 using MVP_Core.Data;
+using MVP_Core.Data.Models;
 
 namespace MVP_Core.Pages.Admin
 {
@@ -15,12 +16,16 @@ namespace MVP_Core.Pages.Admin
         private readonly ApplicationDbContext _db;
         private readonly BehaviorPatternEngine _engine;
         private readonly TrustIndexScoringService _trustService;
+        public PermissionService PermissionService { get; }
+        public AdminUser AdminUser { get; }
 
-        public BehaviorInsightsModel(ApplicationDbContext db, BehaviorPatternEngine engine, TrustIndexScoringService trustService)
+        public BehaviorInsightsModel(ApplicationDbContext db, BehaviorPatternEngine engine, TrustIndexScoringService trustService, PermissionService permissionService)
         {
             _db = db;
             _engine = engine;
             _trustService = trustService;
+            PermissionService = permissionService;
+            AdminUser = HttpContext?.Items["AdminUser"] as AdminUser ?? new AdminUser { EnabledModules = new List<string>() };
         }
 
         [BindProperty(SupportsGet = true)]

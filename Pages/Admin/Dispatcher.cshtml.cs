@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using MVP_Core.Models;
 using MVP_Core.Data.Models;
 using MVP_Core.Services.Dispatcher;
+using MVP_Core.Services.Admin;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -26,10 +27,15 @@ namespace MVP_Core.Pages.Admin
         private readonly ApplicationDbContext _db;
         private readonly TechMapService _mapService;
         public DispatcherViewModel ViewModel { get; set; } = new();
-        public DispatcherModel(ApplicationDbContext db)
+        public PermissionService PermissionService { get; }
+        public AdminUser AdminUser { get; }
+        public DispatcherModel(ApplicationDbContext db, PermissionService permissionService)
         {
             _db = db;
             _mapService = new TechMapService(db);
+            PermissionService = permissionService;
+            // For demo: get current admin user from context/session/service
+            AdminUser = HttpContext?.Items["AdminUser"] as AdminUser ?? new AdminUser { EnabledModules = new List<string>() };
         }
         public void OnGet()
         {
