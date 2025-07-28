@@ -117,7 +117,7 @@ namespace MVP_Core.Data.Models
 
         // Sprint 60.0: Timeline PDF archive and visibility
         [MaxLength(500)]
-        public string? FinalizedPDFPath { get; set; // Path to finalized PDF receipt
+        public string? FinalizedPDFPath { get; set; } // Path to finalized PDF receipt
         public bool ShowInTimeline { get; set; } = true; // Show in customer timeline
 
         [MaxLength(8000)]
