@@ -1,6 +1,7 @@
 @page
 @model MVP_Core.Pages.Admin.TrustMapModel
 @inject MVP_Core.Services.Admin.TechnicianTrustAnalyticsService AnalyticsService
+@inject MVP_Core.Data.ApplicationDbContext Db
 @{
     // Sprint 84.8 Phase 2 — TrustMap Interactivity + GeoCluster
     Layout = "/Pages/Shared/_AdminLayout.cshtml";
@@ -26,7 +27,11 @@
                 <div class="d-flex flex-wrap gap-2">
                 @foreach (var tech in group.OrderByDescending(t => t.HeatScore))
                 {
-                    <div class="card p-2 flex-grow-1" style="min-width:180px;max-width:220px;">
+                    var alert = Db.TechnicianAlertLogs
+                        .Where(a => a.TechnicianId == tech.TechnicianId && a.TriggeredCoachingRecommended)
+                        .OrderByDescending(a => a.TriggeredAt)
+                        .FirstOrDefault();
+                    <div class="card p-2 flex-grow-1 position-relative" style="min-width:180px;max-width:220px;">
                         <div class="d-flex align-items-center mb-1">
                             <span class="fw-bold me-2">@tech.Name</span>
                             <span class="badge" style="background:@heatColor(tech.HeatScore);color:#222;">@tech.HeatScore</span>
@@ -34,11 +39,24 @@
                             {
                                 <span class="pulse-icon text-danger ms-2" title="Low Trust"><i class="fas fa-exclamation-triangle"></i></span>
                             }
+                            @* Sprint 85.3 — Triggered Coaching Suggestions *@
+                            @if (alert != null)
+                            {
+                                <span class="pulse-icon text-warning ms-2" title="Coaching Review Needed"><i class="fas fa-user-graduate"></i></span>
+                                <span class="badge bg-warning ms-1">Coaching</span>
+                            }
                         </div>
                         <div class="small text-muted">Zip: @tech.ZipCode</div>
                         <div class="progress mt-1" style="height:8px;">
                             <div class="progress-bar" role="progressbar" style="width:@tech.HeatScore%;background:@heatColor(tech.HeatScore);" aria-valuenow="@tech.HeatScore" aria-valuemin="0" aria-valuemax="100"></div>
                         </div>
+                        @* Sprint 85.3 — Triggered Coaching Suggestions: Overlay *@
+                        @if (alert != null)
+                        {
+                            <div class="position-absolute top-0 end-0 m-2" style="z-index:10;">
+                                <span class="badge bg-warning text-dark">Coaching Review</span>
+                            </div>
+                        }
                     </div>
                 }
                 </div>

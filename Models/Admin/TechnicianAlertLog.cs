@@ -5,6 +5,7 @@ using System;
 namespace MVP_Core.Data.Models
 {
     // Sprint 84.9 — Drop Alert Logic + TrustScore Delta Detection
+    // Sprint 85.3 — Triggered Coaching Suggestions
     public class TechnicianAlertLog
     {
         [Key]
@@ -14,5 +15,7 @@ namespace MVP_Core.Data.Models
         public int CurrentScore { get; set; }
         public DateTime TriggeredAt { get; set; }
         public bool Acknowledged { get; set; } = false;
+        // Sprint 85.3 — Triggered Coaching Suggestions
+        public bool TriggeredCoachingRecommended { get; set; } = false;
     }
 }

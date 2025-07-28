@@ -4,16 +4,20 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using MVP_Core.Services.Admin;
 
 namespace MVP_Core.Services.Admin
 {
     // Sprint 84.9 — Drop Alert Logic + TrustScore Delta Detection
+    // Sprint 85.3 — Triggered Coaching Suggestions
     public class TrustScoreDropAlertService
     {
         private readonly ApplicationDbContext _db;
-        public TrustScoreDropAlertService(ApplicationDbContext db)
+        private readonly CoachingLogService _coachingLogService;
+        public TrustScoreDropAlertService(ApplicationDbContext db, CoachingLogService coachingLogService)
         {
             _db = db;
+            _coachingLogService = coachingLogService;
         }
 
         // Checks all technicians for HeatScore drops and logs alerts
@@ -25,16 +29,29 @@ namespace MVP_Core.Services.Admin
             {
                 int? lastKnown = tech.LastKnownHeatScore;
                 int current = tech.HeatScore;
-                if (lastKnown.HasValue && (lastKnown.Value - current) >= 15)
+                int drop = lastKnown.HasValue ? (lastKnown.Value - current) : 0;
+                if (lastKnown.HasValue && drop >= 15)
                 {
-                    // Log alert
+                    // Sprint 85.3 — Triggered Coaching Suggestions
+                    bool triggerCoaching = false;
+                    if (drop > 25)
+                    {
+                        var logs = _coachingLogService.GetLogsForTechnician(tech.Id);
+                        var lastCoaching = logs.FirstOrDefault();
+                        if (lastCoaching == null || lastCoaching.Timestamp < DateTime.UtcNow.AddDays(-21))
+                        {
+                            triggerCoaching = true;
+                        }
+                    }
                     _db.TechnicianAlertLogs.Add(new TechnicianAlertLog
                     {
                         TechnicianId = tech.Id,
                         PreviousScore = lastKnown.Value,
                         CurrentScore = current,
                         TriggeredAt = DateTime.UtcNow,
-                        Acknowledged = false
+                        Acknowledged = false,
+                        // Sprint 85.3 — Triggered Coaching Suggestions
+                        TriggeredCoachingRecommended = triggerCoaching
                     });
                     count++;
                 }
