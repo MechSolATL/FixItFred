@@ -27,6 +27,19 @@
         if (t.IsMissedJobAlert) return '<span class="missed-job-ring" title="Missed job"></span>';
         return '';
     }
+    function formatTimeAgo(dateString) {
+        if (!dateString) return 'N/A';
+        const date = new Date(dateString);
+        const now = new Date();
+        const diffMs = now - date;
+        const diffMin = Math.round(diffMs / 60000);
+        if (diffMin < 1) return 'just now';
+        if (diffMin < 60) return `${diffMin} min ago`;
+        const diffHr = Math.floor(diffMin / 60);
+        if (diffHr < 24) return `${diffHr} hr ago`;
+        const diffDay = Math.floor(diffHr / 24);
+        return `${diffDay} day${diffDay > 1 ? 's' : ''} ago`;
+    }
     function renderMarkers() {
         Object.values(markers).forEach(m => map.removeLayer(m));
         Object.values(polylines).forEach(p => map.removeLayer(p));
@@ -43,8 +56,31 @@
             });
             let marker = L.marker([t.Latitude, t.Longitude], { icon }).addTo(map);
             marker.on('click', function () { showTechInfoPanel(t); });
+            // Enhanced popup content
+            const popupContent = `
+              <b>${t.Name}</b><br>
+              <span>Truck ID: ${t.TruckId}</span><br>
+              <span>Status: ${t.Status}</span><br>
+              <span>Reason: ${t.StatusReason || t.statusReason || ''}</span><br>
+              <span>Jobs Today: ${t.JobCount ?? t.jobCount ?? ''}</span><br>
+              <span>Last Updated: ${formatTimeAgo(t.LastUpdated || t.lastUpdated)}</span>
+            `;
+            marker.bindPopup(popupContent);
             marker.bindTooltip(`${t.Name} (${t.TruckId})`, {permanent: false, direction: 'top'});
             markers[t.TechnicianId] = marker;
+            // Visual alerts
+            marker.on('add', function() {
+                setTimeout(() => {
+                    if (marker._icon) {
+                        if (t.HasAlertFlag ?? t.hasAlertFlag) {
+                            marker._icon.classList.add('tech-marker-alert');
+                        }
+                        if (t.HasStaleLocation ?? t.hasStaleLocation) {
+                            marker._icon.classList.add('tech-marker-stale');
+                        }
+                    }
+                }, 0);
+            });
             if (t.GhostTrail && t.GhostTrail.length > 1) {
                 let latlngs = t.GhostTrail.map(p => [p.Latitude, p.Longitude]);
                 let poly = L.polyline(latlngs, { color: getServiceColor(t.ServiceType), weight: 3, dashArray: '6,8', opacity: 0.7 }).addTo(map);

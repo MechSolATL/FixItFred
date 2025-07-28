@@ -9,10 +9,21 @@
   margin-left: 6px;
   box-shadow: 0 0 0 0 #ff5252;
 }
+.tech-marker-alert {
+  border: 2px solid red !important;
+  animation: pulse 1s infinite;
+}
+.tech-marker-stale {
+  opacity: 0.5 !important;
+}
 @keyframes pulse {
-  0% { box-shadow: 0 0 0 0 #ff5252; }
-  70% { box-shadow: 0 0 0 10px rgba(255,82,82,0); }
-  100% { box-shadow: 0 0 0 0 rgba(255,82,82,0); }
+  0% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.5); }
+  70% { box-shadow: 0 0 0 10px rgba(255, 0, 0, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0); }
+}
+@keyframes missedRing {
+  0% { box-shadow: 0 0 8px 2px #ff5252; }
+  100% { box-shadow: 0 0 16px 6px #ff5252; }
 }
 .tech-status-badge {
   background-color: #444;
@@ -53,8 +64,4 @@
   margin-left: 6px;
   box-shadow: 0 0 8px 2px #ff5252;
   animation: missedRing 1.2s infinite alternate;
-}
-@keyframes missedRing {
-  0% { box-shadow: 0 0 8px 2px #ff5252; }
-  100% { box-shadow: 0 0 16px 6px #ff5252; }
 }
