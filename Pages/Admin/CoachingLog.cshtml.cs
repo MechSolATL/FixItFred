@@ -1,11 +1,11 @@
-// Sprint 85.4 — Coaching UI Enhancements + Export
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
+// Sprint 85.6 — Coaching Impact Insights Phase 2
+using System.Collections.Generic;
+using System.Linq;
 using MVP_Core.Models;
 using MVP_Core.Services.Admin;
 using MVP_Core.Data.Models;
-using System.Collections.Generic;
-using System.Linq;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using System;
 
 namespace MVP_Core.Pages.Admin
@@ -19,10 +19,12 @@ namespace MVP_Core.Pages.Admin
             _logService = logService;
             _db = db;
         }
-        public List<CoachingLogEntry> Entries { get; set; } = new();
-        public List<Technician> Technicians { get; set; } = new();
+        public List<MVP_Core.Data.Models.Technician> Technicians { get; set; } = new();
         public List<string> Tiers { get; set; } = new();
         public List<string> Supervisors { get; set; } = new();
+        public List<CoachingLogEntry> Entries { get; set; } = new();
+        public double AvgTrustImprovement { get; set; }
+        public Dictionary<int, int> TechnicianTrustImprovements { get; set; } = new();
         [BindProperty(SupportsGet = true)]
         public string StartDateString { get; set; } = string.Empty;
         [BindProperty(SupportsGet = true)]
@@ -33,7 +35,7 @@ namespace MVP_Core.Pages.Admin
         public string SelectedSupervisor { get; set; } = string.Empty;
         public void OnGet()
         {
-            // Sprint 85.4 — Coaching UI Enhancements + Export
+            // Sprint 85.6 — Coaching Impact Insights Phase 2
             Technicians = _db.Technicians.ToList();
             Tiers = Technicians.Select(t => t.TierLevel.ToString()).Distinct().OrderBy(x => x).ToList();
             Supervisors = _logService.FilterByDate(DateTime.MinValue, DateTime.MaxValue).Select(e => e.SupervisorName).Distinct().OrderBy(x => x).ToList();
@@ -50,6 +52,13 @@ namespace MVP_Core.Pages.Admin
                 filtered = filtered.Where(e => e.SupervisorName == SelectedSupervisor).ToList();
             }
             Entries = filtered;
+            // Calculate average trust improvement
+            AvgTrustImprovement = _logService.GetAverageTrustImprovementPerTechnician();
+            // Calculate per-technician trust improvement
+            TechnicianTrustImprovements = Technicians.ToDictionary(
+                t => t.Id,
+                t => _logService.GetTotalTrustImprovementForTechnician(t.Id)
+            );
         }
         public IActionResult OnGetExport(string startDate, string endDate, string tier, string supervisor)
         {
@@ -66,7 +75,7 @@ namespace MVP_Core.Pages.Admin
             {
                 filtered = filtered.Where(e => e.SupervisorName == supervisor).ToList();
             }
-            var csv = Services.Admin.CsvExportHelper.ExportCoachingLogs(filtered);
+            var csv = MVP_Core.Services.Admin.CsvExportHelper.ExportCoachingLogs(filtered);
             return File(System.Text.Encoding.UTF8.GetBytes(csv), "text/csv", $"CoachingLogs_{DateTime.UtcNow:yyyyMMdd}.csv");
         }
         public IActionResult OnPost()
