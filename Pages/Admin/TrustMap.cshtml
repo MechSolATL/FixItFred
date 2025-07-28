@@ -2,7 +2,7 @@
 @model MVP_Core.Pages.Admin.TrustMapModel
 @inject MVP_Core.Services.Admin.TechnicianTrustAnalyticsService AnalyticsService
 @{
-    // Sprint 84.8 — TrustMap UI Scaffold
+    // Sprint 84.8 Phase 2 — TrustMap Interactivity + GeoCluster
     Layout = "/Pages/Shared/_AdminLayout.cshtml";
     ViewData["Title"] = "Technician TrustMap & Heat Score";
     var heatScores = Model.HeatScores;
@@ -10,7 +10,7 @@
     var cityGroups = heatScores.GroupBy(h => h.City).OrderByDescending(g => g.Average(h => h.HeatScore));
     Func<int, string> heatColor = score => score >= 80 ? "#4caf50" : score >= 60 ? "#ffeb3b" : score >= 40 ? "#ff9800" : "#f44336";
 }
-<!-- Sprint 84.8 — Technician Heat Score + Map Overlay -->
+<!-- Sprint 84.8 Phase 2 — TrustMap Interactivity + GeoCluster -->
 <partial name="/Pages/Shared/_SEOHead.cshtml" />
 <div class="container-fluid px-2 px-md-4 mt-4">
     <h2 class="mb-4 text-primary">Technician TrustMap & Heat Score</h2>
@@ -73,14 +73,16 @@
         }
     </div>
     <div class="mb-4">
-        <h4>GeoMap Overlay (Coming Soon)</h4>
-        <div class="alert alert-info">GeoMapJS integration placeholder. Map overlay will visualize technician trust heat by region.</div>
+        <h4>GeoMap Overlay</h4>
+        <div id="trustmap" style="height: 480px; width: 100%;"></div>
     </div>
 </div>
 @section Scripts {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="/js/trustmap.js"></script>
     <style>
         .pulse-icon { animation: pulse 1.2s infinite alternate; }
-        @keyframes pulse { 0% { opacity: 1; } 100% { opacity: 0.4; } }
     </style>
 }

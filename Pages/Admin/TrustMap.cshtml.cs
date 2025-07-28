@@ -5,6 +5,7 @@ using MVP_Core.Data.Models;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using System.Linq;
 
 namespace MVP_Core.Pages.Admin
 {
@@ -18,12 +19,26 @@ namespace MVP_Core.Pages.Admin
         }
 
         public List<TechnicianHeatScoreDto> HeatScores { get; set; } = new();
-        public List<TechnicianDropAlertDto> DropAlerts { get; set; } = new();
 
         public async Task OnGetAsync()
         {
             HeatScores = await _analyticsService.GetHeatScoreMapData();
-            DropAlerts = await _analyticsService.GetRecentDropAlerts();
+        }
+
+        // Sprint 84.8 Phase 2 — TrustMap Interactivity + GeoCluster
+        public async Task<IActionResult> OnGetTrustMapDataAsync()
+        {
+            var data = await _analyticsService.GetHeatScoreMapData();
+            // Optionally enrich with city/region summary
+            var grouped = data.GroupBy(t => t.City ?? t.ZipCode ?? "Unknown")
+                .Select(g => new {
+                    City = g.Key,
+                    Technicians = g.ToList(),
+                    TechnicianCount = g.Count(),
+                    AvgHeatScore = g.Average(t => t.HeatScore),
+                    LastActivity = g.Max(t => t.TechnicianId) // Placeholder for real last activity
+                });
+            return new JsonResult(grouped);
         }
     }
 
@@ -35,15 +50,8 @@ namespace MVP_Core.Pages.Admin
         public int HeatScore { get; set; }
         public string City { get; set; } = string.Empty;
         public string ZipCode { get; set; } = string.Empty;
-    }
-    public class TechnicianDropAlertDto
-    {
-        public int TechnicianId { get; set; }
-        public string Name { get; set; } = string.Empty;
-        public int PreviousScore { get; set; }
-        public int CurrentScore { get; set; }
-        public string City { get; set; } = string.Empty;
-        public string ZipCode { get; set; } = string.Empty;
-        public string DropReason { get; set; } = string.Empty;
+        public double? Latitude { get; set; } // For map plotting
+        public double? Longitude { get; set; } // For map plotting
+        public string? LastActivity { get; set; } // For hover summary
     }
 }
