@@ -1,0 +1,30 @@
+@page
+@model MVP_Core.Pages.Admin.TrustTimelineModel
+@{
+    ViewData["Title"] = "Trust Incident Timeline";
+}
+<!-- Sprint 85.5 — Trust Incident Timeline -->
+<h2>Trust Incident Timeline</h2>
+<form method="get">
+    <label for="techId">Technician ID:</label>
+    <input type="number" id="techId" name="TechnicianId" value="@Model.TechnicianId" />
+    <button type="submit">Filter</button>
+</form>
+@if (Model.TimelineEntries?.Any() == true)
+{
+    <ul class="timeline-list">
+        @foreach (var entry in Model.TimelineEntries)
+        {
+            <li>
+                <strong>@entry.Date.ToString("g")</strong> — <span>@entry.Category</span>
+                <span class="badge">@entry.Severity</span>
+                <div>@entry.Note</div>
+                <small>Log ID: @entry.LinkedLogId</small>
+            </li>
+        }
+    </ul>
+}
+else if (Model.TechnicianId > 0)
+{
+    <div>No incidents found for this technician.</div>
+}
