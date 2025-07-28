@@ -4,6 +4,7 @@ using System.Linq;
 using MVP_Core.Models;
 using MVP_Core.Data;
 using MVP_Core.Data.Models;
+using MVP_Core.Services.Analytics;
 
 namespace MVP_Core.Services.Admin
 {
@@ -14,6 +15,11 @@ namespace MVP_Core.Services.Admin
         {
             _db = db;
         }
+
+        public int CompliantFlowCount { get; set; }
+        public int DeviantFlowCount { get; set; }
+        public DateTime? LastDeviation { get; set; }
+        public bool IsMentorCandidate { get; set; }
 
         public List<ViolationInsightModel> AnalyzeTechnicianBehavior(int? technicianId = null, DateTime? from = null, DateTime? to = null)
         {
@@ -75,6 +81,15 @@ namespace MVP_Core.Services.Admin
 
             // Add more pattern detection as needed
             return insights;
+        }
+
+        public async Task AnalyzeUserFlows(int userId, ActionLogService actionLogService)
+        {
+            CompliantFlowCount = await actionLogService.GetCompliantFlowCount(userId);
+            DeviantFlowCount = await actionLogService.GetDeviantFlowCount(userId);
+            LastDeviation = await actionLogService.GetLastDeviation(userId);
+            var mentorIds = await actionLogService.DetectMentorCandidates();
+            IsMentorCandidate = mentorIds.Contains(userId);
         }
     }
 }
