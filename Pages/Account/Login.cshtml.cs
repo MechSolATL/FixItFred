@@ -1,16 +1,19 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using MVP_Core.Services.Admin; // Sprint 84.9 — Drop Alert Logic + TrustScore Delta Detection
 
 namespace MVP_Core.Pages.Account
 {
     public class LoginModel : PageModel
     {
         private readonly ApplicationDbContext _context;
+        private readonly TrustScoreDropAlertService _dropAlertService; // Sprint 84.9
 
-        public LoginModel(ApplicationDbContext context)
+        public LoginModel(ApplicationDbContext context, TrustScoreDropAlertService dropAlertService)
         {
             _context = context;
+            _dropAlertService = dropAlertService;
         }
 
         [BindProperty]
@@ -43,6 +46,9 @@ namespace MVP_Core.Pages.Account
                 ErrorMessage = "Invalid login attempt.";
                 return Page();
             }
+
+            // Sprint 84.9 — Drop Alert Logic + TrustScore Delta Detection
+            await _dropAlertService.CheckAndLogDropsAsync();
 
             List<Claim> claims =
             [

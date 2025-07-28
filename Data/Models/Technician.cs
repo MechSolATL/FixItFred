@@ -69,5 +69,7 @@ namespace MVP_Core.Data.Models
         public int HeatScore { get; set; } = 100;
         public string ZipCode { get; set; } = string.Empty;
         public DateTime? LastReviewedAt { get; set; }
+        // Sprint 84.9 — HeatScore Tracking
+        public int? LastKnownHeatScore { get; set; }
     }
 }

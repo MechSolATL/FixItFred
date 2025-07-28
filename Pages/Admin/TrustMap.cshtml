@@ -6,7 +6,6 @@
     Layout = "/Pages/Shared/_AdminLayout.cshtml";
     ViewData["Title"] = "Technician TrustMap & Heat Score";
     var heatScores = Model.HeatScores;
-    var dropAlerts = Model.DropAlerts;
     var cityGroups = heatScores.GroupBy(h => h.City).OrderByDescending(g => g.Average(h => h.HeatScore));
     Func<int, string> heatColor = score => score >= 80 ? "#4caf50" : score >= 60 ? "#ffeb3b" : score >= 40 ? "#ff9800" : "#f44336";
 }
@@ -14,32 +13,6 @@
 <partial name="/Pages/Shared/_SEOHead.cshtml" />
 <div class="container-fluid px-2 px-md-4 mt-4">
     <h2 class="mb-4 text-primary">Technician TrustMap & Heat Score</h2>
-    <div class="mb-4">
-        <h4>Recent Trust Score Drops <i class="fas fa-exclamation-triangle text-danger"></i></h4>
-        @if (dropAlerts.Any())
-        {
-            <table class="table table-bordered table-sm">
-                <thead><tr><th>Name</th><th>City</th><th>Zip</th><th>Previous</th><th>Current</th><th>Reason</th></tr></thead>
-                <tbody>
-                @foreach (var alert in dropAlerts)
-                {
-                    <tr class="table-danger">
-                        <td>@alert.Name</td>
-                        <td>@alert.City</td>
-                        <td>@alert.ZipCode</td>
-                        <td>@alert.PreviousScore</td>
-                        <td><b>@alert.CurrentScore</b></td>
-                        <td><span class="pulse-icon text-danger" title="Drop Alert"><i class="fas fa-exclamation-circle"></i> @alert.DropReason</span></td>
-                    </tr>
-                }
-                </tbody>
-            </table>
-        }
-        else
-        {
-            <div class="alert alert-success">No recent trust drops detected.</div>
-        }
-    </div>
     <div class="mb-4">
         <h4>Heat Score by City/Region</h4>
         @foreach (var group in cityGroups)

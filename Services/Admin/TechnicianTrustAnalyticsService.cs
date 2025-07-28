@@ -40,39 +40,5 @@ namespace MVP_Core.Services.Admin
             }).ToList();
             return await Task.FromResult(result);
         }
-
-        public async Task<List<MVP_Core.Pages.Admin.TechnicianDropAlertDto>> GetRecentDropAlerts()
-        {
-            // Find technicians whose trust score dropped by 20+ in last 48h
-            var now = DateTime.UtcNow;
-            var logs = _db.TechnicianTrustLogs
-                .Where(t => t.RecordedAt > now.AddDays(-2))
-                .OrderByDescending(t => t.RecordedAt)
-                .ToList();
-            var drops = new List<MVP_Core.Pages.Admin.TechnicianDropAlertDto>();
-            var grouped = logs.GroupBy(l => l.TechnicianId);
-            foreach (var g in grouped)
-            {
-                var recent = g.OrderByDescending(l => l.RecordedAt).Take(2).ToList();
-                if (recent.Count == 2 && recent[0].TrustScore < recent[1].TrustScore - 19)
-                {
-                    var tech = _db.Technicians.FirstOrDefault(t => t.Id == g.Key);
-                    if (tech != null)
-                    {
-                        drops.Add(new MVP_Core.Pages.Admin.TechnicianDropAlertDto
-                        {
-                            TechnicianId = tech.Id,
-                            Name = tech.FullName,
-                            PreviousScore = (int)recent[1].TrustScore,
-                            CurrentScore = (int)recent[0].TrustScore,
-                            City = tech.City ?? string.Empty,
-                            ZipCode = tech.ZipCode ?? string.Empty,
-                            DropReason = $"Drop of {(int)(recent[1].TrustScore - recent[0].TrustScore)} in 48h"
-                        });
-                    }
-                }
-            }
-            return await Task.FromResult(drops);
-        }
     }
 }

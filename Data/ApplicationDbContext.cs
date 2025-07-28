@@ -171,6 +171,8 @@ namespace MVP_Core.Data
         // Sprint 83.6-RoastRoulette
         public DbSet<RoastDeliveryLog> RoastDeliveryLogs { get; set; } = null!;
         public DbSet<UserOnboardingStatus> UserOnboardingStatuses { get; set; } = null!; // Sprint 84.0 — OnboardingStatus Schema
+        // Sprint 84.9 — Drop Alert Logic + TrustScore Delta Detection
+        public DbSet<TechnicianAlertLog> TechnicianAlertLogs { get; set; } = null!;
 
         #endregion
 
@@ -317,6 +319,8 @@ namespace MVP_Core.Data
             _ = modelBuilder.Entity<OnboardingStaging>().ToTable("OnboardingStaging"); // Sprint 83.3: SmartControlUX Gatekeeper Wizard
             _ = modelBuilder.Entity<FeatureSuggestion>().ToTable("FeatureSuggestions"); // Sprint 83.4: FeatureSuggestion model
             _ = modelBuilder.Entity<RoastDeliveryLog>().ToTable("RoastDeliveryLogs"); // Sprint 83.6-RoastRoulette
+            // Sprint 84.9 — Drop Alert Logic + TrustScore Delta Detection
+            modelBuilder.Entity<TechnicianAlertLog>().ToTable("TechnicianAlertLogs");
 
             modelBuilder.Entity<LoyaltyPointTransaction>()
                 .HasOne(l => l.Technician)
