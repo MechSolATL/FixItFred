@@ -1,4 +1,4 @@
-// Sprint 91.7: Technician Tracker Map Logic (Leaflet.js)
+// Sprint 91.7.Part5.2: Enhanced Technician Tracker Map Logic (Leaflet.js + Diagnostics)
 (function () {
     let map, markers = {}, polylines = {};
     let techs = window.TechTrackingTechs || [];
@@ -6,11 +6,11 @@
 
     function getStatusBadge(status) {
         switch (status) {
-            case 'En Route': return '<span style="color:#007bff">?? En Route</span>';
-            case 'Working': return '<span style="color:#28a745">?? Working</span>';
-            case 'Idle': return '<span style="color:#2ecc40">?? Idle</span>';
-            case 'Delayed': return '<span style="color:#e74c3c">?? Delayed</span>';
-            default: return status;
+            case 'En Route': return '<span class="tech-status-badge" style="background:#007bff">?? En Route</span>';
+            case 'Working': return '<span class="tech-status-badge" style="background:#28a745">?? Working</span>';
+            case 'Idle': return '<span class="tech-status-badge" style="background:#ffc107;color:#222;">?? Idle</span>';
+            case 'Delayed': return '<span class="tech-status-badge" style="background:#e74c3c">?? Delayed</span>';
+            default: return `<span class='tech-status-badge'>${status}</span>`;
         }
     }
     function getServiceColor(type) {
@@ -21,38 +21,62 @@
             default: return 'gray';
         }
     }
+    function getAlertDot(t) {
+        if (t.IsStaleSignalAlert) return '<span class="pulse-alert" title="Stale location"></span>';
+        if (t.IsIdleAlert) return '<span class="idle-glow" title="Idle too long"></span>';
+        if (t.IsMissedJobAlert) return '<span class="missed-job-ring" title="Missed job"></span>';
+        return '';
+    }
     function renderMarkers() {
-        // Remove old
         Object.values(markers).forEach(m => map.removeLayer(m));
         Object.values(polylines).forEach(p => map.removeLayer(p));
         markers = {}; polylines = {};
-        // Filter
         let filtered = techs.filter(t =>
             (!filterServiceType || t.ServiceType === filterServiceType) &&
             (!filterStatus || t.Status === filterStatus) &&
             (!filterTruckId || t.TruckId.toLowerCase().includes(filterTruckId.toLowerCase()))
         );
         filtered.forEach(t => {
-            // Marker
             let icon = L.divIcon({
                 className: 'tech-marker',
-                html: `<div style='background:${getServiceColor(t.ServiceType)};color:white;padding:4px 10px;border-radius:8px;font-weight:bold;box-shadow:0 2px 8px #0003;'>${t.Name}<br><span style='font-size:0.9em;'>${t.TruckId}</span></div>`
+                html: `<div style='background:${getServiceColor(t.ServiceType)};color:white;padding:4px 10px;border-radius:8px;font-weight:bold;box-shadow:0 2px 8px #0003;position:relative;'>${t.Name}<br><span style='font-size:0.9em;'>${t.TruckId}</span>${getAlertDot(t)}</div>`
             });
             let marker = L.marker([t.Latitude, t.Longitude], { icon }).addTo(map);
-            marker.bindPopup(
-                `<b>${t.Name}</b> <span style='float:right;'>${t.TruckId}</span><br>` +
-                `Service: <span style='color:${getServiceColor(t.ServiceType)}'>${t.ServiceType}</span><br>` +
-                `Status: ${getStatusBadge(t.Status)}<br>` +
-                `ETA: <b>${t.ETA}</b><br>`
-            );
+            marker.on('click', function () { showTechInfoPanel(t); });
+            marker.bindTooltip(`${t.Name} (${t.TruckId})`, {permanent: false, direction: 'top'});
             markers[t.TechnicianId] = marker;
-            // Ghost trail
             if (t.GhostTrail && t.GhostTrail.length > 1) {
                 let latlngs = t.GhostTrail.map(p => [p.Latitude, p.Longitude]);
                 let poly = L.polyline(latlngs, { color: getServiceColor(t.ServiceType), weight: 3, dashArray: '6,8', opacity: 0.7 }).addTo(map);
                 polylines[t.TechnicianId] = poly;
             }
         });
+    }
+    function showTechInfoPanel(t) {
+        let panel = document.getElementById('tech-info-panel');
+        if (!panel) {
+            panel = document.createElement('div');
+            panel.id = 'tech-info-panel';
+            document.body.appendChild(panel);
+        }
+        let lastUpdated = t.LastUpdated ? new Date(t.LastUpdated) : null;
+        let now = new Date();
+        let minAgo = lastUpdated ? Math.round((now - lastUpdated) / 60000) : null;
+        let staleWarn = t.IsStaleSignalAlert ? `<span style='color:#ff5252;font-weight:bold;'>Stale (${minAgo} min ago)</span>` : (lastUpdated ? `${minAgo} min ago` : 'N/A');
+        panel.innerHTML = `
+            <div style='display:flex;align-items:center;gap:8px;'>
+                <span style='font-size:1.3em;font-weight:bold;'>${t.Name}</span>
+                <span class='tech-status-badge' style='background:#555;'>${t.TruckId}</span>
+                ${getAlertDot(t)}
+            </div>
+            <div style='margin-top:6px;'>
+                <b>Status:</b> ${getStatusBadge(t.Status)} <span style='margin-left:8px;'>${t.StatusReason}</span>
+            </div>
+            <div><b>Jobs Today:</b> ${t.JobCount}</div>
+            <div><b>Last Updated:</b> ${staleWarn}</div>
+            <div><b>ETA:</b> ${t.ETA}</div>
+        `;
+        panel.style.display = 'block';
     }
     function populateFilters() {
         let svcTypes = [...new Set(techs.map(t => t.ServiceType))];
@@ -67,7 +91,6 @@
         document.getElementById('filterStatus').onchange = function () { filterStatus = this.value; renderMarkers(); };
         document.getElementById('filterTruckId').oninput = function () { filterTruckId = this.value; renderMarkers(); };
     }
-    // --- SignalR Integration ---
     function setupSignalR() {
         if (window.signalR) {
             const connection = new signalR.HubConnectionBuilder()
@@ -91,7 +114,11 @@
         populateFilters();
         attachFilterEvents();
         renderMarkers();
-        setupSignalR(); // Sprint 91.7.Part4: Use SignalR for live updates
-        // pollUpdates(); // Disabled polling in favor of SignalR
+        setupSignalR();
+        // Hide info panel on map click
+        map.on('click', function () {
+            let panel = document.getElementById('tech-info-panel');
+            if (panel) panel.style.display = 'none';
+        });
     });
 })();

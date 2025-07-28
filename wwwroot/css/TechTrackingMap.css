@@ -1,0 +1,60 @@
+/* Sprint 91.7.Part5.2: Diagnostics Overlay Styles */
+.pulse-alert {
+  animation: pulse 2s infinite;
+  background: red;
+  border-radius: 50%;
+  width: 12px;
+  height: 12px;
+  display: inline-block;
+  margin-left: 6px;
+  box-shadow: 0 0 0 0 #ff5252;
+}
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 #ff5252; }
+  70% { box-shadow: 0 0 0 10px rgba(255,82,82,0); }
+  100% { box-shadow: 0 0 0 0 rgba(255,82,82,0); }
+}
+.tech-status-badge {
+  background-color: #444;
+  color: white;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  margin-left: 4px;
+}
+#tech-info-panel {
+  position: absolute;
+  top: 80px;
+  right: 30px;
+  background: #222;
+  color: #fff;
+  border-radius: 6px;
+  padding: 12px;
+  max-width: 300px;
+  z-index: 1000;
+  box-shadow: 0 0 10px #000;
+  display: none;
+}
+.idle-glow {
+  box-shadow: 0 0 8px 4px #ffe066, 0 0 0 0 #ffe066;
+  background: #ffe066;
+  border-radius: 50%;
+  width: 12px;
+  height: 12px;
+  display: inline-block;
+  margin-left: 6px;
+}
+.missed-job-ring {
+  border: 2px solid #ff5252;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  display: inline-block;
+  margin-left: 6px;
+  box-shadow: 0 0 8px 2px #ff5252;
+  animation: missedRing 1.2s infinite alternate;
+}
+@keyframes missedRing {
+  0% { box-shadow: 0 0 8px 2px #ff5252; }
+  100% { box-shadow: 0 0 16px 6px #ff5252; }
+}
