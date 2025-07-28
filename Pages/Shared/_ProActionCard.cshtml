@@ -1,0 +1,10 @@
+@model MVP_Core.Models.ViewModels.ProActionCardViewModel
+<!-- Sprint 89.1 — Phase 3C: _ProActionCard SmartUX partial view created -->
+<div class="proaction-card proaction-risk-@Model.RiskLevel.ToLower()">
+    <div class="proaction-header">
+        <span class="proaction-title">@Model.Title</span>
+        <span class="proaction-risk">@Model.RiskLevel</span>
+    </div>
+    <div class="proaction-desc">@Model.Description</div>
+    <a class="proaction-cta" href="@Model.ActionUrl">@Model.ActionLabel</a>
+</div>
