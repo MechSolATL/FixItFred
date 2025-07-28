@@ -131,6 +131,9 @@ namespace MVP_Core.Data.Models
         public int? AssignedTechId { get; set; }
         public DateTime? DispatchTime { get; set; }
         public DateTime? ArrivalETA { get; set; }
+        public DateTime? ArrivalTime { get; set; } // Sprint 86.7 — Technician AI Companion: Arrival time logging
+        public DateTime? InvoiceCompletedAt { get; set; } // Sprint 86.7 — Technician AI Companion: Invoice completion
+        public int? CustomerId { get; set; } // Sprint 86.7 — For notification/alert
     }
 
     public class SlaSetting

@@ -3,6 +3,7 @@ using MVP_Core.Data;
 using MVP_Core.Data.Models;
 using System.Collections.Generic;
 using System.Linq;
+using TechnicianModel = MVP_Core.Data.Models.Technician;
 
 namespace MVP_Core.Services
 {
@@ -15,10 +16,10 @@ namespace MVP_Core.Services
         }
 
         // Sprint 47.1: Get top technicians by skill points
-        public List<(Technician tech, int totalPoints)> GetTopTechniciansBySkill(string skillName, int topN = 10)
+        public List<(TechnicianModel tech, int totalPoints)> GetTopTechniciansBySkill(string skillName, int topN = 10)
         {
             var skill = _db.TechnicianSkills.FirstOrDefault(s => s.Name == skillName);
-            if (skill == null) return new List<(Technician, int)>();
+            if (skill == null) return new List<(TechnicianModel, int)>();
             var techIds = _db.TechnicianSkillMaps.Where(m => m.SkillId == skill.Id).Select(m => m.TechnicianId).ToList();
             var leaderboard = techIds
                 .Select(id => new {
@@ -28,7 +29,7 @@ namespace MVP_Core.Services
                 .Where(x => x.Tech != null)
                 .OrderByDescending(x => x.Points)
                 .Take(topN)
-                .Select(x => (x.Tech!, x.Points))
+                .Select(x => ((TechnicianModel)x.Tech!, x.Points))
                 .ToList();
             return leaderboard;
         }

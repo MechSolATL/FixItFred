@@ -3,6 +3,7 @@ using MVP_Core.Data;
 using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
+using TechnicianModel = MVP_Core.Data.Models.Technician;
 
 namespace MVP_Core.Services.Admin
 {
@@ -13,7 +14,7 @@ namespace MVP_Core.Services.Admin
         {
             _db = db;
         }
-        public List<Technician> GetTechnicians() => _db.Technicians.OrderBy(t => t.FullName).ToList();
+        public List<TechnicianModel> GetTechnicians() => _db.Technicians.OrderBy(t => t.FullName).ToList();
         public List<ServiceRequest> GetJobs() => _db.ServiceRequests.OrderByDescending(j => j.CreatedAt).Take(100).ToList();
         public List<TechnicianAuditLog> GetTrail(int technicianId, string? routeTag = null)
         {

@@ -22,5 +22,7 @@ namespace MVP_Core.Models
         public double? Latitude { get; set; } // For location display (optional)
         public double? Longitude { get; set; } // For location display (optional)
         public string Source { get; set; } = string.Empty; // For source display (optional)
+        public string TriggerType { get; set; } = string.Empty; // Sprint 86.7 — e.g. "AutoLoggedArrival", "LateETAAlertSent"
+        public bool Acknowledged { get; set; } = false; // Sprint 86.7 — Whether tech acknowledged prompt
     }
 }

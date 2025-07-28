@@ -1,6 +1,7 @@
 using MVP_Core.Data;
 using MVP_Core.Data.Models;
 using BillingInvoiceRecordModel = MVP_Core.Data.Models.BillingInvoiceRecord;
+using TechnicianModel = MVP_Core.Data.Models.Technician;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -45,7 +46,7 @@ namespace MVP_Core.Services
             return _db.Customers.FirstOrDefault(c => c.Email == email);
         }
         // Sprint 60.0: Get all technicians for avatar display
-        public List<Technician> GetTechnicians()
+        public List<TechnicianModel> GetTechnicians()
         {
             return _db.Technicians.ToList();
         }

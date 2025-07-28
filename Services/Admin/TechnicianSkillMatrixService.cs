@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System;
+using TechnicianModel = MVP_Core.Data.Models.Technician;
 
 namespace MVP_Core.Services.Admin
 {
@@ -44,7 +45,7 @@ namespace MVP_Core.Services.Admin
             await _db.SaveChangesAsync();
         }
 
-        public async Task<List<Technician>> GetBestMatchTechniciansAsync(string requiredSkill, int minLevel)
+        public async Task<List<TechnicianModel>> GetBestMatchTechniciansAsync(string requiredSkill, int minLevel)
         {
             var techIds = await _db.TechnicianSkillMatrices
                 .Where(x => x.SkillTag == requiredSkill && x.ProficiencyLevel >= minLevel)

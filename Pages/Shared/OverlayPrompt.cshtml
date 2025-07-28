@@ -1,0 +1,18 @@
+@* Sprint 86.7 — Compliance Overlay Prompt *@
+<div id="overlay-prompt" style="position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.5);z-index:9999;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);">
+    <div style="background:white;padding:2rem 3rem;border-radius:1rem;box-shadow:0 2px 24px #0003;text-align:center;max-width:90vw;">
+        <div style="font-size:2rem;font-weight:bold;">? You're at the job site. Want me to log your arrival time?</div>
+        <button id="overlay-confirm" class="btn btn-success mt-4" style="font-size:1.2rem;">Yes, log my arrival</button>
+        <button id="overlay-dismiss" class="btn btn-secondary mt-4 ml-3" style="font-size:1.2rem;">Dismiss</button>
+    </div>
+</div>
+<script>
+    document.getElementById('overlay-confirm').onclick = function() {
+        fetch('/api/tech/log-arrival', { method: 'POST' });
+        document.getElementById('overlay-prompt').style.display = 'none';
+    };
+    document.getElementById('overlay-dismiss').onclick = function() {
+        fetch('/api/tech/log-arrival-dismiss', { method: 'POST' });
+        document.getElementById('overlay-prompt').style.display = 'none';
+    };
+</script>

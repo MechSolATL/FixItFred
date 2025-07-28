@@ -8,6 +8,7 @@ namespace MVP_Core.Services
         // Sprint 42.2 – Reply Alerts via Email/SMS
         Task SendEmailAsync(string toEmail, string subject, string htmlBody);
         Task SendSMSAsync(string toPhone, string message); // stub
+        Task SendAsync(object recipient, string message);
     }
     public class NotificationService : INotificationService
     {
@@ -25,6 +26,23 @@ namespace MVP_Core.Services
         {
             // TODO: Implement SMS sending (stub)
             await Task.CompletedTask;
+        }
+        public async Task SendAsync(object recipient, string message)
+        {
+            // Sprint 86.7 — Unified send for SMS/email/alerts
+            if (recipient is int customerId)
+            {
+                // Lookup customer email/phone by ID (stub)
+                await SendEmailAsync($"customer{customerId}@example.com", "Notification", message);
+            }
+            else if (recipient is string emailOrPhone && emailOrPhone.Contains("@"))
+            {
+                await SendEmailAsync(emailOrPhone, "Notification", message);
+            }
+            else if (recipient is string phone)
+            {
+                await SendSMSAsync(phone, message);
+            }
         }
     }
 }

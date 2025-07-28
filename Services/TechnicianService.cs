@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System; // Sprint 84.7.2 — Live Filter + UI Overlay
 using System.Security.Claims;
+using TechnicianModel = MVP_Core.Data.Models.Technician;
 
 namespace MVP_Core.Services
 {
@@ -54,14 +55,14 @@ namespace MVP_Core.Services
             };
         }
 
-        public async Task AddAsync(Technician technician)
+        public async Task AddAsync(TechnicianModel technician)
         {
             _db.Technicians.Add(technician);
             await _db.SaveChangesAsync();
             await _hub.Clients.All.SendAsync("TechnicianAdded", technician.Id, technician.FullName);
         }
 
-        public async Task UpdateAsync(Technician technician)
+        public async Task UpdateAsync(TechnicianModel technician)
         {
             _db.Technicians.Update(technician);
             await _db.SaveChangesAsync();
@@ -89,9 +90,9 @@ namespace MVP_Core.Services
             throw new Exception("TechnicianId claim not found");
         }
 
-        public Technician GetTechnicianById(int id)
+        public TechnicianModel GetTechnicianById(int id)
         {
-            return _db.Technicians.FirstOrDefault(t => t.Id == id) ?? new Technician();
+            return _db.Technicians.FirstOrDefault(t => t.Id == id) ?? new TechnicianModel();
         }
     }
 }

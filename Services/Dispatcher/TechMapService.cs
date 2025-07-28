@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using TechnicianModel = MVP_Core.Data.Models.Technician;
 
 namespace MVP_Core.Services.Dispatcher
 {

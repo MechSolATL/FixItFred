@@ -12,5 +12,6 @@ namespace MVP_Core.Models
         // Optional: filters
         public string? ProximityFilter { get; set; }
         public string? AvailabilityFilter { get; set; }
+        public Dictionary<int, string> TechnicianStatuses { get; set; } = new(); // Sprint 86.7 — TechId -> Status (Available, Lunch, Restocking, Idle)
     }
 }

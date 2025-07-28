@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using TechnicianModel = MVP_Core.Data.Models.Technician;
 
 namespace MVP_Core.Services
 {
@@ -20,7 +21,7 @@ namespace MVP_Core.Services
             _config = config;
         }
 
-        public Technician? GetLeastLoadedTechnician(string serviceType)
+        public TechnicianModel? GetLeastLoadedTechnician(string serviceType)
         {
             return _db.Technicians
                 .Where(t => t.IsActive && (string.IsNullOrEmpty(serviceType) || t.Specialty == null || t.Specialty == serviceType))
@@ -29,12 +30,12 @@ namespace MVP_Core.Services
                 .FirstOrDefault();
         }
 
-        public Technician? GetBestTechnician(ServiceRequest request)
+        public TechnicianModel? GetBestTechnician(ServiceRequest request)
         {
             var techs = _db.Technicians
                 .Where(t => t.IsActive && (string.IsNullOrEmpty(request.ServiceType) || t.Specialty == null || t.Specialty == request.ServiceType))
                 .ToList();
-            Technician? bestTech = null;
+            TechnicianModel? bestTech = null;
             double bestScore = double.MinValue;
             foreach (var tech in techs)
             {
@@ -48,12 +49,12 @@ namespace MVP_Core.Services
             return bestTech;
         }
 
-        public (Technician? BestMatch, double ConfidenceScore) GetBestTechnicianWithScore(ServiceRequest request)
+        public (TechnicianModel? BestMatch, double ConfidenceScore) GetBestTechnicianWithScore(ServiceRequest request)
         {
             // Try to use navigation property if available, else fallback to join table
             var technicians = _db.Technicians
                 .ToList();
-            Technician? bestMatch = null;
+            TechnicianModel? bestMatch = null;
             double bestScore = double.MinValue;
             foreach (var tech in technicians)
             {
@@ -67,7 +68,7 @@ namespace MVP_Core.Services
             return (bestMatch, Math.Round(bestScore * 100, 2));
         }
 
-        public double CalculateTechScore(Technician tech, ServiceRequest request)
+        public double CalculateTechScore(TechnicianModel tech, ServiceRequest request)
         {
             // Skill match weight 0.7, load balance 0.3
             var reqSkills = (request.RequiredSkills ?? "")
@@ -82,7 +83,7 @@ namespace MVP_Core.Services
             return (skillScore * 0.7) + (loadScore * 0.3);
         }
 
-        public async Task<Technician?> AutoAssignTechnicianAsync(ServiceRequest req)
+        public async Task<TechnicianModel?> AutoAssignTechnicianAsync(ServiceRequest req)
         {
             var tech = GetBestTechnician(req);
             if (tech == null) return null;
