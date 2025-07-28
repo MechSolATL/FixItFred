@@ -30,4 +30,29 @@ namespace MVP_Core.Services.Admin
             doc.GeneratePdf(outputPath);
         }
     }
+
+    // Sprint 90.0: PDF composer for Service-Atlanta Revitalize MasterPlan blueprint
+    public static class BlueprintPdfComposer
+    {
+        public static void GenerateBlueprintPdf(string markdownContent, string outputPath)
+        {
+            var doc = Document.Create(container =>
+            {
+                container.Page(page =>
+                {
+                    page.Margin(40);
+                    page.Header().Text("Service-Atlanta Revitalize Master Execution Blueprint").FontSize(18).Bold();
+                    page.Content().Column(col =>
+                    {
+                        col.Item().Text(markdownContent).FontSize(10);
+                        col.Item().PaddingVertical(10).LineHorizontal(1);
+                        col.Item().Text("© 2025 NovaOps | Service-Atlanta Revitalize Initiative").FontSize(9).Italic();
+                    });
+                    page.Footer().AlignCenter().Text($"Generated: {DateTime.UtcNow:yyyy-MM-dd HH:mm} UTC").FontSize(8);
+                });
+            });
+            Directory.CreateDirectory(Path.GetDirectoryName(outputPath)!);
+            doc.GeneratePdf(outputPath);
+        }
+    }
 }
