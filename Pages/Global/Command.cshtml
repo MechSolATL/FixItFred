@@ -11,4 +11,36 @@
             @await Html.PartialAsync("/Pages/Shared/_MetricsCard.cshtml", card)
         }
     </div>
+    @if (Model.Forecast != null)
+    {
+        <div class="forecast-display mt-5 p-4 rounded shadow-sm bg-white">
+            <h4 class="mb-3"><i class="fas fa-chart-line text-primary"></i> Predictive Insights (Next 7 Days)</h4>
+            <div class="row g-3">
+                <div class="col-md-3 col-6">
+                    <div class="forecast-metric">
+                        <div class="forecast-label">Projected Requests</div>
+                        <div class="forecast-value">@Model.Forecast.ProjectedRequests</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="forecast-metric">
+                        <div class="forecast-label">Avg. Delay (min)</div>
+                        <div class="forecast-value">@Model.Forecast.AverageDelayMinutes</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="forecast-metric">
+                        <div class="forecast-label">Projected Revenue</div>
+                        <div class="forecast-value text-success">$@Model.Forecast.ProjectedRevenue.ToString("N0")</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="forecast-metric">
+                        <div class="forecast-label">Tech Gap</div>
+                        <div class="forecast-value text-danger">@Model.Forecast.TechnicianGap</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
 </div>
