@@ -66,6 +66,15 @@
     // bool isMobile = Detection.Device.Type == DeviceType.Mobile;
     // bool isTablet = Detection.Device.Type == DeviceType.Tablet;
     // bool isDesktop = Detection.Device.Type == DeviceType.Desktop;
+    // TrustIndex badge logic
+    int trustIndex = 100;
+    var trustService = Context.RequestServices.GetService(typeof(MVP_Core.Services.Admin.TrustIndexScoringService)) as MVP_Core.Services.Admin.TrustIndexScoringService;
+    if (techStatus != null && trustService != null)
+    {
+        trustIndex = trustService.GetCachedTrustIndex(techStatus.TechnicianId) ?? 100;
+    }
+    string trustBadgeClass = trustIndex >= 80 ? "bg-success" : trustIndex >= 50 ? "bg-warning text-dark" : "bg-danger";
+    string trustTooltip = $"TrustIndex: {trustIndex}\n- 100 = Clean\n- 50–79 = Moderate concern\n- <50 = Review required";
 }
 <!-- Sprint 83: SmartControlUX upgrade -->
 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-2">
@@ -76,6 +85,15 @@
             <div class="text-lg">@kpi.Value</div>
         </div>
     }
+    <div class="card bg-gradient-to-r from-gray-100 to-gray-300 shadow p-2 flex flex-col items-center">
+        <div class="text-sm font-bold">TrustIndex</div>
+        <div class="text-lg">
+            <span class="badge @trustBadgeClass" data-bs-toggle="tooltip" data-bs-placement="top" title="@trustTooltip">
+                <i class="fas fa-shield-alt"></i> @trustIndex
+            </span>
+        </div>
+    </div>
+}
 </div>
 <button class="btn btn-primary mb-2" onclick="toggleSection('jobCardDetails')">Toggle Details</button>
 <div id="jobCardDetailsSection" class="collapse show">

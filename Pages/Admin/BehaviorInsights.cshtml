@@ -1,0 +1,46 @@
+@page
+@model MVP_Core.Pages.Admin.BehaviorInsightsModel
+@{
+    ViewData["Title"] = "Behavior Insights";
+}
+<h2>Behavior Insights</h2>
+<form method="get">
+    <label>Technician:</label>
+    <select asp-for="SelectedTechnicianId" asp-items="Model.TechnicianOptions"></select>
+    <label>Pattern Type:</label>
+    <select asp-for="SelectedPatternType">
+        <option value="">All</option>
+        @foreach (var type in Model.PatternTypes)
+        {
+            <option value="@type">@type</option>
+        }
+    </select>
+    <label>Date Range:</label>
+    <input type="date" asp-for="FromDate" /> - <input type="date" asp-for="ToDate" />
+    <button type="submit">Filter</button>
+</form>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Technician</th>
+            <th>Pattern</th>
+            <th>Confidence</th>
+            <th>Summary</th>
+            <th>Date Range</th>
+            <th>TrustIndex</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var insight in Model.Insights)
+    {
+        <tr>
+            <td>@insight.TechnicianId</td>
+            <td>@insight.PatternType</td>
+            <td>@insight.ConfidenceScore.ToString("P0")</td>
+            <td>@insight.SummaryText</td>
+            <td>@insight.StartDate.ToShortDateString() - @insight.EndDate.ToShortDateString()</td>
+            <td>@Model.GetTrustIndex(insight.TechnicianId)</td>
+        </tr>
+    }
+    </tbody>
+</table>
