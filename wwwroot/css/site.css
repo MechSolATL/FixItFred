@@ -495,3 +495,49 @@ footer {
     margin-bottom: 18px;
     font-weight: 600;
 }
+
+/* =============================
+   Tenant Dashboard Styles
+============================= */
+.tenant-dashboard {
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+    padding: 36px 32px 28px 32px;
+    margin-top: 40px;
+    margin-bottom: 40px;
+}
+.tier-pill {
+    display: inline-block;
+    padding: 4px 16px;
+    border-radius: 16px;
+    font-weight: 600;
+    font-size: 1rem;
+    background: #e0e0e0;
+    color: #333;
+    margin-left: 8px;
+    vertical-align: middle;
+    letter-spacing: 0.5px;
+}
+.tier-pill.tier-starter { background: #e0e0e0; color: #333; }
+.tier-pill.tier-pro { background: #007bff; color: #fff; }
+.tier-pill.tier-enterprise { background: #28a745; color: #fff; }
+
+.module-badge {
+    display: inline-block;
+    padding: 6px 16px;
+    border-radius: 14px;
+    font-size: 0.98rem;
+    font-weight: 600;
+    margin-right: 10px;
+    margin-bottom: 8px;
+    background: #f0f0f0;
+    color: #222;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    vertical-align: middle;
+    transition: background 0.2s, color 0.2s;
+}
+.module-badge.bg-primary { background: #007bff; color: #fff; }
+.module-badge.bg-success { background: #28a745; color: #fff; }
+.module-badge.bg-info { background: #17a2b8; color: #fff; }
+.module-badge.bg-warning { background: #ffc107; color: #222; }
