@@ -1,4 +1,18 @@
 // JS for Manager Tools admin actions
+// SignalR client for manager action broadcasts
+if (window.signalR) {
+    const managerActionConnection = new signalR.HubConnectionBuilder()
+        .withUrl("/hubs/manageractions")
+        .build();
+
+    managerActionConnection.on("ManagerActionBroadcast", function (data) {
+        console.log("?? Manager action broadcast:", data);
+        // Optional: live toast, table refresh, or alert animation
+    });
+
+    managerActionConnection.start().catch(err => console.error(err.toString()));
+}
+
 function showCancelModal(requestId) {
     document.getElementById('cancelRequestId').value = requestId || '';
     document.getElementById('cancelModal').style.display = 'block';

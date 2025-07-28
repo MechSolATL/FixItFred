@@ -4,6 +4,8 @@ using MVP_Core.Services; // For INotificationService
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.SignalR;
+using MVP_Core.Hubs; // <-- Add this for ManagerActionHub
 
 namespace MVP_Core.Services.Admin
 {
@@ -11,9 +13,11 @@ namespace MVP_Core.Services.Admin
     public class ManagerInterventionService
     {
         private readonly ApplicationDbContext _db;
-        public ManagerInterventionService(ApplicationDbContext db)
+        private readonly IHubContext<ManagerActionHub> _hubContext;
+        public ManagerInterventionService(ApplicationDbContext db, IHubContext<ManagerActionHub> hubContext)
         {
             _db = db;
+            _hubContext = hubContext;
         }
 
         // Cancel a technician assignment for a request
@@ -73,7 +77,13 @@ namespace MVP_Core.Services.Admin
             await _db.SaveChangesAsync();
             // Notify
             await notificationService.SendAsync(req.Email, $"Your request #{req.Id} was cancelled by a manager. Reason: {reason}");
-            // Optionally: SignalR broadcast here
+            // SignalR broadcast
+            await _hubContext.Clients.All.SendAsync("ManagerActionBroadcast", new {
+                Action = "Cancel",
+                RequestId = requestId,
+                TechnicianId = req.AssignedTechnicianId,
+                Timestamp = DateTime.UtcNow
+            });
             return true;
         }
 
@@ -94,7 +104,13 @@ namespace MVP_Core.Services.Admin
             await _db.SaveChangesAsync();
             // Notify
             await notificationService.SendAsync(tech.Email ?? "", $"You have been assigned to request #{req.Id} by a manager.");
-            // Optionally: SignalR broadcast here
+            // SignalR broadcast
+            await _hubContext.Clients.All.SendAsync("ManagerActionBroadcast", new {
+                Action = "Reassign",
+                RequestId = requestId,
+                TechnicianId = tech.Id,
+                Timestamp = DateTime.UtcNow
+            });
             return true;
         }
 
@@ -114,7 +130,13 @@ namespace MVP_Core.Services.Admin
             await _db.SaveChangesAsync();
             // Notify
             await notificationService.SendAsync(req.Email, $"Your request #{req.Id} was reopened by a manager. Notes: {managerNotes}");
-            // Optionally: SignalR broadcast here
+            // SignalR broadcast
+            await _hubContext.Clients.All.SendAsync("ManagerActionBroadcast", new {
+                Action = "Reopen",
+                RequestId = requestId,
+                TechnicianId = req.AssignedTechnicianId,
+                Timestamp = DateTime.UtcNow
+            });
             return true;
         }
 
