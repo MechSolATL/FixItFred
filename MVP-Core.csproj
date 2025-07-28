@@ -68,7 +68,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Data\Models\Loyalty\" />
     <Folder Include="wwwroot\assets\" />
   </ItemGroup>
 

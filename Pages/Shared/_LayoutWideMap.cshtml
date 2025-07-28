@@ -1,0 +1,39 @@
+@*
+    Sprint 91.7: Wide Map Layout for Technician Tracker
+    Use this layout for full-screen map pages (no sidebar, no padding)
+*@
+@{
+    Layout = null;
+    ViewData["Title"] ??= "Technician Tracker";
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="/css/site.css" />
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        #techTrackingMapContainer, #techTrackingMap {
+            height: 100vh;
+            width: 100vw;
+            position: relative;
+        }
+        .leaflet-container {
+            font-family: 'Poppins', sans-serif;
+        }
+    </style>
+    @RenderSection("Head", required: false)
+</head>
+<body>
+    @RenderBody()
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

@@ -1,0 +1,28 @@
+@page
+@model MVP_Core.Pages.Admin.TechTrackingModel
+@using MVP_Core.Services
+@inject TechnicianTrackingService TrackingService
+@{
+    ViewData["Title"] = "Technician Tracker";
+    Layout = "../Shared/_LayoutWideMap.cshtml"; // Sprint 91.7: Use wide map layout
+    // Sprint 91.7: Preload techs for initial map render
+    var techsJson = System.Text.Json.JsonSerializer.Serialize(TrackingService.GetAllTechnicianLocations());
+}
+<!-- Sprint 91.7: Technician Tracker UI Layer -->
+<div id="techTrackingMapContainer" class="w-100 h-100" style="height:100vh; width:100vw; position:relative;">
+    <div id="techTrackingMap" style="height:100vh; width:100vw;"></div>
+    <!-- Sprint 91.7: Filter/Overlay UI will be injected here -->
+    <div id="techTrackingFilters" style="position:absolute;top:20px;left:20px;z-index:1000;background:rgba(255,255,255,0.95);padding:12px 18px;border-radius:8px;box-shadow:0 2px 8px #0002;">
+        <label><b>Service Type:</b> <select id="filterServiceType"></select></label>
+        <label class="ms-3"><b>Status:</b> <select id="filterStatus"></select></label>
+        <label class="ms-3"><b>Truck ID:</b> <input id="filterTruckId" type="text" style="width:80px;" /></label>
+    </div>
+</div>
+@section Scripts {
+    <script>
+        // Sprint 91.7: Expose techs for JS
+        window.TechTrackingTechs = @Html.Raw(techsJson);
+    </script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="/js/TechTrackingMap.js"></script>
+}
