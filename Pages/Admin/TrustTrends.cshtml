@@ -1,0 +1,58 @@
+@page
+@model MVP_Core.Pages.Admin.TrustTrendsModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@inject MVP_Core.Services.Admin.TechnicianTrustAnalyticsService AnalyticsService
+@{
+    // Sprint 85.0 — TrustScore Trend Chart UI
+    // Sprint 85.0 — Trust Trends Chart Logic + Filters
+    // Sprint 85.0 — Trust Trends Razor Fix + Chart Completion
+    Layout = "/Pages/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "TrustScore Trends";
+}
+<div class="container-fluid px-2 px-md-4 mt-4">
+    <h2 class="mb-4 text-primary">TrustScore Trends</h2>
+    <div class="card mb-3">
+        <div class="card-body">
+            <form method="get" class="row g-2 align-items-end">
+                <div class="col-md-3">
+                    <label class="form-label">Technician</label>
+                    <select name="TechnicianId" class="form-select">
+                        <option value="">All</option>
+                        @foreach (var tech in Model.Technicians)
+                        {
+                            @if (Model.TechnicianId == tech.Id)
+                            {
+                                <option value="@tech.Id" selected>@tech.FullName</option>
+                            }
+                            else
+                            {
+                                <option value="@tech.Id">@tech.FullName</option>
+                            }
+                        }
+                    </select>
+                </div>
+                <div class="col-md-5">
+                    <label class="form-label">Date Range</label>
+                    <input type="range" min="0" max="29" value="@Model.DateRangeIndex" name="DateRangeIndex" class="form-range" id="dateRangeSlider" />
+                    <div class="small">@Model.StartDate.ToString("yyyy-MM-dd") to @Model.EndDate.ToString("yyyy-MM-dd")</div>
+                </div>
+                <div class="col-md-2 d-grid">
+                    <button type="submit" class="btn btn-primary mt-2">Filter</button>
+                </div>
+                <div class="col-md-2 d-grid">
+                    <a asp-page-handler="Export" class="btn btn-outline-success mt-2">Export CSV</a>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="mb-4">
+        <canvas id="trendChart" height="100"></canvas>
+    </div>
+</div>
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/js/trusttrends.js"></script>
+}
+<!-- Sprint 85.0 — TrustScore Trend Chart UI -->
+<!-- Sprint 85.0 — Trust Trends Chart Logic + Filters -->
+<!-- Sprint 85.0 — Trust Trends Razor Fix + Chart Completion -->

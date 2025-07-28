@@ -40,5 +40,29 @@ namespace MVP_Core.Services.Admin
             }).ToList();
             return await Task.FromResult(result);
         }
+
+        // Sprint 85.0 — Trust Trends Chart Logic + Filters
+        public async Task<List<MVP_Core.Pages.Admin.TechnicianTrendPoint>> GetTechnicianTrustTrends(DateTime start, DateTime end, int? technicianId = null)
+        {
+            var logs = _db.TechnicianTrustLogs
+                .Where(l => l.RecordedAt >= start && l.RecordedAt <= end)
+                .ToList();
+            if (technicianId.HasValue)
+                logs = logs.Where(l => l.TechnicianId == technicianId.Value).ToList();
+            var techs = _db.Technicians.ToList();
+            var points = logs
+                .GroupBy(l => new { l.TechnicianId, Date = l.RecordedAt.Date })
+                .Select(g => new MVP_Core.Pages.Admin.TechnicianTrendPoint
+                {
+                    TechnicianId = g.Key.TechnicianId,
+                    TechnicianName = techs.FirstOrDefault(t => t.Id == g.Key.TechnicianId)?.FullName ?? $"Tech #{g.Key.TechnicianId}",
+                    Date = g.Key.Date,
+                    HeatScore = (int)g.Average(l => l.TrustScore)
+                })
+                .OrderBy(p => p.TechnicianId).ThenBy(p => p.Date)
+                .ToList();
+            return await Task.FromResult(points);
+        }
     }
 }
+// Sprint 85.0 — Trust Trends Chart Logic + Filters
