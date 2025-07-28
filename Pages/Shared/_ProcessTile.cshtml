@@ -1,0 +1,25 @@
+@model MVP_Core.ViewModels.ProcessStatusViewModel
+@{
+    string statusClass = Model.Status switch
+    {
+        MVP_Core.ViewModels.ProcessHealthStatus.Healthy => "process-tile-healthy",
+        MVP_Core.ViewModels.ProcessHealthStatus.Warning => "process-tile-warning",
+        MVP_Core.ViewModels.ProcessHealthStatus.Critical => "process-tile-critical",
+        _ => "process-tile-unknown"
+    };
+    string badgeIcon = Model.Status switch
+    {
+        MVP_Core.ViewModels.ProcessHealthStatus.Healthy => "??",
+        MVP_Core.ViewModels.ProcessHealthStatus.Warning => "??",
+        MVP_Core.ViewModels.ProcessHealthStatus.Critical => "??",
+        _ => "?"
+    };
+}
+<div class="process-tile @statusClass mb-3 animate__animated animate__fadeInUp">
+    <div class="d-flex align-items-center mb-2">
+        <span class="process-badge me-2">@badgeIcon</span>
+        <span class="fw-bold">@Model.Name</span>
+    </div>
+    <div class="small text-muted mb-1">Last checked: @Model.LastChecked.ToLocalTime().ToString("g")</div>
+    <div class="suggested-action small">@Model.SuggestedAction</div>
+</div>

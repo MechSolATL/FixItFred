@@ -11,6 +11,17 @@
             @await Html.PartialAsync("/Pages/Shared/_MetricsCard.cshtml", card)
         }
     </div>
+    <div class="process-monitor-grid mt-5 mb-4">
+        <h4 class="mb-3"><i class="fas fa-microchip text-info"></i> Process Monitor</h4>
+        <div class="row row-cols-1 row-cols-md-3 row-cols-lg-5 g-4">
+            @foreach (var proc in Model.ProcessStatuses)
+            {
+                <div class="col">
+                    @await Html.PartialAsync("/Pages/Shared/_ProcessTile.cshtml", proc)
+                </div>
+            }
+        </div>
+    </div>
     @if (Model.Forecast != null)
     {
         <div class="forecast-display mt-5 p-4 rounded shadow-sm bg-white">
