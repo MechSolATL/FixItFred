@@ -1,1 +1,42 @@
-/* CSS for Manager Tools admin UI will be implemented here */
+/* CSS for Manager Tools admin UI */
+.manager-tools-container {
+    max-width: 700px;
+    margin: 2rem auto;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    padding: 2rem;
+}
+.manager-actions {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1050;
+    left: 0; top: 0; width: 100vw; height: 100vh;
+    background: rgba(0,0,0,0.4);
+    align-items: center;
+    justify-content: center;
+}
+.modal-dialog {
+    margin: 10vh auto;
+    max-width: 400px;
+}
+.modal-content {
+    background: #fff;
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    padding: 1rem;
+}
+.alert {
+    margin-bottom: 1rem;
+}
+.btn-close {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    float: right;
+}

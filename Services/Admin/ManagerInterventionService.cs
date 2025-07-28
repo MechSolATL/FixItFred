@@ -1,12 +1,13 @@
 using MVP_Core.Data;
 using MVP_Core.Data.Models;
+using MVP_Core.Services; // For INotificationService
 using System;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace MVP_Core.Services.Admin
 {
-    // Sprint 91.7.8.1: Core logic for manager interventions
+    // Sprint 91.7.8.2: Manager action execution, audit, and notification
     public class ManagerInterventionService
     {
         private readonly ApplicationDbContext _db;
@@ -57,14 +58,63 @@ namespace MVP_Core.Services.Admin
             return true;
         }
 
-        // Reopen a closed request
-        public async Task<bool> ReopenRequest(int requestId)
+        // Cancel a request with audit and notification
+        public async Task<bool> CancelRequestAsync(int requestId, string reason, string manager, INotificationService notificationService, AuditLogger auditLogger, string ip)
+        {
+            var req = _db.ServiceRequests.FirstOrDefault(r => r.Id == requestId);
+            if (req == null) return false;
+            var oldStatus = req.Status;
+            req.Status = "Cancelled";
+            req.Notes = $"[Manager Cancelled] {reason}\n" + (req.Notes ?? "");
+            await _db.SaveChangesAsync();
+            // Audit
+            var log = auditLogger.CreateEncryptedLog("CancelRequest", 0, oldStatus, req.Status, ip, "Standard");
+            _db.AuditLogs.Add(log);
+            await _db.SaveChangesAsync();
+            // Notify
+            await notificationService.SendAsync(req.Email, $"Your request #{req.Id} was cancelled by a manager. Reason: {reason}");
+            // Optionally: SignalR broadcast here
+            return true;
+        }
+
+        // Reassign technician with audit and notification
+        public async Task<bool> ReassignTechnicianAsync(int requestId, int newTechId, string manager, INotificationService notificationService, AuditLogger auditLogger, string ip)
+        {
+            var req = _db.ServiceRequests.FirstOrDefault(r => r.Id == requestId);
+            var tech = _db.Technicians.FirstOrDefault(t => t.Id == newTechId);
+            if (req == null || tech == null) return false;
+            var oldTech = req.AssignedTechnicianId;
+            req.AssignedTechnicianId = tech.Id;
+            req.AssignedTo = tech.FullName;
+            req.Status = "Assigned";
+            await _db.SaveChangesAsync();
+            // Audit
+            var log = auditLogger.CreateEncryptedLog("ReassignTechnician", 0, oldTech?.ToString() ?? "", tech.Id.ToString(), ip, "Standard");
+            _db.AuditLogs.Add(log);
+            await _db.SaveChangesAsync();
+            // Notify
+            await notificationService.SendAsync(tech.Email ?? "", $"You have been assigned to request #{req.Id} by a manager.");
+            // Optionally: SignalR broadcast here
+            return true;
+        }
+
+        // Reopen a closed ticket with audit and notification
+        public async Task<bool> ReopenTicketAsync(int requestId, string managerNotes, string manager, INotificationService notificationService, AuditLogger auditLogger, string ip)
         {
             var req = _db.ServiceRequests.FirstOrDefault(r => r.Id == requestId);
             if (req == null || req.Status == "Open" || req.Status == "Pending") return false;
+            var oldStatus = req.Status;
             req.Status = "Pending";
             req.ClosedAt = null;
+            req.Notes = $"[Manager Reopened] {managerNotes}\n" + (req.Notes ?? "");
             await _db.SaveChangesAsync();
+            // Audit
+            var log = auditLogger.CreateEncryptedLog("ReopenTicket", 0, oldStatus, req.Status, ip, "Standard");
+            _db.AuditLogs.Add(log);
+            await _db.SaveChangesAsync();
+            // Notify
+            await notificationService.SendAsync(req.Email, $"Your request #{req.Id} was reopened by a manager. Notes: {managerNotes}");
+            // Optionally: SignalR broadcast here
             return true;
         }
 

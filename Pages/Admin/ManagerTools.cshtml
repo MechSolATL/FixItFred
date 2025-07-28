@@ -1,6 +1,91 @@
 @page
-@model dynamic
+@model MVP_Core.Pages.Admin.ManagerToolsModel
 @{
     Layout = "~/Pages/Shared/_LayoutWideMap.cshtml";
 }
-<!-- Manager Tools UI will be implemented here -->
+<link rel="stylesheet" href="/css/ManagerTools.css" />
+<script src="/js/ManagerTools.js"></script>
+
+<div class="manager-tools-container">
+    <h2>Manager Tools</h2>
+    <div id="manager-action-feedback">
+        @if (TempData["ManagerActionResult"] != null)
+        {
+            <div class="alert alert-info">@TempData["ManagerActionResult"]</div>
+        }
+    </div>
+    <div class="manager-actions">
+        <button class="btn btn-danger" onclick="showCancelModal()">Cancel Request</button>
+        <button class="btn btn-warning" onclick="showReassignModal()">Reassign Technician</button>
+        <button class="btn btn-success" onclick="showReopenModal()">Reopen Ticket</button>
+    </div>
+
+    <!-- Cancel Modal -->
+    <div id="cancelModal" class="modal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form method="post" asp-page-handler="CancelRequest" onsubmit="return disableSubmit(this)">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Cancel Request</h5>
+                        <button type="button" class="btn-close" onclick="closeCancelModal()"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" name="requestId" id="cancelRequestId" />
+                        <label>Reason for cancellation:</label>
+                        <textarea name="reason" required class="form-control"></textarea>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-danger">Confirm Cancel</button>
+                        <button type="button" class="btn btn-secondary" onclick="closeCancelModal()">Close</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reassign Modal -->
+    <div id="reassignModal" class="modal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form method="post" asp-page-handler="ReassignTech" onsubmit="return disableSubmit(this)">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Reassign Technician</h5>
+                        <button type="button" class="btn-close" onclick="closeReassignModal()"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" name="requestId" id="reassignRequestId" />
+                        <label>New Technician ID:</label>
+                        <input type="number" name="newTechId" required class="form-control" />
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-warning">Confirm Reassign</button>
+                        <button type="button" class="btn btn-secondary" onclick="closeReassignModal()">Close</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reopen Modal -->
+    <div id="reopenModal" class="modal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form method="post" asp-page-handler="ReopenTicket" onsubmit="return disableSubmit(this)">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Reopen Ticket</h5>
+                        <button type="button" class="btn-close" onclick="closeReopenModal()"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" name="requestId" id="reopenRequestId" />
+                        <label>Manager Notes:</label>
+                        <textarea name="managerNotes" required class="form-control"></textarea>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-success">Confirm Reopen</button>
+                        <button type="button" class="btn btn-secondary" onclick="closeReopenModal()">Close</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
