@@ -179,6 +179,9 @@ namespace MVP_Core.Data
         public DbSet<MVP_Core.Models.TechPulseLog> TechPulseLogs { get; set; } = null!;
         public DbSet<MVP_Core.Models.UserActionLog> UserActionLogs { get; set; } = null!;
         public DbSet<MVP_Core.Models.MentorReplyLog> MentorReplyLogs { get; set; } = null!;
+        public DbSet<TechMilestone> TechMilestones { get; set; } = null!;
+        public DbSet<TechProgress> TechProgresses { get; set; } = null!;
+        public DbSet<MilestoneAuditLog> MilestoneAuditLogs { get; set; } = null!;
 
         #endregion
 
