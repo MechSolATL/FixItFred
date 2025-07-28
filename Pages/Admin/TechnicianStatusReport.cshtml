@@ -1,0 +1,63 @@
+@page
+@using MVP_Core.Models
+@using MVP_Core.Services.Admin
+@model MVP_Core.Pages.Admin.TechnicianStatusReportModel
+@inject TechnicianAuditService AuditService
+@{
+    ViewData["Title"] = "Technician Status Report";
+    var logs = Model.BehaviorLogs;
+    var compliance = Model.ComplianceStats;
+}
+<h2>Technician Status Report</h2>
+<p>Global Compliance: <strong>@compliance.GlobalCompliancePercent.ToString("F1")%</strong></p>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Technician</th>
+            <th>Compliance %</th>
+            <th>Flagged</th>
+            <th>Time Violations</th>
+            <th>Location Violations</th>
+            <th>Metadata Violations</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var stat in compliance.PerTechnician)
+    {
+        <tr>
+            <td>@stat.Name</td>
+            <td>@stat.CompliancePercent.ToString("F1")%</td>
+            <td>@stat.FlaggedCount</td>
+            <td>@stat.TimeViolations</td>
+            <td>@stat.LocationViolations</td>
+            <td>@stat.MetadataViolations</td>
+        </tr>
+    }
+    </tbody>
+</table>
+<h3>Flagged Behavior Logs</h3>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Technician</th>
+            <th>Service Request</th>
+            <th>Violation</th>
+            <th>Notes</th>
+            <th>Timestamp</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var log in logs)
+    {
+        <tr class="@(log.Status == "Flagged" ? "table-warning" : "")">
+            <td>@log.TechnicianId</td>
+            <td>@log.ServiceRequestId</td>
+            <td>@log.ViolationType</td>
+            <td>@log.Notes</td>
+            <td>@log.Timestamp.ToString("g")</td>
+            <td>@log.Status</td>
+        </tr>
+    }
+    </tbody>
+</table>

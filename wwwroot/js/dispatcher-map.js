@@ -16,10 +16,14 @@ window.addEventListener('DOMContentLoaded', function () {
     // Example: [{ id: 1, name: 'Alice', lat: 33.76, lng: -84.4, jobs: 3, eta: '12:30', currentJob: 'Water Heater' }]
     techs.forEach(function (t) {
         var marker = L.marker([t.lat, t.lng]).addTo(map);
+        let iconHtml = '';
+        if (t.flagged) {
+            iconHtml = '<span style="color:#d9534f;font-size:1.5em;">&#9888;</span> ';
+        }
         marker.bindPopup(
-            `<b>${t.name}</b><br/>Jobs: ${t.jobs}<br/>ETA: ${t.eta || 'N/A'}<br/>Current: ${t.currentJob || 'N/A'}`
+            iconHtml + `<b>${t.name}</b><br/>Jobs: ${t.jobs}<br/>ETA: ${t.eta || 'N/A'}<br/>Current: ${t.currentJob || 'N/A'}`
         );
-        marker.bindTooltip(`${t.name} (${t.jobs})`, {permanent: false, direction: 'top'});
+        marker.bindTooltip(`${iconHtml}${t.name} (${t.jobs})`, {permanent: false, direction: 'top'});
     });
 
     // Optional: Draw zone boundaries or heatmap (stub)
@@ -28,6 +32,28 @@ window.addEventListener('DOMContentLoaded', function () {
             L.polygon(zone.coords, {color: zone.color || 'blue', weight: 2, fillOpacity: 0.08}).addTo(map).bindTooltip(zone.name);
         });
     }
+
+    // Add filter for flagged only
+    var flaggedOnlyCheckbox = document.createElement('input');
+    flaggedOnlyCheckbox.type = 'checkbox';
+    flaggedOnlyCheckbox.id = 'flaggedOnlyFilter';
+    var flaggedLabel = document.createElement('label');
+    flaggedLabel.htmlFor = 'flaggedOnlyFilter';
+    flaggedLabel.innerText = 'Flagged Only';
+    var filterDiv = document.createElement('div');
+    filterDiv.appendChild(flaggedOnlyCheckbox);
+    filterDiv.appendChild(flaggedLabel);
+    document.getElementById('zoneMap').parentElement.insertBefore(filterDiv, document.getElementById('zoneMap'));
+    flaggedOnlyCheckbox.addEventListener('change', function () {
+        var techs = window.DispatcherTechMarkers || [];
+        if (flaggedOnlyCheckbox.checked) {
+            techs = techs.filter(t => t.flagged);
+        }
+        // Remove all markers
+        Object.values(markers).forEach(m => map.removeLayer(m));
+        Object.keys(markers).forEach(k => delete markers[k]);
+        techs.forEach(createOrUpdateMarker);
+    });
 });
 // End Sprint 33.3 - Zone Map View
 
@@ -59,11 +85,13 @@ window.addEventListener('DOMContentLoaded', function () {
         if (markers[key]) {
             markers[key].setLatLng([t.lat, t.lng]);
             markers[key].setIcon(icon);
-            markers[key].setPopupContent(`<b>${t.name}</b><br/>Jobs: ${t.jobs}<br/>ETA: ${t.eta || 'N/A'}<br/>Current: ${t.currentJob || 'N/A'}`);
+            let iconHtml = t.flagged ? '<span style="color:#d9534f;font-size:1.5em;">&#9888;</span> ' : '';
+            markers[key].setPopupContent(iconHtml + `<b>${t.name}</b><br/>Jobs: ${t.jobs}<br/>ETA: ${t.eta || 'N/A'}<br/>Current: ${t.currentJob || 'N/A'}`);
         } else {
             let marker = L.marker([t.lat, t.lng], {icon: icon}).addTo(map);
-            marker.bindPopup(`<b>${t.name}</b><br/>Jobs: ${t.jobs}<br/>ETA: ${t.eta || 'N/A'}<br/>Current: ${t.currentJob || 'N/A'}`);
-            marker.bindTooltip(`${t.name} (${t.jobs})`, {permanent: false, direction: 'top'});
+            let iconHtml = t.flagged ? '<span style="color:#d9534f;font-size:1.5em;">&#9888;</span> ' : '';
+            marker.bindPopup(iconHtml + `<b>${t.name}</b><br/>Jobs: ${t.jobs}<br/>ETA: ${t.eta || 'N/A'}<br/>Current: ${t.currentJob || 'N/A'}`);
+            marker.bindTooltip(`${iconHtml}${t.name} (${t.jobs})`, {permanent: false, direction: 'top'});
             markers[key] = marker;
         }
     }
