@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using MVP_Core.Data;
 using MVP_Core.Models;
 using Microsoft.EntityFrameworkCore;
+using MVP_Core.Services.Loyalty;
 
 namespace MVP_Core.Services.Technician
 {
@@ -10,10 +11,14 @@ namespace MVP_Core.Services.Technician
     public class FieldCoachService
     {
         private readonly ApplicationDbContext _db;
-        public FieldCoachService(ApplicationDbContext db)
+        private readonly LoyaltyRewardEngine _loyaltyEngine;
+
+        public FieldCoachService(ApplicationDbContext db, LoyaltyRewardEngine loyaltyEngine)
         {
             _db = db;
+            _loyaltyEngine = loyaltyEngine;
         }
+
         public async Task<bool> DetectArrivalViaGeoAsync(int techId, (double lat, double lng) jobLatLng)
         {
             var tech = await _db.Technicians.FindAsync(techId);
@@ -40,6 +45,14 @@ namespace MVP_Core.Services.Technician
         public string RecommendNextStatus(int techId)
         {
             return "Available"; // Stub: always available
+        }
+
+        public async Task LogBehaviorAsync(int technicianId, string behaviorType)
+        {
+            // existing logging logic...
+
+            // Reward Check
+            await _loyaltyEngine.EvaluateProgressAsync(technicianId);
         }
     }
 }

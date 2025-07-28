@@ -11,6 +11,7 @@ using MVP_Core.Services.Dispatch;
 using MVP_Core.Services.System;
 using MVP_Core.Services.FollowUp;
 using MVP_Core.Data.Seeders;
+using MVP_Core.Services.Loyalty;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -68,6 +69,7 @@ builder.Services.AddScoped<MVP_Core.Services.FollowUp.FollowUpAIService>();
 builder.Services.AddScoped<TechnicianPayService>();
 builder.Services.AddScoped<CertificationService>();
 builder.Services.AddScoped<LoyaltyRewardService>();
+builder.Services.AddScoped<LoyaltyRewardEngine>();
 builder.Services.AddScoped<ReviewService>();
 builder.Services.AddScoped<CustomerPortalService>();
 builder.Services.AddScoped<SkillsTrackerService>();
