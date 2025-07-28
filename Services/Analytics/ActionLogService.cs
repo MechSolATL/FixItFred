@@ -71,5 +71,23 @@ namespace MVP_Core.Services.Analytics
                 .Select(s => s.UserId)
                 .ToList();
         }
+
+        public async Task<List<UserActionLog>> CaptureRecentFlowAsync(int userId, int steps = 15)
+        {
+            return await _db.UserActionLogs
+                .Where(l => l.AdminUserId == userId)
+                .OrderByDescending(l => l.Timestamp)
+                .Take(steps)
+                .OrderBy(l => l.Timestamp)
+                .ToListAsync();
+        }
+
+        public async Task<int> GetFlowComplianceScore(int userId)
+        {
+            var total = await _db.UserActionLogs.CountAsync(l => l.AdminUserId == userId && (l.ActionType == "FlowCompleted" || l.ActionType == "FlowDeviation"));
+            if (total == 0) return 0;
+            var compliant = await _db.UserActionLogs.CountAsync(l => l.AdminUserId == userId && l.ActionType == "FlowCompleted" && !l.IsError);
+            return (int)(100.0 * compliant / total);
+        }
     }
 }

@@ -31,5 +31,6 @@ namespace MVP_Core.Data.Models
         public List<string> EnabledModules { get; set; } = new();
         public string JobFunction { get; set; } = string.Empty;  // e.g. "TechnicianLead", "Dispatcher", "Viewer"
         public int SkillLevel { get; set; }      // 1 = Entry, 2 = Mid, 3 = Lead
+        public int TrustIndex { get; set; } = 0; // Sprint 86.6 — Mentor Routing: TrustIndex for mentor selection
     }
 }

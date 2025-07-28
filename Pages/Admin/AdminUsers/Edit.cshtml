@@ -73,6 +73,7 @@
             <li><b>Skill Level:</b> @(Model.SkillLevel == 1 ? "Entry" : Model.SkillLevel == 2 ? "Mid" : "Lead")</li>
             <li><b>Enabled Modules:</b> @string.Join(", ", Model.EnabledModules ?? new List<string>())</li>
         </ul>
+        <a href="/Admin/SendToMentor" class="btn btn-link text-blue-600">Request Help from Mentor</a>
         <input type="hidden" name="JobFunction" value="@Model.JobFunction" />
         <input type="hidden" name="SkillLevel" value="@Model.SkillLevel" />
         @foreach (var m in Model.EnabledModules ?? new List<string>())

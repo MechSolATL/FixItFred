@@ -178,6 +178,7 @@ namespace MVP_Core.Data
         public DbSet<MVP_Core.Models.LeaderboardEntry> LeaderboardEntries { get; set; } = null!;
         public DbSet<MVP_Core.Models.TechPulseLog> TechPulseLogs { get; set; } = null!;
         public DbSet<MVP_Core.Models.UserActionLog> UserActionLogs { get; set; } = null!;
+        public DbSet<MVP_Core.Models.MentorReplyLog> MentorReplyLogs { get; set; } = null!;
 
         #endregion
 

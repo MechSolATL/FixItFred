@@ -1,0 +1,40 @@
+@page
+@model MVP_Core.Pages.Admin.SendToMentorModel
+@{
+    ViewData["Title"] = "Request Help from Mentor";
+}
+<h2>Request Help from Mentor</h2>
+@if (Model.SuggestedMentors.Any())
+{
+    <div class="mb-3">
+        <b>Suggested Mentors:</b>
+        <ul>
+        @foreach (var mentor in Model.SuggestedMentors)
+        {
+            <li>
+                <label>
+                    <input type="radio" name="SelectedMentorId" value="@mentor.Id" @(Model.SelectedMentorId == mentor.Id ? "checked" : "") />
+                    @mentor.Username (@mentor.JobFunction, TrustIndex: @mentor.TrustIndex, Flow: @(mentor.Id))
+                </label>
+            </li>
+        }
+        </ul>
+    </div>
+}
+<form method="post">
+    <div class="mb-3">
+        <label for="HelpMessage">Describe your issue or where you got stuck:</label>
+        <textarea asp-for="HelpMessage" class="form-control" rows="3"></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Send to Mentor</button>
+</form>
+@if (Model.RecentFlow.Any())
+{
+    <h4 class="mt-4">Your Recent Flow Steps</h4>
+    <ol>
+    @foreach (var step in Model.RecentFlow)
+    {
+        <li>@step.PageName (@step.ActionType, @step.Timestamp.ToShortTimeString())</li>
+    }
+    </ol>
+}

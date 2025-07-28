@@ -1,0 +1,42 @@
+@page
+@model MVP_Core.Pages.Admin.MentorInboxModel
+@{
+    ViewData["Title"] = "Mentor Inbox";
+}
+<h2>Mentor Inbox</h2>
+@if (Model.Requests.Any())
+{
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>User</th>
+                <th>Request</th>
+                <th>Time</th>
+                <th>Respond</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var req in Model.Requests)
+        {
+            var user = Model.Users.FirstOrDefault(u => u.Id == req.RequestingUserId);
+            <tr>
+                <td>@(user?.Username ?? ("User " + req.RequestingUserId))</td>
+                <td>@req.ResponseText.Replace("[REQUEST]", "")</td>
+                <td>@req.Timestamp.ToString("g")</td>
+                <td>
+                    <form method="post">
+                        <input type="hidden" name="ReplyId" value="@req.Id" />
+                        <textarea name="ResponseText" class="form-control" rows="2"></textarea>
+                        <label><input type="checkbox" name="Resolved" value="true" /> Resolved?</label>
+                        <button type="submit" class="btn btn-success btn-sm mt-1">Send Reply</button>
+                    </form>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+else
+{
+    <div class="alert alert-info">No mentor requests at this time.</div>
+}
