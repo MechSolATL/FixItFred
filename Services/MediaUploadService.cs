@@ -20,10 +20,10 @@ namespace MVP_Core.Services
             _db = db;
             _mediaRoot = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "media");
         }
-        public bool SaveMediaUpload(IFormFile file, int technicianId, int requestId, string uploadedBy, string notesOrTags)
+        public bool SaveMediaUpload(IFormFile file, int technicianId, int requestId, string uploadedBy, string notesOrTags, DateTime? photoTimestamp = null, double? geoLat = null, double? geoLng = null)
         {
             // Sprint 80: IFormFile and parameter hardening
-            if (file == null || string.IsNullOrWhiteSpace(uploadedBy) || string.IsNullOrWhiteSpace(notesOrTags))
+            if (file == null || string.IsNullOrWhiteSpace(uploadedBy) || photoTimestamp == null || geoLat == null || geoLng == null)
                 return false;
             uploadedBy = uploadedBy ?? "System";
             notesOrTags = notesOrTags ?? string.Empty;
@@ -59,10 +59,31 @@ namespace MVP_Core.Services
                 FileType = fileType,
                 UploadedBy = uploadedBy,
                 UploadedAt = DateTime.UtcNow,
-                NotesOrTags = notesOrTags
+                NotesOrTags = notesOrTags,
+                PhotoTimestamp = photoTimestamp,
+                GeoLatitude = geoLat,
+                GeoLongitude = geoLng
             };
             _db.TechnicianMedias.Add(media);
             _db.SaveChanges();
+            // Fraud/metadata validation
+            var incidentDetails = string.Empty;
+            if (photoTimestamp > DateTime.UtcNow.AddMinutes(5) || photoTimestamp < DateTime.UtcNow.AddYears(-1))
+                incidentDetails += "Photo timestamp is suspicious. ";
+            if (geoLat < -90 || geoLat > 90 || geoLng < -180 || geoLng > 180)
+                incidentDetails += "GeoLocation is out of bounds. ";
+            if (!string.IsNullOrEmpty(incidentDetails))
+            {
+                _db.TechnicianPerformanceLogs.Add(new TechnicianPerformanceLog
+                {
+                    TechnicianId = technicianId,
+                    ServiceRequestId = requestId,
+                    IncidentType = "PhotoMetadataDiscrepancy",
+                    Details = incidentDetails,
+                    OccurredAt = DateTime.UtcNow
+                });
+                _db.SaveChanges();
+            }
             return true;
         }
         public List<TechnicianMedia> GetMediaForRequest(int requestId)

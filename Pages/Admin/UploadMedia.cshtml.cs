@@ -42,20 +42,25 @@ namespace MVP_Core.Pages.Admin
 
         public async Task<IActionResult> OnPostAsync()
         {
-            // Sprint 80: Razor ? backend sync for media uploads
             var techId = int.TryParse(Request?.Form["TechnicianId"].ToString(), out var tId) ? tId : 0;
             var requestId = int.TryParse(Request?.Form["RequestId"].ToString(), out var rId) ? rId : 0;
             var notes = Request?.Form["NotesOrTags"].ToString() ?? string.Empty;
             var file = Request?.Form.Files["MediaFile"];
-            if (file == null || techId == 0 || requestId == 0)
+            var photoTimestampStr = Request?.Form["PhotoTimestamp"].ToString();
+            var geoLatStr = Request?.Form["GeoLatitude"].ToString();
+            var geoLngStr = Request?.Form["GeoLongitude"].ToString();
+            DateTime? photoTimestamp = DateTime.TryParse(photoTimestampStr, out var ts) ? ts : null;
+            double? geoLat = double.TryParse(geoLatStr, out var lat) ? lat : null;
+            double? geoLng = double.TryParse(geoLngStr, out var lng) ? lng : null;
+            if (file == null || techId == 0 || requestId == 0 || photoTimestamp == null || geoLat == null || geoLng == null)
             {
                 TempData["MediaStatus"] = "Missing required fields.";
                 await Task.CompletedTask;
                 return Page();
             }
             var username = User?.Identity?.Name?.ToString() ?? "system";
-            var success = _mediaService.SaveMediaUpload(file, techId, requestId, username, notes);
-            TempData["MediaStatus"] = success ? "Media uploaded successfully." : "Upload failed (invalid file or size).";
+            var success = _mediaService.SaveMediaUpload(file, techId, requestId, username, notes, photoTimestamp, geoLat, geoLng);
+            TempData["MediaStatus"] = success ? "Media uploaded successfully." : "Upload failed (invalid file, size, or metadata).";
             await Task.CompletedTask;
             return RedirectToPage();
         }

@@ -44,6 +44,18 @@
         <label class="form-label">Notes/Tags (optional)</label>
         <input type="text" name="NotesOrTags" class="form-control" maxlength="500" value="@safeNotesOrTags" />
     </div>
+    <div class="mb-3">
+        <label class="form-label">Photo Timestamp (UTC)</label>
+        <input type="datetime-local" name="PhotoTimestamp" class="form-control" required />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">GeoLocation (Latitude, Longitude)</label>
+        <div class="input-group">
+            <input type="number" step="any" name="GeoLatitude" class="form-control" placeholder="Latitude" required />
+            <input type="number" step="any" name="GeoLongitude" class="form-control" placeholder="Longitude" required />
+        </div>
+        <small class="text-muted">Required for fraud prevention and compliance.</small>
+    </div>
     <button type="submit" class="btn btn-primary">Upload</button>
 </form>
 @if (!string.IsNullOrEmpty(status))

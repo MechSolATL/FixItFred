@@ -22,5 +22,10 @@ namespace MVP_Core.Data.Models
         public DateTime UploadedAt { get; set; } = DateTime.UtcNow;
         [MaxLength(500)]
         public string? NotesOrTags { get; set; }
+
+        // Sprint 85.8: Photo metadata enforcement
+        public double? GeoLatitude { get; set; }
+        public double? GeoLongitude { get; set; }
+        public DateTime? PhotoTimestamp { get; set; }
     }
 }
