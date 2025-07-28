@@ -584,3 +584,64 @@ footer {
 .forecast-value.text-danger {
     color: #dc3545;
 }
+
+/* === ProAction Card Styles (Sprint 89.1) === */
+.proaction-card {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    border: 2px solid #e0e0e0;
+    padding: 20px 24px 18px 24px;
+    margin-bottom: 18px;
+    transition: box-shadow 0.3s, border 0.3s;
+    position: relative;
+    min-height: 170px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+.proaction-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+.proaction-title {
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: #222;
+}
+.proaction-risk {
+    font-size: 0.98rem;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 12px;
+    margin-left: 8px;
+    letter-spacing: 0.5px;
+}
+.proaction-risk-high { background: #ffeaea; color: #dc3545; border: 1.5px solid #dc3545; }
+.proaction-risk-medium { background: #fffbe6; color: #ffc107; border: 1.5px solid #ffc107; }
+.proaction-risk-low { background: #eaffea; color: #28a745; border: 1.5px solid #28a745; }
+.proaction-desc {
+    font-size: 1.01rem;
+    color: #444;
+    margin-bottom: 18px;
+}
+.proaction-cta {
+    display: inline-block;
+    background: #007bff;
+    color: #fff;
+    font-weight: 600;
+    padding: 8px 18px;
+    border-radius: 10px;
+    text-align: center;
+    text-decoration: none;
+    transition: background 0.2s, box-shadow 0.2s;
+    box-shadow: 0 1px 4px rgba(0,123,255,0.08);
+    margin-top: auto;
+}
+.proaction-cta:hover {
+    background: #004080;
+    color: #fff;
+    text-decoration: none;
+}
