@@ -1,0 +1,28 @@
+@model List<MVP_Core.Data.Models.NovaIntel.NovaDecisionMemory>
+@if (Model != null && Model.Count > 0)
+{
+    <div class="decision-memory-summary my-4">
+        <h4 class="mb-3"><i class="fas fa-brain text-info"></i> Decision Memory</h4>
+        <table class="table table-bordered table-sm">
+            <thead>
+                <tr>
+                    <th>Timestamp</th>
+                    <th>Action Taken</th>
+                    <th>Reason</th>
+                    <th>Initiator</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var mem in Model)
+                {
+                    <tr>
+                        <td>@mem.Timestamp.ToString("g")</td>
+                        <td>@mem.DecisionType</td>
+                        <td>@mem.ReasonProvided</td>
+                        <td>@mem.InitiatedBy</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

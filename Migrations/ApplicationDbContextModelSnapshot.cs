@@ -71,7 +71,7 @@ namespace MVP_Core.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("KanbanHistoryLogs");
+                    b.ToTable("KanbanHistoryLogs", (string)null);
                 });
 
             modelBuilder.Entity("MVP_Core.Data.BlacklistEntry", b =>
@@ -84,7 +84,7 @@ namespace MVP_Core.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("BlacklistEntries");
+                    b.ToTable("BlacklistEntries", (string)null);
                 });
 
             modelBuilder.Entity("MVP_Core.Data.BlacklistViewLog", b =>
@@ -97,7 +97,7 @@ namespace MVP_Core.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("BlacklistViewLogs");
+                    b.ToTable("BlacklistViewLogs", (string)null);
                 });
 
             modelBuilder.Entity("MVP_Core.Data.BotDetectionLog", b =>
@@ -110,7 +110,7 @@ namespace MVP_Core.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("BotDetectionLogs");
+                    b.ToTable("BotDetectionLogs", (string)null);
                 });
 
             modelBuilder.Entity("MVP_Core.Data.ChallengeRequest", b =>
@@ -123,7 +123,7 @@ namespace MVP_Core.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ChallengeRequests");
+                    b.ToTable("ChallengeRequests", (string)null);
                 });
 
             modelBuilder.Entity("MVP_Core.Data.FlagLog", b =>
@@ -136,7 +136,7 @@ namespace MVP_Core.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("FlagLogs");
+                    b.ToTable("FlagLogs", (string)null);
                 });
 
             modelBuilder.Entity("MVP_Core.Data.LiveMetric", b =>
@@ -149,7 +149,7 @@ namespace MVP_Core.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("LiveMetrics");
+                    b.ToTable("LiveMetrics", (string)null);
                 });
 
             modelBuilder.Entity("MVP_Core.Data.Models.AccountabilityDelayLog", b =>
@@ -420,7 +420,7 @@ namespace MVP_Core.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("AuditLogEntries");
+                    b.ToTable("AuditLogEntries", (string)null);
                 });
 
             modelBuilder.Entity("MVP_Core.Data.Models.BackgroundImage", b =>
@@ -568,7 +568,7 @@ namespace MVP_Core.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("BillingInvoiceRecords");
+                    b.ToTable("BillingInvoiceRecords", (string)null);
                 });
 
             modelBuilder.Entity("MVP_Core.Data.Models.BreakComplianceOverrideLog", b =>
@@ -1007,7 +1007,7 @@ namespace MVP_Core.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("DisputeInsightLogs");
+                    b.ToTable("DisputeInsightLogs", (string)null);
                 });
 
             modelBuilder.Entity("MVP_Core.Data.Models.DisputeRecord", b =>
@@ -1096,7 +1096,7 @@ namespace MVP_Core.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ETAHistoryEntries");
+                    b.ToTable("ETAHistoryEntries", (string)null);
                 });
 
             modelBuilder.Entity("MVP_Core.Data.Models.EgoVectorLog", b =>
@@ -1607,7 +1607,7 @@ namespace MVP_Core.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("FlaggedCustomers");
+                    b.ToTable("FlaggedCustomers", (string)null);
                 });
 
             modelBuilder.Entity("MVP_Core.Data.Models.FollowUpActionLog", b =>
@@ -2082,7 +2082,7 @@ namespace MVP_Core.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("MilestoneAuditLogs");
+                    b.ToTable("MilestoneAuditLogs", (string)null);
                 });
 
             modelBuilder.Entity("MVP_Core.Data.Models.NotificationQueue", b =>
@@ -2123,7 +2123,7 @@ namespace MVP_Core.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("NotificationQueues");
+                    b.ToTable("NotificationQueues", (string)null);
                 });
 
             modelBuilder.Entity("MVP_Core.Data.Models.NotificationsSent", b =>
@@ -2397,7 +2397,7 @@ namespace MVP_Core.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("PendingEntries");
+                    b.ToTable("PendingEntries", (string)null);
                 });
 
             modelBuilder.Entity("MVP_Core.Data.Models.ProfileReview", b =>
@@ -2515,7 +2515,7 @@ namespace MVP_Core.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("QBOAccountRecord");
+                    b.ToTable("QBOAccountRecord", (string)null);
                 });
 
             modelBuilder.Entity("MVP_Core.Data.Models.Question", b =>
@@ -2632,7 +2632,7 @@ namespace MVP_Core.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("QuickBooksIntegrationTokens");
+                    b.ToTable("QuickBooksIntegrationTokens", (string)null);
                 });
 
             modelBuilder.Entity("MVP_Core.Data.Models.RecoveryLearningLog", b =>
@@ -3442,7 +3442,7 @@ namespace MVP_Core.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("SessionPlaybackLogs");
+                    b.ToTable("SessionPlaybackLogs", (string)null);
                 });
 
             modelBuilder.Entity("MVP_Core.Data.Models.SkillBadge", b =>
@@ -3780,7 +3780,7 @@ namespace MVP_Core.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("TechMilestones");
+                    b.ToTable("TechMilestones", (string)null);
                 });
 
             modelBuilder.Entity("MVP_Core.Data.Models.TechProgress", b =>
@@ -3811,7 +3811,7 @@ namespace MVP_Core.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("TechProgresses");
+                    b.ToTable("TechProgresses", (string)null);
                 });
 
             modelBuilder.Entity("MVP_Core.Data.Models.Technician", b =>
@@ -3916,7 +3916,7 @@ namespace MVP_Core.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Technicians");
+                    b.ToTable("Technicians", (string)null);
                 });
 
             modelBuilder.Entity("MVP_Core.Data.Models.TechnicianActivityFeedLog", b =>
@@ -4248,7 +4248,7 @@ namespace MVP_Core.Migrations
 
                     b.HasKey("FeedbackId");
 
-                    b.ToTable("TechnicianFeedbacks");
+                    b.ToTable("TechnicianFeedbacks", (string)null);
                 });
 
             modelBuilder.Entity("MVP_Core.Data.Models.TechnicianForecastLog", b =>
@@ -4277,7 +4277,7 @@ namespace MVP_Core.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("TechnicianForecastLogs");
+                    b.ToTable("TechnicianForecastLogs", (string)null);
                 });
 
             modelBuilder.Entity("MVP_Core.Data.Models.TechnicianHeatmapLog", b =>
@@ -4379,7 +4379,7 @@ namespace MVP_Core.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("TechnicianInsightLogs");
+                    b.ToTable("TechnicianInsightLogs", (string)null);
                 });
 
             modelBuilder.Entity("MVP_Core.Data.Models.TechnicianLoadLog", b =>
@@ -4453,7 +4453,7 @@ namespace MVP_Core.Migrations
 
                     b.HasKey("MediaId");
 
-                    b.ToTable("TechnicianMedias");
+                    b.ToTable("TechnicianMedias", (string)null);
                 });
 
             modelBuilder.Entity("MVP_Core.Data.Models.TechnicianOfflineSession", b =>
@@ -4981,7 +4981,7 @@ namespace MVP_Core.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Tenants");
+                    b.ToTable("Tenants", (string)null);
                 });
 
             modelBuilder.Entity("MVP_Core.Data.Models.TenantBranding", b =>
@@ -5011,7 +5011,7 @@ namespace MVP_Core.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("TenantBrandings");
+                    b.ToTable("TenantBrandings", (string)null);
                 });
 
             modelBuilder.Entity("MVP_Core.Data.Models.TenantModules", b =>
@@ -5037,7 +5037,7 @@ namespace MVP_Core.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("TenantModules");
+                    b.ToTable("TenantModules", (string)null);
                 });
 
             modelBuilder.Entity("MVP_Core.Data.Models.TenantSettings", b =>
@@ -5060,7 +5060,7 @@ namespace MVP_Core.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("TenantSettings");
+                    b.ToTable("TenantSettings", (string)null);
                 });
 
             modelBuilder.Entity("MVP_Core.Data.Models.ThreatBlock", b =>
@@ -5246,7 +5246,7 @@ namespace MVP_Core.Migrations
 
                     b.HasKey("UserId");
 
-                    b.ToTable("UserOnboardingStatuses");
+                    b.ToTable("UserOnboardingStatuses", (string)null);
                 });
 
             modelBuilder.Entity("MVP_Core.Data.Models.UserResponse", b =>
@@ -5338,7 +5338,7 @@ namespace MVP_Core.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("SearchLogs");
+                    b.ToTable("SearchLogs", (string)null);
                 });
 
             modelBuilder.Entity("MVP_Core.Data.TechTrackingLog", b =>
@@ -5370,7 +5370,7 @@ namespace MVP_Core.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("TechTrackingLogs");
+                    b.ToTable("TechTrackingLogs", (string)null);
                 });
 
             modelBuilder.Entity("MVP_Core.Data.TokenLog", b =>
@@ -5402,7 +5402,7 @@ namespace MVP_Core.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("UserActivityLogs");
+                    b.ToTable("UserActivityLogs", (string)null);
                 });
 
             modelBuilder.Entity("MVP_Core.Data.VettedApplication", b =>
@@ -5415,7 +5415,7 @@ namespace MVP_Core.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("VettedApplications");
+                    b.ToTable("VettedApplications", (string)null);
                 });
 
             modelBuilder.Entity("MVP_Core.Models.LeaderboardEntry", b =>
@@ -5445,7 +5445,7 @@ namespace MVP_Core.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("LeaderboardEntries");
+                    b.ToTable("LeaderboardEntries", (string)null);
                 });
 
             modelBuilder.Entity("MVP_Core.Models.MentorReplyLog", b =>
@@ -5477,7 +5477,7 @@ namespace MVP_Core.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("MentorReplyLogs");
+                    b.ToTable("MentorReplyLogs", (string)null);
                 });
 
             modelBuilder.Entity("MVP_Core.Models.QuoteMessage", b =>
@@ -5501,7 +5501,7 @@ namespace MVP_Core.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("QuoteMessages");
+                    b.ToTable("QuoteMessages", (string)null);
                 });
 
             modelBuilder.Entity("MVP_Core.Models.TechPulseLog", b =>
@@ -5521,7 +5521,7 @@ namespace MVP_Core.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("TechPulseLogs");
+                    b.ToTable("TechPulseLogs", (string)null);
                 });
 
             modelBuilder.Entity("MVP_Core.Models.UserActionLog", b =>
@@ -5563,7 +5563,7 @@ namespace MVP_Core.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("UserActionLogs");
+                    b.ToTable("UserActionLogs", (string)null);
                 });
 
             modelBuilder.Entity("MVP_Core.Models.Whisper", b =>
@@ -5591,7 +5591,7 @@ namespace MVP_Core.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Whispers");
+                    b.ToTable("Whispers", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -6034,7 +6034,7 @@ namespace MVP_Core.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("TechnicianKarmaLogs");
+                    b.ToTable("TechnicianKarmaLogs", (string)null);
                 });
 
             modelBuilder.Entity("TechnicianLoyaltyLog", b =>
@@ -6068,7 +6068,7 @@ namespace MVP_Core.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("TechnicianLoyaltyLogs");
+                    b.ToTable("TechnicianLoyaltyLogs", (string)null);
                 });
 
             modelBuilder.Entity("TechnicianMessage", b =>
@@ -6101,7 +6101,7 @@ namespace MVP_Core.Migrations
 
                     b.HasKey("MessageId");
 
-                    b.ToTable("TechnicianMessages");
+                    b.ToTable("TechnicianMessages", (string)null);
                 });
 
             modelBuilder.Entity("TechnicianMoraleLog", b =>
@@ -6130,7 +6130,7 @@ namespace MVP_Core.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("TechnicianMoraleLogs");
+                    b.ToTable("TechnicianMoraleLogs", (string)null);
                 });
 
             modelBuilder.Entity("TechnicianPatternProfile", b =>
@@ -6193,7 +6193,7 @@ namespace MVP_Core.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("TechnicianRedemptionLogs");
+                    b.ToTable("TechnicianRedemptionLogs", (string)null);
                 });
 
             modelBuilder.Entity("TechnicianScheduleConflictLog", b =>
@@ -6235,7 +6235,7 @@ namespace MVP_Core.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("TechnicianScheduleConflictLogs");
+                    b.ToTable("TechnicianScheduleConflictLogs", (string)null);
                 });
 
             modelBuilder.Entity("MVP_Core.Data.Models.FeedbackResponse", b =>

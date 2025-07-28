@@ -188,6 +188,7 @@ namespace MVP_Core.Data
         public DbSet<TenantModules> TenantModules { get; set; } = null!;
         public DbSet<ComplianceOverrideLog> ComplianceOverrideLogs { get; set; } = null!;
         public DbSet<ComplianceAlertLog> ComplianceAlertLogs { get; set; } = null!;
+        public DbSet<MVP_Core.Data.Models.NovaIntel.NovaDecisionMemory> NovaDecisionMemories { get; set; } = null!;
 
         #endregion
 

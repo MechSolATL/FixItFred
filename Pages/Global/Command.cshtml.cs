@@ -44,6 +44,7 @@ namespace MVP_Core.Pages.Global
         public List<Tenant> LockedOutTenants { get; set; } = new();
         public List<MVP_Core.Data.Models.ComplianceAlertLog> AlertSummary { get; set; } = new();
         public List<DiagnosticsAlertResult> DiagnosticsAlerts { get; set; } = new();
+        public List<MVP_Core.Data.Models.NovaIntel.NovaDecisionMemory> DecisionMemory { get; set; } = new();
         public async Task OnGetAsync()
         {
             Metrics = await _metricsEngine.GetGlobalMetricsAsync();
@@ -54,6 +55,8 @@ namespace MVP_Core.Pages.Global
             AlertSummary = _reminderService.GetActiveReminders();
             // Example: Find tenants with expired docs (replace with real logic)
             LockedOutTenants = _db.Tenants.Where(t => t.CompanyName.Contains("Lockout")).ToList();
+            // Load all decision memory for demo (filter by tenant as needed)
+            DecisionMemory = await _db.NovaDecisionMemories.OrderByDescending(x => x.Timestamp).Take(20).ToListAsync();
         }
         public async Task<IActionResult> OnPostOverrideLockoutAsync(string TenantId, string AdminNote)
         {

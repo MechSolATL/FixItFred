@@ -31,6 +31,8 @@
             </div>
         </div>
     }
+    <!-- Decision Memory Partial -->
+    @await Html.PartialAsync("/Pages/Shared/_DecisionMemorySummary.cshtml", Model.DecisionMemory)
     <div class="alert alert-danger compliance-lockout-alert my-4" style="display:@(Model.LockedOutTenants.Any() ? "block" : "none")">
         <b>Compliance Lockout:</b> The following tenants are locked out due to expired compliance documents:
         <ul>
