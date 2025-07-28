@@ -93,6 +93,12 @@ namespace MVP_Core.Services.Admin
                 .ToListAsync();
         }
 
+        // Sprint 91.7 Part 6.3: Get all active technicians for transfer dropdown
+        public async Task<List<Technician>> GetAvailableTechsAsync()
+        {
+            return await _context.Technicians.Where(t => t.IsActive).OrderBy(t => t.FullName).ToListAsync();
+        }
+
         // --- Helper methods for Guid <-> int mapping (for legacy int PKs) ---
         private static Guid GuidFromInt(int id)
         {
