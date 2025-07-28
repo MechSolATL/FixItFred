@@ -191,6 +191,8 @@ namespace MVP_Core.Data
         public DbSet<MVP_Core.Data.Models.NovaIntel.NovaDecisionMemory> NovaDecisionMemories { get; set; } = null!;
         // public DbSet<MVP_Core.Data.Models.Loyalty.TechnicianBadge> TechnicianBadges { get; set; } = null!;
         // public DbSet<MVP_Core.Data.Models.Loyalty.BadgeDefinition> BadgeDefinitions { get; set; } = null!;
+        public DbSet<MVP_Core.Data.Models.ToolInventory> ToolInventories { get; set; } = null!;
+        public DbSet<MVP_Core.Data.Models.ToolTransferLog> ToolTransferLogs { get; set; } = null!;
 
         #endregion
 
