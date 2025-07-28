@@ -35,6 +35,8 @@ namespace MVP_Core.Services
         {
             var techs = _db.Technicians.ToList();
             var logs = _db.TechTrackingLogs.ToList();
+            var today = DateTime.UtcNow.Date;
+            var jobs = _db.ScheduleQueues.Where(q => q.ScheduledFor.HasValue && q.ScheduledFor.Value.Date == today).ToList();
             var result = new List<TechnicianTrackingDto>();
             foreach (var tech in techs)
             {
@@ -44,11 +46,46 @@ namespace MVP_Core.Services
                                    .OrderBy(l => l.Timestamp)
                                    .ToList();
                 var latest = lastLogs.LastOrDefault();
+                var lastUpdated = latest?.Timestamp ?? tech.EmploymentDate ?? DateTime.MinValue;
+                // Diagnostics logic
+                var techJobs = jobs.Where(j => j.TechnicianId == tech.Id).ToList();
+                int jobCount = techJobs.Count;
+                // Status reason
+                string statusReason = "Unknown";
+                if (latest != null)
+                {
+                    var now = DateTime.UtcNow;
+                    var minutesSinceUpdate = (now - latest.Timestamp).TotalMinutes;
+                    if (minutesSinceUpdate > 10)
+                        statusReason = "Stale Signal";
+                    else if (jobCount > 0 && MockStatus(tech) == "Working")
+                        statusReason = "Working";
+                    else if (MockStatus(tech) == "Idle")
+                        statusReason = "Idle";
+                    else if (MockStatus(tech) == "En Route")
+                        statusReason = "Driving";
+                    else
+                        statusReason = MockStatus(tech);
+                }
+                // Alerts
+                bool isIdleAlert = false;
+                bool isMissedJobAlert = false;
+                bool isStaleSignalAlert = false;
+                if (latest != null)
+                {
+                    var now = DateTime.UtcNow;
+                    var minutesSinceUpdate = (now - latest.Timestamp).TotalMinutes;
+                    isStaleSignalAlert = minutesSinceUpdate > 10;
+                    isIdleAlert = MockStatus(tech) == "Idle" && minutesSinceUpdate > 20;
+                }
+                // Missed job: mock if jobCount > 0 and status is not Working or En Route
+                if (jobCount > 0 && MockStatus(tech) != "Working" && MockStatus(tech) != "En Route")
+                    isMissedJobAlert = true;
                 result.Add(new TechnicianTrackingDto
                 {
                     TechnicianId = tech.Id,
                     Name = tech.FullName,
-                    TruckId = $"TRK-{tech.Id:D3}", // Sprint 91.7: Mock truck ID
+                    TruckId = $"TRK-{tech.Id:D3}",
                     ServiceType = tech.Specialty ?? "General",
                     Status = MockStatus(tech),
                     Latitude = latest?.Latitude ?? tech.Latitude ?? 33.75,
@@ -60,6 +97,12 @@ namespace MVP_Core.Services
                         Timestamp = l.Timestamp
                     }).ToList(),
                     ETA = MockEta(),
+                    StatusReason = statusReason,
+                    JobCount = jobCount,
+                    LastUpdated = latest?.Timestamp,
+                    IsIdleAlert = isIdleAlert,
+                    IsMissedJobAlert = isMissedJobAlert,
+                    IsStaleSignalAlert = isStaleSignalAlert
                 });
             }
             return result;
@@ -99,6 +142,13 @@ namespace MVP_Core.Services
         public double Longitude { get; set; }
         public List<TechnicianGhostTrailPoint> GhostTrail { get; set; } = new();
         public string ETA { get; set; } = string.Empty;
+        // Sprint 91.7 Part 5: Diagnostics overlay fields
+        public string StatusReason { get; set; } = string.Empty; // e.g. Driving, Parked, Idle, Working
+        public int JobCount { get; set; } // Total jobs assigned today
+        public DateTime? LastUpdated { get; set; } // Last location or job update
+        public bool IsIdleAlert { get; set; } // True if idle too long
+        public bool IsMissedJobAlert { get; set; } // True if job was missed
+        public bool IsStaleSignalAlert { get; set; } // True if no update >10min
     }
     public class TechnicianGhostTrailPoint
     {
