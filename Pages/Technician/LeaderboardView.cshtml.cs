@@ -1,14 +1,15 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using MVP_Core.Services;
+using System.Collections.Generic;
 
 namespace MVP_Core.Pages.Technician
 {
-    // Sprint 84.5 — Technician Leaderboard + Rivalry Engine
-    public class LeaderboardModel : PageModel
+    // Sprint 84.5.1 — Razor Rename: Leaderboard.cshtml to LeaderboardView.cshtml (encoding fix)
+    public class LeaderboardViewModel : PageModel
     {
         public List<TechnicianLeaderboardEntry> Leaderboard { get; set; } = new();
         private readonly TechnicianLeaderboardService _leaderboardService;
-        public LeaderboardModel(TechnicianLeaderboardService leaderboardService)
+        public LeaderboardViewModel(TechnicianLeaderboardService leaderboardService)
         {
             _leaderboardService = leaderboardService;
         }

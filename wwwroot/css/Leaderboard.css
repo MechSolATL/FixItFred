@@ -36,3 +36,42 @@
     color: #0d6efd;
     font-size: 0.95rem;
 }
+
+/* Sprint 84.5.1 — Responsive Layout */
+.leaderboard-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+}
+@media (min-width: 600px) {
+    .leaderboard-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+@media (min-width: 900px) {
+    .leaderboard-grid {
+        grid-template-columns: 1fr 1fr 1fr;
+    }
+}
+.leaderboard-scroll {
+    overflow-x: auto;
+    display: flex;
+    gap: 1rem;
+    padding-bottom: 1rem;
+}
+.leaderboard-card {
+    min-width: 260px;
+    max-width: 340px;
+    transition: box-shadow 0.2s, transform 0.2s;
+    cursor: pointer;
+}
+.leaderboard-card.collapsed {
+    max-height: 60px;
+    overflow: hidden;
+    opacity: 0.7;
+}
+@media (max-width: 600px) {
+    .leaderboard-grid { display: block; }
+    .leaderboard-scroll { display: flex; overflow-x: auto; }
+    .leaderboard-card { min-width: 90vw; margin-right: 1rem; }
+}

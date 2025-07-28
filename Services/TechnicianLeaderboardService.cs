@@ -16,8 +16,11 @@ namespace MVP_Core.Services
         }
 
         // Get leaderboard by tier, points, or city
+        // Sprint 84.5.1 — Leaderboard Expansion: Add daily delta, rank change, rivalry heat
         public List<TechnicianLeaderboardEntry> GetLeaderboard(string groupBy = "points", int topN = 20)
         {
+            var today = DateTime.UtcNow.Date;
+            var yesterday = today.AddDays(-1);
             var query = _db.Technicians.AsQueryable();
             switch (groupBy)
             {
@@ -31,14 +34,32 @@ namespace MVP_Core.Services
                     query = query.OrderByDescending(t => t.TotalPoints);
                     break;
             }
-            return query.Take(topN).Select(t => new TechnicianLeaderboardEntry
+            var leaderboard = query.Take(topN).ToList();
+            var entries = new List<TechnicianLeaderboardEntry>();
+            for (int i = 0; i < leaderboard.Count; i++)
             {
-                TechnicianId = t.Id,
-                Name = t.Name,
-                TierLevel = t.TierLevel,
-                TotalPoints = t.TotalPoints,
-                City = t.City
-            }).ToList();
+                var t = leaderboard[i];
+                // Points gained today
+                var pointsToday = _db.TechnicianScoreEntries.Where(e => e.TechnicianId == t.Id && e.Date.Date == today).Sum(e => e.Points);
+                // Rank change delta (compare to yesterday's rank)
+                var yesterdayPoints = _db.TechnicianScoreEntries.Where(e => e.TechnicianId == t.Id && e.Date.Date == yesterday).Sum(e => e.Points);
+                var rankChangeDelta = pointsToday - yesterdayPoints;
+                // Rivalry heat level (simple: top 3 in city get highest heat)
+                var cityTechs = _db.Technicians.Where(x => x.City == t.City).OrderByDescending(x => x.TotalPoints).Take(3).ToList();
+                int rivalryHeatLevel = cityTechs.Any(x => x.Id == t.Id) ? 3 : 1;
+                entries.Add(new TechnicianLeaderboardEntry
+                {
+                    TechnicianId = t.Id,
+                    Name = t.Name,
+                    TierLevel = t.TierLevel,
+                    TotalPoints = t.TotalPoints,
+                    City = t.City,
+                    PointsGainedToday = pointsToday,
+                    RankChangeDelta = rankChangeDelta,
+                    RivalryHeatLevel = rivalryHeatLevel
+                });
+            }
+            return entries;
         }
 
         // Get rivalry stats (anonymous and named)
@@ -80,6 +101,10 @@ namespace MVP_Core.Services
         public int TierLevel { get; set; }
         public int TotalPoints { get; set; }
         public string City { get; set; } = string.Empty;
+        // Sprint 84.5.1 — Leaderboard Expansion
+        public int PointsGainedToday { get; set; }
+        public int RankChangeDelta { get; set; }
+        public int RivalryHeatLevel { get; set; }
     }
 
     public class TechnicianRivalryStat
