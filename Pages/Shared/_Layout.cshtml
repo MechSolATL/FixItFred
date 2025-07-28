@@ -1,8 +1,12 @@
+@using MVP_Core.Services.Tenant
+@inject TenantResolver TenantResolver
 @{
     Layout = null;
     var deviceType = Context.Items["DeviceType"]?.ToString() ?? "Unknown";
     var isMobile = deviceType == "Mobile";
     ViewData["Title"] ??= "Service Atlanta";
+    var branding = TenantResolver.TenantBranding;
+    var modules = TenantResolver.TenantModules;
 }
 
 <!-- Offline Banner for ConnectivityMonitor.js -->
@@ -18,10 +22,10 @@
     <meta name="keywords" content="@ViewData["Keywords"]" />
     <meta name="robots" content="@ViewData["Robots"]" />
 
-    <!-- ??? Fonts -->
+    <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 
-    <!-- ?? Styles -->
+    <!-- Styles -->
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/MVP_Core.styles.css" asp-append-version="true" />
@@ -35,7 +39,13 @@
             margin: 0;
             padding: 0;
         }
-
+        .navbar, .navbar-brand, .navbar-nav .nav-link, .navbar-light {
+            background-color: @(branding?.PrimaryColor ?? "#007bff") !important;
+        }
+        .navbar-brand img {
+            max-height: 48px;
+            max-width: 160px;
+        }
         .content-wrapper {
             background: rgba(255, 255, 255, 0.5);
             padding: 30px;
@@ -44,24 +54,20 @@
             margin-top: 30px;
             margin-bottom: 30px;
         }
-
         h1, h2, h3 {
             font-weight: 700;
         }
-
         .btn {
             font-family: 'Poppins', sans-serif;
             font-weight: 600;
             letter-spacing: 0.5px;
             border-radius: 0.5rem;
         }
-
         .form-control, .form-select {
             font-family: 'Poppins', sans-serif;
             font-size: 1rem;
             border-radius: 0.5rem;
         }
-
         .save-status-chip {
             position: fixed;
             top: 10px;
@@ -75,20 +81,36 @@
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
             display: none;
         }
-
         .save-status-chip.syncing {
             background: #007bff;
         }
     </style>
 
     <script src="~/js/MediaQueueHandler.js"></script>
+    @if (!string.IsNullOrEmpty(branding?.FaviconUrl))
+    {
+        <link rel="icon" type="image/png" href="@branding.FaviconUrl" />
+    }
+    else
+    {
+        <link rel="icon" type="image/png" href="/favicon.ico" />
+    }
 </head>
 <body>
-    <!-- ?? Header -->
+    <!-- Header -->
     <header role="banner">
-        <nav class="navbar navbar-expand-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-sm navbar-light border-bottom box-shadow mb-3">
             <div class="container">
-                <a class="navbar-brand fw-bold" asp-area="" asp-page="/Index">Service Atlanta</a>
+                <a class="navbar-brand fw-bold" asp-area="" asp-page="/Index">
+                    @if (!string.IsNullOrEmpty(branding?.LogoUrl))
+                    {
+                        <img src="@branding.LogoUrl" alt="Logo" />
+                    }
+                    else
+                    {
+                        <span>Service Atlanta</span>
+                    }
+                </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse"
                         aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -99,13 +121,16 @@
                         <li class="nav-item"><a class="nav-link text-dark" asp-area="" asp-page="/Privacy">Privacy</a></li>
                         <li class="nav-item"><a class="nav-link text-dark" asp-page="/Services/Plumbing">Plumbing</a></li>
                         <li class="nav-item"><a class="nav-link text-dark" asp-page="/Technician/LeaderboardView">Technician Leaderboard</a></li>
-                        <!-- TODO: Dynamically load other services here in future from DB or route -->
+                        @* Module Guards *@
+                        @if (modules?.AccountingView == true)
+                        {
+                            <li class="nav-item"><a class="nav-link text-dark" asp-page="/Admin/Accounting">Accounting</a></li>
+                        }
                     </ul>
                 </div>
             </div>
         </nav>
-
-        <!-- ?? Microsoft Advertising UET Tag -->
+        <!-- Microsoft Advertising UET Tag -->
         <script>
             (function(w,d,t,r,u){
               var f,n,i;
@@ -123,14 +148,14 @@
         </script>
     </header>
 
-    <!-- ?? Main Content -->
+    <!-- Main Content -->
     <main role="main" class="container">
         <div class="content-wrapper">
             @RenderBody()
         </div>
     </main>
 
-    <!-- ?? Footer -->
+    <!-- Footer -->
     <footer class="text-center mt-5" style="font-size:8pt; color:white; background-color:rgba(0, 0, 0, 0.5); padding: 15px;" role="contentinfo">
         &copy; 1997–2025 <strong>Virtual Concepts</strong> for
         <a href="https://service-atlanta.com" target="_blank" style="color:white; text-decoration:underline;">service-atlanta.com</a> |
@@ -142,15 +167,14 @@
         <a href="/Legal/Terms" style="color:white; text-decoration:underline;">Terms</a>
     </footer>
 
-    <!-- ?? Scripts -->
+    <!-- Scripts -->
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="~/js/ConnectivityMonitor.js" asp-append-version="true"></script>
     <script src="~/js/SaveStatusTracker.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
-
-    <!-- ?? Disable Right-Click, Ctrl+U, F12 -->
+    <!-- Disable Right-Click, Ctrl+U, F12 -->
     <script>
         document.addEventListener('contextmenu', e => e.preventDefault());
         document.addEventListener('keydown', e => {
@@ -161,8 +185,7 @@
             }
         });
     </script>
-
-    <!-- ??? Click Tracking -->
+    <!-- Click Tracking -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             document.body.addEventListener('click', e => {
@@ -182,7 +205,6 @@
             });
         });
     </script>
-
     @if (TempData["ToastMessage"] is string msg)
     {
         <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1100;">
@@ -191,7 +213,6 @@
             </div>
         </div>
     }
-
     <div id="media-sync-chip" class="success" style="position:fixed;top:10px;right:10px;z-index:9999;padding:6px 12px;border-radius:16px;background:#eee;color:#333;font-weight:bold;box-shadow:0 2px 8px rgba(0,0,0,0.1);">0 pending media items</div>
     <div class="save-status-chip syncing" style="display:none;">?? Saving…</div>
 </body>
