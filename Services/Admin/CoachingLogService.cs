@@ -1,5 +1,6 @@
 // Sprint 85.6 — Coaching Impact Insights Phase 2
 using MVP_Core.Models;
+using MVP_Core.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,6 +26,11 @@ namespace MVP_Core.Services.Admin
         {
             entry.Id = _entries.Count > 0 ? _entries.Max(e => e.Id) + 1 : 1;
             entry.Timestamp = DateTime.UtcNow;
+            // Sprint 85.7 — Encrypt sensitive notes
+            if (entry.IsSensitive && !string.IsNullOrEmpty(entry.CoachingNote))
+            {
+                entry.CoachingNote = SensitiveNoteEncryptor.Encrypt(entry.CoachingNote);
+            }
             _entries.Add(entry);
         }
 

@@ -138,6 +138,9 @@ builder.Logging.AddDebug();
 builder.Services.Configure<MVP_Core.Services.Config.LoadBalancingConfig>(
     builder.Configuration.GetSection("LoadBalancing"));
 
+// Register DataProtection for sensitive note encryption
+builder.Services.AddDataProtection();
+
 var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())
@@ -172,6 +175,9 @@ app.MapHub<MVP_Core.Hubs.ETAHub>("/etahub");
 app.MapHub<MVP_Core.Hubs.JobMessageHub>("/hubs/jobmessages");
 app.MapHub<MVP_Core.Hubs.RewardNotificationHub>("/hubs/rewardnotifications");
 app.MapHub<MVP_Core.Hubs.NotificationHub>("/notificationHub"); // Register NotificationHub for SignalR
+
+// Configure SensitiveNoteEncryptor with DataProtection
+SensitiveNoteEncryptor.Configure(app.Services.GetRequiredService<Microsoft.AspNetCore.DataProtection.IDataProtectionProvider>());
 
 // DB Seeding
 using (var scope = app.Services.CreateScope())

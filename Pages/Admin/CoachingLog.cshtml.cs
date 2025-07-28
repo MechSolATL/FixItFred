@@ -7,6 +7,7 @@ using MVP_Core.Data.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System;
+using MVP_Core.Helpers;
 
 namespace MVP_Core.Pages.Admin
 {
@@ -80,19 +81,30 @@ namespace MVP_Core.Pages.Admin
         }
         public IActionResult OnPost()
         {
-            // Sprint 85.4 — Coaching UI Enhancements + Export
+            // Sprint 85.7 — Admin Log Hardening & Encryption
             var techId = int.Parse(Request.Form["TechnicianId"]);
             var supervisor = Request.Form["SupervisorName"];
             var category = Request.Form["Category"];
             var note = Request.Form["CoachingNote"];
+            var isSensitive = !string.IsNullOrEmpty(Request.Form["IsSensitive"]) && Request.Form["IsSensitive"] == "on";
             _logService.AddEntry(new CoachingLogEntry
             {
                 TechnicianId = techId,
                 SupervisorName = supervisor,
                 Category = category,
-                CoachingNote = note
+                CoachingNote = note,
+                IsSensitive = isSensitive
             });
             return RedirectToPage();
+        }
+        // Helper to decrypt note for admin
+        public string GetDecryptedNote(CoachingLogEntry entry)
+        {
+            if (entry.IsSensitive && User.IsInRole("Admin"))
+            {
+                try { return SensitiveNoteEncryptor.Decrypt(entry.CoachingNote); } catch { return "[Decryption Error]"; }
+            }
+            return entry.CoachingNote;
         }
     }
 }

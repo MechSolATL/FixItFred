@@ -6,6 +6,7 @@ namespace MVP_Core.Data.Models
 {
     // Sprint 84.9 — Drop Alert Logic + TrustScore Delta Detection
     // Sprint 85.3 — Triggered Coaching Suggestions
+    // Sprint 85.7 — Admin Log Hardening & Encryption
     public class TechnicianAlertLog
     {
         [Key]
@@ -17,5 +18,7 @@ namespace MVP_Core.Data.Models
         public bool Acknowledged { get; set; } = false;
         // Sprint 85.3 — Triggered Coaching Suggestions
         public bool TriggeredCoachingRecommended { get; set; } = false;
+        // Sprint 85.7 — Admin Log Hardening & Encryption
+        public bool IsSensitive { get; set; } = false;
     }
 }

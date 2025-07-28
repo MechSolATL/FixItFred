@@ -2,7 +2,7 @@
 @model MVP_Core.Pages.Admin.CoachingLogModel
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @{
-    // Sprint 85.6 — Coaching Impact Insights Phase 2
+    // Sprint 85.7 — Admin Log Hardening & Encryption
     Layout = "/Pages/Shared/_AdminLayout.cshtml";
     ViewData["Title"] = "Supervisor Coaching Logbook";
 }
@@ -80,6 +80,7 @@
                     <th>Supervisor</th>
                     <th>Category</th>
                     <th>Note</th>
+                    <th>Sensitive</th>
                 </tr>
             </thead>
             <tbody>
@@ -94,7 +95,29 @@
                     <td>
                         <span class="badge bg-info text-dark">@entry.Category</span>
                     </td>
-                    <td>@entry.CoachingNote</td>
+                    <td>
+                        @if (entry.IsSensitive)
+                        {
+                            if (User.IsInRole("Admin"))
+                            {
+                                <span class="text-danger">@Model.GetDecryptedNote(entry)</span>
+                            }
+                            else
+                            {
+                                <span class="text-muted">[Sensitive - Admin Only]</span>
+                            }
+                        }
+                        else
+                        {
+                            @entry.CoachingNote
+                        }
+                    </td>
+                    <td>
+                        @if (entry.IsSensitive)
+                        {
+                            <span class="badge bg-warning text-dark">Sensitive</span>
+                        }
+                    </td>
                 </tr>
             }
             </tbody>
@@ -135,6 +158,10 @@
                         <div class="mb-2">
                             <label class="form-label">Note</label>
                             <textarea name="CoachingNote" class="form-control" required></textarea>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" name="IsSensitive" id="IsSensitiveCheckbox">
+                            <label class="form-check-label" for="IsSensitiveCheckbox">Sensitive (Admin Only)</label>
                         </div>
                     </div>
                     <div class="modal-footer">

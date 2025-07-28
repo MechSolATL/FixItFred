@@ -1,10 +1,12 @@
 // Sprint 85.2 — Coaching Logbook System
+// Sprint 85.7 — Admin Log Hardening & Encryption
 using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace MVP_Core.Models
 {
     // Sprint 85.2 — Coaching Logbook System
+    // Sprint 85.7 — Admin Log Hardening & Encryption
     public class CoachingLogEntry
     {
         [Key]
@@ -17,5 +19,7 @@ namespace MVP_Core.Models
         [Required]
         public string Category { get; set; } = string.Empty;
         public DateTime Timestamp { get; set; } = DateTime.UtcNow;
+        // Sprint 85.7 — Admin Log Hardening & Encryption
+        public bool IsSensitive { get; set; } = false;
     }
 }
