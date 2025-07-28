@@ -178,6 +178,7 @@ app.MapHub<MVP_Core.Hubs.ETAHub>("/etahub");
 app.MapHub<MVP_Core.Hubs.JobMessageHub>("/hubs/jobmessages");
 app.MapHub<MVP_Core.Hubs.RewardNotificationHub>("/hubs/rewardnotifications");
 app.MapHub<MVP_Core.Hubs.NotificationHub>("/notificationHub"); // Register NotificationHub for SignalR
+app.MapHub<MVP_Core.Hubs.TechnicianTrackingHub>("/hubs/techtracking"); // Sprint 91.7.Part4: Live tech tracking hub
 
 // Configure SensitiveNoteEncryptor with DataProtection
 SensitiveNoteEncryptor.Configure(app.Services.GetRequiredService<Microsoft.AspNetCore.DataProtection.IDataProtectionProvider>());

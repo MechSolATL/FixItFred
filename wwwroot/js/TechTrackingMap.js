@@ -67,13 +67,19 @@
         document.getElementById('filterStatus').onchange = function () { filterStatus = this.value; renderMarkers(); };
         document.getElementById('filterTruckId').oninput = function () { filterTruckId = this.value; renderMarkers(); };
     }
-    function pollUpdates() {
-        // Sprint 91.7: Poll for updates every 7s (mock)
-        setInterval(function () {
-            fetch('/api/techtracking/live')
-                .then(r => r.json())
-                .then(data => { techs = data; populateFilters(); renderMarkers(); });
-        }, 7000);
+    // --- SignalR Integration ---
+    function setupSignalR() {
+        if (window.signalR) {
+            const connection = new signalR.HubConnectionBuilder()
+                .withUrl("/hubs/techtracking")
+                .build();
+            connection.on("ReceiveLocationUpdate", function (technicianList) {
+                techs = technicianList;
+                populateFilters();
+                renderMarkers();
+            });
+            connection.start().catch(err => console.error("SignalR connection error:", err));
+        }
     }
     window.addEventListener('DOMContentLoaded', function () {
         if (!window.L || !document.getElementById('techTrackingMap')) return;
@@ -85,6 +91,7 @@
         populateFilters();
         attachFilterEvents();
         renderMarkers();
-        pollUpdates();
+        setupSignalR(); // Sprint 91.7.Part4: Use SignalR for live updates
+        // pollUpdates(); // Disabled polling in favor of SignalR
     });
 })();
