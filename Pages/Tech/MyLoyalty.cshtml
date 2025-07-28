@@ -1,0 +1,22 @@
+@page
+@model MVP_Core.Pages.Tech.MyLoyaltyModel
+@{
+    ViewData["Title"] = "My Loyalty Badges";
+    Layout = "_Layout";
+}
+
+<h2>My Loyalty Badges</h2>
+<div class="milestone-list">
+    @foreach (var milestone in Model.Milestones)
+    {
+        bool unlocked = Model.UnlockedMilestones.Any(u => u.MilestoneId == milestone.Id);
+        <partial name="_MilestoneCard" model="milestone" view-data='new ViewDataDictionary(ViewData) { { "Unlocked", unlocked } }' />
+    }
+</div>
+
+@section Scripts {
+    <script>
+        // Trigger animation if any new milestone unlocked
+        if (window.triggerMilestoneAnimation) window.triggerMilestoneAnimation();
+    </script>
+}

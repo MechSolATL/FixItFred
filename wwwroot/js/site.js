@@ -262,3 +262,23 @@ function exportChartPDF(chartId) {
         pdf.save(chartId + '.pdf');
     });
 }
+
+// Loyalty milestone unlock animation
+window.triggerMilestoneAnimation = function() {
+    // Confetti effect
+    if (window.confetti) {
+        window.confetti({
+            particleCount: 100,
+            spread: 70,
+            origin: { y: 0.6 }
+        });
+    }
+    // Glow effect for unlocked cards
+    document.querySelectorAll('.milestone-card.unlocked').forEach(function(card) {
+        card.classList.add('glow-animate');
+    });
+    // Modal cue (simple alert for demo)
+    setTimeout(function() {
+        alert('Congratulations! You unlocked a new milestone!');
+    }, 500);
+};

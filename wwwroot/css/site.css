@@ -349,3 +349,67 @@ footer {
 .sync-champion-widget .badge {
     animation: championBounce 1s infinite alternate;
 }
+
+/* Loyalty Milestone Card Animations */
+.milestone-card {
+    border-radius: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    background: #fff;
+    margin: 12px 0;
+    padding: 18px 24px;
+    transition: box-shadow 0.4s, border 0.4s, background 0.4s;
+    border: 2px solid #e0e0e0;
+    position: relative;
+}
+.milestone-card.unlocked {
+    border-color: #28a745;
+    background: linear-gradient(90deg, #e0ffe0 0%, #f8fff8 100%);
+}
+.milestone-card.locked {
+    opacity: 0.7;
+    filter: grayscale(0.2);
+}
+.milestone-card .milestone-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #222;
+}
+.milestone-card .milestone-points {
+    font-size: 1rem;
+    color: #007bff;
+    margin-bottom: 6px;
+}
+.milestone-card .milestone-desc {
+    font-size: 0.98rem;
+    color: #444;
+}
+
+/* Glow animation for unlocked */
+.glow-animate {
+    animation: glowPulse 1.2s 2;
+    box-shadow: 0 0 16px 4px #aaffaa;
+}
+@keyframes glowPulse {
+    0% { box-shadow: 0 0 0 0 #aaffaa; }
+    50% { box-shadow: 0 0 24px 8px #aaffaa; }
+    100% { box-shadow: 0 0 0 0 #aaffaa; }
+}
+
+/* Banner for milestone unlock */
+.milestone-banner {
+    background: linear-gradient(90deg, #28a745 0%, #b2f7b2 100%);
+    color: #fff;
+    font-weight: bold;
+    text-align: center;
+    padding: 16px 0;
+    border-radius: 12px;
+    margin: 18px 0 24px 0;
+    font-size: 1.2rem;
+    box-shadow: 0 2px 12px rgba(40,167,69,0.08);
+    letter-spacing: 1px;
+    animation: bannerFadeIn 1s;
+}
+@keyframes bannerFadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}

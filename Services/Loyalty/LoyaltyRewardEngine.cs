@@ -10,10 +10,12 @@ namespace MVP_Core.Services.Loyalty
     public class LoyaltyRewardEngine
     {
         private readonly ApplicationDbContext _context;
+        private readonly LoyaltyGratitudeEngine _gratitudeEngine;
 
-        public LoyaltyRewardEngine(ApplicationDbContext context)
+        public LoyaltyRewardEngine(ApplicationDbContext context, LoyaltyGratitudeEngine gratitudeEngine)
         {
             _context = context;
+            _gratitudeEngine = gratitudeEngine;
         }
 
         public async Task EvaluateProgressAsync(int technicianId)
@@ -46,7 +48,8 @@ namespace MVP_Core.Services.Loyalty
                         Timestamp = DateTime.UtcNow
                     });
 
-                    // TODO: Update TrustIndex or other rewards here
+                    // Trigger gratitude engine
+                    await _gratitudeEngine.TriggerGratitudeAsync(technicianId, milestone.Id);
                 }
             }
 
