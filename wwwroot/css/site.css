@@ -541,3 +541,46 @@ footer {
 .module-badge.bg-success { background: #28a745; color: #fff; }
 .module-badge.bg-info { background: #17a2b8; color: #fff; }
 .module-badge.bg-warning { background: #ffc107; color: #222; }
+
+/* NovaGodView Forecast Display Styles */
+.forecast-display {
+    background: #f8fafd;
+    border: 1.5px solid #e3eaf3;
+    border-radius: 18px;
+    box-shadow: 0 2px 12px rgba(0,123,255,0.04);
+    padding: 32px 28px 24px 28px;
+    margin-top: 32px;
+    margin-bottom: 32px;
+    transition: box-shadow 0.3s, border 0.3s;
+}
+.forecast-display h4 {
+    font-weight: 700;
+    color: #007bff;
+    letter-spacing: 0.5px;
+}
+.forecast-metric {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.04);
+    padding: 18px 12px 12px 12px;
+    text-align: center;
+    margin-bottom: 10px;
+}
+.forecast-label {
+    font-size: 1.02rem;
+    color: #888;
+    font-weight: 500;
+    margin-bottom: 4px;
+}
+.forecast-value {
+    font-size: 2.1rem;
+    font-weight: 700;
+    color: #222;
+    letter-spacing: 1px;
+}
+.forecast-value.text-success {
+    color: #28a745;
+}
+.forecast-value.text-danger {
+    color: #dc3545;
+}
