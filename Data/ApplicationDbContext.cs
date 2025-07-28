@@ -186,6 +186,7 @@ namespace MVP_Core.Data
         public DbSet<TenantBranding> TenantBrandings { get; set; } = null!;
         public DbSet<TenantSettings> TenantSettings { get; set; } = null!;
         public DbSet<TenantModules> TenantModules { get; set; } = null!;
+        public DbSet<ComplianceOverrideLog> ComplianceOverrideLogs { get; set; } = null!;
 
         #endregion
 
