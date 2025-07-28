@@ -1,0 +1,48 @@
+@* Sprint 91.7 Part 7: Technician Layout for Dashboard and Mobile Views *@
+@{
+    Layout = null;
+    ViewData["Title"] ??= "Technician Portal";
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="/css/site.css" />
+    <style>
+        html, body { height: 100%; margin: 0; padding: 0; background: #f8fafc; font-family: 'Poppins', sans-serif; }
+        .tech-navbar { background: #0d6efd; color: #fff; padding: 10px 0; }
+        .tech-navbar .navbar-brand { font-weight: 700; font-size: 1.2em; color: #fff; }
+        .tech-navbar .nav-link { color: #fff; font-weight: 500; margin-right: 18px; }
+        .tech-navbar .nav-link.active { text-decoration: underline; }
+        .tech-navbar .nav-link:hover { color: #ffc107; }
+        .tech-footer { background: #0d6efd; color: #fff; font-size: 0.9em; text-align: center; padding: 10px 0; margin-top: 30px; }
+        @media (max-width: 600px) {
+            .tech-navbar, .tech-footer { font-size: 1em; }
+        }
+    </style>
+    @RenderSection("Head", required: false)
+</head>
+<body>
+    <header class="tech-navbar">
+        <div class="container d-flex align-items-center justify-content-between">
+            <a class="navbar-brand" asp-page="/Tech/Dashboard">Technician Dashboard</a>
+            <nav>
+                <a class="nav-link" asp-page="/Tech/Dashboard">Dashboard</a>
+                <a class="nav-link" asp-page="/Technician/LiveTracking">Live Tracking</a>
+                <a class="nav-link" asp-page="/Technician/ScheduleQueue">My Jobs</a>
+                <a class="nav-link" asp-page="/Tech/MyLoyalty">Loyalty</a>
+            </nav>
+        </div>
+    </header>
+    <main class="container-fluid px-0">
+        @RenderBody()
+    </main>
+    <footer class="tech-footer">
+        &copy; 2025 Service Atlanta | Technician Portal
+    </footer>
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

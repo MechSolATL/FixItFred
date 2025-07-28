@@ -1,0 +1,131 @@
+@* Sprint 91.7 Part 7: Technician Dashboard View + Embedded Route Guidance + Action Card Stack *@
+@page
+@model MVP_Core.Pages.Tech.DashboardModel
+@using MVP_Core.Data.Models
+@{
+    ViewData["Title"] = "Technician Dashboard";
+    Layout = "_LayoutTechnician.cshtml";
+}
+<div class="dashboard-root mobile-fullheight">
+    <!-- Sprint 91.7 Part 7: Embedded Route Guidance -->
+    <section class="dashboard-map-section">
+        <h3 class="mb-2">Route Guidance</h3>
+        <div id="dashboard-map" style="height:260px;width:100%;background:#e9ecef;border-radius:12px;"></div>
+        <div class="route-summary mt-2">
+            <span><strong>Next Stop:</strong> @Model.NextJob?.Zone ?? "N/A"</span> |
+            <span><strong>ETA:</strong> @Model.NextJob?.EstimatedArrival?.ToLocalTime().ToShortTimeString() ?? "--"</span> |
+            <span><strong>Distance:</strong> @Model.MockDistanceKm km</span>
+        </div>
+    </section>
+    <!-- Sprint 91.7 Part 7: Action Card Stack -->
+    <section class="dashboard-action-cards mt-3">
+        <div class="action-card current-job-card @Model.GetUrgencyClass(Model.CurrentJob)">
+            <div class="card-header d-flex align-items-center">
+                <span class="badge bg-primary me-2">?? Current Job</span>
+                <span class="status-badge ms-auto">@Model.CurrentJobStatus</span>
+            </div>
+            <div class="card-body">
+                <div><strong>Address:</strong> @Model.CurrentJob?.Zone</div>
+                <div><strong>Client:</strong> @Model.CurrentJobClientName</div>
+                <div><strong>ETA:</strong> @Model.CurrentJob?.EstimatedArrival?.ToLocalTime().ToShortTimeString()</div>
+                <div><strong>Type:</strong> @Model.CurrentJob?.ServiceTypePriority</div>
+                <div><strong>Value:</strong> $@Model.CurrentJob?.CommissionAmount?.ToString("F2")</div>
+                <div class="mt-2">
+                    <button class="btn btn-success btn-sm">Navigate</button>
+                    <button class="btn btn-primary btn-sm">Start Job</button>
+                    <button class="btn btn-outline-secondary btn-sm">Contact Client</button>
+                </div>
+            </div>
+        </div>
+        <div class="action-card next-job-card @Model.GetUrgencyClass(Model.NextJob)">
+            <div class="card-header d-flex align-items-center">
+                <span class="badge bg-info me-2">?? Next Job</span>
+                @if (Model.NextJobOverlapWarning)
+                {
+                    <span class="badge bg-warning text-dark ms-auto">Overlap Warning</span>
+                }
+            </div>
+            <div class="card-body">
+                <div><strong>Preview:</strong> @Model.NextJob?.Zone</div>
+                <div><strong>Start:</strong> @Model.NextJob?.ScheduledFor?.ToLocalTime().ToShortTimeString()</div>
+            </div>
+        </div>
+        <div class="action-card tools-required-card">
+            <div class="card-header"><span class="badge bg-secondary">?? Tools Required</span></div>
+            <div class="card-body">
+                @if (Model.ToolsRequired?.Count > 0)
+                {
+                    <ul>
+                        @foreach (var tool in Model.ToolsRequired)
+                        {
+                            <li>@tool.Name (@tool.ToolType)</li>
+                        }
+                    </ul>
+                }
+                else
+                {
+                    <span>No tools required for this job.</span>
+                }
+            </div>
+        </div>
+        <div class="action-card alerts-card">
+            <div class="card-header"><span class="badge bg-danger">?? Alerts</span></div>
+            <div class="card-body">
+                @if (Model.Alerts?.Count > 0)
+                {
+                    <ul>
+                        @foreach (var alert in Model.Alerts)
+                        {
+                            <li>@alert</li>
+                        }
+                    </ul>
+                }
+                else
+                {
+                    <span>No alerts.</span>
+                }
+            </div>
+        </div>
+    </section>
+</div>
+@section Scripts {
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // Sprint 91.7 Part 7: Mock map with current location and next destination
+        document.addEventListener('DOMContentLoaded', function() {
+            var map = L.map('dashboard-map').setView([@Model.CurrentLat, @Model.CurrentLng], 13);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '© OpenStreetMap'
+            }).addTo(map);
+            L.marker([@Model.CurrentLat, @Model.CurrentLng]).addTo(map).bindPopup('You are here').openPopup();
+            @if (Model.NextJobLat != null && Model.NextJobLng != null)
+            {
+            <text>
+            L.marker([@Model.NextJobLat, @Model.NextJobLng], {icon: L.icon({iconUrl:'/img/pin-next.png',iconSize:[32,32]})}).addTo(map).bindPopup('Next Job');
+            </text>
+            }
+        });
+    </script>
+}
+<style>
+    /* Sprint 91.7 Part 7: Mobile-first, card stack, color codes */
+    .dashboard-root { max-width: 600px; margin: 0 auto; padding: 0 8px; }
+    .mobile-fullheight { min-height: 100vh; background: #f8fafc; }
+    .dashboard-map-section { background: #fff; border-radius: 12px; box-shadow: 0 2px 8px #0001; padding: 16px; margin-bottom: 12px; }
+    .dashboard-action-cards { display: flex; flex-direction: column; gap: 14px; }
+    .action-card { background: #fff; border-radius: 10px; box-shadow: 0 2px 8px #0001; padding: 14px 18px; }
+    .action-card .card-header { font-weight: 600; font-size: 1.1em; margin-bottom: 6px; }
+    .status-badge { font-size: 0.95em; font-weight: 600; padding: 2px 10px; border-radius: 8px; background: #e0e0e0; color: #333; }
+    .current-job-card.green { border-left: 6px solid #28a745; }
+    .current-job-card.yellow { border-left: 6px solid #ffc107; }
+    .current-job-card.red { border-left: 6px solid #dc3545; }
+    .next-job-card.green { border-left: 6px solid #28a745; }
+    .next-job-card.yellow { border-left: 6px solid #ffc107; }
+    .next-job-card.red { border-left: 6px solid #dc3545; }
+    @media (max-width: 600px) {
+        .dashboard-root { padding: 0 2px; }
+        .dashboard-map-section { padding: 8px; }
+        .action-card { padding: 10px 8px; }
+    }
+</style>
