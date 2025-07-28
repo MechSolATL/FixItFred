@@ -1,0 +1,66 @@
+@page
+@model MVP_Core.Pages.Admin.TrustRebuildModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@inject MVP_Core.Data.ApplicationDbContext Db
+@{
+    // Sprint 85.1 — Trust Rebuild Suggestions UI
+    Layout = "/Pages/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Trust Rebuild Suggestions";
+    var technicians = Model.Technicians;
+    var selectedTechId = Model.SelectedTechnicianId;
+    var suggestions = Model.Suggestions;
+    var selectedTech = technicians.FirstOrDefault(t => t.Id == selectedTechId);
+}
+<div class="container-fluid px-2 px-md-4 mt-4">
+    <h2 class="mb-4 text-primary">Trust Rebuild Suggestions</h2>
+    <form method="get" class="mb-4 row g-2 align-items-end">
+        <div class="col-md-4">
+            <label class="form-label">Technician</label>
+            <select name="technicianId" class="form-select" onchange="this.form.submit()">
+                <option value="">Select Technician</option>
+                @foreach (var tech in technicians)
+                {
+                    var selected = selectedTechId == tech.Id ? "selected" : "";
+                    <option value="@tech.Id" @selected>@tech.FullName</option>
+                }
+            </select>
+        </div>
+    </form>
+    @if (selectedTech != null)
+    {
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title mb-2">@selectedTech.FullName</h5>
+                <div class="mb-2">Trust Score: <span class="fw-bold">@selectedTech.TrustScore</span></div>
+                <div class="mb-2">Status: <span class="badge bg-@(selectedTech.TrustScore >= 80 ? "success" : selectedTech.TrustScore >= 60 ? "warning text-dark" : "danger")">@(selectedTech.TrustScore >= 80 ? "Trusted" : selectedTech.TrustScore >= 60 ? "Monitor" : "Probation")</span></div>
+            </div>
+        </div>
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title mb-3">Rebuild Recommendations</h5>
+                @if (suggestions.Any())
+                {
+                    <ul class="list-group">
+                        @foreach (var s in suggestions.OrderByDescending(x => x.Weight))
+                        {
+                            <li class="list-group-item">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <span><b>@s.Category</b>: @s.SuggestedAction</span>
+                                    <span class="badge bg-secondary">@s.RecommendedBy</span>
+                                </div>
+                                <div class="progress" style="height: 8px;">
+                                    <div class="progress-bar" role="progressbar" style="width:@s.Weight%;background:@(s.Weight >= 80 ? "#4caf50" : s.Weight >= 60 ? "#ffeb3b" : s.Weight >= 40 ? "#ff9800" : "#f44336");" aria-valuenow="@s.Weight" aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                            </li>
+                        }
+                    </ul>
+                }
+                else
+                {
+                    <div class="alert alert-info">No suggestions available for this technician.</div>
+                }
+            </div>
+        </div>
+    }
+}
+<!-- Sprint 85.1 — Trust Rebuild Suggestions UI -->
