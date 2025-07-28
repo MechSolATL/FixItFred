@@ -1,0 +1,14 @@
+@page
+@model MVP_Core.Pages.Global.CommandModel
+@{
+    ViewData["Title"] = "NovaGodView Command Console";
+}
+<div class="container-fluid px-4 py-4">
+    <h2 class="mb-4">NovaGodView — Command Console</h2>
+    <div class="row row-cols-1 row-cols-md-3 row-cols-lg-5 g-4">
+        @foreach (var card in Model.Metrics)
+        {
+            @await Html.PartialAsync("/Pages/Shared/_MetricsCard.cshtml", card)
+        }
+    </div>
+</div>
