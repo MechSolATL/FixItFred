@@ -413,3 +413,85 @@ footer {
     from { opacity: 0; transform: translateY(-20px); }
     to { opacity: 1; transform: translateY(0); }
 }
+
+/* =============================
+   Setup Wizard Stepper Styles
+============================= */
+.setup-wizard {
+    max-width: 540px;
+    margin: 40px auto;
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+    padding: 32px 28px 24px 28px;
+}
+.setup-steps {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 32px;
+}
+.setup-step {
+    flex: 1;
+    text-align: center;
+    position: relative;
+    color: #bbb;
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+.setup-step.active {
+    color: var(--primary-color);
+}
+.setup-step:before {
+    content: '';
+    display: block;
+    width: 18px;
+    height: 18px;
+    margin: 0 auto 8px auto;
+    border-radius: 50%;
+    background: #e0e0e0;
+    border: 2px solid #bbb;
+    transition: background 0.3s, border 0.3s;
+}
+.setup-step.active:before {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+}
+.setup-step:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    top: 8px;
+    right: -50%;
+    width: 100%;
+    height: 4px;
+    background: #e0e0e0;
+    z-index: 0;
+}
+.setup-step.active:not(:last-child)::after {
+    background: var(--primary-color);
+}
+.setup-wizard .form-label {
+    font-weight: 600;
+}
+.setup-wizard .form-control, .setup-wizard .form-select {
+    border-radius: 8px;
+    margin-bottom: 18px;
+}
+.setup-wizard .wizard-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 18px;
+}
+.setup-wizard .wizard-actions .btn {
+    min-width: 110px;
+}
+.setup-wizard .success-message {
+    background: #e8f5e9;
+    color: #388e3c;
+    border-radius: 10px;
+    padding: 18px 20px;
+    text-align: center;
+    font-size: 1.15rem;
+    margin-bottom: 18px;
+    font-weight: 600;
+}
