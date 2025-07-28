@@ -43,4 +43,18 @@
             </div>
         </div>
     }
+    @if (Model.ProActions != null && Model.ProActions.Count > 0)
+    {
+        <div class="proaction-queue mt-5">
+            <h4 class="mb-3"><i class="fas fa-bolt text-warning"></i> ProAction Queue</h4>
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                @foreach (var action in Model.ProActions)
+                {
+                    <div class="col">
+                        @await Html.PartialAsync("/Pages/Shared/_ProActionCard.cshtml", action)
+                    </div>
+                }
+            </div>
+        </div>
+    }
 </div>
