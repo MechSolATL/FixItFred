@@ -1,0 +1,21 @@
+@page
+@model Admin.TechLoyaltyModel
+@{
+    ViewData["Title"] = "Technician Loyalty Progress";
+    Layout = "_Layout";
+}
+
+<h2>Technician Loyalty Progress</h2>
+
+@foreach (var tech in Model.Technicians)
+{
+    <h3>@tech.Name (@tech.Email)</h3>
+    <div class="milestone-list">
+        @foreach (var milestone in Model.Milestones)
+        {
+            bool unlocked = Model.UnlockedMilestones.Any(u =>
+                u.TechnicianId == tech.Id && u.MilestoneId == milestone.Id);
+            <partial name="_MilestoneCard" model="milestone" view-data='new ViewDataDictionary(ViewData) { { "Unlocked", unlocked } }' />
+        }
+    </div>
+}

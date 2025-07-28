@@ -1,0 +1,10 @@
+@model MVP_Core.Data.Models.TechMilestone
+@{
+    bool unlocked = ViewData["Unlocked"] as bool? ?? false;
+}
+
+<div class="milestone-card @(unlocked ? "unlocked" : "locked")">
+    <div class="milestone-title">@Model.Name</div>
+    <div class="milestone-points">@Model.Points pts</div>
+    <div class="milestone-desc">@Model.Description</div>
+</div>
