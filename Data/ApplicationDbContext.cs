@@ -182,6 +182,10 @@ namespace MVP_Core.Data
         public DbSet<TechMilestone> TechMilestones { get; set; } = null!;
         public DbSet<TechProgress> TechProgresses { get; set; } = null!;
         public DbSet<MilestoneAuditLog> MilestoneAuditLogs { get; set; } = null!;
+        public DbSet<Tenant> Tenants { get; set; } = null!;
+        public DbSet<TenantBranding> TenantBrandings { get; set; } = null!;
+        public DbSet<TenantSettings> TenantSettings { get; set; } = null!;
+        public DbSet<TenantModules> TenantModules { get; set; } = null!;
 
         #endregion
 

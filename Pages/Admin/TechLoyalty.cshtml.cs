@@ -14,7 +14,7 @@ namespace MVP_Core.Pages.Admin
             _context = context;
         }
 
-        public List<Technician> Technicians { get; set; } = new();
+        public List<MVP_Core.Data.Models.Technician> Technicians { get; set; } = new();
         public List<TechMilestone> Milestones { get; set; } = new();
         public List<MilestoneAuditLog> UnlockedMilestones { get; set; } = new();
 
