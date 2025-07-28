@@ -25,12 +25,19 @@ namespace MVP_Core.Pages.Admin
         public List<MVP_Core.Data.Models.Technician> Technicians { get; set; } = new();
         public int SelectedTechnicianId => TechnicianId ?? 0;
         public List<TrustRebuildSuggestion> Suggestions { get; set; } = new();
+        public bool DemoDataActive { get; set; } = false; // Sprint 85.1 — TrustRebuild CSV Export + Filters
+
         public void OnGet()
         {
             Technicians = _db.Technicians.OrderBy(t => t.FullName).ToList();
             if (TechnicianId.HasValue)
             {
                 Suggestions = _advisorService.GetSuggestionsForTechnician(TechnicianId.Value);
+                // Sprint 85.1 — TrustRebuild CSV Export + Filters: Inject demo data for internal QA
+                if (Suggestions.Count == 3 && Suggestions.All(s => s.RecommendedBy == "Algorithm" || s.RecommendedBy == "System" || s.RecommendedBy == "User"))
+                {
+                    DemoDataActive = true;
+                }
             }
         }
     }
