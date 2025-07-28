@@ -1,0 +1,50 @@
+@page
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize(Roles = "Admin")]
+@model MVP_Core.Pages.Admin.LeaderboardModel
+@{
+    ViewData["Title"] = "Leaderboard";
+}
+<div class="container mx-auto py-6">
+    <h2 class="text-2xl font-bold mb-4">Technician Leaderboard</h2>
+    <div class="mb-4 flex gap-2">
+        <form method="get">
+            <select name="filter" class="form-select" onchange="this.form.submit()">
+                <option value="all" selected>All Time</option>
+                <option value="monthly">Monthly</option>
+                <option value="weekly">Weekly</option>
+            </select>
+        </form>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        @foreach (var entry in Model.Leaderboard)
+        {
+            <div class="bg-white rounded shadow p-4 flex flex-col items-center">
+                <div class="flex items-center gap-2 mb-2">
+                    <span class="text-xl font-bold">@entry.Rank</span>
+                    <span class="font-semibold">@entry.Name</span>
+                    @if (entry.RankChange > 0)
+                    {
+                        <span class="text-green-600">&#8593; @entry.RankChange</span>
+                    }
+                    else if (entry.RankChange < 0)
+                    {
+                        <span class="text-red-600">&#8595; @(-entry.RankChange)</span>
+                    }
+                </div>
+                <div class="flex gap-2 mb-2">
+                    @foreach (var badge in entry.Badges)
+                    {
+                        <span class="px-2 py-1 rounded bg-blue-100 text-blue-800 text-xs font-semibold">@badge</span>
+                    }
+                </div>
+                <div class="flex flex-col items-center">
+                    <span class="text-gray-700">Jobs: <b>@entry.JobsCompleted</b></span>
+                    <span class="text-gray-700">Rating: <b>@entry.Rating.ToString("F1")</b></span>
+                    <span class="text-gray-700">Upsells: <b>@entry.UpsellCount</b></span>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+<!-- Optionally add Chart.js sparklines here for trends -->

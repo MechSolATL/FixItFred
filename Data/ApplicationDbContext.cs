@@ -173,6 +173,10 @@ namespace MVP_Core.Data
         public DbSet<UserOnboardingStatus> UserOnboardingStatuses { get; set; } = null!; // Sprint 84.0 — OnboardingStatus Schema
         // Sprint 84.9 — Drop Alert Logic + TrustScore Delta Detection
         public DbSet<TechnicianAlertLog> TechnicianAlertLogs { get; set; } = null!;
+        public DbSet<MVP_Core.Models.QuoteMessage> QuoteMessages { get; set; } = null!;
+        public DbSet<MVP_Core.Models.Whisper> Whispers { get; set; } = null!;
+        public DbSet<MVP_Core.Models.LeaderboardEntry> LeaderboardEntries { get; set; } = null!;
+        public DbSet<MVP_Core.Models.TechPulseLog> TechPulseLogs { get; set; } = null!;
 
         #endregion
 

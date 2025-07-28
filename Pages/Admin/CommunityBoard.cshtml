@@ -1,0 +1,70 @@
+@page
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize(Roles = "Admin")]
+@model MVP_Core.Pages.Admin.CommunityBoardModel
+@{
+    ViewData["Title"] = "Community Board";
+}
+<div class="container mx-auto py-6">
+    <h2 class="text-2xl font-bold mb-4">Community Board</h2>
+    <div class="mb-4 flex flex-col md:flex-row gap-4">
+        <div class="flex-1">
+            <h3 class="font-semibold mb-2">Manager Announcements</h3>
+            <form method="post" asp-page-handler="PostAnnouncement">
+                <textarea name="Announcement" class="form-control mb-2" rows="2" maxlength="500" required></textarea>
+                <button type="submit" class="btn btn-primary">Post</button>
+            </form>
+            <ul class="mt-2">
+                @foreach (var ann in Model.Announcements)
+                {
+                    <li class="mb-1"><span class="font-bold">@ann.Author:</span> @ann.Message <span class="text-xs text-gray-500">(@ann.CreatedAt.ToShortTimeString())</span></li>
+                }
+            </ul>
+        </div>
+        <div class="flex-1">
+            <h3 class="font-semibold mb-2">Whisper Chat (Today)</h3>
+            <form method="post" asp-page-handler="SendWhisper">
+                <input type="text" name="Recipient" class="form-control mb-1" placeholder="To (username)" required />
+                <textarea name="Message" class="form-control mb-1" rows="1" maxlength="250" required></textarea>
+                <button type="submit" class="btn btn-secondary">Send Whisper</button>
+            </form>
+            <ul class="mt-2">
+                @foreach (var whisper in Model.Whispers)
+                {
+                    <li class="mb-1"><span class="font-bold">@whisper.Sender</span> ? <span class="font-bold">@whisper.Recipient</span>: @whisper.Message <span class="text-xs text-gray-500">(@whisper.SentAt.ToShortTimeString())</span></li>
+                }
+            </ul>
+        </div>
+    </div>
+    <div class="my-6 p-4 bg-yellow-50 border-l-4 border-yellow-400">
+        <b>Daily Quote:</b> <span>@Model.DailyQuote?.Message</span> <span class="text-xs text-gray-500">- @Model.DailyQuote?.Author</span>
+    </div>
+    <div class="my-4">
+        <b>Random Audio Drop:</b>
+        @if (!string.IsNullOrEmpty(Model.AudioFile))
+        {
+            <audio controls src="/audio/daily/@Model.AudioFile"></audio>
+        }
+        else
+        {
+            <span class="text-muted">No audio for today.</span>
+        }
+    </div>
+    <div class="my-4 p-4 bg-blue-50 border-l-4 border-blue-400">
+        <b>Tech Spotlight:</b> <span>@Model.TechSpotlight</span>
+    </div>
+    <div class="my-4">
+        <b>Team Sentiment:</b>
+        <form method="post" asp-page-handler="React">
+            <button type="submit" name="Emoji" value="??" class="btn btn-light">??</button>
+            <button type="submit" name="Emoji" value="??" class="btn btn-light">??</button>
+            <button type="submit" name="Emoji" value="??" class="btn btn-light">??</button>
+        </form>
+        <div class="mt-2">
+            @foreach (var pulse in Model.PulseSummary)
+            {
+                <span class="mr-2">@pulse.Emoji: @pulse.Count</span>
+            }
+        </div>
+    </div>
+</div>
