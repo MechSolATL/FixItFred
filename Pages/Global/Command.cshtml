@@ -11,6 +11,11 @@
             @await Html.PartialAsync("/Pages/Shared/_MetricsCard.cshtml", card)
         }
     </div>
+    <!-- Compliance Reminders Partial -->
+    @if (Model.AlertSummary != null && Model.AlertSummary.Count > 0)
+    {
+        @await Html.PartialAsync("/Pages/Shared/_ComplianceReminderCard.cshtml", Model.AlertSummary)
+    }
     <!-- Diagnostics AI Alerts Partial -->
     @if (Model.DiagnosticsAlerts != null && Model.DiagnosticsAlerts.Count > 0)
     {

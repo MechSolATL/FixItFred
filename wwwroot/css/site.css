@@ -234,6 +234,29 @@ footer {
     margin-bottom: 20px;
 }
 
+.compliance-alert {
+    background: #fffbe6;
+    border-left: 4px solid #ffa500;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+.badge-warning {
+    background-color: #ffa500;
+    color: #fff;
+    padding: 3px 7px;
+    border-radius: 4px;
+    font-weight: bold;
+}
+
+.alert-expired {
+    border-color: red !important;
+}
+
+.alert-expire-soon {
+    border-color: orange !important;
+}
+
 /* FixItFred: Responsive ETA layout */
 .eta-grid div {
   padding: 8px;

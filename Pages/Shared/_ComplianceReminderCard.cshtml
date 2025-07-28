@@ -1,0 +1,27 @@
+@model List<MVP_Core.Data.Models.ComplianceAlertLog>
+@if (Model != null && Model.Count > 0)
+{
+    <div class="compliance-alerts-section my-4">
+        <h4 class="mb-3"><i class="fas fa-shield-alt text-warning"></i> Compliance Reminders</h4>
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            @foreach (var alert in Model)
+            {
+                var expireClass = alert.ExpiresAt.HasValue && alert.ExpiresAt.Value < DateTime.UtcNow ? "alert-expired" : (alert.ExpiresAt.HasValue && alert.ExpiresAt.Value < DateTime.UtcNow.AddDays(3) ? "alert-expire-soon" : "");
+                <div class="col">
+                    <div class="compliance-alert @expireClass">
+                        <span class="badge badge-warning">@alert.AlertType</span>
+                        <span class="ms-2">@alert.Message</span>
+                        @if (alert.ExpiresAt.HasValue)
+                        {
+                            <span class="ms-2 small">(Expires: @alert.ExpiresAt.Value.ToShortDateString())</span>
+                        }
+                        @if (!string.IsNullOrEmpty(alert.Severity))
+                        {
+                            <span class="ms-2 text-danger">@alert.Severity</span>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+}
