@@ -2,12 +2,128 @@
 @model MVP_Core.Pages.Admin.CoachingLogModel
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @{
-    // Sprint 85.2 — Coaching Logbook System
+    // Sprint 85.4 — Coaching UI Enhancements + Export
     Layout = "/Pages/Shared/_AdminLayout.cshtml";
     ViewData["Title"] = "Supervisor Coaching Logbook";
 }
 <div class="container-fluid px-2 px-md-4 mt-4">
     <h2 class="mb-4 text-primary">Supervisor Coaching Logbook</h2>
-    <!-- Sprint 85.2 — Coaching Logbook System: UI will be implemented in next steps -->
-    <div class="alert alert-info">Coaching logbook UI coming soon.</div>
+    <!-- Sprint 85.4 — Coaching UI Enhancements + Export -->
+    <form method="get" class="row g-2 mb-3 align-items-end">
+        <div class="col-md-3">
+            <label class="form-label">Date Range</label>
+            <input type="date" name="startDate" class="form-control" value="@Model.StartDateString" />
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">To</label>
+            <input type="date" name="endDate" class="form-control" value="@Model.EndDateString" />
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">Technician Tier</label>
+            <select name="tier" class="form-select">
+                <option value="">All</option>
+                @foreach (var tier in Model.Tiers)
+                {
+                    <option value="@tier" @(Model.SelectedTier == tier ? "selected" : null)>@tier</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">Supervisor</label>
+            <select name="supervisor" class="form-select">
+                <option value="">All</option>
+                @foreach (var sup in Model.Supervisors)
+                {
+                    <option value="@sup" @(Model.SelectedSupervisor == sup ? "selected" : null)>@sup</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-2 mt-2">
+            <button type="submit" class="btn btn-primary w-100">Filter</button>
+        </div>
+        <div class="col-md-2 mt-2">
+            <button type="submit" name="export" value="1" class="btn btn-success w-100">Export to CSV</button>
+        </div>
+        <div class="col-md-2 mt-2">
+            <button type="button" class="btn btn-outline-secondary w-100" data-bs-toggle="modal" data-bs-target="#addCoachingModal">Add Entry</button>
+        </div>
+    </form>
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Date</th>
+                    <th>Technician</th>
+                    <th>Tier</th>
+                    <th>Supervisor</th>
+                    <th>Category</th>
+                    <th>Note</th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach (var entry in Model.Entries)
+            {
+                var tech = Model.Technicians.FirstOrDefault(t => t.Id == entry.TechnicianId);
+                <tr>
+                    <td>@entry.Timestamp.ToLocalTime().ToString("yyyy-MM-dd")</td>
+                    <td>@(tech?.FullName ?? $"Tech #{entry.TechnicianId}")</td>
+                    <td>@(tech?.TierLevel.ToString() ?? "-")</td>
+                    <td>@entry.SupervisorName</td>
+                    <td>
+                        <span class="badge bg-info text-dark">@entry.Category</span>
+                    </td>
+                    <td>@entry.CoachingNote</td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+    <!-- Modal for new coaching entry -->
+    <div class="modal fade" id="addCoachingModal" tabindex="-1" aria-labelledby="addCoachingModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form method="post">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addCoachingModalLabel">Add Coaching Entry</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-2">
+                            <label class="form-label">Technician</label>
+                            <select name="TechnicianId" class="form-select" required>
+                                <option value="">Select...</option>
+                                @foreach (var tech in Model.Technicians)
+                                {
+                                    <option value="@tech.Id">@tech.FullName</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label">Supervisor</label>
+                            <input name="SupervisorName" class="form-control" required />
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label">Category</label>
+                            <select name="Category" class="form-select" required>
+                                <option value="Performance">Performance</option>
+                                <option value="Attitude">Attitude</option>
+                                <option value="Skill">Skill</option>
+                            </select>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label">Note</label>
+                            <textarea name="CoachingNote" class="form-control" required></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Add Entry</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+}
