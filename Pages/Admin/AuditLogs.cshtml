@@ -32,9 +32,18 @@ else
                     <td>@log.Id</td>
                     <td>@log.UserId</td>
                     <td>@log.ChangeType</td>
-                    <td>@log.OldValue</td>
-                    <td>@log.NewValue</td>
-                    <td>@log.IPAddress</td>
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <td>@log.OldValue</td>
+                        <td>@log.NewValue</td>
+                        <td>@log.IPAddress</td>
+                    }
+                    else
+                    {
+                        <td>??</td>
+                        <td>??</td>
+                        <td>??</td>
+                    }
                     <td>@log.Timestamp.ToLocalTime().ToString("g")</td>
                 </tr>
             }
