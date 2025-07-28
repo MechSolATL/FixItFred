@@ -1,0 +1,14 @@
+@model MVP_Core.Pages.Admin.AdminUsers.EditModel
+@using MVP_Core.Services.Admin
+@{
+    var allModules = PermissionService.GetAllModules();
+}
+<div class="mb-3">
+    @foreach (var module in allModules)
+    {
+        <label class="block">
+            <input type="checkbox" name="EnabledModules" value="@module" @(Model.EnabledModules?.Contains(module) == true ? "checked" : "") />
+            @module
+        </label>
+    }
+</div>

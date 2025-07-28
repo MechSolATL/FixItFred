@@ -1,3 +1,7 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+
 namespace MVP_Core.Data.Models
 {
     public class AdminUser
@@ -22,5 +26,10 @@ namespace MVP_Core.Data.Models
 
         [StringLength(500)]
         public string? ReviewNotes { get; set; }
+
+        // Sprint 86.4 — Role-Based Feature Toggle Engine
+        public List<string> EnabledModules { get; set; } = new();
+        public string JobFunction { get; set; } = string.Empty;  // e.g. "TechnicianLead", "Dispatcher", "Viewer"
+        public int SkillLevel { get; set; }      // 1 = Entry, 2 = Mid, 3 = Lead
     }
 }

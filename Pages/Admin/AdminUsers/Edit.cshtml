@@ -1,0 +1,81 @@
+@page
+@model MVP_Core.Pages.Admin.AdminUsers.EditModel
+@using MVP_Core.Services.Admin
+@inject PermissionService PermissionService
+@{
+    ViewData["Title"] = "Edit Admin User";
+    var allModules = PermissionService.GetAllModules();
+    var step = Model.WizardStep;
+    var totalSteps = 4;
+}
+<form method="post">
+    @Html.AntiForgeryToken()
+    <div class="wizard-progress mb-4">
+        <div class="progress-bar bg-primary" style="width:@((step * 100) / totalSteps)%"></div>
+        <div class="flex justify-between text-xs mt-1">
+            <span class="@(step == 1 ? "font-bold text-blue-700" : "")">Step 1: Job Function</span>
+            <span class="@(step == 2 ? "font-bold text-blue-700" : "")">Step 2: Skill Level</span>
+            <span class="@(step == 3 ? "font-bold text-blue-700" : "")">Step 3: Features</span>
+            <span class="@(step == 4 ? "font-bold text-blue-700" : "")">Step 4: Review</span>
+        </div>
+    </div>
+    @if (step == 1)
+    {
+        <h3>Select Job Function</h3>
+        <select asp-for="JobFunction" class="form-select mb-4">
+            <option value="">-- Select --</option>
+            <option value="Dispatcher">Dispatcher</option>
+            <option value="TechnicianLead">Technician Lead</option>
+            <option value="Viewer">Viewer</option>
+            <option value="QA">QA</option>
+            <option value="Admin">Admin</option>
+        </select>
+        <input type="hidden" name="WizardStep" value="1" />
+        <button type="submit" name="action" value="Next" class="btn btn-primary">Next</button>
+    }
+    else if (step == 2)
+    {
+        <h3>Select Skill Level</h3>
+        <div class="mb-4">
+            <label><input type="radio" asp-for="SkillLevel" value="1" /> Entry</label>
+            <label class="ml-3"><input type="radio" asp-for="SkillLevel" value="2" /> Mid</label>
+            <label class="ml-3"><input type="radio" asp-for="SkillLevel" value="3" /> Lead</label>
+        </div>
+        <input type="hidden" name="JobFunction" value="@Model.JobFunction" />
+        <input type="hidden" name="WizardStep" value="2" />
+        <button type="submit" name="action" value="Back" class="btn btn-secondary">Back</button>
+        <button type="submit" name="action" value="Next" class="btn btn-primary ml-2">Next</button>
+    }
+    else if (step == 3)
+    {
+        <h3>Customize Features</h3>
+        <partial name="../_ModuleCheckboxesPartial" model="Model" />
+        <input type="hidden" name="JobFunction" value="@Model.JobFunction" />
+        <input type="hidden" name="SkillLevel" value="@Model.SkillLevel" />
+        <input type="hidden" name="WizardStep" value="3" />
+        <button type="submit" name="action" value="Back" class="btn btn-secondary">Back</button>
+        <button type="submit" name="action" value="Next" class="btn btn-primary ml-2">Next</button>
+    }
+    else if (step == 4)
+    {
+        <h3>Review & Save</h3>
+        <ul class="mb-4">
+            <li><b>Job Function:</b> @Model.JobFunction</li>
+            <li><b>Skill Level:</b> @(Model.SkillLevel == 1 ? "Entry" : Model.SkillLevel == 2 ? "Mid" : "Lead")</li>
+            <li><b>Enabled Modules:</b> @string.Join(", ", Model.EnabledModules ?? new List<string>())</li>
+        </ul>
+        <input type="hidden" name="JobFunction" value="@Model.JobFunction" />
+        <input type="hidden" name="SkillLevel" value="@Model.SkillLevel" />
+        @foreach (var m in Model.EnabledModules ?? new List<string>())
+        {
+            <input type="hidden" name="EnabledModules" value="@m" />
+        }
+        <input type="hidden" name="WizardStep" value="4" />
+        <button type="submit" name="action" value="Back" class="btn btn-secondary">Back</button>
+        <button type="submit" name="action" value="Save" class="btn btn-success ml-2">Save</button>
+    }
+</form>
+<style>
+    .wizard-progress { position: relative; height: 6px; background: #e5e7eb; border-radius: 3px; }
+    .progress-bar { height: 100%; border-radius: 3px; transition: width 0.3s; }
+</style>
