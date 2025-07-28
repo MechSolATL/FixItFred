@@ -21,14 +21,16 @@ namespace MVP_Core.Pages.Global
         private readonly ProActionQueueEngine _proActionQueueEngine;
         private readonly ProcessMonitorService _processMonitorService;
         private readonly ComplianceEnforcementService _complianceService;
+        private readonly DiagnosticsAIService _diagnosticsAIService;
         private readonly ApplicationDbContext _db;
-        public CommandModel(MetricsEngineService metricsEngine, ForecastingEngine forecastingEngine, ProActionQueueEngine proActionQueueEngine, ProcessMonitorService processMonitorService, ComplianceEnforcementService complianceService, ApplicationDbContext db)
+        public CommandModel(MetricsEngineService metricsEngine, ForecastingEngine forecastingEngine, ProActionQueueEngine proActionQueueEngine, ProcessMonitorService processMonitorService, ComplianceEnforcementService complianceService, DiagnosticsAIService diagnosticsAIService, ApplicationDbContext db)
         {
             _metricsEngine = metricsEngine;
             _forecastingEngine = forecastingEngine;
             _proActionQueueEngine = proActionQueueEngine;
             _processMonitorService = processMonitorService;
             _complianceService = complianceService;
+            _diagnosticsAIService = diagnosticsAIService;
             _db = db;
         }
         public List<MetricsCardViewModel> Metrics { get; set; } = new();
@@ -36,12 +38,14 @@ namespace MVP_Core.Pages.Global
         public List<ProActionCardViewModel> ProActions { get; set; } = new();
         public List<ProcessStatusViewModel> ProcessStatuses { get; set; } = new();
         public List<Tenant> LockedOutTenants { get; set; } = new();
+        public List<DiagnosticsAlertResult> DiagnosticsAlerts { get; set; } = new();
         public async Task OnGetAsync()
         {
             Metrics = await _metricsEngine.GetGlobalMetricsAsync();
             Forecast = await _forecastingEngine.GetForecastAsync();
             ProActions = _proActionQueueEngine.GetProActions();
             ProcessStatuses = await _processMonitorService.GetAllProcessStatusesAsync();
+            DiagnosticsAlerts = await _diagnosticsAIService.GetLatestAlertsAsync();
             // Example: Find tenants with expired docs (replace with real logic)
             LockedOutTenants = _db.Tenants.Where(t => t.CompanyName.Contains("Lockout")).ToList();
         }

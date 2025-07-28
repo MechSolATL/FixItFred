@@ -1,0 +1,24 @@
+@model MVP_Core.Models.ViewModels.DiagnosticsAlertResult
+@{
+    string badgeClass = Model.SeverityLevel switch
+    {
+        "Critical" => "severity-badge severity-critical",
+        "Error" => "severity-badge severity-error",
+        "Warning" => "severity-badge severity-warning",
+        _ => "severity-badge severity-info"
+    };
+}
+<div class="diagnostics-card animate__animated animate__fadeInUp">
+    <div class="d-flex align-items-center mb-2">
+        <span class="@badgeClass me-2">@Model.SeverityLevel</span>
+        <span class="fw-bold">@Model.Type</span>
+        <span class="ms-auto text-muted small">@Model.Timestamp.ToLocalTime().ToString("g")</span>
+    </div>
+    <div class="diagnostics-summary mb-2">@Model.Description</div>
+    <button class="suggestion-toggle btn btn-link p-0" type="button" data-bs-toggle="collapse" data-bs-target="#suggestion-@Model.Timestamp.Ticks" aria-expanded="false" aria-controls="suggestion-@Model.Timestamp.Ticks">
+        <span class="text-primary">Suggested Fix</span>
+    </button>
+    <div class="collapse mt-2" id="suggestion-@Model.Timestamp.Ticks">
+        <div class="suggested-fix bg-light p-2 rounded">@Model.SuggestedFix</div>
+    </div>
+</div>

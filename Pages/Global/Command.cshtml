@@ -11,6 +11,21 @@
             @await Html.PartialAsync("/Pages/Shared/_MetricsCard.cshtml", card)
         }
     </div>
+    <!-- Diagnostics AI Alerts Partial -->
+    @if (Model.DiagnosticsAlerts != null && Model.DiagnosticsAlerts.Count > 0)
+    {
+        <div class="diagnostics-alerts-section my-4">
+            <h4 class="mb-3"><i class="fas fa-robot text-primary"></i> AI Diagnostics Alerts</h4>
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                @foreach (var alert in Model.DiagnosticsAlerts)
+                {
+                    <div class="col">
+                        @await Html.PartialAsync("/Pages/Shared/_DiagnosticsAlertCard.cshtml", alert)
+                    </div>
+                }
+            </div>
+        </div>
+    }
     <div class="alert alert-danger compliance-lockout-alert my-4" style="display:@(Model.LockedOutTenants.Any() ? "block" : "none")">
         <b>Compliance Lockout:</b> The following tenants are locked out due to expired compliance documents:
         <ul>
