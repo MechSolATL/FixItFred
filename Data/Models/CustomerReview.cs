@@ -27,5 +27,11 @@ namespace MVP_Core.Data.Models
         public float? SentimentScore { get; set; } // Sprint 57.0: Sentiment analysis score
         public string? Keywords { get; set; } // Sprint 57.0: Extracted keywords
         public bool IsFlagged { get; set; } = false; // Sprint 57.0: Flag for concerning feedback
+        // Sprint 84.7.2 — Live Filter + UI Overlay
+        public bool IsApproved { get; set; } = true;
+        public string? Tier { get; set; }
+        public string? CustomerName { get; set; }
+        public string? Comment { get; set; }
+        public DateTime? Timestamp => SubmittedAt;
     }
 }

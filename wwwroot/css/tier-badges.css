@@ -1,0 +1,40 @@
+/* Sprint 84.7.2 — Live Filter + UI Overlay */
+.badge-tier-bronze {
+    background-color: #CC6600;
+    color: #fff;
+}
+.badge-tier-silver {
+    background-color: #B0B0B0;
+    color: #222;
+}
+.badge-tier-gold {
+    background-color: #FFD700;
+    color: #222;
+    box-shadow: 0 0 8px 2px #FFD70080;
+    transition: box-shadow 0.3s;
+}
+.badge-tier-gold:hover {
+    box-shadow: 0 0 16px 4px #FFD700;
+}
+.badge-tier-platinum {
+    background-color: #007BFF;
+    color: #fff;
+}
+.badge-tier-diamond {
+    background: linear-gradient(90deg, #6F42C1 0%, #9B59B6 100%);
+    color: #fff;
+    box-shadow: 0 0 8px 2px #9B59B680;
+    transition: box-shadow 0.3s;
+}
+.badge-tier-diamond:hover {
+    box-shadow: 0 0 16px 4px #9B59B6;
+}
+
+/* Sprint 84.7.2 — Live Filter + UI Overlay: Modal fade-in animation */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(40px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.animate-fadeIn {
+    animation: fadeIn 0.5s ease;
+}

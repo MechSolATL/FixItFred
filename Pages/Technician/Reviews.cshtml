@@ -1,0 +1,138 @@
+@page
+@model MVP_Core.Pages.Technician.ReviewsModel
+@using MVP_Core.Data.Models
+@using MVP_Core.Services
+@inject ITechnicianService TechnicianService
+@inject IReviewService ReviewService
+@inject ITechnicianLeaderboardService LeaderboardService
+@{
+    Layout = "/Pages/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Technician Reviews";
+    // Sprint 84.7.2 — Live Filter + UI Overlay
+    var technicianId = Model.TechnicianId;
+    var tiers = Model.Tiers;
+    var selectedTier = Model.SelectedTier;
+    var reviews = Model.FilteredReviews;
+    var stats = Model.Stats;
+    var techDetail = Model.TechnicianDetail; // Sprint 84.7.2 — Live Filter + UI Overlay
+}
+
+<!-- Sprint 84.7 — Technician Review Dashboard -->
+<div class="container mx-auto px-2 py-4">
+    <h2>Technician Reviews</h2>
+    <div class="mb-4">
+        <label for="tierFilter" class="form-label">Filter by Tier:</label>
+        <select id="tierFilter" class="form-select" onchange="filterByTier()">
+            <option value="">All Tiers</option>
+            @foreach (var tier in tiers)
+            {
+                <option value="@tier.Name" selected="@(tier.Name == selectedTier ? "selected" : null)">@tier.Name</option> <!-- Sprint 84.7.2 — Live Filter + UI Overlay: Fix RZ1031 -->
+            }
+        </select>
+    </div>
+    <div id="statsSection" class="mb-4">
+        <span class="badge @GetTierBadgeClass(stats.TierName)" id="tierBadge">@stats.TierName</span> <!-- Sprint 84.7.2 — Live Filter + UI Overlay -->
+        <span class="mx-2">?? Avg Rating: @stats.AverageRating.ToString("0.0")</span>
+        <span class="mx-2">Total Reviews: @stats.TotalReviews</span>
+    </div>
+    <div id="heatmapSection" class="mb-4">
+        <!-- Heatmap will be rendered here -->
+        <canvas id="ratingHeatmap" height="80"></canvas>
+    </div>
+    <div id="reviewsSection">
+        <table class="table table-striped">
+            <thead><tr><th>Date</th><th>Customer</th><th>Rating</th><th>Comment</th><th>Details</th></tr></thead>
+            <tbody>
+            @foreach (var review in reviews)
+            {
+                <tr>
+                    <td>@(review.Timestamp?.ToShortDateString() ?? "—")</td>
+                    <td>@review.CustomerName</td>
+                    <td>@review.Rating</td>
+                    <td>@review.Comment</td>
+                    <td><button class="btn btn-sm btn-info" onclick="showOverlay(@review.Id)">Overlay</button></td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+    <!-- Technician Overlay UI -->
+    <div id="technicianOverlay" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 transition-opacity duration-300" style="display:none;">
+        <div class="bg-white bg-opacity-80 backdrop-blur-lg rounded-xl shadow-lg p-8 w-full max-w-md animate-fadeIn">
+            <div class="flex justify-between items-center mb-4">
+                <h5 class="text-xl font-bold">Technician Details</h5>
+                <button type="button" class="btn-close" onclick="hideOverlay()"></button>
+            </div>
+            @if (techDetail != null)
+            {
+                <div class="mb-2"><span class="font-semibold">Name:</span> @techDetail.Name</div>
+                <div class="mb-2"><span class="font-semibold">Tier:</span> <span class="badge @GetTierBadgeClass(stats.TierName)">@stats.TierName</span></div>
+                <div class="mb-2"><span class="font-semibold">Trust Score:</span> @techDetail.TrustScore</div>
+                <div class="mb-2"><span class="font-semibold">Review History:</span></div>
+                <ul class="list-disc ml-6">
+                    @foreach (var review in reviews.Take(5))
+                    {
+                        <li>@(review.Timestamp?.ToShortDateString() ?? "—") — <span class="font-semibold">@review.Rating</span> — @review.Comment</li>
+                    }
+                </ul>
+            }
+        </div>
+    </div>
+</div>
+@functions {
+    // Sprint 84.7.2 — Live Filter + UI Overlay
+    public string GetTierBadgeClass(string tierName)
+    {
+        return tierName switch
+        {
+            "Bronze" => "badge-tier-bronze",
+            "Silver" => "badge-tier-silver",
+            "Gold" => "badge-tier-gold",
+            "Platinum" => "badge-tier-platinum",
+            "Diamond" => "badge-tier-diamond",
+            _ => "badge-tier-silver"
+        };
+    }
+}
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script>
+    // Sprint 84.7.2 — Live Filter + UI Overlay
+    function filterByTier() {
+        var tier = document.getElementById('tierFilter').value;
+        fetch(`?handler=Filter&tier=${encodeURIComponent(tier)}`)
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById('reviewsSection').innerHTML =
+                    html.match(/<tbody>[\s\S]*<\/tbody>/)[0];
+            });
+    }
+    function showOverlay(reviewId) {
+        var overlay = document.getElementById('technicianOverlay');
+        overlay.style.display = 'flex';
+        overlay.classList.add('animate-fadeIn');
+    }
+    function hideOverlay() {
+        var overlay = document.getElementById('technicianOverlay');
+        overlay.style.display = 'none';
+        overlay.classList.remove('animate-fadeIn');
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+        // Rating heatmap logic
+        var ctx = document.getElementById('ratingHeatmap').getContext('2d');
+        var ratings = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.HeatmapRatings));
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['1', '2', '3', '4', '5'],
+                datasets: [{
+                    label: 'Ratings',
+                    data: ratings,
+                    backgroundColor: ['#f44336', '#ff9800', '#ffeb3b', '#8bc34a', '#2196f3']
+                }]
+            },
+            options: { plugins: { legend: { display: false } } }
+        });
+    });
+    </script>
+}

@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 using System.Collections.Generic;
+using System; // Sprint 84.7.2 — Live Filter + UI Overlay
 
 namespace MVP_Core.Data.Models
 {
@@ -60,5 +61,8 @@ namespace MVP_Core.Data.Models
         public string City { get; set; } = string.Empty; // Leaderboard city
 
         public string Name => FullName;
+
+        // Sprint 84.7.2 — Live Filter + UI Overlay
+        public int TrustScore { get; set; } = 100;
     }
 }

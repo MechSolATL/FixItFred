@@ -6,6 +6,8 @@ using MVP_Core.Hubs;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System; // Sprint 84.7.2 — Live Filter + UI Overlay
+using System.Security.Claims;
 
 namespace MVP_Core.Services
 {
@@ -75,6 +77,21 @@ namespace MVP_Core.Services
                 await _db.SaveChangesAsync();
                 await _hub.Clients.All.SendAsync("TechnicianRemoved", tech.Id, tech.FullName);
             }
+        }
+
+        // Sprint 84.7.2 — Live Filter + UI Overlay
+        public int GetCurrentTechnicianId(ClaimsPrincipal user)
+        {
+            // Assumes claim type "TechnicianId" is present
+            var idClaim = user?.Claims?.FirstOrDefault(c => c.Type == "TechnicianId");
+            if (idClaim != null && int.TryParse(idClaim.Value, out int id))
+                return id;
+            throw new Exception("TechnicianId claim not found");
+        }
+
+        public Technician GetTechnicianById(int id)
+        {
+            return _db.Technicians.FirstOrDefault(t => t.Id == id) ?? new Technician();
         }
     }
 }

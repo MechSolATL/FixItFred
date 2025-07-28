@@ -3,11 +3,12 @@ using MVP_Core.Data.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using MVP_Core.Pages.Technician; // Sprint 84.7.2 — Live Filter + UI Overlay
 
 namespace MVP_Core.Services
 {
     // Sprint 84.5 — Technician Leaderboard + Rivalry Engine
-    public class TechnicianLeaderboardService
+    public class TechnicianLeaderboardService : ITechnicianLeaderboardService // Sprint 84.7.2 — Live Filter + UI Overlay
     {
         private readonly ApplicationDbContext _db;
         public TechnicianLeaderboardService(ApplicationDbContext db)
@@ -91,6 +92,30 @@ namespace MVP_Core.Services
             var todayPoints = _db.TechnicianScoreEntries.Where(e => e.TechnicianId == technicianId && e.Date.Date == today).Sum(e => e.Points);
             var yesterdayPoints = _db.TechnicianScoreEntries.Where(e => e.TechnicianId == technicianId && e.Date.Date == yesterday).Sum(e => e.Points);
             return todayPoints - yesterdayPoints;
+        }
+
+        // Sprint 84.7.2 — Live Filter + UI Overlay
+        public List<RewardTier> GetTechnicianTiers()
+        {
+            return _db.RewardTiers.OrderBy(t => t.PointsRequired).ToList();
+        }
+
+        public ReviewsModel.ReviewStats GetReviewStats(int technicianId, string? selectedTier)
+        {
+            var reviews = _db.CustomerReviews.Where(r => r.TechnicianId == technicianId && r.IsApproved);
+            if (!string.IsNullOrEmpty(selectedTier))
+                reviews = reviews.Where(r => r.Tier == selectedTier);
+            var list = reviews.ToList();
+            var avg = list.Any() ? list.Average(r => r.Rating) : 0.0;
+            var tierName = selectedTier ?? "All";
+            var badgeColor = "#2196f3"; // TODO: Map tier to color if needed
+            return new ReviewsModel.ReviewStats
+            {
+                TierName = tierName,
+                BadgeColor = badgeColor,
+                AverageRating = avg,
+                TotalReviews = list.Count
+            };
         }
     }
 
