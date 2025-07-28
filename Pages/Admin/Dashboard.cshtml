@@ -17,6 +17,50 @@
 <div class="container mt-5">
     <h1 class="text-center mb-4">?? Service Requests Dashboard</h1>
 
+    <!-- Sprint 85.0 — Admin Drop Alert UI + Toast Integration -->
+    <div class="mb-4">
+        <h4>Recent TrustScore Drop Alerts
+            @if (Model.DropAlertCount >= 3)
+            {
+                <span class="badge bg-danger ms-2" title="Multiple TrustScore drops"><i class="fas fa-exclamation-triangle"></i> @Model.DropAlertCount</span>
+            }
+        </h4>
+        @if (Model.LatestDropAlerts.Any())
+        {
+            <div class="card shadow-sm mb-3">
+                <div class="card-body p-2">
+                    <table class="table table-sm table-bordered mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Technician</th>
+                                <th>Drop ?</th>
+                                <th>Previous ? Current</th>
+                                <th>Triggered At</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        @foreach (var alert in Model.LatestDropAlerts)
+                        {
+                            var tech = Db.Technicians.FirstOrDefault(t => t.Id == alert.TechnicianId);
+                            <tr>
+                                <td>@(tech?.FullName ?? $"Tech #{alert.TechnicianId}")</td>
+                                <td class="text-danger fw-bold">@(alert.PreviousScore - alert.CurrentScore)</td>
+                                <td><span class="text-muted">@alert.PreviousScore</span> ? <span class="fw-bold">@alert.CurrentScore</span></td>
+                                <td>@alert.TriggeredAt.ToLocalTime().ToString("g")</td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-success">No TrustScore drops in the past 7 days.</div>
+        }
+    </div>
+    <!-- End Sprint 85.0 — Admin Drop Alert UI + Toast Integration -->
+
     <!-- P.R.O.S. Certified Badge -->
     @if (onboarding != null && onboarding.IsVerified)
     {
@@ -95,10 +139,18 @@
         {
             <div class="alert alert-success">No active alerts.</div>
         }
-        <div class="d-flex flex-row">
+        <div class="d-flex flex-row align-items-center">
             <span class="me-2"><i class="fas fa-bell"></i></span>
             <span class="me-2"><i class="fas fa-bolt"></i></span>
             <span class="me-2"><i class="fas fa-shield-alt"></i></span>
+            <!-- Sprint 85.0 — Admin Drop Alert UI + Toast Integration: TrustMap badge icon -->
+            <a href="/Admin/TrustMap" class="ms-3 position-relative" title="TrustMap">
+                <i class="fas fa-map-marked-alt fa-lg"></i>
+                @if (Model.DropAlertCount >= 3)
+                {
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">@Model.DropAlertCount</span>
+                }
+            </a>
         </div>
     </div>
 
@@ -241,6 +293,19 @@
       <button class="btn btn-sm btn-outline-danger" onclick="toggleMute('Warning')">Mute Warning</button>
     </div>
 </div>
+
+@section Scripts {
+    <script src="/js/dashboard-alerts.js"></script>
+    <script>
+        // Sprint 85.0 — Admin Drop Alert UI + Toast Integration
+        window.latestDropAlerts = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.LatestDropAlerts.Select(a => new {
+            technicianId = a.TechnicianId,
+            previousScore = a.PreviousScore,
+            currentScore = a.CurrentScore,
+            triggeredAt = a.TriggeredAt
+        })));
+    </script>
+}
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
 <script>
