@@ -1,0 +1,22 @@
+@page
+@model MVP_Core.Pages.Admin.AnalyticsDashboardModel
+@{
+    Layout = "/Pages/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Admin Analytics Dashboard";
+}
+<link rel="stylesheet" href="/css/AdminAnalytics.css" />
+<div class="analytics-dashboard-container">
+    <h2 class="mb-4">Admin Analytics & Insights</h2>
+    <div class="kpi-summary">
+        <!-- KPI summary header -->
+        @* KPIs will be rendered here *@
+    </div>
+    <div class="analytics-grid">
+        <!-- Analytics grid layout: technician status, tool transfer, alerts, heatmap -->
+        <div id="technician-status-metrics"></div>
+        <div id="tool-transfer-metrics"></div>
+        <div id="alert-flags"></div>
+        <div id="zone-heatmap"></div>
+    </div>
+</div>
+<script src="/js/AdminAnalytics.js"></script>
