@@ -31,7 +31,7 @@ namespace MVP_Core.Pages.Global
             Metrics = await _metricsEngine.GetGlobalMetricsAsync();
             Forecast = await _forecastingEngine.GetForecastAsync();
             ProActions = _proActionQueueEngine.GetProActions();
-            ProcessStatuses = _processMonitorService.GetAllProcessStatuses();
+            ProcessStatuses = await _processMonitorService.GetAllProcessStatusesAsync();
         }
     }
 }

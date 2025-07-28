@@ -704,8 +704,34 @@ footer {
     0% { filter: brightness(1); }
     100% { filter: brightness(1.3); }
 }
-.suggested-action {
+
+/* === Live Subsystem Health Tracker (Sprint 89.2) === */
+.pulse-status {
+    animation: pulseStatus 1.2s infinite alternate;
+}
+@keyframes pulseStatus {
+    0% { filter: brightness(1); }
+    100% { filter: brightness(1.4); }
+}
+.latency-dot {
+    display: inline-block;
+    margin-left: 8px;
     font-size: 0.98rem;
-    color: #555;
-    margin-top: 6px;
+    color: #007bff;
+    font-weight: 600;
+    position: relative;
+}
+.live-flash {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #28a745;
+    margin-right: 5px;
+    animation: liveFlash 0.8s infinite alternate;
+    vertical-align: middle;
+}
+@keyframes liveFlash {
+    0% { opacity: 0.5; background: #28a745; }
+    100% { opacity: 1; background: #00e676; }
 }

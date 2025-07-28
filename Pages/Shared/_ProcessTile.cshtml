@@ -17,8 +17,12 @@
 }
 <div class="process-tile @statusClass mb-3 animate__animated animate__fadeInUp">
     <div class="d-flex align-items-center mb-2">
-        <span class="process-badge me-2">@badgeIcon</span>
+        <span class="process-badge me-2 pulse-status">@badgeIcon</span>
         <span class="fw-bold">@Model.Name</span>
+        <span class="latency-dot ms-2" title="Ping Latency">
+            <span class="live-flash"></span>
+            @Model.PingLatencyMs ms
+        </span>
     </div>
     <div class="small text-muted mb-1">Last checked: @Model.LastChecked.ToLocalTime().ToString("g")</div>
     <div class="suggested-action small">@Model.SuggestedAction</div>

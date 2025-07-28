@@ -1,47 +1,27 @@
-using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using MVP_Core.ViewModels;
 
 namespace MVP_Core.Services.Diagnostics
 {
     public class ProcessMonitorService
     {
-        public List<ProcessStatusViewModel> GetAllProcessStatuses()
+        private readonly ISubsystemChecker _subsystemChecker;
+        public ProcessMonitorService(ISubsystemChecker subsystemChecker)
         {
-            // In a real implementation, these would be live checks
-            return new List<ProcessStatusViewModel>
+            _subsystemChecker = subsystemChecker;
+        }
+
+        // Sprint 89.2: Now async and uses subsystem checker
+        public async Task<List<ProcessStatusViewModel>> GetAllProcessStatusesAsync()
+        {
+            var subsystems = new[] { "Auth", "Email", "Queue", "DB", "Payments", "Forecasting", "Media" };
+            var results = new List<ProcessStatusViewModel>();
+            foreach (var name in subsystems)
             {
-                new ProcessStatusViewModel {
-                    Name = "Dispatch Engine",
-                    Status = ProcessHealthStatus.Healthy,
-                    LastChecked = DateTime.UtcNow,
-                    SuggestedAction = "No action needed"
-                },
-                new ProcessStatusViewModel {
-                    Name = "Email Delivery",
-                    Status = ProcessHealthStatus.Warning,
-                    LastChecked = DateTime.UtcNow,
-                    SuggestedAction = "Verify SMTP credentials / spam flags"
-                },
-                new ProcessStatusViewModel {
-                    Name = "SMS Gateway",
-                    Status = ProcessHealthStatus.Critical,
-                    LastChecked = DateTime.UtcNow,
-                    SuggestedAction = "Check Twilio API keys and balance"
-                },
-                new ProcessStatusViewModel {
-                    Name = "Alerts System",
-                    Status = ProcessHealthStatus.Healthy,
-                    LastChecked = DateTime.UtcNow,
-                    SuggestedAction = "No action needed"
-                },
-                new ProcessStatusViewModel {
-                    Name = "Billing Processor",
-                    Status = ProcessHealthStatus.Unknown,
-                    LastChecked = DateTime.UtcNow,
-                    SuggestedAction = "Check integration logs"
-                }
-            };
+                results.Add(await _subsystemChecker.CheckAsync(name));
+            }
+            return results;
         }
     }
 }

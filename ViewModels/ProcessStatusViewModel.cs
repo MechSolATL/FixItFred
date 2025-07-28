@@ -16,5 +16,7 @@ namespace MVP_Core.ViewModels
         public ProcessHealthStatus Status { get; set; } = ProcessHealthStatus.Unknown;
         public DateTime LastChecked { get; set; }
         public string SuggestedAction { get; set; } = string.Empty;
+        // Sprint 89.2: Add ping latency and last checked
+        public int PingLatencyMs { get; set; }
     }
 }
