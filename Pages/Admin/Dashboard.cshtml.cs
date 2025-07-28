@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using MVP_Core.Services.Admin;
 using Microsoft.EntityFrameworkCore;
 using System;
+using MVP_Core.Models;
 
 namespace MVP_Core.Pages.Admin
 {
@@ -21,14 +22,17 @@ namespace MVP_Core.Pages.Admin
         private readonly SmartAdminAlertsService _smartAdminAlertsService;
         // Sprint 85.0 — Admin Drop Alert UI + Toast Integration
         private readonly TrustScoreDropAlertService _trustScoreDropAlertService;
+        // Sprint 85.2 — Admin Metrics Dashboard Integration
+        private readonly AdminAnalyticsService _adminAnalyticsService;
 
-        public DashboardModel(ApplicationDbContext context, SlaDriftAnalyzerService slaDriftAnalyzerService, StorageMonitorService storageMonitorService, SmartAdminAlertsService smartAdminAlertsService, TrustScoreDropAlertService trustScoreDropAlertService)
+        public DashboardModel(ApplicationDbContext context, SlaDriftAnalyzerService slaDriftAnalyzerService, StorageMonitorService storageMonitorService, SmartAdminAlertsService smartAdminAlertsService, TrustScoreDropAlertService trustScoreDropAlertService, AdminAnalyticsService adminAnalyticsService)
         {
             _context = context;
             _slaDriftAnalyzerService = slaDriftAnalyzerService;
             _storageMonitorService = storageMonitorService;
             _smartAdminAlertsService = smartAdminAlertsService;
             _trustScoreDropAlertService = trustScoreDropAlertService;
+            _adminAnalyticsService = adminAnalyticsService;
         }
 
         [BindProperty(SupportsGet = true)]
@@ -46,6 +50,9 @@ namespace MVP_Core.Pages.Admin
         // Sprint 85.0 — Admin Drop Alert UI + Toast Integration
         public List<TechnicianAlertLog> LatestDropAlerts { get; set; } = new();
         public int DropAlertCount { get; set; }
+
+        // Sprint 85.2 — Admin Metrics Dashboard Integration
+        public AdminMetricsViewModel Metrics { get; set; } = new();
 
         public async Task OnGetAsync()
         {
@@ -71,6 +78,15 @@ namespace MVP_Core.Pages.Admin
                 .OrderByDescending(a => a.TriggeredAt)
                 .ToListAsync();
             DropAlertCount = LatestDropAlerts.Count;
+
+            // Sprint 85.2 — Admin Metrics Dashboard Integration
+            Metrics = new AdminMetricsViewModel
+            {
+                TechniciansFlaggedThisWeek = _adminAnalyticsService.GetTechniciansFlaggedThisWeek(),
+                TrustScoreDrops7Days = _adminAnalyticsService.GetTrustScoreDrops7Days(),
+                CoachingLogs14Days = _adminAnalyticsService.GetCoachingLogs14Days(),
+                AvgRebuildSuggestionsPerTech = _adminAnalyticsService.GetAvgRebuildSuggestionsPerTech()
+            };
         }
 
         public async Task<IActionResult> OnPostAcknowledgeAlertAsync(int alertId, string actionTaken)

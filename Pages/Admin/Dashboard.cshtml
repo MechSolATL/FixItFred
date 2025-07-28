@@ -14,6 +14,10 @@
     var onboardingStatus = userId != null ? Db.UserOnboardingStatuses.FirstOrDefault(u => u.UserId.ToString() == userId) : null;
 }
 
+<!-- Sprint 85.2 — Admin Metrics Dashboard Integration -->
+@await Html.PartialAsync("/Pages/Shared/_MetricsCards.cshtml", Model.Metrics)
+<!-- End Sprint 85.2 — Admin Metrics Dashboard Integration -->
+
 <div class="container mt-5">
     <h1 class="text-center mb-4">?? Service Requests Dashboard</h1>
 

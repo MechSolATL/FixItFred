@@ -1,0 +1,36 @@
+@* Sprint 85.2 — Admin Metrics Dashboard Integration *@
+@model MVP_Core.Models.AdminMetricsViewModel
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card text-center shadow-sm">
+            <div class="card-body">
+                <h6 class="card-title">Flagged Techs (7d)</h6>
+                <div class="display-5 fw-bold">@Model.TechniciansFlaggedThisWeek</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center shadow-sm">
+            <div class="card-body">
+                <h6 class="card-title">TrustScore Drops (7d)</h6>
+                <div class="display-5 fw-bold text-danger">@Model.TrustScoreDrops7Days</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center shadow-sm">
+            <div class="card-body">
+                <h6 class="card-title">Coaching Logs (14d)</h6>
+                <div class="display-5 fw-bold text-primary">@Model.CoachingLogs14Days</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center shadow-sm">
+            <div class="card-body">
+                <h6 class="card-title">Avg. Suggestions/Tech</h6>
+                <div class="display-5 fw-bold text-success">@Model.AvgRebuildSuggestionsPerTech</div>
+            </div>
+        </div>
+    </div>
+</div>
