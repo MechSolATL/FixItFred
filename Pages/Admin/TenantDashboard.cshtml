@@ -1,0 +1,93 @@
+@page
+@model MVP_Core.Pages.Admin.TenantDashboardModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    Layout = "/Pages/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Tenant Dashboard";
+    var tenant = Model.Tenant;
+    var branding = Model.Branding;
+    var settings = Model.Settings;
+    var modules = Model.Modules;
+}
+<div class="tenant-dashboard container mt-5 mb-5">
+    <div class="row align-items-center mb-4">
+        <div class="col-auto">
+            <img src="@(branding?.LogoUrl ?? "/img/default-logo.png")" alt="Logo" class="rounded shadow" style="max-height:70px;max-width:120px;background:#fff;" />
+        </div>
+        <div class="col">
+            <h2 class="mb-1">@tenant?.CompanyName</h2>
+            <span class="tier-pill tier-@((tenant?.Tier ?? "starter").ToLower())">@tenant?.Tier</span>
+        </div>
+        <div class="col-auto">
+            <span class="badge bg-secondary">Tenant ID: @tenant?.Id.ToString().Substring(0, 8)</span>
+        </div>
+    </div>
+    <div class="row mb-4">
+        <div class="col-md-6 mb-3">
+            <div class="card p-3" style="border-left:8px solid @(branding?.PrimaryColor ?? "#007bff");">
+                <div class="mb-2"><b>Primary Color:</b> <span style="background:@branding?.PrimaryColor;padding:0 10px;border-radius:4px;color:#fff;">@branding?.PrimaryColor</span></div>
+                <div><b>Secondary Color:</b> <span style="background:@branding?.SecondaryColor;padding:0 10px;border-radius:4px;color:#222;">@branding?.SecondaryColor</span></div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-3">
+            <div class="card p-3">
+                <div class="mb-2"><b>Contact Email:</b> @tenant?.ContactEmail</div>
+                <div><b>Created:</b> @tenant?.CreatedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</div>
+            </div>
+        </div>
+    </div>
+    <div class="mb-4">
+        <h4 class="mb-2">Active Modules</h4>
+        <div>
+            @if (modules?.TechnicianTracking == true)
+            {
+                <span class="module-badge bg-primary">Technician Tracking</span>
+            }
+            @if (modules?.AccountingView == true)
+            {
+                <span class="module-badge bg-success">Accounting</span>
+            }
+            @if (modules?.CommunityFeed == true)
+            {
+                <span class="module-badge bg-info">Community Feed</span>
+            }
+            @if (modules?.HeatPumpMatchups == true)
+            {
+                <span class="module-badge bg-warning text-dark">Heat Pump Matchups</span>
+            }
+        </div>
+    </div>
+    <div class="mb-4">
+        @if (modules?.TechnicianTracking == true)
+        {
+            <section class="mb-3">
+                <h5>Technician Tracking</h5>
+                <p class="text-muted">Monitor technician activity, location, and job progress in real time.</p>
+            </section>
+        }
+        @if (modules?.AccountingView == true)
+        {
+            <section class="mb-3">
+                <h5>Accounting</h5>
+                <p class="text-muted">Access billing, invoices, and financial reports for your company.</p>
+            </section>
+        }
+        @if (modules?.CommunityFeed == true)
+        {
+            <section class="mb-3">
+                <h5>Community Feed</h5>
+                <p class="text-muted">Engage with your team and share updates on the company feed.</p>
+            </section>
+        }
+        @if (modules?.HeatPumpMatchups == true)
+        {
+            <section class="mb-3">
+                <h5>Heat Pump Matchups</h5>
+                <p class="text-muted">Compare and analyze heat pump performance and compatibility.</p>
+            </section>
+        }
+    </div>
+    <div class="text-end">
+        <a href="/Admin/SetupWizard?tenantId=@tenant?.Id" class="btn btn-outline-secondary btn-sm">Edit Branding & Modules</a>
+    </div>
+</div>
