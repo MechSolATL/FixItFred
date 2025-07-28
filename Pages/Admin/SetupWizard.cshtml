@@ -1,0 +1,109 @@
+@page
+@model MVP_Core.Pages.Admin.SetupWizardModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    Layout = "/Pages/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Tenant Setup Wizard";
+    var step = Model.Step;
+    var steps = new[] { "Company Info", "Branding", "Theme", "Modules", "Review" };
+}
+<div class="setup-wizard mt-5">
+    <div class="setup-steps mb-4">
+        @for (int i = 0; i < steps.Length; i++)
+        {
+            <div class="setup-step @(step == i ? "active" : (step > i ? "completed" : ""))">@steps[i]</div>
+        }
+    </div>
+    <form method="post">
+        @if (Model.Success)
+        {
+            <div class="success-message">
+                <span class="me-2">??</span>Tenant setup complete! Redirecting to dashboard...
+            </div>
+        }
+        else if (step == 0)
+        {
+            <div>
+                <label class="form-label">Company Name</label>
+                <input asp-for="CompanyName" class="form-control" required />
+                <span asp-validation-for="CompanyName" class="text-danger"></span>
+                <label class="form-label">Contact Email</label>
+                <input asp-for="ContactEmail" class="form-control" type="email" required />
+                <span asp-validation-for="ContactEmail" class="text-danger"></span>
+                <label class="form-label">Tier</label>
+                <select asp-for="Tier" class="form-select" required>
+                    <option value="Starter">Starter</option>
+                    <option value="Pro">Pro</option>
+                    <option value="Enterprise">Enterprise</option>
+                </select>
+                <span asp-validation-for="Tier" class="text-danger"></span>
+            </div>
+        }
+        else if (step == 1)
+        {
+            <div>
+                <label class="form-label">Logo URL</label>
+                <input asp-for="LogoUrl" class="form-control" />
+                <span asp-validation-for="LogoUrl" class="text-danger"></span>
+            </div>
+        }
+        else if (step == 2)
+        {
+            <div>
+                <label class="form-label">Primary Color</label>
+                <input asp-for="PrimaryColor" class="form-control" type="color" />
+                <span asp-validation-for="PrimaryColor" class="text-danger"></span>
+            </div>
+        }
+        else if (step == 3)
+        {
+            <div>
+                <label class="form-label">Feature Toggles</label>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" asp-for="FeatureToggles.TechnicianTracking" />
+                    <label class="form-check-label">Technician Tracking</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" asp-for="FeatureToggles.AccountingView" />
+                    <label class="form-check-label">Accounting View</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" asp-for="FeatureToggles.CommunityFeed" />
+                    <label class="form-check-label">Community Feed</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" asp-for="FeatureToggles.HeatPumpMatchups" />
+                    <label class="form-check-label">Heat Pump Matchups</label>
+                </div>
+            </div>
+        }
+        else if (step == 4)
+        {
+            <div>
+                <h5 class="mb-3">Review & Confirm</h5>
+                <ul class="list-group mb-3">
+                    <li class="list-group-item"><b>Company:</b> @Model.CompanyName</li>
+                    <li class="list-group-item"><b>Email:</b> @Model.ContactEmail</li>
+                    <li class="list-group-item"><b>Tier:</b> @Model.Tier</li>
+                    <li class="list-group-item"><b>Logo:</b> <span>@Model.LogoUrl</span></li>
+                    <li class="list-group-item"><b>Primary Color:</b> <span style="background:@Model.PrimaryColor;padding:0 10px;">@Model.PrimaryColor</span></li>
+                    <li class="list-group-item"><b>Modules:</b> @Model.FeatureToggles.ToString()</li>
+                </ul>
+                <div class="alert alert-info">Confirm to create tenant and seed starter modules.</div>
+            </div>
+        }
+        <div class="wizard-actions">
+            @if (step > 0 && !Model.Success)
+            {
+                <button type="submit" name="action" value="Back" class="btn btn-secondary">Back</button>
+            }
+            @if (!Model.Success)
+            {
+                <button type="submit" name="action" value="Next" class="btn btn-primary">@(step == steps.Length - 1 ? "Finish" : "Next")</button>
+            }
+        </div>
+    </form>
+</div>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
