@@ -11,6 +11,43 @@
             @await Html.PartialAsync("/Pages/Shared/_MetricsCard.cshtml", card)
         }
     </div>
+    <div class="alert alert-danger compliance-lockout-alert my-4" style="display:@(Model.LockedOutTenants.Any() ? "block" : "none")">
+        <b>Compliance Lockout:</b> The following tenants are locked out due to expired compliance documents:
+        <ul>
+            @foreach (var t in Model.LockedOutTenants)
+            {
+                <li>
+                    <b>@t.CompanyName</b> (ID: @t.Id)
+                    <button class="btn btn-warning btn-sm ms-2 override-lockout-btn" data-tenant-id="@t.Id" data-company="@t.CompanyName">Override Lockout</button>
+                </li>
+            }
+        </ul>
+    </div>
+    <div id="overrideLockoutModal" class="modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <form method="post" asp-page-handler="OverrideLockout">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Override Lockout</h5>
+                        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" name="TenantId" id="modalTenantId" />
+                        <div class="mb-3">
+                            <label for="AdminNote" class="form-label">Reason for Override</label>
+                            <textarea name="AdminNote" id="modalAdminNote" class="form-control" required></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-success">Submit Override</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
     <div class="process-monitor-grid mt-5 mb-4">
         <h4 class="mb-3"><i class="fas fa-microchip text-info"></i> Process Monitor</h4>
         <div class="row row-cols-1 row-cols-md-3 row-cols-lg-5 g-4">
@@ -69,3 +106,18 @@
         </div>
     }
 </div>
+@section Scripts {
+<script>
+    document.querySelectorAll('.override-lockout-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.getElementById('modalTenantId').value = this.getAttribute('data-tenant-id');
+            document.getElementById('overrideLockoutModal').style.display = 'block';
+        });
+    });
+    document.querySelectorAll('.modal .close, .modal .btn-secondary').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.getElementById('overrideLockoutModal').style.display = 'none';
+        });
+    });
+</script>
+}

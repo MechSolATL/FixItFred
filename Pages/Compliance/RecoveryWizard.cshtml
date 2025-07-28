@@ -1,0 +1,46 @@
+@page
+@model MVP_Core.Pages.Compliance.RecoveryWizardModel
+@using MVP_Core.ViewModels.Compliance
+@{
+    ViewData["Title"] = "Lockout Recovery Wizard";
+}
+<div class="compliance-recovery-wizard container mt-5 mb-5 p-4 bg-white rounded shadow-sm">
+    <h2 class="mb-4">Lockout Recovery Wizard</h2>
+    <div class="alert alert-warning mb-4">
+        Your account is locked out due to expired compliance documents. Please upload the required documents to restore access.
+    </div>
+    <form method="post" enctype="multipart/form-data">
+        <table class="table table-bordered mb-4">
+            <thead>
+                <tr>
+                    <th>Document Type</th>
+                    <th>Last Valid Date</th>
+                    <th>Status</th>
+                    <th>Upload</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var doc in Model.ViewModel.ExpiredDocuments)
+                {
+                    <tr>
+                        <td>@doc.DocumentType</td>
+                        <td>@(doc.LastValidDate?.ToString("yyyy-MM-dd") ?? "-")</td>
+                        <td>@doc.FileStatus</td>
+                        <td>
+                            <input type="file" name="Uploads[@doc.DocumentType]" class="form-control" accept=".pdf,.jpg,.jpeg,.png" />
+                            @if (doc.RequiresCertificateHolder)
+                            {
+                                <small class="text-danger">* Certificate Holder required for insurance</small>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        <div class="mb-3">
+            <label for="HardshipNote" class="form-label">Optional Hardship Note</label>
+            <textarea name="HardshipNote" class="form-control" rows="2" maxlength="500"></textarea>
+        </div>
+        <button type="submit" class="btn btn-success">Submit for Review</button>
+    </form>
+</div>
