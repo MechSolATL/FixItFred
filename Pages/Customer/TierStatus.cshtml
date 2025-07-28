@@ -1,7 +1,6 @@
 @page
 @model MVP_Core.Pages.Customer.TierStatusModel
 @inject MVP_Core.Services.CustomerPortalService PortalService
-@inject MVP_Core.Services.RewardTriggerService RewardService
 @{
     Layout = "/Pages/Shared/_Layout.cshtml";
     if (!(User.Identity?.IsAuthenticated == true) || !User.HasClaim("IsCustomer", "true"))
@@ -15,7 +14,6 @@
     var currentTier = tiers.LastOrDefault(t => loyalty.Sum(l => l.Points) >= t.PointsRequired);
     var nextTier = tiers.FirstOrDefault(t => t.PointsRequired > (loyalty.Sum(l => l.Points)));
     var totalPoints = loyalty.Sum(l => l.Points);
-    var unlockedRewards = RewardService.GetUnlockedRewards(email) ?? new List<string>();
     var progressPercent = nextTier != null && nextTier.PointsRequired > 0 ? (int)(100.0 * totalPoints / nextTier.PointsRequired) : 100;
     bool hasBronze = currentTier != null && currentTier.PointsRequired >= (tiers.FirstOrDefault(t => t.Name == "Bronze")?.PointsRequired ?? 0);
 }
@@ -58,13 +56,8 @@
             </div>
         </div>
     </div>
+    @* Sprint 84.6 — Review Display Integration: Show last 3 reviews for current user *@
     <div class="mb-4">
-        <label class="fw-bold">Rewards Unlocked</label>
-        <ul class="list-group">
-        @foreach (var reward in unlockedRewards)
-        {
-            <li class="list-group-item">@reward</li>
-        }
-        </ul>
+        <partial name="/Pages/Shared/_ReviewHistoryPartial" />
     </div>
 </div>

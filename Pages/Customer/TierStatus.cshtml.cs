@@ -11,7 +11,6 @@ namespace MVP_Core.Pages.Customer
         public int TotalPoints { get; set; }
         public RewardTier? CurrentTier { get; set; }
         public RewardTier? NextTier { get; set; }
-        public List<string> RewardsUnlocked { get; set; } = new();
         public int ProgressPercent { get; set; }
         public bool HasBronze { get; set; }
         public List<RewardTier> Tiers { get; set; } = new();
@@ -19,13 +18,11 @@ namespace MVP_Core.Pages.Customer
         {
             var email = User.Identity?.Name ?? string.Empty;
             var portalService = HttpContext.RequestServices.GetService(typeof(CustomerPortalService)) as CustomerPortalService;
-            var rewardService = HttpContext.RequestServices.GetService(typeof(RewardTriggerService)) as RewardTriggerService;
             var loyalty = portalService?.GetLoyaltyTransactions(email) ?? new List<LoyaltyPointTransaction>();
             Tiers = portalService?.GetRewardTiers() ?? new List<RewardTier>();
             TotalPoints = loyalty.Sum(l => l.Points);
             CurrentTier = Tiers.LastOrDefault(t => TotalPoints >= t.PointsRequired);
             NextTier = Tiers.FirstOrDefault(t => t.PointsRequired > TotalPoints);
-            RewardsUnlocked = rewardService?.GetUnlockedRewards(email) ?? new List<string>();
             ProgressPercent = NextTier != null && NextTier.PointsRequired > 0 ? (int)(100.0 * TotalPoints / NextTier.PointsRequired) : 100;
             HasBronze = CurrentTier != null && CurrentTier.PointsRequired >= (Tiers.FirstOrDefault(t => t.Name == "Bronze")?.PointsRequired ?? 0);
         }

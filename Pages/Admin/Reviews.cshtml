@@ -1,0 +1,51 @@
+@* Sprint 84.6 — Review Display Integration *@
+@page
+@model MVP_Core.Pages.Admin.ReviewsModel
+@inject MVP_Core.Data.ApplicationDbContext Db
+@{
+    ViewData["Title"] = "Review Management";
+    var reviews = Db.CustomerReviews.OrderByDescending(r => r.SubmittedAt).Take(100).ToList();
+}
+<h2>Review Management</h2>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>CustomerId</th>
+            <th>TechnicianId</th>
+            <th>Rating</th>
+            <th>Review</th>
+            <th>Submitted</th>
+            <th>Public</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var review in reviews)
+    {
+        <tr>
+            <td>@review.Id</td>
+            <td>@review.CustomerId</td>
+            <td>@review.TechnicianId</td>
+            <td>@review.Rating</td>
+            <td>@review.Feedback</td>
+            <td>@review.SubmittedAt.ToString("g")</td>
+            <td>
+                <form method="post" asp-page-handler="TogglePublic" asp-route-id="@review.Id">
+                    <button type="submit" class="btn btn-sm @(review.IsPublic ? "btn-success" : "btn-secondary")">
+                        @(review.IsPublic ? "Public" : "Hidden")
+                    </button>
+                </form>
+            </td>
+            <td>
+                <form method="post" asp-page-handler="Approve" asp-route-id="@review.Id" style="display:inline">
+                    <button type="submit" class="btn btn-sm btn-primary">Approve</button>
+                </form>
+                <form method="post" asp-page-handler="Reject" asp-route-id="@review.Id" style="display:inline">
+                    <button type="submit" class="btn btn-sm btn-danger">Reject</button>
+                </form>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
