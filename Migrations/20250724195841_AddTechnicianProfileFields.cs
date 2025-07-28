@@ -11,30 +11,30 @@ namespace MVP_Core.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<string>(
-                name: "Badges",
-                table: "Technicians",
-                type: "nvarchar(max)",
-                nullable: true);
+            // migrationBuilder.AddColumn<string>(
+            //     name: "Badges",
+            //     table: "Technicians",
+            //     type: "nvarchar(max)",
+            //     nullable: true);
 
-            migrationBuilder.AddColumn<DateTime>(
-                name: "Birthday",
-                table: "Technicians",
-                type: "datetime2",
-                nullable: true);
+            // migrationBuilder.AddColumn<DateTime>(
+            //     name: "Birthday",
+            //     table: "Technicians",
+            //     type: "datetime2",
+            //     nullable: true);
 
-            migrationBuilder.AddColumn<DateTime>(
-                name: "EmploymentDate",
-                table: "Technicians",
-                type: "datetime2",
-                nullable: true);
+            // migrationBuilder.AddColumn<DateTime>(
+            //     name: "EmploymentDate",
+            //     table: "Technicians",
+            //     type: "datetime2",
+            //     nullable: true);
 
-            migrationBuilder.AddColumn<string>(
-                name: "PhotoUrl",
-                table: "Technicians",
-                type: "nvarchar(500)",
-                maxLength: 500,
-                nullable: true);
+            // migrationBuilder.AddColumn<string>(
+            //     name: "PhotoUrl",
+            //     table: "Technicians",
+            //     type: "nvarchar(500)",
+            //     maxLength: 500,
+            //     nullable: true);
         }
 
         /// <inheritdoc />

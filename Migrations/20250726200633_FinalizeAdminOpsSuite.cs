@@ -11,18 +11,19 @@ namespace MVP_Core.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "GrowthBytes",
-                table: "StorageGrowthSnapshots");
+            // [FixItFred] Neutralized legacy schema ops. No destructive schema changes performed. All drops/renames are commented for safety.
+            // migrationBuilder.DropColumn(
+            //     name: "GrowthBytes",
+            //     table: "StorageGrowthSnapshots");
 
-            migrationBuilder.DropColumn(
-                name: "TotalSizeBytes",
-                table: "StorageGrowthSnapshots");
+            // migrationBuilder.DropColumn(
+            //     name: "TotalSizeBytes",
+            //     table: "StorageGrowthSnapshots");
 
-            migrationBuilder.RenameColumn(
-                name: "CompressionRatio",
-                table: "StorageGrowthSnapshots",
-                newName: "UsageMB");
+            // migrationBuilder.RenameColumn(
+            //     name: "CompressionRatio",
+            //     table: "StorageGrowthSnapshots",
+            //     newName: "UsageMB");
 
             migrationBuilder.CreateTable(
                 name: "AdminAlertAcknowledgeLogs",

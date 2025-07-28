@@ -3,14 +3,17 @@ using System.IO;
 using MVP_Core.Services.Admin;
 
 // Standalone console app for generating the PDF blueprint
-class BlueprintGen
+namespace MVP_Core.Tools
 {
-    static void Main(string[] args)
+    class BlueprintGen
     {
-        string mdPath = Path.Combine("Docs", "Blueprints", "Service-Atlanta-Revitalize-MasterPlan.md");
-        string pdfPath = Path.Combine("Docs", "Blueprints", "Service-Atlanta-Revitalize-MasterPlan.pdf");
-        string markdown = File.ReadAllText(mdPath);
-        BlueprintPdfComposer.GenerateBlueprintPdf(markdown, pdfPath);
-        Console.WriteLine($"PDF generated at: {pdfPath}");
+        static void Main(string[] args)
+        {
+            string mdPath = System.IO.Path.Combine("Docs", "Blueprints", "Service-Atlanta-Revitalize-MasterPlan.md");
+            string pdfPath = System.IO.Path.Combine("Docs", "Blueprints", "Service-Atlanta-Revitalize-MasterPlan.pdf");
+            string markdown = System.IO.File.ReadAllText(mdPath);
+            MVP_Core.Services.Admin.BlueprintPdfComposer.GenerateBlueprintPdf(markdown, pdfPath);
+            System.Console.WriteLine($"PDF generated at: {pdfPath}");
+        }
     }
 }

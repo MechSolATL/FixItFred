@@ -189,6 +189,8 @@ namespace MVP_Core.Data
         public DbSet<ComplianceOverrideLog> ComplianceOverrideLogs { get; set; } = null!;
         public DbSet<ComplianceAlertLog> ComplianceAlertLogs { get; set; } = null!;
         public DbSet<MVP_Core.Data.Models.NovaIntel.NovaDecisionMemory> NovaDecisionMemories { get; set; } = null!;
+        // public DbSet<MVP_Core.Data.Models.Loyalty.TechnicianBadge> TechnicianBadges { get; set; } = null!;
+        // public DbSet<MVP_Core.Data.Models.Loyalty.BadgeDefinition> BadgeDefinitions { get; set; } = null!;
 
         #endregion
 

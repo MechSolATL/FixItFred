@@ -19,11 +19,11 @@ namespace MVP_Core.Migrations
             //     defaultValue: false);
 
             // ? This one can still be applied
-            _ = migrationBuilder.AddColumn<int>(
-                name: "ScoreWeight",
-                table: "QuestionOptions",
-                type: "int",
-                nullable: true);
+            // _ = migrationBuilder.AddColumn<int>(
+            //     name: "ScoreWeight",
+            //     table: "QuestionOptions",
+            //     type: "int",
+            //     nullable: true);
         }
 
         /// <inheritdoc />
@@ -34,9 +34,9 @@ namespace MVP_Core.Migrations
             //     name: "IsGlobal",
             //     table: "Questions");
 
-            _ = migrationBuilder.DropColumn(
-                name: "ScoreWeight",
-                table: "QuestionOptions");
+            // _ = migrationBuilder.DropColumn(
+            //     name: "ScoreWeight",
+            //     table: "QuestionOptions");
         }
     }
 }
