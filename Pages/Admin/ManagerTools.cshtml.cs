@@ -67,11 +67,6 @@ namespace MVP_Core.Pages.Admin
             await _managerService.ResetRoute(technicianId);
             return RedirectToPage();
         }
-        public async Task<IActionResult> OnPostReopenRequestAsync(int requestId)
-        {
-            await _managerService.ReopenRequest(requestId);
-            return RedirectToPage();
-        }
         public async Task<IActionResult> OnPostFlagTechnicianAsync(int technicianId, string reason)
         {
             await _managerService.FlagTechnician(technicianId, reason);
