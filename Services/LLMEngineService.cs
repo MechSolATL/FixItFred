@@ -1,9 +1,11 @@
 // Sprint 90.1
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using System.Net.Http;
 using System.Text.Json;
 using System.Text;
 using System;
+using Microsoft.Extensions.Configuration;
 using MVP_Core.Data.Models;
 
 namespace MVP_Core.Services
@@ -12,28 +14,50 @@ namespace MVP_Core.Services
     public class LLMEngineService
     {
         private readonly HttpClient _httpClient;
-        public LLMEngineService(HttpClient httpClient)
+        private readonly IConfiguration _configuration;
+
+        public LLMEngineService(HttpClient httpClient, IConfiguration configuration)
         {
             _httpClient = httpClient;
+            _configuration = configuration;
         }
-        public async Task<string> RunPromptAsync(string provider, string model, string prompt, string apiKey)
+
+        public async Task<string> RunPromptAsync(string prompt)
         {
-            // Example: OpenAI/Volcengine call stub
+            var apiKey = _configuration["OpenAI:ApiKey"];
+            var model = _configuration["OpenAI:DefaultModel"] ?? "gpt-4";
+
+            _httpClient.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", apiKey);
+
             var requestBody = new
             {
-                model = model,
-                prompt = prompt
+                model,
+                messages = new[] {
+                    new { role = "user", content = prompt }
+                },
+                temperature = Convert.ToDouble(_configuration["OpenAI:Temperature"] ?? "0.7"),
+                max_tokens = Convert.ToInt32(_configuration["OpenAI:MaxTokens"] ?? "2048")
             };
+
             var content = new StringContent(JsonSerializer.Serialize(requestBody), Encoding.UTF8, "application/json");
-            // This is a stub. Replace with actual endpoint logic per provider.
-            var url = provider == "OpenAI" ? "https://api.openai.com/v1/completions" : "https://api.volcengine.com/llm/generate";
-            var request = new HttpRequestMessage(HttpMethod.Post, url);
-            request.Content = content;
-            request.Headers.Add("Authorization", $"Bearer {apiKey}");
-            var response = await _httpClient.SendAsync(request);
-            response.EnsureSuccessStatusCode();
-            var result = await response.Content.ReadAsStringAsync();
-            return result;
+
+            var response = await _httpClient.PostAsync("https://api.openai.com/v1/chat/completions", content);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new Exception($"OpenAI error: {response.StatusCode} - {await response.Content.ReadAsStringAsync()}");
+            }
+
+            var json = await response.Content.ReadAsStringAsync();
+            using var doc = JsonDocument.Parse(json);
+            var message = doc.RootElement
+                .GetProperty("choices")[0]
+                .GetProperty("message")
+                .GetProperty("content")
+                .GetString();
+
+            return message ?? "No response.";
         }
     }
 
