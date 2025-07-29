@@ -144,6 +144,7 @@ builder.Services.Configure<MVP_Core.Services.Config.LoadBalancingConfig>(
 // Register DataProtection for sensitive note encryption
 builder.Services.AddDataProtection();
 builder.Services.AddHttpClient<LLMEngineService>();
+builder.Services.AddHostedService<PatchBadgeHostedService>();
 
 var app = builder.Build();
 

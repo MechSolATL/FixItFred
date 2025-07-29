@@ -1,11 +1,16 @@
 @page
 @model MVP_Core.Pages.Technician.ProfileModel
 @inject MVP_Core.Services.Admin.RewardTriggerService RewardTriggerService
+@inject MVP_Core.Services.BadgeAssignmentService BadgeAssignmentService
+@using MVP_Core.Data.Models.PatchAnalytics
 @{
     ViewData["Title"] = "Technician Profile";
     var tierStatus = Model.TierStatus;
     var patchProfile = Model.PatchProfile;
     var banterFlagCount = Model.BanterFlagCount;
+    // Sprint 91.22.4 - BadgeAssignment: Load badges for this technician
+    var badges = BadgeAssignmentService.GetBadgesForTechnicianAsync(patchProfile?.Id ?? 0).GetAwaiter().GetResult();
+    var patchFav = badges.FirstOrDefault(b => b.BadgeType == "PatchFav");
 }
 <h2>Technician Profile</h2>
 @if (tierStatus != null)
@@ -37,6 +42,29 @@
             <span class="badge bg-success">Close Rate: @patchProfile.CloseRate:P0</span>
         </div>
     </div>
+    <!-- Sprint 91.22.4 - BadgeAssignment: Badge grid -->
+    @if (badges.Any())
+    {
+        <div class="card mb-3">
+            <div class="card-header">Badges</div>
+            <div class="card-body">
+                <div class="row row-cols-2 row-cols-md-4 g-3">
+                    @foreach (var badge in badges)
+                    {
+                        <div class="col text-center">
+                            <img src="@badge.IconPath" alt="@badge.BadgeType" title="@badge.Description (Earned: @badge.EarnedOn.ToShortDateString())" style="width:64px;height:64px;" class="mb-1" />
+                            <div class="small">@badge.BadgeType</div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+    <!-- PatchFav quote if present -->
+    @if (patchFav != null)
+    {
+        <div class="alert alert-info">?? <strong>Patch Quote:</strong> @patchFav.Description</div>
+    }
     <div class="card mb-3">
         <div class="card-header">Patch Identity</div>
         <div class="card-body">
