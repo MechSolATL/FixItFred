@@ -11,6 +11,7 @@ using MVP_Core.Services.Admin;
 using Microsoft.EntityFrameworkCore;
 using System;
 using MVP_Core.Models;
+using MVP_Core.Data.Models.PatchAnalytics;
 
 namespace MVP_Core.Pages.Admin
 {
@@ -53,6 +54,7 @@ namespace MVP_Core.Pages.Admin
 
         // Sprint 85.2 — Admin Metrics Dashboard Integration
         public AdminMetricsViewModel Metrics { get; set; } = new();
+        public List<(string TechName, TechnicianBadge Badge)> CurrentBadgeHolders { get; set; } = new();
 
         public async Task OnGetAsync()
         {
@@ -87,6 +89,14 @@ namespace MVP_Core.Pages.Admin
                 CoachingLogs14Days = _adminAnalyticsService.GetCoachingLogs14Days(),
                 AvgRebuildSuggestionsPerTech = _adminAnalyticsService.GetAvgRebuildSuggestionsPerTech()
             };
+            // Sprint 91.22.5 - Patch Badge Visuals: Get current week's badge holders
+            var weekAgo = DateTime.UtcNow.AddDays(-7);
+            CurrentBadgeHolders = _context.TechnicianBadges
+                .Where(b => b.EarnedOn >= weekAgo)
+                .Join(_context.Technicians, b => b.TechnicianId, t => t.Id, (b, t) => new { t.FullName, Badge = b })
+                .OrderByDescending(x => x.Badge.EarnedOn)
+                .Select(x => (x.FullName, x.Badge))
+                .ToList();
         }
 
         public async Task<IActionResult> OnPostAcknowledgeAlertAsync(int alertId, string actionTaken)
