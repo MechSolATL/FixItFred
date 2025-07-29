@@ -7,6 +7,8 @@ using System.Text;
 using System;
 using Microsoft.Extensions.Configuration;
 using MVP_Core.Data.Models;
+using MVP_Core.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace MVP_Core.Services
 {
@@ -15,11 +17,13 @@ namespace MVP_Core.Services
     {
         private readonly HttpClient _httpClient;
         private readonly IConfiguration _configuration;
+        private readonly ApplicationDbContext _db;
 
-        public LLMEngineService(HttpClient httpClient, IConfiguration configuration)
+        public LLMEngineService(HttpClient httpClient, IConfiguration configuration, ApplicationDbContext db)
         {
             _httpClient = httpClient;
             _configuration = configuration;
+            _db = db;
         }
 
         public async Task<string> RunPromptAsync(string prompt)
@@ -58,6 +62,49 @@ namespace MVP_Core.Services
                 .GetString();
 
             return message ?? "No response.";
+        }
+
+        // Sprint 91.17 - TroubleshootingBrain
+        public async Task LogTroubleshootingAttemptAsync(Guid techId, string promptInput, string suggestedFix, bool? wasSuccessful, string techNotes)
+        {
+            var log = new TroubleshootingAttemptLog
+            {
+                TechId = techId,
+                PromptInput = promptInput,
+                SuggestedFix = suggestedFix,
+                WasSuccessful = wasSuccessful ?? false,
+                TechNotes = techNotes,
+                Timestamp = DateTime.UtcNow
+            };
+            _db.TroubleshootingAttemptLogs.Add(log);
+            await _db.SaveChangesAsync();
+        }
+
+        // Sprint 91.17 - TroubleshootingBrain
+        public async Task PromoteKnownFixAsync(string errorCode, string equipmentType, string manufacturer, string fix)
+        {
+            var known = await _db.KnownFixes.FirstOrDefaultAsync(k => k.ErrorCode == errorCode && k.EquipmentType == equipmentType && k.Manufacturer == manufacturer);
+            if (known == null)
+            {
+                known = new KnownFix
+                {
+                    ErrorCode = errorCode,
+                    EquipmentType = equipmentType,
+                    Manufacturer = manufacturer,
+                    CommonFix = fix,
+                    SuccessCount = 1,
+                    LastConfirmed = DateTime.UtcNow
+                };
+                _db.KnownFixes.Add(known);
+            }
+            else
+            {
+                known.CommonFix = fix;
+                known.SuccessCount++;
+                known.LastConfirmed = DateTime.UtcNow;
+                _db.KnownFixes.Update(known);
+            }
+            await _db.SaveChangesAsync();
         }
     }
 

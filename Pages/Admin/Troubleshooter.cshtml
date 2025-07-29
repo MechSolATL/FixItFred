@@ -1,0 +1,67 @@
+@page
+@model MVP_Core.Pages.Admin.TroubleshooterModel
+@{
+    ViewData["Title"] = "Tech Troubleshooting Assistant";
+    Layout = "/Pages/Shared/_AdminLayout.cshtml";
+}
+<!-- Sprint 91.17 - TroubleshootingBrain -->
+<h2 class="mb-4">?? Tech Troubleshooting Assistant</h2>
+<form method="post" class="mb-4">
+    <div class="row mb-2">
+        <div class="col-md-3">
+            <input asp-for="ErrorCode" class="form-control" placeholder="Error Code" required />
+        </div>
+        <div class="col-md-3">
+            <input asp-for="EquipmentType" class="form-control" placeholder="Equipment Type" required />
+        </div>
+        <div class="col-md-3">
+            <input asp-for="Manufacturer" class="form-control" placeholder="Manufacturer (optional)" />
+        </div>
+        <div class="col-md-3">
+            <button type="submit" class="btn btn-primary">Suggest Fix</button>
+        </div>
+    </div>
+</form>
+@if (Model.KnownFix != null)
+{
+    <div class="alert alert-info mb-3">
+        <strong>Known Fix:</strong> <span>@Model.KnownFix.CommonFix</span><br />
+        <span class="small text-muted">Proven in field @Model.KnownFix.SuccessCount times (last: @Model.KnownFix.LastConfirmed.ToLocalTime())</span>
+    </div>
+}
+@if (Model.AISuggestedFix != null)
+{
+    <div class="alert alert-success mb-3">
+        <strong>AI-Suggested Fix:</strong>
+        <div class="border rounded p-2 bg-light">@Model.AISuggestedFix</div>
+    </div>
+    <form method="post" asp-page-handler="Feedback">
+        <input type="hidden" asp-for="ErrorCode" />
+        <input type="hidden" asp-for="EquipmentType" />
+        <input type="hidden" asp-for="Manufacturer" />
+        <input type="hidden" asp-for="AISuggestedFix" />
+        <div class="mb-2">
+            <label><strong>Did this fix work?</strong></label><br />
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" asp-for="FeedbackResult" value="Worked" required />
+                <label class="form-check-label">Fix worked</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" asp-for="FeedbackResult" value="DidntWork" />
+                <label class="form-check-label">Didn't work</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" asp-for="FeedbackResult" value="Testing" />
+                <label class="form-check-label">Still testing</label>
+            </div>
+        </div>
+        <div class="mb-2">
+            <textarea asp-for="TechNotes" class="form-control" placeholder="Add notes or details (optional)"></textarea>
+        </div>
+        <button type="submit" class="btn btn-success">Submit Feedback</button>
+    </form>
+}
+@if (Model.FeedbackSubmitted)
+{
+    <div class="alert alert-success mt-3">Thank you! Your feedback has been recorded.</div>
+}

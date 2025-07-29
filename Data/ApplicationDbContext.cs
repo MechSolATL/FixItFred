@@ -198,6 +198,8 @@ namespace MVP_Core.Data
         public DbSet<MVP_Core.Data.Models.PromptExperiment> PromptExperiments { get; set; } = null!;
         public DbSet<MVP_Core.Data.Models.PromptTraceLog> PromptTraceLogs { get; set; } = null!;
         public DbSet<MVP_Core.Data.Models.LLMModelProvider> LLMModelProviders { get; set; } = null!;
+        public DbSet<MVP_Core.Data.Models.KnownFix> KnownFixes { get; set; } = null!; // Sprint 91.17 - TroubleshootingBrain
+        public DbSet<MVP_Core.Data.Models.TroubleshootingAttemptLog> TroubleshootingAttemptLogs { get; set; } = null!; // Sprint 91.17 - TroubleshootingBrain
         #endregion
 
         #region Fluent Table Mappings
