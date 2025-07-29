@@ -193,7 +193,11 @@ namespace MVP_Core.Data
         // public DbSet<MVP_Core.Data.Models.Loyalty.BadgeDefinition> BadgeDefinitions { get; set; } = null!;
         public DbSet<MVP_Core.Data.Models.ToolInventory> ToolInventories { get; set; } = null!;
         public DbSet<MVP_Core.Data.Models.ToolTransferLog> ToolTransferLogs { get; set; } = null!;
-
+        // Sprint 90.1
+        public DbSet<MVP_Core.Data.Models.PromptVersion> PromptVersions { get; set; } = null!;
+        public DbSet<MVP_Core.Data.Models.PromptExperiment> PromptExperiments { get; set; } = null!;
+        public DbSet<MVP_Core.Data.Models.PromptTraceLog> PromptTraceLogs { get; set; } = null!;
+        public DbSet<MVP_Core.Data.Models.LLMModelProvider> LLMModelProviders { get; set; } = null!;
         #endregion
 
         #region Fluent Table Mappings

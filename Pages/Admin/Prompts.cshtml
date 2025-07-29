@@ -1,0 +1,22 @@
+@page
+@model MVP_Core.Pages.Admin.PromptsModel
+@{
+    ViewData["Title"] = "Prompt Debugger & Runner";
+    Layout = "/Pages/Shared/_AdminLayout.cshtml";
+}
+<!-- Sprint 90.1: Prompt Debugger UI (OpenAI live) -->
+<h2>Prompt Debugger & Runner</h2>
+<form method="post">
+    <div class="mb-3">
+        <label>Prompt</label>
+        <textarea asp-for="PromptInput" class="form-control" rows="5"></textarea>
+    </div>
+    <button type="submit" asp-page-handler="RunPrompt" class="btn btn-primary">Run Prompt</button>
+</form>
+@if (Model.Output != null)
+{
+    <div class="alert alert-success mt-3">
+        <strong>Output:</strong>
+        <pre>@Model.Output</pre>
+    </div>
+}

@@ -1,0 +1,104 @@
+@page
+@using Microsoft.AspNetCore.Authorization
+@model MVP_Core.Pages.Admin.ExecutiveDigestModel
+@attribute [Authorize(Roles = "Admin,CEO")]
+@{
+    Layout = "/Pages/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Executive EOD Digest";
+}
+<link rel="stylesheet" href="/css/ExecutiveDigest.css" />
+<div class="executive-digest-container">
+    <h2 class="mb-4">Executive End-of-Day Snapshot</h2>
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="digest-tile">
+                <div class="digest-label">Total Requests</div>
+                <div class="digest-value">@Model.Snapshot.TotalRequests</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="digest-tile">
+                <div class="digest-label">Completed</div>
+                <div class="digest-value">@Model.Snapshot.CompletedRequests</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="digest-tile">
+                <div class="digest-label">Invoiced</div>
+                <div class="digest-value">@Model.Snapshot.InvoicedRequests</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="digest-tile">
+                <div class="digest-label">Avg. Completion Time (hrs)</div>
+                <div class="digest-value">@Model.Snapshot.AverageCompletionTimeHours</div>
+            </div>
+        </div>
+    </div>
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="digest-tile">
+                <div class="digest-label">Missed/Reschedule Ratio</div>
+                <div class="digest-value">@Model.Snapshot.MissedRescheduleRatio</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="digest-tile">
+                <div class="digest-label">Trend vs. Yesterday</div>
+                <div class="digest-value">@Model.Snapshot.Trend.PercentChange.ToString("+#.##;-#.##;0")% <small>(@Model.Snapshot.Trend.YesterdayCompleted completed)</small></div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="digest-tile">
+                <div class="digest-label">Critical Alerts</div>
+                <ul class="digest-alert-list">
+                    @if (Model.Snapshot.CriticalAlerts != null && Model.Snapshot.CriticalAlerts.Count > 0)
+                    {
+                        foreach (var alert in Model.Snapshot.CriticalAlerts)
+                        {
+                            <li>@alert</li>
+                        }
+                    }
+                    else
+                    {
+                        <li>No critical alerts</li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="digest-tile">
+                <div class="digest-label">Top Performing Technicians</div>
+                <table class="table table-sm table-bordered mt-2">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Jobs Completed</th>
+                            <th>Revenue Generated</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Snapshot.TopTechnicians != null && Model.Snapshot.TopTechnicians.Count > 0)
+                        {
+                            foreach (var tech in Model.Snapshot.TopTechnicians)
+                            {
+                                <tr>
+                                    <td>@tech.TechnicianName</td>
+                                    <td>@tech.JobsCompleted</td>
+                                    <td>@tech.RevenueGenerated.ToString("C")</td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr><td colspan="3">No data</td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/js/ExecutiveDigest.js"></script>

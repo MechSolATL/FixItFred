@@ -1,4 +1,4 @@
-@* Sprint 91.7 Part 7: Technician Dashboard View + Embedded Route Guidance + Action Card Stack *@
+@* Sprint 91.8 - RazorFix: Remove any stray @media or @keyframes Razor lines left from previous inline CSS removal. *@
 @page
 @model MVP_Core.Pages.Tech.DashboardModel
 @using MVP_Core.Data.Models
@@ -108,24 +108,3 @@
         });
     </script>
 }
-<style>
-    /* Sprint 91.7 Part 7: Mobile-first, card stack, color codes */
-    .dashboard-root { max-width: 600px; margin: 0 auto; padding: 0 8px; }
-    .mobile-fullheight { min-height: 100vh; background: #f8fafc; }
-    .dashboard-map-section { background: #fff; border-radius: 12px; box-shadow: 0 2px 8px #0001; padding: 16px; margin-bottom: 12px; }
-    .dashboard-action-cards { display: flex; flex-direction: column; gap: 14px; }
-    .action-card { background: #fff; border-radius: 10px; box-shadow: 0 2px 8px #0001; padding: 14px 18px; }
-    .action-card .card-header { font-weight: 600; font-size: 1.1em; margin-bottom: 6px; }
-    .status-badge { font-size: 0.95em; font-weight: 600; padding: 2px 10px; border-radius: 8px; background: #e0e0e0; color: #333; }
-    .current-job-card.green { border-left: 6px solid #28a745; }
-    .current-job-card.yellow { border-left: 6px solid #ffc107; }
-    .current-job-card.red { border-left: 6px solid #dc3545; }
-    .next-job-card.green { border-left: 6px solid #28a745; }
-    .next-job-card.yellow { border-left: 6px solid #ffc107; }
-    .next-job-card.red { border-left: 6px solid #dc3545; }
-    @media (max-width: 600px) {
-        .dashboard-root { padding: 0 2px; }
-        .dashboard-map-section { padding: 8px; }
-        .action-card { padding: 10px 8px; }
-    }
-</style>

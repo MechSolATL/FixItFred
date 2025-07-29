@@ -1,0 +1,30 @@
+name: "?? Attest Build Provenance (Private)"
+
+on:
+  workflow_run:
+    workflows: ["CI"]  # ??? Replace this with your real CI workflow name
+    types:
+      - completed
+
+permissions:
+  id-token: write
+  contents: read
+  attestations: write
+
+jobs:
+  attest:
+    name: "?? Generate Attestation"
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+
+    steps:
+      - name: "?? Download artifact from CI workflow"
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifact
+          run-id: ${{ github.event.workflow_run.id }}
+
+      - name: "?? Attest build provenance"
+        uses: github/attest-build-provenance@v1
+        with:
+          subject-path: "./bin/Release/net7.0/**/*.dll"  # ?? Adjust to your actual compiled output
