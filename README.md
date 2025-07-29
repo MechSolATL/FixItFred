@@ -4,12 +4,6 @@ MVP-Core is a robust, scalable web application framework designed to streamline 
 
 ---
 
-## **Attribution & Creative Legacy**
-
-This platform was developed in collaboration with AI under the creative direction of **Dino**, the original architect of the MechSolATL initiative and creator of Service-Atlanta.com. All core logic, flow design, and architectural choices reflect Dino’s leadership and contribution. AI was used solely to assist — not to originate — and any derivative ideas must reference this foundation.
-
----
-
 ## **Features**
 
 - **Service Request Flows**: Dynamic, question-driven service request engines per service type.
@@ -19,6 +13,8 @@ This platform was developed in collaboration with AI under the creative directio
 - **Secure Authentication and Authorization**: Role- and policy-based access control.
 - **Session Management**: Secure and configurable session tracking.
 - **CORS Support**: Enable cross-origin requests securely.
+- **Patch (AI Assistant)**: In-house LLM trained to help technicians troubleshoot error codes, generate diagnostics, and learn from field feedback.
+- **PDF Packet Generator**: Service reports and estimates include branding, mission statement, and diagnostics.
 
 ---
 
@@ -82,6 +78,9 @@ This platform was developed in collaboration with AI under the creative directio
 | `/Pages/Shared` | Shared views (ThankYou page, SupportBox partial, etc.) |
 | `/Helpers` | Session extensions, utility classes. |
 | `/wwwroot` | Static files (CSS, JS, images). |
+| `/Pages/Admin/Prompts.cshtml` | Run, test, and trace LLM prompts. |
+| `/Pages/Admin/Troubleshooter.cshtml` | AI-assisted technician diagnostic UI. |
+| `/Pages/About/WhyAI.cshtml` | Mission statement for internal/external trust. |
 
 ---
 
@@ -104,6 +103,7 @@ This platform was developed in collaboration with AI under the creative directio
 - **Secure Cookies**: HTTP-only, Secure, SameSite.Strict session cookies.
 - **Anti-Fraud Features**: Hard server-side session expiration + soft client countdown warnings.
 - **Authorization**: Admin dashboard protected by role-based policy.
+- **LLM Monitoring**: Every AI prompt is evaluated under PROS standards. Abuse tracking and warning thresholds in place.
 
 ---
 
@@ -193,9 +193,31 @@ This project is licensed under the **MIT License**.
 
 ---
 
+## **Attribution & Creative Legacy**
+
+This platform was developed in collaboration with AI under the creative direction of **Dino**, the original architect of the MechSolATL initiative and creator of Service-Atlanta.com. All core logic, flow design, and architectural choices reflect Dino’s leadership and contribution. AI was used solely to assist — not to originate — and any derivative ideas must reference this foundation.
+
+---
+
+## **AI Attribution Notice**
+
+All LLM-based enhancements (Patch) are built internally using OpenAI APIs and strict governance under PROS standards. Patch is not a replacement for technician insight but an enhancement powered by your own field knowledge.
+
+---
+
+## **Testing Notice**
+
+Test project uses EF Core InMemory + xUnit. See /MVP_Core.Tests/README.md for usage.
+
+---
+
 ## Legal Notice
 
 All code, designs, workflows, service structures, and business methods associated with Service-Atlanta.com and Mechanical Solutions Atlanta are protected under a Proprietary License.  
 Unauthorized use, duplication, or resale without express permission from Virtual Concepts is strictly prohibited.
 
 [View Protected Proprietary License](./Pages/Legal/License.cshtml)
+
+---
+
+> “We’re building a self-learning technician platform where every job teaches the next. It’s powered by AI, guided by experience, and built on the values that define real pros.”
