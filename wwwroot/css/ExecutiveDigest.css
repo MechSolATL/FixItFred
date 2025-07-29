@@ -1,0 +1,12 @@
+/* Executive Digest CSS stub */
+.executive-digest-container {
+    max-width: 1100px;
+    margin: 2.5rem auto;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.09);
+    padding: 2.5rem 2rem;
+}
+#executive-digest-root {
+    min-height: 300px;
+}
