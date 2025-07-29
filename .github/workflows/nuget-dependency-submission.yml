@@ -1,17 +1,30 @@
-name: "Automatic Dependency Submission (NuGet)"
-
+name: "NuGet Dependency Submission"
 on:
-  push:
-    branches:
-      - master
   workflow_dispatch:
+  schedule:
+    - cron: '0 3 * * 1' # Every Monday at 3 AM UTC
+
+permissions:
+  contents: read
+  security-events: write
 
 jobs:
-  submit-nuget:
+  dependency-submission:
     runs-on: ubuntu-latest
     steps:
-      - name: [34m[1m[4m[24m[22m[39m
-document.addEventListener('DOMContentLoaded', function() {
-    // TODO: Implement AJAX fetch and grid rendering
-});
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '7.0.x' # Ensure this matches your project
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Submit NuGet dependencies
+        uses: github/submit-nuget-dependencies@v1
+        with:
+          dotnet-project-path: MVP-Core.csproj
 
