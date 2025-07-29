@@ -43,22 +43,26 @@
             </tr>
         </thead>
         <tbody>
-        @foreach (var tool in Model.Tools)
+        @* Sprint 91.8 - RazorFix: Ensure Razor foreach/if syntax is correct in table rows *@
+        @if (Model.Tools != null)
         {
-            <tr data-toolid="@tool.ToolId">
-                <td>@tool.ToolId</td>
-                <td>@tool.Name</td>
-                <td>@tool.ToolType</td>
-                <td>@tool.AssignedTechnicianName</td>
-                <td>@tool.LastTransferDate?.ToString("g")</td>
-                <td>@tool.Status</td>
-                <td>
-                    @if (tool.IsTransferable && tool.AssignedTechnicianId != null)
-                    {
-                        <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#transferModal" data-toolid="@tool.ToolId" data-fromtechid="@tool.AssignedTechnicianId" data-fromtechname="@tool.AssignedTechnicianName">Transfer Tool</button>
-                    }
-                </td>
-            </tr>
+            foreach (var tool in Model.Tools)
+            {
+                <tr data-toolid="@tool.ToolId">
+                    <td>@tool.ToolId</td>
+                    <td>@tool.Name</td>
+                    <td>@tool.ToolType</td>
+                    <td>@tool.AssignedTechnicianName</td>
+                    <td>@tool.LastTransferDate?.ToString("g")</td>
+                    <td>@tool.Status</td>
+                    <td>
+                        @if (tool.IsTransferable && tool.AssignedTechnicianId != null)
+                        {
+                            <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#transferModal" data-toolid="@tool.ToolId" data-fromtechid="@tool.AssignedTechnicianId" data-fromtechname="@tool.AssignedTechnicianName">Transfer Tool</button>
+                        }
+                    </td>
+                </tr>
+            }
         }
         </tbody>
     </table>
@@ -128,12 +132,3 @@
         });
     </script>
 }
-<style>
-    .tool-alert-badge { display:inline-block; margin-left:6px; padding:2px 8px; border-radius:8px; font-size:0.85em; background:#ffc107; color:#222; font-weight:600; animation: none; }
-    .pulse-assigned { animation: pulse-assign 2s linear; background:#0dcaf0!important; color:#fff!important; }
-    .pulse-confirmed { animation: pulse-confirm 2s linear; background:#198754!important; color:#fff!important; }
-    .pulse-failed { animation: pulse-fail 2.5s linear; background:#dc3545!important; color:#fff!important; }
-    @keyframes pulse-assign { 0%{box-shadow:0 0 0 0 #0dcaf088;} 70%{box-shadow:0 0 0 10px #0dcaf000;} 100%{box-shadow:0 0 0 0 #0dcaf000;} }
-    @keyframes pulse-confirm { 0%{box-shadow:0 0 0 0 #19875488;} 70%{box-shadow:0 0 0 10px #19875400;} 100%{box-shadow:0 0 0 0 #19875400;} }
-    @keyframes pulse-fail { 0%{box-shadow:0 0 0 0 #dc354588;} 70%{box-shadow:0 0 0 10px #dc354500;} 100%{box-shadow:0 0 0 0 #dc354500;} }
-</style>
