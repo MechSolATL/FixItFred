@@ -27,6 +27,11 @@ namespace MVP_Core.Data.Models
         public double AvgReviewScore { get; set; }
         public int ReviewCount { get; set; }
         public List<string> Skills { get; set; } = new();
+
+        // Sprint 91.21 - Patch Identity Engine
+        public string? Nickname { get; set; }
+        public bool NicknameApproved { get; set; }
+        public bool EnableBanterMode { get; set; }
     }
 
     public class TechnicianAnalyticsDto

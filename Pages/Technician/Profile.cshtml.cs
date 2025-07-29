@@ -1,50 +1,76 @@
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Models.Admin;
-using MVP_Core.Services.Admin;
-using MVP_Core.Data;
-using System.Linq;
+using MVP_Core.Services;
+using MVP_Core.Data.Models;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 
 namespace MVP_Core.Pages.Technician
 {
     public class ProfileModel : PageModel
     {
-        private readonly ApplicationDbContext _db;
-        private readonly RewardTriggerService _rewardTriggerService;
+        private readonly ITechnicianProfileService _profileService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public MVP_Core.Data.Models.TechnicianProfileDto? PatchProfile { get; set; }
+        [BindProperty]
+        public string? Nickname { get; set; }
+        [BindProperty]
+        public bool EnableBanterMode { get; set; }
+        public string? PatchPreview { get; set; }
+        public string? PatchIdentityError { get; set; }
+        public int BanterFlagCount { get; set; }
 
-        public TierStatusDto? TierStatus { get; set; }
-
-        public ProfileModel(ApplicationDbContext db, RewardTriggerService rewardTriggerService)
+        public ProfileModel(ITechnicianProfileService profileService, IHttpContextAccessor httpContextAccessor)
         {
-            _db = db;
-            _rewardTriggerService = rewardTriggerService;
+            _profileService = profileService;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task OnGetAsync()
         {
             var techId = User.Identity?.Name != null ? int.Parse(User.Identity.Name) : 0;
-            var tech = _db.Technicians.FirstOrDefault(t => t.Id == techId);
-            if (tech != null)
+            PatchProfile = await _profileService.GetProfileAsync(techId);
+            Nickname = PatchProfile?.Nickname;
+            EnableBanterMode = PatchProfile?.EnableBanterMode ?? false;
+            PatchPreview = GetPatchPreview(PatchProfile);
+            BanterFlagCount = _httpContextAccessor.HttpContext?.Session.GetInt32("PatchBanterFlagCount") ?? 0;
+        }
+
+        public async Task<IActionResult> OnPostAsync()
+        {
+            var techId = User.Identity?.Name != null ? int.Parse(User.Identity.Name) : 0;
+            BanterFlagCount = _httpContextAccessor.HttpContext?.Session.GetInt32("PatchBanterFlagCount") ?? 0;
+            var result = await _profileService.UpdatePatchIdentityAsync(techId, Nickname, EnableBanterMode);
+            if (result.Flagged)
             {
-                var trustLog = _db.TechnicianTrustLogs
-                    .Where(x => x.TechnicianId == techId)
-                    .OrderByDescending(x => x.RecordedAt)
-                    .FirstOrDefault();
-                var currentTier = ""; // TODO: Get from loyalty/tier logic
-                var totalPoints = _db.LoyaltyPointTransactions
-                    .Where(l => l.TechnicianId == techId)
-                    .Sum(l => l.Points);
-                var lastReward = trustLog?.LastRewardSentAt;
-                var eligible = trustLog == null || !lastReward.HasValue || (System.DateTime.UtcNow - lastReward.Value).TotalDays >= 1;
-                TierStatus = new TierStatusDto
-                {
-                    TechnicianId = tech.Id,
-                    TechnicianName = tech.FullName,
-                    CurrentTier = currentTier,
-                    TotalPoints = totalPoints,
-                    LastRewardSentAt = lastReward,
-                    IsEligibleForReward = eligible
-                };
+                BanterFlagCount++;
+                _httpContextAccessor.HttpContext?.Session.SetInt32("PatchBanterFlagCount", BanterFlagCount);
+            }
+            if (!result.Success)
+            {
+                PatchIdentityError = result.Message;
+                PatchProfile = await _profileService.GetProfileAsync(techId);
+                PatchPreview = GetPatchPreview(PatchProfile);
+                return Page();
+            }
+            // Success
+            PatchProfile = await _profileService.GetProfileAsync(techId);
+            PatchPreview = GetPatchPreview(PatchProfile);
+            PatchIdentityError = null;
+            return RedirectToPage();
+        }
+
+        private string GetPatchPreview(MVP_Core.Data.Models.TechnicianProfileDto? profile)
+        {
+            if (profile == null) return "";
+            var name = !string.IsNullOrWhiteSpace(profile.Nickname) && profile.NicknameApproved ? profile.Nickname : profile.FullName.Split(' ')[0];
+            if (profile.EnableBanterMode)
+            {
+                return $"Ey! {name}, you fix that boiler or you need me to call my cousin Tony?";
+            }
+            else
+            {
+                return $"Hello {name}, ready to get to work?";
             }
         }
     }

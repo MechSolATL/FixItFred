@@ -6,13 +6,23 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System;
+using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace MVP_Core.Services
 {
+    public class PatchIdentityUpdateResult
+    {
+        public bool Success { get; set; }
+        public string? Message { get; set; }
+        public bool Flagged { get; set; }
+    }
+
     public interface ITechnicianProfileService
     {
         Task<TechnicianProfileDto?> GetProfileAsync(int techId);
         Task<TechnicianAnalyticsDto> GetAnalyticsAsync(int techId, DateRange range);
+        Task<PatchIdentityUpdateResult> UpdatePatchIdentityAsync(int techId, string? nickname, bool enableBanterMode);
         // ...other methods as needed...
     }
 
@@ -28,6 +38,12 @@ namespace MVP_Core.Services
     public class TechnicianProfileService : ITechnicianProfileService
     {
         private readonly ApplicationDbContext _db;
+        private static readonly string[] BannedWords = new[]
+        {
+            // Add more as needed for PROS compliance
+            "damn", "hell", "shit", "fuck", "bastard", "idiot", "dumb", "stupid", "ass", "bitch", "crap", "fool", "moron"
+        };
+        private const string BanterFlagSessionKey = "PatchBanterFlagCount";
         public TechnicianProfileService(ApplicationDbContext db)
         {
             _db = db;
@@ -66,8 +82,51 @@ namespace MVP_Core.Services
                 CloseRate = totalJobs > 0 ? (completedJobs / (double)totalJobs) : 0,
                 AvgReviewScore = avgReview,
                 ReviewCount = reviews.Count,
-                Skills = skills
+                Skills = skills,
+                Nickname = tech.Nickname,
+                NicknameApproved = tech.NicknameApproved,
+                EnableBanterMode = tech.EnableBanterMode
             };
+        }
+
+        public async Task<PatchIdentityUpdateResult> UpdatePatchIdentityAsync(int techId, string? nickname, bool enableBanterMode)
+        {
+            var result = new PatchIdentityUpdateResult();
+            var tech = await _db.Technicians.FindAsync(techId);
+            if (tech == null)
+            {
+                result.Success = false;
+                result.Message = "Technician not found.";
+                return result;
+            }
+            // Nickname compliance check
+            if (!string.IsNullOrWhiteSpace(nickname))
+            {
+                var lower = nickname.ToLowerInvariant();
+                foreach (var banned in BannedWords)
+                {
+                    if (Regex.IsMatch(lower, $"\\b{Regex.Escape(banned)}\\b"))
+                    {
+                        result.Success = false;
+                        result.Message = "Whoa, whoa, whoa. Patch don’t talk like that. Clean it up.";
+                        result.Flagged = true;
+                        return result;
+                    }
+                }
+                if (nickname.Length > 40)
+                {
+                    result.Success = false;
+                    result.Message = "Nickname too long (max 40 chars).";
+                    result.Flagged = true;
+                    return result;
+                }
+            }
+            tech.Nickname = nickname;
+            tech.NicknameApproved = !string.IsNullOrWhiteSpace(nickname) && !result.Flagged;
+            tech.EnableBanterMode = enableBanterMode;
+            await _db.SaveChangesAsync();
+            result.Success = true;
+            return result;
         }
 
         public async Task<byte[]> ExportCsvAsync(int techId)

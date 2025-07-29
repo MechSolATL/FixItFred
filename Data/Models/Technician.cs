@@ -71,5 +71,11 @@ namespace MVP_Core.Data.Models
         public DateTime? LastReviewedAt { get; set; }
         // Sprint 84.9 — HeatScore Tracking
         public int? LastKnownHeatScore { get; set; }
+
+        // Sprint 91.21 - Patch Identity Engine
+        [MaxLength(40)]
+        public string? Nickname { get; set; }
+        public bool NicknameApproved { get; set; }
+        public bool EnableBanterMode { get; set; }
     }
 }
