@@ -12,8 +12,71 @@
     gap: 2rem;
     margin-bottom: 2rem;
 }
+.kpi-tile {
+    flex: 1;
+    background: #f8fafc;
+    border-radius: 8px;
+    box-shadow: 0 1px 4px #0001;
+    padding: 1.2rem 1.5rem;
+    text-align: center;
+    border-left: 4px solid #0d6efd;
+}
+.kpi-label {
+    font-size: 1.05rem;
+    color: #6c757d;
+    margin-bottom: 0.5rem;
+}
+.kpi-value {
+    font-size: 2.1rem;
+    font-weight: 700;
+    color: #0d6efd;
+}
 .analytics-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 2rem;
+}
+.analytics-block {
+    background: #f5f7fa;
+    border-radius: 8px;
+    box-shadow: 0 1px 4px #0001;
+    padding: 1.5rem 1.2rem;
+    min-height: 180px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+.analytics-block h5 {
+    font-size: 1.1rem;
+    color: #0d6efd;
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+.status-list, .transfer-list, .totals-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.status-label, .transfer-label, .totals-label {
+    font-weight: 500;
+    color: #495057;
+}
+.status-value, .transfer-value, .totals-value {
+    font-weight: 700;
+    color: #198754;
+    margin-left: 0.5rem;
+}
+.heatmap-placeholder {
+    min-height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.heatmap-table {
+    width: 100%;
+    font-size: 0.98rem;
+}
+.heatmap-table th, .heatmap-table td {
+    padding: 0.3rem 0.6rem;
+    text-align: left;
 }

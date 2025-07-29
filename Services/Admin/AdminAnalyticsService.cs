@@ -42,23 +42,46 @@ namespace MVP_Core.Services.Admin
 
         public Task<TechnicianStatusMetricsDto> GetTechnicianStatusMetricsAsync()
         {
-            // TODO: Implement real logic
-            return Task.FromResult(new TechnicianStatusMetricsDto());
+            // Demo/mock data for grid render
+            return Task.FromResult(new TechnicianStatusMetricsDto
+            {
+                Assigned = 12,
+                EnRoute = 7,
+                Idle = 3
+            });
         }
         public Task<ToolTransferMetricsDto> GetToolTransferMetricsAsync()
         {
-            // TODO: Implement real logic
-            return Task.FromResult(new ToolTransferMetricsDto());
+            return Task.FromResult(new ToolTransferMetricsDto
+            {
+                Pending = 5,
+                InTransit = 2,
+                Completed = 18
+            });
         }
         public Task<ZoneAlertHeatmapDto> GetZoneAlertHeatmapAsync()
         {
-            // TODO: Implement real logic
-            return Task.FromResult(new ZoneAlertHeatmapDto());
+            return Task.FromResult(new ZoneAlertHeatmapDto
+            {
+                Zones = new List<ZoneAlert>
+                {
+                    new ZoneAlert { ZoneName = "North", AlertCount = 4, Density = 0.8 },
+                    new ZoneAlert { ZoneName = "South", AlertCount = 2, Density = 0.3 },
+                    new ZoneAlert { ZoneName = "East", AlertCount = 1, Density = 0.1 },
+                    new ZoneAlert { ZoneName = "West", AlertCount = 0, Density = 0.0 }
+                }
+            });
         }
         public Task<KpiSummaryDto> GetAggregateKPIsAsync()
         {
-            // TODO: Implement real logic
-            return Task.FromResult(new KpiSummaryDto());
+            return Task.FromResult(new KpiSummaryDto
+            {
+                OverdueJobs = 6,
+                IdleTechnicians = 3,
+                MissedTransfers = 1,
+                TotalTechnicians = 22,
+                TotalTransfers = 25
+            });
         }
     }
 }

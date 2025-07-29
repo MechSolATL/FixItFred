@@ -8,15 +8,71 @@
 <div class="analytics-dashboard-container">
     <h2 class="mb-4">Admin Analytics & Insights</h2>
     <div class="kpi-summary">
-        <!-- KPI summary header -->
-        @* KPIs will be rendered here *@
+        <div class="kpi-tile">
+            <div class="kpi-label">Overdue Jobs</div>
+            <div class="kpi-value">@Model.KpiSummary.OverdueJobs</div>
+        </div>
+        <div class="kpi-tile">
+            <div class="kpi-label">Idle Technicians</div>
+            <div class="kpi-value">@Model.KpiSummary.IdleTechnicians</div>
+        </div>
+        <div class="kpi-tile">
+            <div class="kpi-label">Missed Transfers</div>
+            <div class="kpi-value">@Model.KpiSummary.MissedTransfers</div>
+        </div>
+        <div class="kpi-tile">
+            <div class="kpi-label">Total Technicians</div>
+            <div class="kpi-value">@Model.KpiSummary.TotalTechnicians</div>
+        </div>
     </div>
     <div class="analytics-grid">
-        <!-- Analytics grid layout: technician status, tool transfer, alerts, heatmap -->
-        <div id="technician-status-metrics"></div>
-        <div id="tool-transfer-metrics"></div>
-        <div id="alert-flags"></div>
-        <div id="zone-heatmap"></div>
+        <div class="analytics-block">
+            <h5>Technician Status</h5>
+            <ul class="status-list">
+                <li><span class="status-label">Assigned:</span> <span class="status-value">@Model.TechnicianStatusMetrics.Assigned</span></li>
+                <li><span class="status-label">En Route:</span> <span class="status-value">@Model.TechnicianStatusMetrics.EnRoute</span></li>
+                <li><span class="status-label">Idle:</span> <span class="status-value">@Model.TechnicianStatusMetrics.Idle</span></li>
+            </ul>
+        </div>
+        <div class="analytics-block">
+            <h5>Tool Transfer Stats</h5>
+            <ul class="transfer-list">
+                <li><span class="transfer-label">Pending:</span> <span class="transfer-value">@Model.ToolTransferMetrics.Pending</span></li>
+                <li><span class="transfer-label">In Transit:</span> <span class="transfer-value">@Model.ToolTransferMetrics.InTransit</span></li>
+                <li><span class="transfer-label">Completed:</span> <span class="transfer-value">@Model.ToolTransferMetrics.Completed</span></li>
+            </ul>
+        </div>
+        <div class="analytics-block">
+            <h5>Zone Alert Heatmap</h5>
+            <div class="heatmap-placeholder">
+                @if (Model.ZoneAlertHeatmap.Zones?.Count > 0)
+                {
+                    <table class="table table-sm heatmap-table">
+                        <thead><tr><th>Zone</th><th>Alerts</th><th>Density</th></tr></thead>
+                        <tbody>
+                        @foreach (var zone in Model.ZoneAlertHeatmap.Zones)
+                        {
+                            <tr>
+                                <td>@zone.ZoneName</td>
+                                <td>@zone.AlertCount</td>
+                                <td>@zone.Density</td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <span class="text-muted">No alert data available.</span>
+                }
+            </div>
+        </div>
+        <div class="analytics-block">
+            <h5>Transfer Totals</h5>
+            <ul class="totals-list">
+                <li><span class="totals-label">Total Transfers:</span> <span class="totals-value">@Model.KpiSummary.TotalTransfers</span></li>
+            </ul>
+        </div>
     </div>
 </div>
 <script src="/js/AdminAnalytics.js"></script>
