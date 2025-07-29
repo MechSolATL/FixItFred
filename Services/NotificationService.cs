@@ -9,6 +9,7 @@ namespace MVP_Core.Services
         Task SendEmailAsync(string toEmail, string subject, string htmlBody);
         Task SendSMSAsync(string toPhone, string message); // stub
         Task SendAsync(object recipient, string message);
+        void Notify(string message); // Added for ExecutiveDigest
     }
     public class NotificationService : INotificationService
     {
@@ -43,6 +44,10 @@ namespace MVP_Core.Services
             {
                 await SendSMSAsync(phone, message);
             }
+        }
+        public void Notify(string message)
+        {
+            // Stub for ExecutiveDigest notification
         }
     }
 }
