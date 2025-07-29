@@ -1,47 +1,42 @@
 @page
-@model MVP_Core.Pages.Admin.PromptTracesModel
+@model PromptTracesModel
 @{
+    // Sprint 91.8 - Part 5.B
     ViewData["Title"] = "Prompt Trace Logs";
-    Layout = "/Pages/Shared/_AdminLayout.cshtml";
+    Layout = "_AdminLayout";
 }
-<!-- Sprint 90.1: Prompt Trace Log Viewer UI -->
-<h2>Prompt Trace Logs</h2>
-<form method="get" class="row g-2 mb-3">
-    <div class="col-md-3">
-        <input asp-for="UserId" class="form-control" placeholder="UserId" />
-    </div>
-    <div class="col-md-3">
-        <input asp-for="SessionId" class="form-control" placeholder="SessionId" />
-    </div>
-    <div class="col-md-3">
-        <input asp-for="VersionId" class="form-control" placeholder="PromptVersionId" />
-    </div>
-    <div class="col-md-3">
-        <button type="submit" class="btn btn-secondary">Filter</button>
-    </div>
-</form>
-<table class="table table-bordered table-sm">
-    <thead>
+
+<h2 class="mb-4">?? OpenAI Prompt Execution Logs</h2>
+
+<table class="table table-striped table-bordered">
+    <thead class="thead-dark">
         <tr>
-            <th>Time</th>
-            <th>User</th>
-            <th>Session</th>
-            <th>PromptVersion</th>
-            <th>Input</th>
-            <th>Output</th>
+            <th>#</th>
+            <th>Prompt (truncated)</th>
+            <th>Model</th>
+            <th>Tokens</th>
+            <th>Executed At</th>
         </tr>
     </thead>
     <tbody>
-    @foreach (var trace in Model.Traces)
-    {
-        <tr>
-            <td>@trace.CreatedAt.ToString("g")</td>
-            <td>@trace.UserId</td>
-            <td>@trace.SessionId</td>
-            <td>@trace.PromptVersionId</td>
-            <td><pre>@trace.Input</pre></td>
-            <td><pre>@trace.Output</pre></td>
-        </tr>
-    }
+        @if (Model.Traces.Any())
+        {
+            int index = 1;
+            foreach (var trace in Model.Traces)
+            {
+                <tr>
+                    <td>@index</td>
+                    <td>@(trace.Input.Length > 60 ? trace.Input.Substring(0, 60) + "…" : trace.Input)</td>
+                    <td>@trace.ModelUsed</td>
+                    <td>@trace.ResponseTokens</td>
+                    <td>@trace.ExecutedAt.ToLocalTime()</td>
+                </tr>
+                index++;
+            }
+        }
+        else
+        {
+            <tr><td colspan="5" class="text-center">No prompt traces found.</td></tr>
+        }
     </tbody>
 </table>
