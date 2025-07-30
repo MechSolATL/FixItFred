@@ -10,28 +10,57 @@ using MVP_Core.Services;
 
 namespace MVP_Core.Pages.Admin
 {
+    /// <summary>
+    /// Represents the Technician Audit page model for viewing and filtering technician behavior logs.
+    /// </summary>
     [Authorize(Roles = "Admin")]
     public class TechAuditModel : PageModel
     {
         private readonly MVP_Core.Services.Admin.TechnicianAuditService _auditService;
         internal readonly ApplicationDbContext _db;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TechAuditModel"/> class.
+        /// </summary>
+        /// <param name="db">The application database context.</param>
+        /// <param name="auditService">The technician audit service.</param>
         public TechAuditModel(ApplicationDbContext db, MVP_Core.Services.Admin.TechnicianAuditService auditService)
         {
             _db = db;
             _auditService = auditService;
         }
 
+        /// <summary>
+        /// The ID of the technician to filter logs by.
+        /// </summary>
         [BindProperty(SupportsGet = true)]
         public int? TechnicianId { get; set; }
+
+        /// <summary>
+        /// The date to filter logs by.
+        /// </summary>
         [BindProperty(SupportsGet = true)]
         public DateTime? Date { get; set; }
+
+        /// <summary>
+        /// The action type to filter logs by.
+        /// </summary>
         [BindProperty(SupportsGet = true)]
         public TechnicianAuditActionType? ActionType { get; set; }
 
-        // FixItFred: Use TechnicianBehaviorLog for logs to match TechnicianAuditService
+        /// <summary>
+        /// The list of technician behavior logs matching the filter criteria.
+        /// </summary>
         public List<MVP_Core.Models.TechnicianBehaviorLog> Logs { get; set; } = new();
+
+        /// <summary>
+        /// The list of technicians available for filtering.
+        /// </summary>
         public List<MVP_Core.Data.Models.Technician> Technicians { get; set; } = new();
 
+        /// <summary>
+        /// Handles GET requests to the Technician Audit page.
+        /// </summary>
         public async Task OnGetAsync()
         {
             Technicians = _db.Technicians.OrderBy(t => t.FullName).ToList();
@@ -62,6 +91,11 @@ namespace MVP_Core.Pages.Admin
             }
         }
 
+        /// <summary>
+        /// Gets the full name of a technician by their ID.
+        /// </summary>
+        /// <param name="technicianId">The ID of the technician.</param>
+        /// <returns>The full name of the technician, or a placeholder if not found.</returns>
         public string GetTechnicianName(int technicianId)
         {
             var tech = Technicians.FirstOrDefault(t => t.Id == technicianId);

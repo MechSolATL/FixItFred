@@ -1,36 +1,22 @@
-// Sprint92_Fix_GroupB — Razor layout set, ViewData["Title"] applied, dynamic SEO injected using ISEOService for route Patch/PatchDashboard.
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Services; // Ensure ISEOService is accessible
-using MVP_Core.Data.Models.Seo;
-using System.Threading.Tasks;
+using MVP_Core.Modules.Patch.Models;
+using System.Collections.Generic;
 
-namespace MVP_Core.Pages.Patch
+namespace MVP_Core.Modules.Patch.Pages
 {
+    // Sprint93_Start — PatchDashboard.cshtml.cs initialized
+    // Sprint93_Fix_B3 — Stripped SEO dependencies for Razor-safe compilation (rebuild planned in Sprint 93)
+    // TODO: Reinject ISEOService and SEOModel in Sprint 93_AfterStabilization
+
     public class PatchDashboardModel : PageModel
     {
-        private readonly ISEOService _seoService;
+        public List<ReviewEntry> Reviews { get; set; }
+        public UserRole CurrentUserRole { get; set; }
 
-        public PatchDashboardModel(ISEOService seoService)
+        public void OnGet()
         {
-            _seoService = seoService;
-        }
-
-        public SEOModel SEO { get; set; }
-
-        public async Task OnGetAsync()
-        {
-            ViewData["Title"] = "Patch Dashboard";
-            Layout = "/Pages/Shared/_Layout.cshtml";
-
-            // ?? Load SEO for Patch Dashboard
-            SEO = await _seoService.GetByPageAsync("Patch/PatchDashboard");
-
-            if (SEO != null)
-            {
-                ViewData["MetaDescription"] = SEO.MetaDescription;
-                ViewData["MetaKeywords"] = SEO.MetaKeywords;
-                ViewData["MetaRobots"] = SEO.Robots;
-            }
+            Reviews = new List<ReviewEntry>();
+            CurrentUserRole = UserRole.Admin; // Example, replace with actual role logic
         }
     }
 }

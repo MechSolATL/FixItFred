@@ -12,6 +12,9 @@ using MVP_Core.Services.Admin;
 using MVP_Core.Services.Dispatch;
 
 // Sprint 34.3 - SLA Monitoring Loop
+/// <summary>
+/// Service for monitoring SLA violations and handling automatic escalations.
+/// </summary>
 public class SLAMonitorService : BackgroundService
 {
     private readonly IServiceScopeFactory _scopeFactory;
@@ -19,6 +22,13 @@ public class SLAMonitorService : BackgroundService
     private readonly DispatcherService _dispatcherService;
     private readonly bool _enableFallback;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SLAMonitorService"/> class.
+    /// </summary>
+    /// <param name="scopeFactory">The service scope factory.</param>
+    /// <param name="notificationDispatchEngine">The notification dispatch engine.</param>
+    /// <param name="dispatcherService">The dispatcher service.</param>
+    /// <param name="enableFallback">Indicates whether fallback reassignment is enabled.</param>
     public SLAMonitorService(IServiceScopeFactory scopeFactory, NotificationDispatchEngine notificationDispatchEngine, DispatcherService dispatcherService, bool enableFallback = true)
     {
         _scopeFactory = scopeFactory;
@@ -27,6 +37,10 @@ public class SLAMonitorService : BackgroundService
         _enableFallback = enableFallback;
     }
 
+    /// <summary>
+    /// Executes the SLA monitoring loop.
+    /// </summary>
+    /// <param name="stoppingToken">The cancellation token for stopping the service.</param>
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         while (!stoppingToken.IsCancellationRequested)

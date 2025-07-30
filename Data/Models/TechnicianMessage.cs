@@ -8,17 +8,44 @@ namespace MVP_Core.Data.Models
     /// </summary>
     public class TechnicianMessage
     {
+        /// <summary>
+        /// The unique identifier for the message.
+        /// </summary>
         [Key]
         public int MessageId { get; set; }
-        public int TechnicianId { get; set; } // Technician involved
-        public int RequestId { get; set; } // Related service request
+
+        /// <summary>
+        /// The ID of the technician involved in the message exchange.
+        /// </summary>
+        public int TechnicianId { get; set; }
+
+        /// <summary>
+        /// The ID of the related service request.
+        /// </summary>
+        public int RequestId { get; set; }
+
+        /// <summary>
+        /// The type of sender (e.g., "Tech" or "Dispatcher").
+        /// </summary>
         [Required]
         [MaxLength(20)]
-        public string SenderType { get; set; } = "Dispatcher"; // "Tech" or "Dispatcher"
+        public string SenderType { get; set; } = "Dispatcher";
+
+        /// <summary>
+        /// The body of the message.
+        /// </summary>
         [Required]
         [MaxLength(2000)]
         public string MessageBody { get; set; } = string.Empty;
+
+        /// <summary>
+        /// The timestamp when the message was sent.
+        /// </summary>
         public DateTime Timestamp { get; set; } = DateTime.UtcNow;
-        public bool ReadFlag { get; set; } = false; // True if recipient has read
+
+        /// <summary>
+        /// Indicates whether the recipient has read the message.
+        /// </summary>
+        public bool ReadFlag { get; set; } = false;
     }
 }

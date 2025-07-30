@@ -8,18 +8,34 @@ using System.Collections.Generic;
 
 namespace MVP_Core.Services
 {
+    /// <summary>
+    /// Service for scheduling and processing notifications.
+    /// </summary>
     public class NotificationSchedulerService
     {
         private readonly ApplicationDbContext _db;
         private readonly NotificationDispatchEngine _dispatchEngine;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="NotificationSchedulerService"/> class.
+        /// </summary>
+        /// <param name="db">The application database context.</param>
+        /// <param name="dispatchEngine">The notification dispatch engine.</param>
         public NotificationSchedulerService(ApplicationDbContext db, NotificationDispatchEngine dispatchEngine)
         {
             _db = db;
             _dispatchEngine = dispatchEngine;
         }
 
-        // Queue a notification
+        /// <summary>
+        /// Queues a notification for future dispatch.
+        /// </summary>
+        /// <param name="recipient">The recipient of the notification.</param>
+        /// <param name="channel">The channel type for the notification.</param>
+        /// <param name="trigger">The trigger type for the notification.</param>
+        /// <param name="targetId">The target ID associated with the notification.</param>
+        /// <param name="messageBody">The message body of the notification.</param>
+        /// <param name="scheduledTime">The time when the notification is scheduled to be sent.</param>
         public async Task QueueNotificationAsync(string recipient, NotificationChannelType channel, NotificationTriggerType trigger, int targetId, string messageBody, DateTime scheduledTime)
         {
             var notification = new NotificationQueue
@@ -36,7 +52,9 @@ namespace MVP_Core.Services
             await _db.SaveChangesAsync();
         }
 
-        // Process pending notifications (retry, delay, SLA check)
+        /// <summary>
+        /// Processes the notification queue, sending pending notifications.
+        /// </summary>
         public async Task ProcessQueueAsync()
         {
             var now = DateTime.UtcNow;
@@ -50,7 +68,10 @@ namespace MVP_Core.Services
             await _db.SaveChangesAsync();
         }
 
-        // Cancel a notification
+        /// <summary>
+        /// Cancels a pending notification.
+        /// </summary>
+        /// <param name="notificationId">The ID of the notification to cancel.</param>
         public async Task CancelNotificationAsync(int notificationId)
         {
             var notification = await _db.NotificationQueues.FindAsync(notificationId);

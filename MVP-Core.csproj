@@ -24,14 +24,12 @@
     <PackageReference Include="Twilio" Version="7.12.0" />
     <PackageReference Include="Wangkanai.Detection" Version="8.20.0" />
   </ItemGroup>
-
+<!-- Sprint92_Fix_B5 — Removed redundant Compile include to resolve NETSDK1022 -->
+<!-- Reports directory is auto-included by SDK-style project layout -->
   <ItemGroup>
     <Folder Include="Tests\Services\" />
   </ItemGroup>
 
-  <!-- Sprint 92 - Nova Patch: Ensure Reports folder is compiled -->
-  <ItemGroup>
-    <Compile Include="MVP_Core.Data.Models.Reports\**\*.cs" />
-  </ItemGroup>
+  
 
 </Project>

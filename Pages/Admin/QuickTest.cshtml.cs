@@ -6,9 +6,19 @@ using System.Collections.Generic;
 
 namespace MVP_Core.Pages.Admin
 {
+    /// <summary>
+    /// Represents the QuickTest page model for testing technician KPIs.
+    /// </summary>
     public class QuickTestModel : PageModel
     {
+        /// <summary>
+        /// The result of the test execution.
+        /// </summary>
         public string TestResult { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Handles GET requests to the QuickTest page.
+        /// </summary>
         public void OnGet()
         {
             // Arrange: create fake requests
