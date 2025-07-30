@@ -77,5 +77,8 @@ namespace MVP_Core.Data.Models
         public string? Nickname { get; set; }
         public bool NicknameApproved { get; set; }
         public bool EnableBanterMode { get; set; }
+
+        // Patch module reputation tracking
+        public double PatchReputationScore { get; set; } = 0;
     }
 }

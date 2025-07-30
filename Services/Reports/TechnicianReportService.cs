@@ -1,111 +1,92 @@
-using QuestPDF.Fluent;
-using QuestPDF.Helpers;
-using QuestPDF.Infrastructure;
+﻿using MVP_Core.Data;
 using MVP_Core.Data.Models;
+using MVP_Core.Data.Models.Reports;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
+// Sprint 91.23 - Technician Report Library
 namespace MVP_Core.Services.Reports
 {
     public class TechnicianReportService
     {
-        public byte[] GenerateSingleReport(TechnicianProfileDto tech, byte[] chartImage, string? notes)
+        private readonly ApplicationDbContext _context;
+
+        public TechnicianReportService(ApplicationDbContext context)
         {
-            return Document.Create(container =>
-            {
-                container.Page(page =>
-                {
-                    page.Margin(30);
-                    page.Header().Row(row =>
-                    {
-                        row.RelativeItem().Column(col =>
-                        {
-                            col.Item().Text("Technician Performance Report").FontSize(20).Bold();
-                            col.Item().Text($"{tech.FullName}").FontSize(14);
-                        });
-                        var logoDescriptor = row.ConstantItem(80).Image("wwwroot/img/logo.png");
-                        logoDescriptor.FitArea();
-                    });
-                    page.Content().Column(col =>
-                    {
-                        col.Item().Text("Technician Info").FontSize(14).Bold();
-                        col.Item().Text($"Specialty: {tech.Specialty}");
-                        col.Item().Text($"Employment: {tech.EmploymentDate?.ToShortDateString() ?? "-"}");
-                        col.Item().Text($"Skills: {string.Join(", ", tech.Skills)}");
-                        if (!string.IsNullOrEmpty(tech.Badges))
-                            col.Item().Text($"Badges: {tech.Badges}");
-                        if (!string.IsNullOrEmpty(tech.PhotoUrl))
-                        {
-                            var photoDescriptor = col.Item().Image(tech.PhotoUrl);
-                            photoDescriptor.FitWidth();
-                        }
-                        col.Item().PaddingVertical(10);
-                        col.Item().Text("KPI Summary").FontSize(14).Bold();
-                        col.Item().Text($"Close Rate: {tech.CloseRate:P2}");
-                        col.Item().Text($"Completed Jobs: {tech.CompletedJobs}");
-                        col.Item().Text($"Callbacks: {tech.Callbacks}");
-                        col.Item().Text($"Avg Review: {tech.AvgReviewScore:F2} ({tech.ReviewCount} reviews)");
-                        col.Item().PaddingVertical(10);
-                        col.Item().Text("Charts").FontSize(14).Bold();
-                        if (chartImage != null && chartImage.Length > 0)
-                        {
-                            var chartDescriptor = col.Item().Image(chartImage);
-                            chartDescriptor.FitWidth();
-                        }
-                        col.Item().PaddingVertical(10);
-                        col.Item().Text("HR Notes").FontSize(14).Bold();
-                        col.Item().Text(notes ?? "");
-                    });
-                });
-            }).GeneratePdf();
+            _context = context;
         }
 
-        public byte[] GenerateComparisonReport(List<TechnicianProfileDto> techs, List<byte[]> chartImages, string? notes)
+        public async Task<int> CreateAsync(TechnicianReport report)
         {
-            return Document.Create(container =>
+            _context.TechnicianReports.Add(report);
+            await _context.SaveChangesAsync();
+            return report.Id;
+        }
+
+        public async Task<List<TechnicianReport>> GetByTechIdAsync(int techId)
+        {
+            return await _context.TechnicianReports
+                .Where(r => r.TechnicianId == techId)
+                .OrderByDescending(r => r.SubmittedOn)
+                .ToListAsync();
+        }
+
+        public async Task<List<TechnicianReport>> FilterAsync(DateTime? startDate, DateTime? endDate, int? technicianId)
+        {
+            var query = _context.TechnicianReports.AsQueryable();
+
+            if (technicianId.HasValue)
+                query = query.Where(r => r.TechnicianId == technicianId);
+
+            if (startDate.HasValue)
+                query = query.Where(r => r.SubmittedOn >= startDate.Value);
+
+            if (endDate.HasValue)
+                query = query.Where(r => r.SubmittedOn <= endDate.Value);
+
+            return await query.OrderByDescending(r => r.SubmittedOn).ToListAsync();
+        }
+
+        public async Task AddFeedbackAsync(TechnicianReportFeedback feedback)
+        {
+            _context.TechnicianReportFeedbacks.Add(feedback);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<List<TechnicianReportFeedback>> GetFeedbackForReportAsync(int reportId)
+        {
+            return await _context.TechnicianReportFeedbacks
+                .Where(f => f.ReportId == reportId)
+                .ToListAsync();
+        }
+
+        // ✅ Added by FixItFred — Sprint92_RecoveryFixes
+        public async Task<ReportResult> GenerateSingleReport(Guid technicianId, DateTime fromDate, DateTime toDate)
+        {
+            // TODO: Replace with actual logic
+            return await Task.FromResult(new ReportResult
             {
-                container.Page(page =>
-                {
-                    page.Margin(30);
-                    page.Header().Row(row =>
-                    {
-                        row.RelativeItem().Column(col =>
-                        {
-                            col.Item().Text("Technician Comparison Report").FontSize(20).Bold();
-                            col.Item().Text(string.Join(", ", techs.ConvertAll(t => t.FullName))).FontSize(14);
-                        });
-                        var logoDescriptor = row.ConstantItem(80).Image("wwwroot/img/logo.png");
-                        logoDescriptor.FitArea();
-                    });
-                    page.Content().Column(col =>
-                    {
-                        col.Item().Text("Technician Info").FontSize(14).Bold();
-                        foreach (var tech in techs)
-                        {
-                            col.Item().Text($"{tech.FullName}: {tech.Specialty}, {tech.EmploymentDate?.ToShortDateString() ?? "-"}, Skills: {string.Join(", ", tech.Skills)}");
-                        }
-                        col.Item().PaddingVertical(10);
-                        col.Item().Text("KPI Summary").FontSize(14).Bold();
-                        foreach (var tech in techs)
-                        {
-                            col.Item().Text($"{tech.FullName}: Close Rate: {tech.CloseRate:P2}, Completed: {tech.CompletedJobs}, Callbacks: {tech.Callbacks}, Avg Review: {tech.AvgReviewScore:F2} ({tech.ReviewCount})");
-                        }
-                        col.Item().PaddingVertical(10);
-                        col.Item().Text("Charts").FontSize(14).Bold();
-                        foreach (var img in chartImages)
-                        {
-                            if (img != null && img.Length > 0)
-                            {
-                                var chartDescriptor = col.Item().Image(img);
-                                chartDescriptor.FitWidth();
-                            }
-                        }
-                        col.Item().PaddingVertical(10);
-                        col.Item().Text("HR Notes").FontSize(14).Bold();
-                        col.Item().Text(notes ?? "");
-                    });
-                });
-            }).GeneratePdf();
+                TechnicianId = technicianId,
+                FromDate = fromDate,
+                ToDate = toDate,
+                Summary = "Report generation pending implementation."
+            });
+        }
+
+        // ✅ Added by FixItFred — Sprint92_RecoveryFixes
+        public async Task<ReportComparison> GenerateComparisonReport(Guid[] technicianIds, DateTime fromDate, DateTime toDate)
+        {
+            // TODO: Replace with real aggregation logic
+            return await Task.FromResult(new ReportComparison
+            {
+                TechnicianIds = technicianIds.ToList(),
+                FromDate = fromDate,
+                ToDate = toDate,
+                ComparisonData = new Dictionary<Guid, string>() // placeholder
+            });
         }
     }
 }

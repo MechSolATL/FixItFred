@@ -1,3 +1,5 @@
+// [FixItFred - Sprint 91.23.A] Confirmed SeoMeta.cs as the authoritative model. Duplicate removed from root Models folder.
+
 using System.ComponentModel.DataAnnotations;
 
 namespace MVP_Core.Data.Models
