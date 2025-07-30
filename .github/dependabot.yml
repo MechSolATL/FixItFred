@@ -1,17 +1,16 @@
-File: .github\dependabot.yml
-````````
-# FixItFred: Sprint 91.23.E � Created valid NuGet-only configuration for .NET project, removed unsupported npm config
+# FixItFred: Sprint91.23.E — Valid NuGet and GitHub Actions Dependabot config
 version: 2
 updates:
   - package-ecosystem: "nuget"
-    directory: "/" # Root of your repo
+    directory: "/"  # Root of your repo
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 5
     ignore:
       - dependency-name: "Microsoft.NET.Test.Sdk"
         versions: ["*"]
+
   - package-ecosystem: "github-actions"
-    directory: "/" 
+    directory: "/"
     schedule:
       interval: "weekly"
