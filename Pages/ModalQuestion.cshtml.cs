@@ -1,6 +1,8 @@
+using Data.Models;
+using Services;
 using System.Text.Json;
 
-namespace MVP_Core.Pages
+namespace Pages
 {
     public class ModalQuestionModel : PageModel
     {

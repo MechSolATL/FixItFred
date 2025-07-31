@@ -17,7 +17,7 @@
 <table class="table table-bordered">
     <thead><tr><th>Date</th><th>Status</th><th>Amount</th><th>Download</th></tr></thead>
     <tbody>
-    @foreach (var doc in Model.Documents ?? new List<MVP_Core.Data.Models.BillingInvoiceRecord>()) // Sprint 78.8: Razor null safety
+    @foreach (var doc in Model.Documents ?? new List<Data.Models.BillingInvoiceRecord>()) // Sprint 78.8: Razor null safety
     {
         <tr>
             <td>@doc.InvoiceDate.ToShortDateString()</td>

@@ -1,14 +1,14 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Services.Admin;
-using MVP_Core.Data;
-using MVP_Core.Models.Admin;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Models.Admin;
+using Data;
+using Services.Admin;
 
-namespace MVP_Core.Pages.Admin
+namespace Pages.Admin
 {
     /// <summary>
     /// Represents the Override Center page model for managing technician assignments and job zones.

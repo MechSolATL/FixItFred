@@ -1,5 +1,5 @@
 // Sprint83.4-FinalFixSweep2
-namespace MVP_Core.Data.Models
+namespace Data.Models
 {
     public class DispatcherNotification
     {

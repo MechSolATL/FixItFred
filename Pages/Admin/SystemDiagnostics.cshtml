@@ -124,9 +124,9 @@
         {
             var statusClass = log.StatusLevel switch
             {
-                MVP_Core.Data.Models.DiagnosticStatusLevel.OK => "table-success",
-                MVP_Core.Data.Models.DiagnosticStatusLevel.Warning => "table-warning",
-                MVP_Core.Data.Models.DiagnosticStatusLevel.Error => "table-danger",
+                Data.Models.DiagnosticStatusLevel.OK => "table-success",
+                Data.Models.DiagnosticStatusLevel.Warning => "table-warning",
+                Data.Models.DiagnosticStatusLevel.Error => "table-danger",
                 _ => ""
             };
             <tr class="@statusClass">

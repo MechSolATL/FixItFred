@@ -1,13 +1,13 @@
 using MVP_Core.Data;
-using MVP_Core.Data.Models;
-using MVP_Core.Services.Admin;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
+using Data.Models;
+using Services.Admin;
 
-namespace MVP_Core.Pages.Admin
+namespace Pages.Admin
 {
     public class LiveFeedModel : PageModel
     {
@@ -46,7 +46,7 @@ namespace MVP_Core.Pages.Admin
                 if (!string.IsNullOrEmpty(FilterActivityType))
                     feed = feed.Where(x => x.ActivityType == FilterActivityType).ToList();
                 if (FilterTimeRange > 0)
-                    feed = feed.Where(x => (System.DateTime.UtcNow - x.Timestamp).TotalMinutes < FilterTimeRange).ToList();
+                    feed = feed.Where(x => (DateTime.UtcNow - x.Timestamp).TotalMinutes < FilterTimeRange).ToList();
                 ActivityFeed = feed;
                 if (!string.IsNullOrEmpty(ReplaySessionId))
                     GeoTrailLogs = await _activityService.GetGeoTrailSessionAsync(ReplaySessionId);

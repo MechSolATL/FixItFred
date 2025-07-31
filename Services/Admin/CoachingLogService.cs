@@ -1,11 +1,11 @@
 // Sprint 85.6 — Coaching Impact Insights Phase 2
-using MVP_Core.Models;
-using MVP_Core.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Helpers;
+using Models;
 
-namespace MVP_Core.Services.Admin
+namespace Services.Admin
 {
     // Sprint 85.6 — Coaching Impact Insights Phase 2
     public class CoachingLogService

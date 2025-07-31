@@ -68,7 +68,7 @@
     // bool isDesktop = Detection.Device.Type == DeviceType.Desktop;
     // TrustIndex badge logic
     int trustIndex = 100;
-    var trustService = Context.RequestServices.GetService(typeof(MVP_Core.Services.Admin.TrustIndexScoringService)) as MVP_Core.Services.Admin.TrustIndexScoringService;
+    var trustService = Context.RequestServices.GetService(typeof(Services.Admin.TrustIndexScoringService)) as Services.Admin.TrustIndexScoringService;
     if (techStatus != null && trustService != null)
     {
         trustIndex = trustService.GetCachedTrustIndex(techStatus.TechnicianId) ?? 100;

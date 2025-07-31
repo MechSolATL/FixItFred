@@ -1,7 +1,8 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Services;
 using Wangkanai.Detection;
 
-namespace MVP_Core.Pages.Shared
+namespace Pages.Shared
 {
     public class _LayoutMobileModel : PageModel
     {

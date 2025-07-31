@@ -1,4 +1,7 @@
-namespace MVP_Core.Services
+using Data;
+using Data.Models;
+
+namespace Services
 {
     public class BackgroundImageService
     {

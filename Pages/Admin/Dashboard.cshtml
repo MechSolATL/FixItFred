@@ -272,8 +272,8 @@
         <strong>Feedback Spotlight:</strong>
         <ul>
         @{
-            var loyaltyDb = Model != null && Model.HttpContext != null ? Model.HttpContext.RequestServices.GetService(typeof(MVP_Core.Data.ApplicationDbContext)) as MVP_Core.Data.ApplicationDbContext : null;
-            var reviews = loyaltyDb != null ? loyaltyDb.CustomerReviews.ToList() : new List<MVP_Core.Data.Models.CustomerReview>();
+            var loyaltyDb = Model != null && Model.HttpContext != null ? Model.HttpContext.RequestServices.GetService(typeof(Data.ApplicationDbContext)) as Data.ApplicationDbContext : null;
+            var reviews = loyaltyDb != null ? loyaltyDb.CustomerReviews.ToList() : new List<Data.Models.CustomerReview>();
             var spotlight = reviews.OrderByDescending(r => r.SentimentScore ?? 0).FirstOrDefault();
             if (spotlight != null)
             {

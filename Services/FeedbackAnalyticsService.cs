@@ -1,11 +1,11 @@
-using MVP_Core.Data;
-using MVP_Core.Data.Models;
+using Data;
+using Data.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 
-namespace MVP_Core.Services
+namespace Services
 {
     // Sprint 57.0: Feedback Analytics & Sentiment Insights
     public class FeedbackAnalyticsService

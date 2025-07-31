@@ -1,13 +1,20 @@
 @page
 @model MVP_Core.Pages.Admin.SnapshotsModel
+
 @{
-    ViewData["Title"] = "System Snapshots";
+    Layout = "_Layout";
+    ViewData["Title"] = Model.Seo.Title;
+    ViewData["Description"] = Model.Seo.Description;
 }
-<h2>System Snapshots</h2>
+
+<h1>@Model.Seo.Title</h1>
+<p>@Model.Seo.Description</p>
+
 <form method="get" class="mb-3">
     <input type="text" name="search" value="@Model.SearchTerm" placeholder="Search summary or type..." class="form-control w-25 d-inline-block" />
     <button type="submit" class="btn btn-primary ms-2">Search</button>
 </form>
+
 <table class="table table-bordered">
     <thead>
         <tr>
@@ -38,6 +45,7 @@
         }
     </tbody>
 </table>
+
 @if (!string.IsNullOrEmpty(Model.StatusMessage))
 {
     <div class="alert alert-info mt-3">@Model.StatusMessage</div>

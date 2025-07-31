@@ -2,7 +2,10 @@
 // ?? File: Data/Seeders/ImageSeeder.cs
 // ===============================
 
-namespace MVP_Core.Data.Seeders
+using Data;
+using Data.Models;
+
+namespace Data.Seeders
 {
     public static class ImageSeeder
     {

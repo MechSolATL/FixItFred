@@ -1,6 +1,4 @@
-using MVP_Core.Data;
 using MVP_Core.Data.Models;
-using MVP_Core.Services;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,8 +6,10 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
+using Data;
+using Services;
 
-namespace MVP_Core.Pages.Account
+namespace Pages.Account
 {
     public class RegisterModel : PageModel
     {

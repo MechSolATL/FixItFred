@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 
-namespace MVP_Core.Hubs
+namespace Hubs
 {
     // Sprint 91.7.Part6.4: SignalR hub for tool tracking and transfer events
     [Authorize(Roles = "Admin,Dispatcher,Manager")]

@@ -1,10 +1,10 @@
 using System;
 using System.IO;
-using MVP_Core.Data.Models;
 using MVP_Core.Data;
 using System.Text.Json;
+using Data.Models;
 
-namespace MVP_Core.Services.Admin
+namespace Services.Admin
 {
     // Sprint 83.4: README generator for onboarding data
     public static class READMEGenerator

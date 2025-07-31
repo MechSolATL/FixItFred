@@ -1,10 +1,10 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Services.Admin;
-using MVP_Core.Data.DTO.Analytics;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
+using Data.DTO.Analytics;
+using Services.Admin;
 
-namespace MVP_Core.Pages.Admin
+namespace Pages.Admin
 {
     public class AnalyticsDashboardModel : PageModel
     {

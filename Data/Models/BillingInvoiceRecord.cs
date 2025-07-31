@@ -1,9 +1,9 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using MVP_Core.Data.Enums;
+using Data.Enums;
 
-namespace MVP_Core.Data.Models
+namespace Data.Models
 {
     public class BillingInvoiceRecord
     {

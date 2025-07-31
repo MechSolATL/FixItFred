@@ -1,4 +1,4 @@
-namespace MVP_Core.Pages
+namespace Pages
 {
     public class ConfirmationModel : PageModel
     {

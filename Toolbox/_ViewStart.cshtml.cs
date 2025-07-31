@@ -1,4 +1,4 @@
-namespace MVP_Core.Toolbox
+namespace Toolbox
 {
     public class _ViewStartModel : PageModel
     {

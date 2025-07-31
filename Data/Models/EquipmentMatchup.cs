@@ -2,7 +2,7 @@
 // File: Data/Models/EquipmentMatchup.cs
 // ===============================
 
-namespace MVP_Core.Data.Models
+namespace Data.Models
 {
     public class EquipmentMatchup
     {

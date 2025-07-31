@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using MVP_Core.Data;
-using MVP_Core.Data.Models;
 using MVP_Core.Data.Enums;
+using Data;
+using Data.Models;
 
-namespace MVP_Core.Services.Compliance
+namespace Services.Compliance
 {
     public class ComplianceReminderService
     {

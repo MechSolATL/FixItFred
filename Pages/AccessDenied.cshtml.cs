@@ -1,8 +1,9 @@
 using System.Threading.Tasks;
+using Data.Models;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Services;
+using Services;
 
-namespace MVP_Core.Pages
+namespace Pages
 {
     // This file has been patched in Sprint 91.9-B
     public class AccessDeniedModel : PageModel

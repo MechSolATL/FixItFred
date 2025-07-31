@@ -1,15 +1,15 @@
 using MVP_Core.Data.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Data;
 using Microsoft.AspNetCore.Http;
 using System.Threading.Tasks;
 using System;
 using System.IO;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Authorization;
+using Data;
 
-namespace MVP_Core.Pages.Admin
+namespace Pages.Admin
 {
     // Sprint 83.4: Feedback center
     [Authorize(Roles = "Admin,User")]

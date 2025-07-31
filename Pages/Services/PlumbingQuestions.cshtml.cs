@@ -1,5 +1,9 @@
 // MVP_Core/Pages/Services/PlumbingQuestions.cshtml.cs
-namespace MVP_Core.Pages.Services
+using Data;
+using Data.Models;
+using Data.Models.ViewModels;
+
+namespace Pages.Services
 {
     public class PlumbingQuestionsModel : PageModel
     {

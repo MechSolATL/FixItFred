@@ -1,14 +1,14 @@
 // Sprint 83.6-RoastRoulette
-using MVP_Core.Data;
 using MVP_Core.Data.Models;
-using MVP_Core.Services.Admin;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Data;
+using Services.Admin;
 
-namespace MVP_Core.Services
+namespace Services
 {
     // Sprint 83.6-RoastRoulette
     public class RoastRouletteService

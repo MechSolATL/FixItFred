@@ -1,23 +1,26 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using MVP_Core.Data;
-using MVP_Core.Data.Models;
 using Helpers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Interfaces;
+using Data;
+using Data.Models;
 
-namespace MVP_Core.Services.Admin
+namespace Services.Admin
 {
     public class ReplayEngineService
     {
         private readonly ApplicationDbContext _db;
         private readonly ILogger<ReplayEngineService> _logger;
+        private readonly IUserContext _userContext;
 
-        public ReplayEngineService(ApplicationDbContext db, ILogger<ReplayEngineService> logger)
+        public ReplayEngineService(ApplicationDbContext db, ILogger<ReplayEngineService> logger, IUserContext userContext)
         {
             _db = db;
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _userContext = userContext ?? new DefaultUserContext();
         }
 
         public async Task<string> CaptureSnapshotAsync(object data, string type, string summary, string createdBy)
@@ -38,17 +41,26 @@ namespace MVP_Core.Services.Admin
             return hash;
         }
 
-        public async Task<bool> ReplaySnapshotAsync(
-            string snapshotHash,
-            string? triggeredBy,
-            DateTime? overrideTimestamp = null,
-            string notes = null)
+        public Task<bool> ReplaySnapshotAsync(string snapshotHash, string? triggeredBy, DateTime? overrideTimestamp = null, string notes = "")
         {
-            triggeredBy ??= "system";
-            return await Task.FromResult(true);
+            return Task.FromResult(true);
         }
 
-        public Task QueueRecoveryScenarioAsync(string scenarioId)
-            => Task.CompletedTask;
+        public Task<bool> ReplaySnapshotAsync(UserContext context, JobMetaData job)
+        {
+            return Task.FromResult(true);
+        }
+
+        public Task QueueRecoveryScenarioAsync(string scenarioName, string adminUserId, DateTime scheduledForUtc, string snapshotHash, string notes)
+        {
+            // Placeholder logic for compile success
+            return Task.CompletedTask;
+        }
+
+        public string? GetReplayOutput()
+        {
+            var userName = _userContext.User?.Identity?.Name ?? "admin";
+            return default!;
+        }
     }
 }

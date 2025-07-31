@@ -1,10 +1,10 @@
+using Data;
+using Data.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Data;
-using MVP_Core.Data.Models;
 using System.Linq;
 
-namespace MVP_Core.Pages.Admin
+namespace Pages.Admin
 {
     // Sprint 84.6 — Review Display Integration
     public class ReviewsModel : PageModel

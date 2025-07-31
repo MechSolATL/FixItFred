@@ -1,12 +1,12 @@
 // FixItFred Patch Log — Sprint 28: Validation Engine
 // [2024-07-25T00:30:00Z] — OnPost logic updated for ModelState validation and error feedback.
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Services.Admin;
 using MVP_Core.Models.Admin;
 using System;
 using Microsoft.AspNetCore.Mvc;
+using Services.Admin;
 
-namespace MVP_Core.Pages.Admin
+namespace Pages.Admin
 {
     public class SendBroadcastModel : PageModel
     {

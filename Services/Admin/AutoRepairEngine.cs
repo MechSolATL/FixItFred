@@ -1,10 +1,10 @@
 using System;
 using System.Threading.Tasks;
-using MVP_Core.Data;
 using MVP_Core.Data.Models;
 using Microsoft.EntityFrameworkCore;
+using Data;
 
-namespace MVP_Core.Services.Admin
+namespace Services.Admin
 {
     /// <summary>
     /// Detects damaged Razor Pages, service classes, or database schema mismatches. Offers rollback to last working version.

@@ -1,11 +1,13 @@
-﻿using MVP_Core.Data.Models;
-using MVP_Core.Services;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Threading.Tasks;
+using Helpers;
+using Data;
+using Data.Models.Seo;
+using Services;
 
-namespace MVP_Core.Pages.Admin
+namespace Pages.Admin
 {
     [Authorize(Policy = "AdminPolicy")]
     [ValidateAntiForgeryToken]

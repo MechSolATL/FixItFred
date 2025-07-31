@@ -1,12 +1,13 @@
-using MVP_Core.Data.Models;
-using MVP_Core.Services.Dispatch;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using Services.Dispatch;
+using Data;
+using Data.Models;
 
-namespace MVP_Core.Services
+namespace Services
 {
     /// <summary>
     /// Service for scheduling and processing notifications.

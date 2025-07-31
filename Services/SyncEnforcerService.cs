@@ -1,9 +1,10 @@
+using Data;
 using MVP_Core.Data.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace MVP_Core.Services
+namespace Services
 {
     /// <summary>
     /// SyncEnforcerService: Enforces media compliance before ticket closure or job sign-off.

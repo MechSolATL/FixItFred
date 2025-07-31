@@ -1,11 +1,11 @@
-using MVP_Core.Data;
-using MVP_Core.Data.Models;
+using Data;
+using Data.Models;
 using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MVP_Core.Services
+namespace Services
 {
     /// <summary>
     /// Sprint 60.0: Regenerates and archives PDF receipts, verifies signed docs, and manages archive storage.

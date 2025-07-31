@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace MVP_Core.Pages.Admin
+namespace Pages.Admin
 {
     public class FavoritismReviewLogModel : PageModel
     {

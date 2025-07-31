@@ -1,12 +1,11 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Services.Admin;
-using MVP_Core.Services; // For INotificationService
-using MVP_Core.Services; // For AuditLogger
 using System.Threading.Tasks;
+using Services;
+using Services.Admin;
 
-namespace MVP_Core.Pages.Admin
+namespace Pages.Admin
 {
     [Authorize(Roles = "Admin,Dispatcher")]
     public class ManagerToolsModel : PageModel

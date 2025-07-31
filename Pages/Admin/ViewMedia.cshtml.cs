@@ -1,10 +1,10 @@
-using MVP_Core.Services;
-using MVP_Core.Data.Models;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Collections.Generic;
 using System.Linq;
+using Data.Models;
+using Services;
 
-namespace MVP_Core.Pages.Admin
+namespace Pages.Admin
 {
     /// <summary>
     /// PageModel for ViewMedia. Injects MediaUploadService via DI.

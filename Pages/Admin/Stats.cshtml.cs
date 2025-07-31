@@ -1,16 +1,16 @@
+using Data;
+using Data.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Data;
-using MVP_Core.Data.Models;
-using MVP_Core.Services.Admin;
+using Services.Admin;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MVP_Core.Pages.Admin
+namespace Pages.Admin
 {
     // Sprint 32.1 - Admin Metrics Reporting
     [Authorize(Roles = "Admin")]
@@ -75,13 +75,13 @@ namespace MVP_Core.Pages.Admin
                 string changelogText = await System.IO.File.ReadAllTextAsync(changelogPath);
                 int start = changelogText.IndexOf("Sprint 44");
                 int end = changelogText.IndexOf("Sprint 47");
-                string sprintText = (start >= 0) ?
-                    changelogText.Substring(start, (end > start ? end - start : changelogText.Length - start)) :
+                string sprintText = start >= 0 ?
+                    changelogText.Substring(start, end > start ? end - start : changelogText.Length - start) :
                     changelogText;
                 await SprintPdfArchive.GenerateSprintChangeLogPdfAsync(sprintText, outputPath, sprintRange, author);
                 PdfArchivePath = outputPath;
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 PdfArchiveError = ex.Message;
             }
@@ -104,14 +104,14 @@ namespace MVP_Core.Pages.Admin
                 string changelogText = await System.IO.File.ReadAllTextAsync(changelogPath);
                 int start = changelogText.IndexOf("Sprint 47");
                 int end = changelogText.IndexOf("Sprint 48");
-                string sprintText = (start >= 0) ?
-                    changelogText.Substring(start, (end > start ? end - start : changelogText.Length - start)) :
+                string sprintText = start >= 0 ?
+                    changelogText.Substring(start, end > start ? end - start : changelogText.Length - start) :
                     changelogText;
                 await SprintPdfArchive.GenerateSprintChangeLogPdfAsync(sprintText, outputPath, sprintRange, author);
                 Sprint47PdfArchivePath = outputPath;
                 Sprint47PdfArchiveError = null;
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 Sprint47PdfArchiveError = ex.Message;
             }

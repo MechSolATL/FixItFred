@@ -1,11 +1,11 @@
 // Sprint 44 – Message Export + Digest
-using MVP_Core.Services;
 using MVP_Core.Data;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Services;
 
-namespace MVP_Core.Pages.Admin
+namespace Pages.Admin
 {
     public class DigestPreviewModel : PageModel
     {

@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
-using MVP_Core.Services;
 using MVP_Core.Data.Models;
+using Services;
 
-namespace MVP_Core.Controllers.Api
+namespace Controllers.Api
 {
     [Route("Admin/TechnicianProfile")]
     public class TechnicianProfileController : Controller
@@ -38,7 +38,7 @@ namespace MVP_Core.Controllers.Api
         [HttpGet("/api/technician/{id}/analytics")]
         public async Task<IActionResult> GetAnalytics(int id, DateTime start, DateTime end)
         {
-            var range = new MVP_Core.Data.Models.DateRange { Start = start, End = end };
+            var range = new DateRange { Start = start, End = end };
             var analytics = await _profileService.GetAnalyticsAsync(id, range);
             return Ok(analytics);
         }

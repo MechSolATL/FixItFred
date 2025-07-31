@@ -1,6 +1,8 @@
+using Data;
+using Data.Models;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
-namespace MVP_Core.Pages.Admin
+namespace Pages.Admin
 {
     public class MatchupsModel : PageModel
     {

@@ -1,4 +1,4 @@
-namespace MVP_Core.Data.Models
+namespace Data.Models
 {
     /// <summary>
     /// Represents the profile information collected during the profile review process.

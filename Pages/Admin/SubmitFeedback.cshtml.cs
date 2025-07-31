@@ -15,15 +15,15 @@
 // FixItFred — Sprint 46.1 Build Correction + Compliance
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Data.Models; // Corrected ServiceRequest namespace
-using MVP_Core.Data.Models.ViewModels;
-using MVP_Core.Services.Admin; // Import DispatcherService
 using MVP_Core.Models.Admin;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Data.Models.ViewModels;
+using Data.Models;
+using Services.Admin;
 
-namespace MVP_Core.Pages.Admin
+namespace Pages.Admin
 {
     public class SubmitFeedbackModel : PageModel
     {

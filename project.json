@@ -1,0 +1,21 @@
+{
+  "name": "MVP-Core",
+  "sprint": "Sprint92",
+  "features": [
+    "Diagnostics Engine Refactor",
+    "Razor Patch Automation System",
+    "FixItFred Scaffolding Extensions",
+    "Interface-to-Service Convergence (ISync)",
+    "Obsolete Service Retirement (ValidationSimulatorService)",
+    "Dynamic SEO Binding Validation",
+    "RootCauseCorrelation Flow Improvements"
+  ],
+  "priority": "high",
+  "owner": "MechSolATL",
+  "environment": "prod-preview",
+  "autoTagOnComplete": true,
+  "onSuccess": {
+    "tag": "Sprint92_Complete",
+    "branch": "release/diagnostics-enhancements"
+  }
+}

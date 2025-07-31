@@ -1,16 +1,16 @@
-using MVP_Core.Data;
-using MVP_Core.Data.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.SignalR;
-using MVP_Core.Hubs;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System; // Sprint 84.7.2 — Live Filter + UI Overlay
 using System.Security.Claims;
-using TechnicianModel = MVP_Core.Data.Models.Technician;
+using TechnicianModel = Data.Models.Technician;
+using Data.Models;
+using Hubs;
+using Data;
 
-namespace MVP_Core.Services
+namespace Services
 {
     public class TechnicianService : ITechnicianService
     {

@@ -1,7 +1,6 @@
 using System;
-using MVP_Core.Data.Models;
 
-namespace MVP_Core.Data.Models
+namespace Data.Models
 {
     public class TechnicianReportCard
     {

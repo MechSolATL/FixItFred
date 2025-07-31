@@ -3,7 +3,7 @@ using System.IO;
 using QuestPDF.Fluent;
 using QuestPDF.Infrastructure;
 
-namespace MVP_Core.Services.Admin
+namespace Services.Admin
 {
     // Sprint 83.4: PDF composer for README onboarding packet
     public static class PDFPacketComposer

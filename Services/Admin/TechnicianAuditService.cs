@@ -1,5 +1,3 @@
-using MVP_Core.Models;
-using MVP_Core.Data;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -7,9 +5,10 @@ using System.Linq;
 using System.Threading.Tasks;
 
 // FixItFred: Explicitly alias TechnicianBehaviorLog to resolve ambiguity
-using DomainTechnicianBehaviorLog = MVP_Core.Models.TechnicianBehaviorLog;
+using DomainTechnicianBehaviorLog = Models.TechnicianBehaviorLog;
+using Data;
 
-namespace MVP_Core.Services.Admin
+namespace Services.Admin
 {
     // Sprint 86.2 — Technician Accountability Engine
     public class TechnicianAuditService

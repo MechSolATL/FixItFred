@@ -1,12 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Data.Models;
-using MVP_Core.Services.Admin;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
+using Data;
+using Services.Admin;
 
-namespace MVP_Core.Pages.Admin
+namespace Pages.Admin
 {
     public class KarmaCenterModel : PageModel
     {
@@ -14,16 +14,16 @@ namespace MVP_Core.Pages.Admin
         private readonly ApplicationDbContext _db; // Sprint 79.3: CS8618/CS860X warning cleanup
         public KarmaCenterModel(TechnicianKarmaService karmaService, ApplicationDbContext db)
         {
-            _karmaService = karmaService ?? throw new System.ArgumentNullException(nameof(karmaService)); // Sprint 79.3: CS8618/CS860X warning cleanup
-            _db = db ?? throw new System.ArgumentNullException(nameof(db)); // Sprint 79.3: CS8618/CS860X warning cleanup
-            TechnicianList = new List<MVP_Core.Data.Models.Technician>(); // Sprint 79.3: CS8618/CS860X warning cleanup
+            _karmaService = karmaService ?? throw new ArgumentNullException(nameof(karmaService)); // Sprint 79.3: CS8618/CS860X warning cleanup
+            _db = db ?? throw new ArgumentNullException(nameof(db)); // Sprint 79.3: CS8618/CS860X warning cleanup
+            TechnicianList = new List<Data.Models.Technician>(); // Sprint 79.3: CS8618/CS860X warning cleanup
             KarmaHistory = new List<TechnicianKarmaLog>(); // Sprint 79.3: CS8618/CS860X warning cleanup
             CurrentTrend = string.Empty; // Sprint 79.3: CS8618/CS860X warning cleanup
             AdminNote = string.Empty; // Sprint 79.3: CS8618/CS860X warning cleanup
         }
         [BindProperty]
         public int TechnicianId { get; set; } // Sprint 79.3: CS8618/CS860X warning cleanup
-        public List<MVP_Core.Data.Models.Technician> TechnicianList { get; set; } = new List<MVP_Core.Data.Models.Technician>(); // Sprint 79.3: CS8618/CS860X warning cleanup
+        public List<Data.Models.Technician> TechnicianList { get; set; } = new List<Data.Models.Technician>(); // Sprint 79.3: CS8618/CS860X warning cleanup
         public List<TechnicianKarmaLog> KarmaHistory { get; set; } = new List<TechnicianKarmaLog>(); // Sprint 79.3: CS8618/CS860X warning cleanup
         public int? CurrentKarmaScore { get; set; } // Sprint 79.3: CS8618/CS860X warning cleanup
         public string CurrentTrend { get; set; } = string.Empty; // Sprint 79.3: CS8618/CS860X warning cleanup

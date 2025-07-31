@@ -2,13 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Data;
+using Data.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Data;
-using MVP_Core.Data.Models;
 using MVP_Core.Services;
 
-namespace MVP_Core.Pages.Admin
+namespace Pages.Admin
 {
     /// <summary>
     /// Represents the Technician Audit page model for viewing and filtering technician behavior logs.
@@ -16,7 +16,7 @@ namespace MVP_Core.Pages.Admin
     [Authorize(Roles = "Admin")]
     public class TechAuditModel : PageModel
     {
-        private readonly MVP_Core.Services.Admin.TechnicianAuditService _auditService;
+        private readonly Services.Admin.TechnicianAuditService _auditService;
         internal readonly ApplicationDbContext _db;
 
         /// <summary>
@@ -24,7 +24,7 @@ namespace MVP_Core.Pages.Admin
         /// </summary>
         /// <param name="db">The application database context.</param>
         /// <param name="auditService">The technician audit service.</param>
-        public TechAuditModel(ApplicationDbContext db, MVP_Core.Services.Admin.TechnicianAuditService auditService)
+        public TechAuditModel(ApplicationDbContext db, Services.Admin.TechnicianAuditService auditService)
         {
             _db = db;
             _auditService = auditService;
@@ -51,12 +51,12 @@ namespace MVP_Core.Pages.Admin
         /// <summary>
         /// The list of technician behavior logs matching the filter criteria.
         /// </summary>
-        public List<MVP_Core.Models.TechnicianBehaviorLog> Logs { get; set; } = new();
+        public List<Models.TechnicianBehaviorLog> Logs { get; set; } = new();
 
         /// <summary>
         /// The list of technicians available for filtering.
         /// </summary>
-        public List<MVP_Core.Data.Models.Technician> Technicians { get; set; } = new();
+        public List<Technician> Technicians { get; set; } = new();
 
         /// <summary>
         /// Handles GET requests to the Technician Audit page.

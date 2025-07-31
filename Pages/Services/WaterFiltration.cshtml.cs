@@ -1,13 +1,14 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Data;
-using MVP_Core.Data.Models;
-using MVP_Core.Services;
 using System.Threading.Tasks;
 using System.Linq;
 using System.Collections.Generic;
+using Helpers;
+using Services;
+using Data;
+using Data.Models;
 
-namespace MVP_Core.Pages.Services
+namespace Pages.Services
 {
     [ValidateAntiForgeryToken]
     // Sprint 26.5 Patch Log: Dynamic form flow cloned from Plumbing for Water Filtration. Multi-step, progress, session, SEO metadata.
@@ -113,8 +114,8 @@ namespace MVP_Core.Pages.Services
                 .Include(q => q.Options)
                 .Where(q => q.ServiceType == "Water Filtration")
                 .Where(q => q.ParentQuestionId == null ||
-                            (session.Answers != null && session.Answers.ContainsKey(q.ParentQuestionId.Value) &&
-                             session.Answers[q.ParentQuestionId.Value].Answer == q.ExpectedAnswer))
+                            session.Answers != null && session.Answers.ContainsKey(q.ParentQuestionId.Value) &&
+                             session.Answers[q.ParentQuestionId.Value].Answer == q.ExpectedAnswer)
                 .Where(q => !answeredIds.Contains(q.Id))
                 .OrderBy(q => q.Id)
                 .FirstOrDefaultAsync();

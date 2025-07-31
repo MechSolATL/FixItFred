@@ -1,6 +1,8 @@
-using MVP_Core.Data.Helpers;
+using Data;
+using Data.Helpers;
+using Data.Models;
 
-namespace MVP_Core.Pages.Admin
+namespace Pages.Admin
 {
     public class ThreatsModel : PageModel
     {

@@ -1,11 +1,11 @@
-using MVP_Core.Data;
-using MVP_Core.Data.Models;
-using BillingInvoiceRecordModel = MVP_Core.Data.Models.BillingInvoiceRecord;
-using TechnicianModel = MVP_Core.Data.Models.Technician;
+using BillingInvoiceRecordModel = Data.Models.BillingInvoiceRecord;
+using TechnicianModel = Data.Models.Technician;
 using System.Collections.Generic;
 using System.Linq;
+using Data;
+using Data.Models;
 
-namespace MVP_Core.Services
+namespace Services
 {
     /// <summary>
     /// Aggregates customer portal data: service requests, loyalty points, documents, etc.

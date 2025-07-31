@@ -6,8 +6,8 @@
     ViewData["Title"] = "Customer Dashboard";
     var ticketCount = Model.TicketCount;
     var avgSatisfaction = Model.AverageSatisfaction;
-    var loyalty = PortalService.GetLoyaltyTransactions(User.Identity?.Name ?? string.Empty) ?? new List<MVP_Core.Data.Models.LoyaltyPointTransaction>();
-    var tiers = PortalService.GetRewardTiers() ?? new List<MVP_Core.Data.Models.RewardTier>();
+    var loyalty = PortalService.GetLoyaltyTransactions(User.Identity?.Name ?? string.Empty) ?? new List<Data.Models.LoyaltyPointTransaction>();
+    var tiers = PortalService.GetRewardTiers() ?? new List<Data.Models.RewardTier>();
     var currentTier = tiers.LastOrDefault(t => loyalty.Sum(l => l.Points) >= t.PointsRequired);
     var unlockedTiers = tiers.Where(t => loyalty.Sum(l => l.Points) >= t.PointsRequired).ToList();
 }
@@ -67,7 +67,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                    @foreach (var ticket in Model.Tickets ?? Enumerable.Empty<MVP_Core.Data.Models.ServiceRequest>()) // Sprint 82: RazorViewFortification
+                    @foreach (var ticket in Model.Tickets ?? Enumerable.Empty<Data.Models.ServiceRequest>()) // Sprint 82: RazorViewFortification
                     {
                         <tr>
                             <td>@ticket?.Id ?? 0 // Sprint 82: RazorViewFortification</td>
@@ -148,7 +148,7 @@
     });
 
     // Sprint 46.3 – Dashboard Analytics: Satisfaction Heatmap
-    const satisfactionData = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject((Model.Tickets ?? Enumerable.Empty<MVP_Core.Data.Models.ServiceRequest>()).OrderByDescending(t => t.RequestedAt).Take(30).Select(t => t.SatisfactionScore ?? 0).ToArray())); // Sprint 82: RazorViewFortification
+    const satisfactionData = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject((Model.Tickets ?? Enumerable.Empty<Data.Models.ServiceRequest>()).OrderByDescending(t => t.RequestedAt).Take(30).Select(t => t.SatisfactionScore ?? 0).ToArray())); // Sprint 82: RazorViewFortification
     const ctxHeatmap = document.getElementById('satisfactionHeatmap').getContext('2d');
     new Chart(ctxHeatmap, {
         type: 'bar',
@@ -168,7 +168,7 @@
 
     // Sprint 46.3 – Dashboard Analytics: Service Type Breakdown
     const serviceTypeCounts = {};
-    @foreach (var t in Model.Tickets ?? Enumerable.Empty<MVP_Core.Data.Models.ServiceRequest>()) { // Sprint 82: RazorViewFortification
+    @foreach (var t in Model.Tickets ?? Enumerable.Empty<Data.Models.ServiceRequest>()) { // Sprint 82: RazorViewFortification
         <text>serviceTypeCounts['@t.ServiceType'] = (serviceTypeCounts['@t.ServiceType'] || 0) + 1;</text>
     }
     const serviceTypeLabels = Object.keys(serviceTypeCounts);
@@ -190,7 +190,7 @@
     const openCount = @(Model.Tickets?.Count(t => t.Status != "Complete" && t.Status != "Cancelled") ?? 0); // Sprint 82: RazorViewFortification
     const closedCount = @(Model.Tickets?.Count(t => t.Status == "Complete" || t.Status == "Cancelled") ?? 0); // Sprint 82: RazorViewFortification
     const avgResolution = (() => {
-        const closed = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject((Model.Tickets ?? Enumerable.Empty<MVP_Core.Data.Models.ServiceRequest>()).Where(t => t.ClosedAt != null).Select(t => (t.ClosedAt.Value - t.RequestedAt).TotalHours)));
+        const closed = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject((Model.Tickets ?? Enumerable.Empty<Data.Models.ServiceRequest>()).Where(t => t.ClosedAt != null).Select(t => (t.ClosedAt.Value - t.RequestedAt).TotalHours)));
         if (closed.length === 0) return 0;
         return (closed.reduce((a, b) => a + b, 0) / closed.length).toFixed(1);
     })();

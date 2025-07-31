@@ -8,10 +8,10 @@
 // - Ensures compliance with Service-Atlanta SEO and layout protocols
 
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Services;
 using MVP_Core.Data.Models;
+using Services;
 
-namespace MVP_Core.Pages
+namespace Pages
 {
     public class TestSeoComplianceModel : PageModel
     {

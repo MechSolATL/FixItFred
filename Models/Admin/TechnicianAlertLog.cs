@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System;
 
-namespace MVP_Core.Data.Models
+namespace Models.Admin
 {
     // Sprint 84.9 — Drop Alert Logic + TrustScore Delta Detection
     // Sprint 85.3 — Triggered Coaching Suggestions

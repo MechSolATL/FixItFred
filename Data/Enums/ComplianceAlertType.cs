@@ -1,4 +1,4 @@
-namespace MVP_Core.Data.Enums
+namespace Data.Enums
 {
     public enum ComplianceAlertType
     {

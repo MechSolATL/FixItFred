@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Services;
-using BillingInvoiceRecordModel = MVP_Core.Data.Models.BillingInvoiceRecord;
+using BillingInvoiceRecordModel = Data.Models.BillingInvoiceRecord;
 using System.Collections.Generic;
+using Services;
 
-namespace MVP_Core.Pages.Customer
+namespace Pages.Customer
 {
     public class DocumentsModel : PageModel
     {
@@ -28,7 +28,7 @@ namespace MVP_Core.Pages.Customer
                 var email = User?.Identity?.Name ?? string.Empty;
                 if (_portalService != null)
                 {
-                    this.Documents = _portalService.GetDocuments(email);
+                    Documents = _portalService.GetDocuments(email);
                 }
             }
         }

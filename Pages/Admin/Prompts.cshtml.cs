@@ -1,12 +1,14 @@
 // Sprint 90.1
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Data.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Linq;
+using Data.Models;
+using Data;
+using Services;
 
-namespace MVP_Core.Pages.Admin
+namespace Pages.Admin
 {
     // Sprint 90.1
     public class PromptsModel : PageModel

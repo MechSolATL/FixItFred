@@ -1,17 +1,17 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Services;
-using MVP_Core.Data.Models;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Data.Models;
+using Services;
 
-namespace MVP_Core.Pages.Technician
+namespace Pages.Technician
 {
     public class ProfileModel : PageModel
     {
         private readonly ITechnicianProfileService _profileService;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        public MVP_Core.Data.Models.TechnicianProfileDto? PatchProfile { get; set; }
+        public TechnicianProfileDto? PatchProfile { get; set; }
         [BindProperty]
         public string? Nickname { get; set; }
         [BindProperty]
@@ -66,7 +66,7 @@ namespace MVP_Core.Pages.Technician
             return RedirectToPage();
         }
 
-        private string GetPatchPreview(MVP_Core.Data.Models.TechnicianProfileDto? profile)
+        private string GetPatchPreview(TechnicianProfileDto? profile)
         {
             if (profile == null) return "";
             var name = !string.IsNullOrWhiteSpace(profile.Nickname) && profile.NicknameApproved ? profile.Nickname : profile.FullName.Split(' ')[0];

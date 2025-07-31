@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc;
-using MVP_Core.Services.Admin;
 using System.Threading.Tasks;
+using Services.Admin;
 
-namespace MVP_Core.Pages.Admin
+namespace Pages.Admin
 {
     public class LegalExportModel : PageModel
     {
@@ -26,7 +26,7 @@ namespace MVP_Core.Pages.Admin
             if (int.TryParse(EntityId, out int id))
             {
                 var zipPath = await _legalExportService.ExportLegalPacketAsync(id, ExportType);
-                DownloadUrl = "/LegalExports/" + System.IO.Path.GetFileName(zipPath);
+                DownloadUrl = "/LegalExports/" + Path.GetFileName(zipPath);
                 // TODO: Move ZIP to wwwroot/LegalExports for download
             }
             return Page();

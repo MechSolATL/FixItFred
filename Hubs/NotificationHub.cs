@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.SignalR;
 using System.Threading.Tasks;
 
-namespace MVP_Core.Hubs
+namespace Hubs
 {
     public class NotificationHub : Hub
     {

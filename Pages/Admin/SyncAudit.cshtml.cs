@@ -1,8 +1,8 @@
-using MVP_Core.Services.Admin;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.DependencyInjection;
+using Services.Admin;
 
-namespace MVP_Core.Pages.Admin
+namespace Pages.Admin
 {
     public class SyncAuditModel : PageModel
     {

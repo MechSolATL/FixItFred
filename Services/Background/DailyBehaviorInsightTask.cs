@@ -3,10 +3,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using MVP_Core.Services.Admin;
-using MVP_Core.Data;
+using Data;
+using Services.Admin;
 
-namespace MVP_Core.Services.Background
+namespace Services.Background
 {
     public class DailyBehaviorInsightTask : BackgroundService
     {

@@ -2,7 +2,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace MVP_Core.Data
+namespace Data
 {
     public class TechTrackingLog
     {

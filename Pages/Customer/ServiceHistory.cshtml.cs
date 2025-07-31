@@ -1,18 +1,18 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Services;
-using MVP_Core.Data.Models;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
+using Services;
+using Data.Models;
 
-namespace MVP_Core.Pages.Customer
+namespace Pages.Customer
 {
     public class ServiceHistoryModel : PageModel
     {
         private readonly CustomerPortalService _portalService;
         private readonly ReceiptArchiveService _archiveService;
         public List<ServiceRequest> Requests { get; set; } = new();
-        public List<MVP_Core.Data.Models.Technician> Technicians { get; set; } = new();
+        public List<Data.Models.Technician> Technicians { get; set; } = new();
         public ServiceHistoryModel(CustomerPortalService portalService, ReceiptArchiveService archiveService)
         {
             _portalService = portalService;
@@ -28,7 +28,7 @@ namespace MVP_Core.Pages.Customer
             Requests = _portalService.GetServiceRequests(email).Where(r => r.ShowInTimeline).OrderByDescending(r => r.RequestedAt).ToList();
             Technicians = _portalService.GetTechnicians();
         }
-        public MVP_Core.Data.Models.Technician? GetTechnicianById(int? id)
+        public Data.Models.Technician? GetTechnicianById(int? id)
         {
             if (!id.HasValue) return null;
             return Technicians.FirstOrDefault(t => t.Id == id.Value);

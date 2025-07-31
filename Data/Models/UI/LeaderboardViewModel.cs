@@ -1,4 +1,4 @@
-namespace MVP_Core.Data.Models.UI
+namespace Data.Models.UI
 {
     public class LeaderboardViewModel
     {

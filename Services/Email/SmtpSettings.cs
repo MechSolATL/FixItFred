@@ -1,4 +1,4 @@
-namespace MVP_Core.Services.Email
+namespace Services.Email
 {
     public class SmtpSettings
     {

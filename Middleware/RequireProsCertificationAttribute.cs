@@ -1,13 +1,13 @@
 // Sprint 84.0 — Feature Access Block Enforcement
+using Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using MVP_Core.Data;
 using MVP_Core.Data.Models;
 using System;
 using System.Linq;
 using System.Security.Claims;
 
-namespace MVP_Core.Middleware
+namespace Middleware
 {
     public class RequireProsCertificationAttribute : Attribute, IPageFilter
     {

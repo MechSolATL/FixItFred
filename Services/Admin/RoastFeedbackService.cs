@@ -1,8 +1,8 @@
-using MVP_Core.Data;
 using MVP_Core.Data.Models;
 using Microsoft.EntityFrameworkCore;
+using Data;
 
-namespace MVP_Core.Services.Admin
+namespace Services.Admin
 {
     // Sprint 73.8: Karma Feedback Loop + Roast Responder Metrics
     public class RoastFeedbackService

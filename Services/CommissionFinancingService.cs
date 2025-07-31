@@ -2,7 +2,7 @@
 using MVP_Core.Data.Models;
 using System;
 
-namespace MVP_Core.Services
+namespace Services
 {
     public class CommissionFinancingService
     {
@@ -18,7 +18,7 @@ namespace MVP_Core.Services
             if (termMonths <= 0 || apr < 0) return 0;
             var monthlyRate = apr / 12 / 100;
             if (monthlyRate == 0) return Math.Round(amount / termMonths, 2);
-            var payment = amount * (monthlyRate * (decimal)Math.Pow(1 + (double)monthlyRate, termMonths)) /
+            var payment = amount * monthlyRate * (decimal)Math.Pow(1 + (double)monthlyRate, termMonths) /
                 ((decimal)Math.Pow(1 + (double)monthlyRate, termMonths) - 1);
             return Math.Round(payment, 2);
         }

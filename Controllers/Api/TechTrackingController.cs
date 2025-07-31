@@ -1,11 +1,10 @@
 // Sprint 91.7
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using MVP_Core.Services;
 using System.Collections.Generic;
-using MVP_Core.Services; // Sprint 91.7
+using Services;
 
-namespace MVP_Core.Controllers.Api
+namespace Controllers.Api
 {
     // Sprint 91.7
     [ApiController]

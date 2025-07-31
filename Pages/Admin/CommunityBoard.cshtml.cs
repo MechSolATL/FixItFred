@@ -7,10 +7,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System;
 using System.IO;
-using MVP_Core.Services.Admin;
-using MVP_Core.Data.Models;
+using Models;
+using Data.Models;
+using Data;
+using Services.Admin;
 
-namespace MVP_Core.Pages.Admin
+namespace Pages.Admin
 {
     [Authorize(Roles = "Admin")]
     public class CommunityBoardModel : PageModel

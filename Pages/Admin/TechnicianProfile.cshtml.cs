@@ -1,14 +1,13 @@
 // [FixItFred] Patch Log: Forced explicit use of MVP_Core.Models.Admin.TechnicianProfileDto for all DTO references
-using MVP_Core.Models.Admin;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Services.Admin;
-using MVP_Core.Services;
-using MVP_Core.Data.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Linq;
+using Data.Models;
+using Services;
+using Services.Admin;
 
-namespace MVP_Core.Pages.Admin
+namespace Pages.Admin
 {
     public class TechnicianProfileModel : PageModel
     {
@@ -16,7 +15,7 @@ namespace MVP_Core.Pages.Admin
         private readonly TechnicianFeedbackService _feedbackService;
         private readonly TechnicianBonusService _bonusService;
         public int TechId { get; private set; }
-        public MVP_Core.Models.Admin.TechnicianProfileDto? Profile { get; private set; }
+        public Models.Admin.TechnicianProfileDto? Profile { get; private set; }
         public double AvgFeedback { get; private set; }
         public List<TechnicianFeedback> RecentReviews { get; private set; } = new();
         public List<SkillBadge> SkillBadges { get; set; } = new();

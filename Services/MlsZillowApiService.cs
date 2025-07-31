@@ -1,7 +1,7 @@
 // Sprint 47.1 Patch Log: Add MLS/Zillow API integration stub service.
 using System.Threading.Tasks;
 
-namespace MVP_Core.Services
+namespace Services
 {
     public class MlsZillowApiService
     {

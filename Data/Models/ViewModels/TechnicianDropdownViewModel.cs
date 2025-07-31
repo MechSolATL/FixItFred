@@ -2,9 +2,9 @@
 // [2024-07-25T00:35:00Z] — Removed duplicate TechnicianDropdownViewModel for build compliance.
 // FixItFred — Sprint 46.1 Build Correction + Compliance
 using System.ComponentModel.DataAnnotations;
-using MVP_Core.Models.Admin;
+using Models.Admin;
 
-namespace MVP_Core.Data.Models.ViewModels
+namespace Data.Models.ViewModels
 {
     public class TechnicianDropdownViewModel
     {

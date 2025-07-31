@@ -1,69 +1,73 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
-using MVP_Core.Data.Models;
 using Services.Diagnostics;
-using MVP_Core.Services.System;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using MVP_Core.Services.Admin; // [Sprint91_28.6] Nova: ReplayEngineService ambiguity resolved
+using MVP_Core.Services.Admin;
+using Interfaces;
+using Services.System;
+using Data;
+using Data.Models;
 
-namespace MVP_Core.Pages.Admin
+namespace Pages.Admin
 {
     public class SystemDiagnosticsModel : PageModel
     {
-        private readonly ApplicationDbContext _db; // Sprint 79.2
-        private readonly SystemDiagnosticsService _diagnosticsService; // Sprint 79.2
-        private readonly AutoRepairEngine _autoRepairEngine; // Sprint 79.2
-        private readonly RootCauseCorrelationEngine _rootCauseCorrelationEngine; // Sprint 79.2
-        private readonly SmartAdminAlertsService _smartAdminAlertsService; // Sprint 79.2
-        private readonly MVP_Core.Services.Admin.ReplayEngineService _replayEngineService; // Sprint 79.2
-        private readonly RecoveryAILearningService _aiService; // Sprint 79.2
+        private readonly ApplicationDbContext _db;
+        private readonly SystemDiagnosticsService _diagnosticsService;
+        private readonly AutoRepairEngine _autoRepairEngine;
+        private readonly IRootCauseCorrelationEngine _rootCauseCorrelationEngine;
+        private readonly ISmartAdminAlertsService _smartAdminAlertsService;
+        private readonly IReplayEngineService _replayEngineService;
+        private readonly RecoveryAILearningService _aiService;
 
-        public SystemDiagnosticsModel(ApplicationDbContext db, SystemDiagnosticsService diagnosticsService, AutoRepairEngine autoRepairEngine)
+        public SystemDiagnosticsModel(
+            ApplicationDbContext db,
+            SystemDiagnosticsService diagnosticsService,
+            AutoRepairEngine autoRepairEngine,
+            IRootCauseCorrelationEngine rootCauseCorrelationEngine,
+            ISmartAdminAlertsService smartAdminAlertsService,
+            IReplayEngineService replayEngineService)
         {
-            _db = db ?? throw new ArgumentNullException(nameof(db)); // Sprint 79.2
-            _diagnosticsService = diagnosticsService ?? throw new ArgumentNullException(nameof(diagnosticsService)); // Sprint 79.2
-            _autoRepairEngine = autoRepairEngine ?? throw new ArgumentNullException(nameof(autoRepairEngine)); // Sprint 79.2
-            _rootCauseCorrelationEngine = rootCauseCorrelationEngine ?? throw new ArgumentNullException(nameof(rootCauseCorrelationEngine)); // Sprint 79.2
-            _smartAdminAlertsService = smartAdminAlertsService ?? throw new ArgumentNullException(nameof(smartAdminAlertsService)); // Sprint 79.2
-            _replayEngineService = replayEngineService ?? throw new ArgumentNullException(nameof(replayEngineService)); // Sprint 79.2
-            _aiService = new RecoveryAILearningService(_db); // Sprint 79.2
-            LatestLogs = new(); // Sprint 79.2
-            HealthStatus = "Unknown"; // Sprint 79.2
-            RootCauseSummary = "No summary"; // Sprint 79.2
-            Alerts = new(); // Sprint 79.2
-            ActiveAlerts = new(); // Sprint 79.2
-            ScheduledScenarios = new(); // Sprint 79.2
-            LearnedPatterns = new(); // Sprint 79.2
-            SuggestedTriggers = new(); // Sprint 79.2
-            StatusMessage = string.Empty; // Sprint 79.2
-            MostCommonOutcome = ""; // Sprint 79.2
+            _db = db ?? throw new ArgumentNullException(nameof(db));
+            _diagnosticsService = diagnosticsService ?? throw new ArgumentNullException(nameof(diagnosticsService));
+            _autoRepairEngine = autoRepairEngine ?? throw new ArgumentNullException(nameof(autoRepairEngine));
+            _rootCauseCorrelationEngine = rootCauseCorrelationEngine ?? throw new ArgumentNullException(nameof(rootCauseCorrelationEngine));
+            _smartAdminAlertsService = smartAdminAlertsService ?? throw new ArgumentNullException(nameof(smartAdminAlertsService));
+            _replayEngineService = replayEngineService ?? throw new ArgumentNullException(nameof(replayEngineService));
+            _aiService = new RecoveryAILearningService(_db);
         }
 
-        public List<SystemDiagnosticLog> LatestLogs { get; set; } = new(); // Sprint 79.2
-        public string HealthStatus { get; set; } = "Unknown"; // Sprint 79.2
-        public string RootCauseSummary { get; set; } = "No summary"; // Sprint 79.2
-        public List<string> Alerts { get; set; } = new(); // Sprint 79.2
-        public List<AdminAlertLog> ActiveAlerts { get; set; } = new(); // Sprint 79.2
-        public string AdminUserId => User?.Identity?.Name ?? "admin"; // Sprint 79.2
-        public List<RecoveryScenarioLog> ScheduledScenarios { get; set; } = new(); // Sprint 79.2
-        public List<RecoveryLearningLog> LearnedPatterns { get; set; } = new(); // Sprint 79.2
+        public List<SystemDiagnosticLog> LatestLogs { get; set; } = new();
+        public string HealthStatus { get; set; } = "Unknown";
+        public string RootCauseSummary { get; set; } = "No summary";
+        public List<string> Alerts { get; set; } = new();
+        public List<AdminAlertLog> ActiveAlerts { get; set; } = new();
+        public string AdminUserId => User?.Identity?.Name ?? "admin";
+        public List<RecoveryScenarioLog> ScheduledScenarios { get; set; } = new();
+        public List<RecoveryLearningLog> LearnedPatterns { get; set; } = new();
         [BindProperty]
-        public List<string> SuggestedTriggers { get; set; } = new(); // Sprint 79.2
-        public string StatusMessage { get; set; } = string.Empty; // Sprint 79.2
-        public int TotalPatternsLearned { get; set; } // Sprint 79.2
-        public string MostCommonOutcome { get; set; } = ""; // Sprint 79.2
-        public RecoveryLearningLog LatestPattern { get; set; } = new RecoveryLearningLog(); // Sprint 79.2
-        public Seo Seo { get; set; } = new Seo();
+        public List<string> SuggestedTriggers { get; set; } = new();
+        public string StatusMessage { get; set; } = string.Empty;
+        public int TotalPatternsLearned { get; set; }
+        public string MostCommonOutcome { get; set; } = "";
+        public RecoveryLearningLog LatestPattern { get; set; } = new RecoveryLearningLog();
         public string ViewTitle { get; set; } = "Untitled";
+
+        // [Sprint91_26] SEO Razor Binding Fix
+        public SeoMetadata Seo { get; set; } = new SeoMetadata();
+        public string Title => Seo.Title;
+        public string MetaDescription => Seo.MetaDescription;
+        public string Keywords => Seo.Keywords;
+        public string Robots => Seo.Robots;
 
         public async Task<IActionResult> OnGetAsync(string filterRange)
         {
             LatestLogs = await _db.SystemDiagnosticLogs.OrderByDescending(l => l.Timestamp).Take(20).ToListAsync();
-            HealthStatus = (await _autoRepairEngine.DetectCorruptionAsync()) ? "Healthy" : "Corruption Detected";
+            HealthStatus = await _autoRepairEngine.DetectCorruptionAsync() ? "Healthy" : "Corruption Detected";
             RootCauseSummary = await _rootCauseCorrelationEngine.CorrelateRootCausesAsync() ?? "No summary";
             Alerts = await _smartAdminAlertsService.TriggerAlertsAsync() ?? new List<string>();
             ActiveAlerts = await _smartAdminAlertsService.GetActiveAlertsAsync(AdminUserId);
@@ -76,10 +80,12 @@ namespace MVP_Core.Pages.Admin
                 query = query.Where(x => x.RecordedAt >= DateTime.UtcNow.AddDays(-7));
             else if (filterRange == "30d")
                 query = query.Where(x => x.RecordedAt >= DateTime.UtcNow.AddDays(-30));
+
             LearnedPatterns = await query.OrderByDescending(x => x.RecordedAt).ToListAsync();
             TotalPatternsLearned = LearnedPatterns.Count;
             MostCommonOutcome = LearnedPatterns.GroupBy(x => x.Outcome).OrderByDescending(g => g.Count()).FirstOrDefault()?.Key ?? "N/A";
             LatestPattern = LearnedPatterns.OrderByDescending(x => x.RecordedAt).FirstOrDefault();
+
             return Page();
         }
 
@@ -102,14 +108,14 @@ namespace MVP_Core.Pages.Admin
 
         public async Task<IActionResult> OnPostRunAutoRepairAsync()
         {
-            await _autoRepairEngine.RunAutoRepairAsync(User?.Identity?.Name ?? "admin");
+            await _autoRepairEngine.RunAutoRepairAsync(AdminUserId);
             await OnGetAsync("");
             return Page();
         }
 
         public async Task<IActionResult> OnPostRewindToSnapshotAsync(int SnapshotId)
         {
-            await _autoRepairEngine.RewindToSnapshotAsync(SnapshotId, User?.Identity?.Name ?? "admin");
+            await _autoRepairEngine.RewindToSnapshotAsync(SnapshotId, AdminUserId);
             await OnGetAsync("");
             return Page();
         }
@@ -133,13 +139,19 @@ namespace MVP_Core.Pages.Admin
             var scenario = await _db.RecoveryScenarioLogs.FindAsync(id);
             if (scenario != null && !scenario.Executed)
             {
-                var success = await _replayEngineService.ReplaySnapshotAsync(scenario.SnapshotHash, scenario.TriggeredBy, DateTime.UtcNow, scenario.Notes);
+                var success = await _replayEngineService.ReplaySnapshotAsync(
+                    scenario.SnapshotHash,
+                    scenario.TriggeredBy,
+                    DateTime.UtcNow,
+                    scenario.Notes
+                );
                 scenario.Executed = true;
                 scenario.ExecutedAtUtc = DateTime.UtcNow;
                 scenario.OutcomeSummary = success ? "Replay succeeded" : "Replay failed";
                 _db.RecoveryScenarioLogs.Update(scenario);
                 await _db.SaveChangesAsync();
             }
+
             await OnGetAsync("");
             return Page();
         }

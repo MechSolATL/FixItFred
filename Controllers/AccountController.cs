@@ -1,4 +1,6 @@
-namespace MVP_Core.Controllers
+using Data.Models.ViewModels;
+
+namespace Controllers
 {
     public class AccountController(ILogger<AccountController> logger) : Controller
     {

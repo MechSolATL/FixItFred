@@ -1,18 +1,18 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
-using MVP_Core.Data.Models;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
-using MVP_Core.Data;
 using System.IO.Compression;
-using System.Text.Json; // Use correct System.Text.Json namespace
+using System.Text.Json;
+using Data;
+using Data.Models;
 
-namespace MVP_Core.Services.Admin
+namespace Services.Admin
 {
     public class LegalExportService
     {

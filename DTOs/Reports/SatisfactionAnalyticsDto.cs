@@ -1,5 +1,5 @@
 // FixItFred – Sprint 44 Build Restoration
-namespace MVP_Core.DTOs.Reports
+namespace DTOs.Reports
 {
     /// <summary>
     /// DTO for satisfaction analytics summaries.

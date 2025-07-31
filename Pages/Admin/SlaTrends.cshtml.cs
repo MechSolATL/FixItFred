@@ -1,11 +1,11 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc;
-using MVP_Core.Services.Admin;
 using MVP_Core.Models.Admin;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Services.Admin;
 
-namespace MVP_Core.Pages.Admin
+namespace Pages.Admin
 {
     public class SlaTrendsModel : PageModel
     {

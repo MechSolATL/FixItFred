@@ -1,10 +1,10 @@
+using Data.Models;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Data.Models;
-using MVP_Core.Services;
+using Services;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace MVP_Core.Pages.Admin
+namespace Pages.Admin
 {
     public class TechniciansModel : PageModel
     {

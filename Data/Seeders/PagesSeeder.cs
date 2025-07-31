@@ -1,4 +1,4 @@
-namespace MVP_Core.Data.Seeders
+namespace Data.Seeders
 {
     /// <summary>
     /// Seeds default application pages with access visibility and tracking metadata.

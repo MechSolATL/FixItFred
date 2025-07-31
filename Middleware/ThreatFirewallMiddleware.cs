@@ -1,4 +1,7 @@
-namespace MVP_Core.Middleware
+using Data;
+using Data.Models;
+
+namespace Middleware
 {
     public class ThreatFirewallMiddleware
     {

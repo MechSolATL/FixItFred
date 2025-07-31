@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace MVP_Core.Pages.Admin
+namespace Pages.Admin
 {
     public class ExecutiveSnapshotViewModel
     {

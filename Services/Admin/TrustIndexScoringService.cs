@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.Caching.Memory;
-using MVP_Core.Models;
+using Models;
 
-namespace MVP_Core.Services.Admin
+namespace Services.Admin
 {
     public class TrustIndexScoringService
     {

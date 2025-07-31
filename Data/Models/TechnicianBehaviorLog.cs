@@ -1,6 +1,6 @@
 using System;
 
-namespace MVP_Core.Data.Models
+namespace Data.Models
 {
     /// <summary>
     /// Logs technician behavioral anomalies for auto-flagging and analytics.

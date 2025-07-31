@@ -1,7 +1,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace MVP_Core.Models
+namespace Models
 {
     public record TechPulseLog
     {

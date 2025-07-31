@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System;
 
-namespace MVP_Core.Data.Models
+namespace Data.Models
 {
     /// <summary>
     /// Represents an entry in the audit log table for tracking user changes and actions.
@@ -47,11 +47,11 @@ namespace MVP_Core.Data.Models
         public DateTime Timestamp { get; set; } = DateTime.UtcNow;
 
         // [NotMapped] decrypted accessors
-        [System.ComponentModel.DataAnnotations.Schema.NotMapped]
+        [NotMapped]
         public string OldValue { get; set; } = string.Empty;
-        [System.ComponentModel.DataAnnotations.Schema.NotMapped]
+        [NotMapped]
         public string NewValue { get; set; } = string.Empty;
-        [System.ComponentModel.DataAnnotations.Schema.NotMapped]
+        [NotMapped]
         public string IPAddress { get; set; } = string.Empty;
     }
 }

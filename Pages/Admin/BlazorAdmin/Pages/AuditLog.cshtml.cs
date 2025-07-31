@@ -1,12 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Services;
 using System.Text.Json;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System;
+using Services;
 
-namespace MVP_Core.Pages.Admin.BlazorAdmin
+namespace Pages.Admin.BlazorAdmin.Pages
 {
     public class AuditLogModel : PageModel
     {

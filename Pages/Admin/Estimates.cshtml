@@ -3,7 +3,7 @@
 @model MVP_Core.Pages.Admin.EstimatesModel
 @{
     Layout = "/Pages/Shared/_Layout.cshtml";
-    var estimates = Model.Estimates ?? new List<MVP_Core.Data.Models.BillingInvoiceRecord>();
+    var estimates = Model.Estimates ?? new List<Data.Models.BillingInvoiceRecord>();
 }
 <h2>Estimates</h2>
 <table class="table table-bordered">

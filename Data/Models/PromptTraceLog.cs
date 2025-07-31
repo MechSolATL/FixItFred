@@ -1,5 +1,5 @@
 // [Sprint91_Recovery_P4] Nova: Class definition conflict resolved
-namespace MVP_Core.Data.Models
+namespace Data.Models
 {
     public class PromptTraceLog
     {

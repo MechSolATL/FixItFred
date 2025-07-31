@@ -1,6 +1,6 @@
 using System;
 
-namespace MVP_Core.Data.Models
+namespace Data.Models
 {
     // Sprint 91.23 - Technician Report Library
     public class TechnicianReport

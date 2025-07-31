@@ -1,15 +1,19 @@
-using MVP_Core.Services.Stats;
+using Data.Models;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace MVP_Core.Services.Stats
+namespace Services.Stats
 {
     public class LeaderboardService : ILeaderboardService
     {
-        public async Task<List<TechProfile>> GetTopTechniciansAsync(int count = 6)
+        public async Task<List<TechnicianViewModel>> GetTopTechniciansAsync(int count = 6)
         {
-            // Mock implementation
-            return await Task.FromResult(new List<TechProfile>());
+            var list = new List<TechnicianViewModel>
+            {
+                new() { TechnicianName = "Dwayne T.", CurrentTier = "Gold", TotalPoints = 47, LastRewardSentAt = DateTime.UtcNow, IsEligibleForReward = true },
+                new() { TechnicianName = "Malik R.", CurrentTier = "Silver", TotalPoints = 42, LastRewardSentAt = DateTime.UtcNow, IsEligibleForReward = true }
+            };
+            return await Task.FromResult(list);
         }
 
         public async Task<string> GetEfficiencyRateAsync()

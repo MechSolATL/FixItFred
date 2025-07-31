@@ -1,17 +1,17 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Services;
-using MVP_Core.Data.Models;
 using System.Collections.Generic;
 using System.Linq;
+using Services;
+using Data.Models;
 
-namespace MVP_Core.Pages.Admin
+namespace Pages.Admin
 {
     public class JobHistoryExportModel : PageModel
     {
         private readonly CustomerPortalService _portalService;
         private readonly ReceiptArchiveService _archiveService;
-        public List<MVP_Core.Data.Models.Customer> Customers { get; set; } = new();
+        public List<Data.Models.Customer> Customers { get; set; } = new();
         public List<ServiceRequest> Jobs { get; set; } = new();
         [BindProperty(SupportsGet = true)]
         public string CustomerEmail { get; set; } = string.Empty;

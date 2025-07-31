@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using MVP_Core.Data;
-using MVP_Core.Data.Models;
+using Data;
+using Data.Models;
 
-namespace MVP_Core.Services
+namespace Services
 {
     public class TechnicianPayService
     {
@@ -18,7 +18,7 @@ namespace MVP_Core.Services
             // Example: Calculate pay based on job logs
             var jobs = _db.ScheduleQueues.Where(q => q.TechnicianId == technicianId && q.ScheduledTime >= periodStart && q.ScheduledTime <= periodEnd).ToList();
             decimal hoursWorked = jobs.Sum(j => (decimal)(j.EstimatedDurationHours ?? 0));
-            decimal commissionEarned = jobs.Sum(j => (decimal)(j.CommissionAmount ?? 0));
+            decimal commissionEarned = jobs.Sum(j => j.CommissionAmount ?? 0);
             var tech = _db.Technicians.FirstOrDefault(t => t.Id == technicianId);
             decimal hourlyRate = tech?.HourlyRate ?? 0;
             string payType = "Commission";

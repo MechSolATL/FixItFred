@@ -1,12 +1,12 @@
 // FixItFred Patch Log — Sprint 26.4E
 // [2025-07-25T00:00:00Z] — ETAReportModel updated to use shared ETAHistoryEntry model.
+using Data.Models;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Data.Models;
-using MVP_Core.Services.Dispatch;
+using Services.Dispatch;
 using System;
 using System.Collections.Generic;
 
-namespace MVP_Core.Pages.Admin
+namespace Pages.Admin
 {
     public class ETAReportModel : PageModel
     {

@@ -1,10 +1,10 @@
-using MVP_Core.Data;
-using MVP_Core.Data.Models;
 using System.Collections.Generic;
 using System.Linq;
 using System;
+using Data;
+using Data.Models;
 
-namespace MVP_Core.Services
+namespace Services
 {
     public class DisputeService
     {

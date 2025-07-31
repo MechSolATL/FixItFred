@@ -1,7 +1,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace MVP_Core.Data.Models
+namespace Data.Models
 {
     // Sprint 87.1 — Tracks each technician’s current progress, counts, and unlock status
     public class TechProgress

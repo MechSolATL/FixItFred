@@ -1,9 +1,9 @@
-using MVP_Core.Data.Models;
+using Data.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace MVP_Core.Services.Admin
+namespace Services.Admin
 {
     public class PermissionService
     {

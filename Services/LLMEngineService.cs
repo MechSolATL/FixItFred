@@ -6,11 +6,11 @@ using System.Text.Json;
 using System.Text;
 using System;
 using Microsoft.Extensions.Configuration;
-using MVP_Core.Data.Models;
-using MVP_Core.Data;
 using Microsoft.EntityFrameworkCore;
+using Data;
+using Data.Models;
 
-namespace MVP_Core.Services
+namespace Services
 {
     // Sprint 90.1
     public class LLMEngineService

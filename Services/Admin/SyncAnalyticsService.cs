@@ -1,10 +1,10 @@
+using Data;
 using MVP_Core.Data.Models;
-using MVP_Core.Services.Admin;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace MVP_Core.Services.Admin
+namespace Services.Admin
 {
     public class SyncAnalyticsService
     {

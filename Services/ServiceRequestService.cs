@@ -5,10 +5,12 @@
 // Sprint 78.2: Hardened for CS860X
 // Sprint 81: Null safety hardening for ServiceRequestService.cs
 
-using MVP_Core.Services.Admin;
-using MVP_Core.Services.Dispatch;
+using Data;
+using Data.Models;
+using Services.Admin;
+using Services.Dispatch;
 
-namespace MVP_Core.Services
+namespace Services
 {
     public class ServiceRequestService
     {

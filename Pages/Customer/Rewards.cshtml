@@ -10,8 +10,8 @@
         return;
     }
     var email = User.Identity?.Name ?? string.Empty; // Sprint 82: RazorViewFortification
-    var loyalty = PortalService.GetLoyaltyTransactions(email) ?? new List<MVP_Core.Data.Models.LoyaltyPointTransaction>(); // Sprint 82: RazorViewFortification
-    var tiers = PortalService.GetRewardTiers() ?? new List<MVP_Core.Data.Models.RewardTier>(); // Sprint 82: RazorViewFortification
+    var loyalty = PortalService.GetLoyaltyTransactions(email) ?? new List<Data.Models.LoyaltyPointTransaction>(); // Sprint 82: RazorViewFortification
+    var tiers = PortalService.GetRewardTiers() ?? new List<Data.Models.RewardTier>(); // Sprint 82: RazorViewFortification
     var currentTier = tiers.LastOrDefault(t => loyalty.Sum(l => l.Points) >= t.PointsRequired); // Sprint 82: RazorViewFortification
     var totalPoints = loyalty.Sum(l => l.Points);
     // Sprint 83.4: Detection code removed to restore build stability
@@ -46,7 +46,7 @@
                 <table class="table table-striped">
                     <thead><tr><th>Date</th><th>Type</th><th>Points</th><th>Description</th></tr></thead>
                     <tbody>
-                    @foreach (var txn in loyalty ?? new List<MVP_Core.Data.Models.LoyaltyPointTransaction>()) // Sprint 82: RazorViewFortification
+                    @foreach (var txn in loyalty ?? new List<Data.Models.LoyaltyPointTransaction>()) // Sprint 82: RazorViewFortification
                     {
                         <tr>
                             <td>@txn?.Timestamp.ToShortDateString() ?? "-" // Sprint 82: RazorViewFortification</td>

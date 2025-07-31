@@ -4,7 +4,7 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace MVP_Core.Services
+namespace Services
 {
     public class AuditLogEncryptionService
     {

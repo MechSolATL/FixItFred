@@ -1,19 +1,19 @@
 using Microsoft.AspNetCore.Mvc;
-using MVP_Core.Services;
-using MVP_Core.Data.Models;
-using MVP_Core.Services.Admin;
-using MVP_Core.Services.Dispatch;
 using System.Threading.Tasks;
-using MVP_Core.Data;
 using System.Linq;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.SignalR;
-using MVP_Core.Hubs;
 using Microsoft.AspNetCore.Authorization;
 using System;
 using System.Security.Claims;
+using Data.Models;
+using Hubs;
+using Services;
+using Services.Dispatch;
+using Data;
+using Services.Admin;
 
-namespace MVP_Core.Controllers.Api
+namespace Controllers.Api
 {
     [ApiController]
     public class TechnicianApiController : ControllerBase
@@ -53,7 +53,8 @@ namespace MVP_Core.Controllers.Api
 
             var ip = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
             var userAgent = Request.Headers["User-Agent"].ToString();
-            db.TechTrackingLogs.Add(new MVP_Core.Data.TechTrackingLog {
+            db.TechTrackingLogs.Add(new TechTrackingLog
+            {
                 TechnicianId = techId,
                 Timestamp = DateTime.UtcNow,
                 IP = ip,
@@ -72,7 +73,7 @@ namespace MVP_Core.Controllers.Api
             var queues = db.ScheduleQueues.Where(q => q.TechnicianId == tech.Id && q.Status == ScheduleStatus.Pending).ToList();
             foreach (var queue in queues)
             {
-                var techProfile = db.Set<MVP_Core.Data.Models.TechnicianProfileDto>().FirstOrDefault(t => t.Id == tech.Id);
+                var techProfile = db.Set<TechnicianProfileDto>().FirstOrDefault(t => t.Id == tech.Id);
                 if (techProfile != null)
                 {
                     techProfile.Latitude = dto.Latitude;

@@ -2,14 +2,15 @@
 // File: Pages/Admin/AuditLogs.cshtml.cs
 // ===============================
 using Microsoft.AspNetCore.Authorization;
-using MVP_Core.Data.Models;
-using MVP_Core.Services;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Data.Models;
+using Data;
+using Services;
 
-namespace MVP_Core.Pages.Admin
+namespace Pages.Admin
 {
     [Authorize(Roles = "Admin,SuperAdmin")]
     public class AuditLogsModel : PageModel

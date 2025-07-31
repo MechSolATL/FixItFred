@@ -4,12 +4,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
-using MVP_Core.Data;
-using MVP_Core.Services.Admin;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
+using Data;
+using Services.Admin;
 
-namespace MVP_Core.Services.Background
+namespace Services.Background
 {
     public class RoastDropSchedulerService : BackgroundService
     {
@@ -26,7 +26,7 @@ namespace MVP_Core.Services.Background
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            bool enabled = _configuration.GetValue<bool>("RoastScheduler:Enabled", true);
+            bool enabled = _configuration.GetValue("RoastScheduler:Enabled", true);
             if (!enabled)
             {
                 _logger.LogInformation("RoastDropSchedulerService is disabled via configuration.");
@@ -36,7 +36,7 @@ namespace MVP_Core.Services.Background
             {
                 var now = DateTime.UtcNow;
                 // Configurable hour (default 13 = 9AM ET)
-                int hour = _configuration.GetValue<int>("RoastScheduler:Hour", 13);
+                int hour = _configuration.GetValue("RoastScheduler:Hour", 13);
                 var nextRun = now.Date.AddDays((int)DayOfWeek.Monday - (int)now.DayOfWeek).AddHours(hour);
                 if (now > nextRun) nextRun = nextRun.AddDays(7);
                 var delay = nextRun - now;

@@ -1,11 +1,12 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using MVP_Core.ViewModels;
-using MVP_Core.Data;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
+using ViewModels;
+using Data;
+using Data.Enums;
 
-namespace MVP_Core.Services.Metrics
+namespace Services.Metrics
 {
     public class MetricsEngineService
     {
@@ -30,8 +31,8 @@ namespace MVP_Core.Services.Metrics
             var totalThisWeek = await _db.BillingInvoiceRecords.CountAsync(i => i.CreatedAt >= weekAgo && i.CreatedAt <= today);
             var percentPaidThisWeek = totalThisWeek > 0 ? (int)(100.0 * paidThisWeek / totalThisWeek) : 0;
             var invoicedToday = await _db.BillingInvoiceRecords.Where(i => i.CreatedAt >= today).SumAsync(i => (decimal?)i.AmountTotal) ?? 0;
-            var zelleCount = await _db.BillingInvoiceRecords.CountAsync(i => i.PaymentMethod == MVP_Core.Data.Enums.PaymentMethodEnum.Zelle);
-            var qbCount = await _db.BillingInvoiceRecords.CountAsync(i => i.PaymentMethod == MVP_Core.Data.Enums.PaymentMethodEnum.QuickBooks);
+            var zelleCount = await _db.BillingInvoiceRecords.CountAsync(i => i.PaymentMethod == PaymentMethodEnum.Zelle);
+            var qbCount = await _db.BillingInvoiceRecords.CountAsync(i => i.PaymentMethod == PaymentMethodEnum.QuickBooks);
 
             return new List<MetricsCardViewModel>
             {

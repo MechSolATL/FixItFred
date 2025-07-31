@@ -1,4 +1,4 @@
-namespace MVP_Core.Controllers
+namespace Controllers
 {
     [ApiController]
     [Route("api/session")]

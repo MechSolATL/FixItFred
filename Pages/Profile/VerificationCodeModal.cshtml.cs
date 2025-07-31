@@ -1,6 +1,6 @@
-using MVP_Core.Controllers.Api;
+using Controllers.Api;
 
-namespace MVP_Core.Pages.Profile
+namespace Pages.Profile
 {
     public class VerificationCodeModalModel : PageModel
     {

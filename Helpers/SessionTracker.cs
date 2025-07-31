@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Http;
 
-namespace MVP_Core.Helpers
+namespace Helpers
 {
     public class SessionTracker
     {

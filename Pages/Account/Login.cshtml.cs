@@ -1,9 +1,12 @@
 using System.Security.Claims;
+using Data;
+using Data.Models;
+using Helpers;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using MVP_Core.Services.Admin; // Sprint 84.9 — Drop Alert Logic + TrustScore Delta Detection
+using Services.Admin;
 
-namespace MVP_Core.Pages.Account
+namespace Pages.Account
 {
     public class LoginModel : PageModel
     {
@@ -61,7 +64,7 @@ namespace MVP_Core.Pages.Account
 
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
 
-            return (adminUser.LastProfileReviewDate == null || adminUser.LastProfileReviewDate <= DateTime.UtcNow.AddDays(-30))
+            return adminUser.LastProfileReviewDate == null || adminUser.LastProfileReviewDate <= DateTime.UtcNow.AddDays(-30)
                 ? RedirectToPage("/Admin/ProfileReview")
                 : RedirectToPage("/Admin/Index");
         }

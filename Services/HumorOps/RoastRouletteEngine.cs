@@ -1,25 +1,25 @@
-using MVP_Core.Data;
-using MVP_Core.Data.Models;
-using MVP_Core.Services.Admin;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Data.Models;
+using Data;
+using Services.Admin;
 
-namespace MVP_Core.Services.HumorOps
+namespace Services.HumorOps
 {
     public class RoastRouletteEngine
     {
         private readonly ApplicationDbContext _db;
         private readonly ILogger<RoastRouletteEngine> _logger;
-        private readonly MVP_Core.Services.Admin.RoastEngineService _roastEngineService;
+        private readonly RoastEngineService _roastEngineService;
         private const int CooldownDays = 10;
         private static readonly RoastTier[] TierRotation = new[] { RoastTier.Soft, RoastTier.Medium, RoastTier.Savage };
         private int _tierIndex = 0;
 
-        public RoastRouletteEngine(ApplicationDbContext db, ILogger<RoastRouletteEngine> logger, MVP_Core.Services.Admin.RoastEngineService roastEngineService)
+        public RoastRouletteEngine(ApplicationDbContext db, ILogger<RoastRouletteEngine> logger, RoastEngineService roastEngineService)
         {
             _db = db;
             _logger = logger;

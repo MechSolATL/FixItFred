@@ -1,11 +1,11 @@
+using Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Data;
 using MVP_Core.Data.Models;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace MVP_Core.Pages.Admin
+namespace Pages.Admin
 {
     // Sprint 32 - Admin Reschedule Logic
     [Authorize(Roles = "Admin,Dispatcher,Supervisor")]

@@ -1,13 +1,13 @@
+using Data;
+using Data.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Data;
-using MVP_Core.Data.Models;
 using MVP_Core.Middleware;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 
-namespace MVP_Core.Pages.Technician
+namespace Pages.Technician
 {
     // Sprint 31.1 - Technician Schedule Acceptance Workflow
     // Sprint 84.2 — Tier Enforcement

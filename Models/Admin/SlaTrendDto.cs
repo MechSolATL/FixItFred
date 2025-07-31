@@ -1,6 +1,6 @@
 using System;
 
-namespace MVP_Core.Models.Admin
+namespace Models.Admin
 {
     // Sprint 41 - Historical SLA Trend DTO
     public class SlaTrendDto

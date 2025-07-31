@@ -1,12 +1,12 @@
 // Sprint 91.7 Part 6.2 — ToolTrackingService for managing technician tools
-using MVP_Core.Data;
-using MVP_Core.Data.DTO.Tools;
-using MVP_Core.Data.Models;
 using Microsoft.EntityFrameworkCore;
-using MVP_Core.Hubs;
 using Microsoft.AspNetCore.SignalR;
+using Hubs;
+using Data.DTO.Tools;
+using Data;
+using Data.Models;
 
-namespace MVP_Core.Services.Admin
+namespace Services.Admin
 {
     public class ToolTrackingService
     {
@@ -29,8 +29,8 @@ namespace MVP_Core.Services.Admin
                     ToolId = GuidFromInt(t.ToolId),
                     Name = t.Name,
                     ToolType = t.ConditionStatus, // No ToolType in model, using ConditionStatus as placeholder
-                    Status = t.IsActive ? (t.AssignedTechId != null ? "InUse" : "Available") : "Inactive",
-                    AssignedTechnicianId = t.AssignedTechId != null ? GuidFromInt(t.AssignedTechId.Value) : (Guid?)null,
+                    Status = t.IsActive ? t.AssignedTechId != null ? "InUse" : "Available" : "Inactive",
+                    AssignedTechnicianId = t.AssignedTechId != null ? GuidFromInt(t.AssignedTechId.Value) : null,
                     AssignedTechnicianName = t.AssignedTechnician != null ? t.AssignedTechnician.FullName : null,
                     LastTransferDate = GetLastTransferDate(t.ToolId),
                     IsTransferable = t.IsActive
@@ -71,11 +71,11 @@ namespace MVP_Core.Services.Admin
             int toTechIntId = IntFromGuid(dto.ToTechnicianId);
             var tool = await _context.ToolInventories.FindAsync(toolIntId);
             if (tool == null || !tool.IsActive) {
-                await _hubContext.Clients.All.SendAsync("toolTransferFailed", new { ToolId = dto.ToolId, Reason = "Tool not found or inactive" });
+                await _hubContext.Clients.All.SendAsync("toolTransferFailed", new { dto.ToolId, Reason = "Tool not found or inactive" });
                 return false;
             }
             if (tool.AssignedTechId != fromTechIntId) {
-                await _hubContext.Clients.All.SendAsync("toolTransferFailed", new { ToolId = dto.ToolId, Reason = "Tool not assigned to this technician" });
+                await _hubContext.Clients.All.SendAsync("toolTransferFailed", new { dto.ToolId, Reason = "Tool not assigned to this technician" });
                 return false;
             }
 
@@ -93,7 +93,7 @@ namespace MVP_Core.Services.Admin
 
             await _context.SaveChangesAsync();
             // Broadcast transfer event
-            await _hubContext.Clients.All.SendAsync("toolConfirmed", new { ToolId = dto.ToolId, FromTechnicianId = dto.FromTechnicianId, ToTechnicianId = dto.ToTechnicianId });
+            await _hubContext.Clients.All.SendAsync("toolConfirmed", new { dto.ToolId, dto.FromTechnicianId, dto.ToTechnicianId });
             return true;
         }
 
@@ -108,7 +108,7 @@ namespace MVP_Core.Services.Admin
         }
 
         // Sprint 91.7 Part 6.3: Get all active technicians for transfer dropdown
-        public async Task<List<MVP_Core.Data.Models.Technician>> GetAvailableTechsAsync()
+        public async Task<List<Data.Models.Technician>> GetAvailableTechsAsync()
         {
             return await _context.Technicians.Where(t => t.IsActive).OrderBy(t => t.FullName).ToListAsync();
         }

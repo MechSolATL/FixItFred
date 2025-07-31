@@ -2,7 +2,7 @@
 // [2025-07-25T00:00:00Z] — ETAHistoryEntry model for ETA accuracy reporting.
 using System;
 
-namespace MVP_Core.Models.Dispatch
+namespace Models.Dispatch
 {
     public class ETAHistoryEntry
     {

@@ -1,10 +1,11 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Services;
 using MVP_Core.Data.Models;
 using System.Collections.Generic;
 using System.Linq;
+using Data;
+using Services;
 
-namespace MVP_Core.Pages.Admin
+namespace Pages.Admin
 {
     public class BonusTrackerModel : PageModel
     {

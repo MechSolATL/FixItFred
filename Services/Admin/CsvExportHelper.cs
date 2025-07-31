@@ -1,10 +1,10 @@
 // Sprint 85.4 — Coaching UI Enhancements + Export
-using MVP_Core.Models;
 using System.Collections.Generic;
 using System.Text;
 using System.Linq;
+using Models;
 
-namespace MVP_Core.Services.Admin
+namespace Services.Admin
 {
     public static class CsvExportHelper
     {

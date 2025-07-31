@@ -1,12 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.ViewModels.Compliance;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
 using Microsoft.AspNetCore.Http;
+using ViewModels;
 
-namespace MVP_Core.Pages.Compliance
+namespace Pages.Compliance
 {
     public class RecoveryWizardModel : PageModel
     {

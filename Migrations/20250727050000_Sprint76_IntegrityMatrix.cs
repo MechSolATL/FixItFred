@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace MVP_Core.Migrations
+namespace Migrations
 {
     public partial class Sprint76_IntegrityMatrix : Migration
     {

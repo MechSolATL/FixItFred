@@ -1,4 +1,4 @@
-namespace MVP_Core.Services
+namespace Services
 {
     public interface IDeviceResolver
     {

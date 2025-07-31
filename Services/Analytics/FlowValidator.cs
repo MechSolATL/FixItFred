@@ -1,6 +1,6 @@
 using System;
 
-namespace MVP_Core.Services.Analytics
+namespace Services.Analytics
 {
     // Sprint 86.5 — Real-Time Flow Compliance Validator
     public static class FlowValidator

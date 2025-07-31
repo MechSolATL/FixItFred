@@ -1,10 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using MVP_Core.Data.Models;
-using MVP_Core.Models.Admin;
+using Data;
+using Data.Models;
+using Models.Admin;
 
-namespace MVP_Core.Services.Admin
+namespace Services.Admin
 {
     /// <summary>
     /// AssignmentScoringEngine: Calculates assignment scores and confidence for technicians.
@@ -67,10 +68,10 @@ namespace MVP_Core.Services.Admin
                 score.IsEscalationRisk = escalations > 0;
                 // Predictive assignment scoring
                 // Base: 100 - (ETA) + (Reviews*5) + (SLAWins*2) + (Availability*10) - (Burnout*15) - (BonusCooldown*10) - (Escalation*20)
-                score.Score = 100 - etaMinutes + (avgReview * 5) + (slaWins * 2) + (score.Factors["Availability"] * 10)
-                    - (score.Factors["Burnout"] * 15) - (score.Factors["BonusCooldown"] * 10) - (escalations * 20);
+                score.Score = 100 - etaMinutes + avgReview * 5 + slaWins * 2 + score.Factors["Availability"] * 10
+                    - score.Factors["Burnout"] * 15 - score.Factors["BonusCooldown"] * 10 - escalations * 20;
                 // Confidence: 1.0 - (burnout+bonusCooldown+escalation)/maxPenalty
-                double penalty = (score.Factors["Burnout"] * 15) + (score.Factors["BonusCooldown"] * 10) + (escalations * 20);
+                double penalty = score.Factors["Burnout"] * 15 + score.Factors["BonusCooldown"] * 10 + escalations * 20;
                 score.Confidence = Math.Max(0.1, 1.0 - penalty / 100.0);
                 scores.Add(score);
             }

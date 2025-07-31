@@ -1,12 +1,13 @@
 // Sprint 84.8 — Technician Heat Score + Map Overlay
-using MVP_Core.Data;
 using MVP_Core.Data.Models;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System; // Fix: Use System for DateTime
+using System;
+using Data;
+using Pages.Admin;
 
-namespace MVP_Core.Services.Admin
+namespace Services.Admin
 {
     // Sprint 84.8 — Technician Heat Score + Map Overlay
     public class TechnicianTrustAnalyticsService
@@ -17,7 +18,7 @@ namespace MVP_Core.Services.Admin
             _db = db;
         }
 
-        public async Task<List<MVP_Core.Pages.Admin.TechnicianHeatScoreDto>> GetHeatScoreMapData()
+        public async Task<List<TechnicianHeatScoreDto>> GetHeatScoreMapData()
         {
             // Join Technicians with latest TrustLog, fallback to TrustScore
             var techs = _db.Technicians.ToList();
@@ -42,7 +43,7 @@ namespace MVP_Core.Services.Admin
         }
 
         // Sprint 85.0 — Trust Trends Chart Logic + Filters
-        public async Task<List<MVP_Core.Pages.Admin.TechnicianTrendPoint>> GetTechnicianTrustTrends(DateTime start, DateTime end, int? technicianId = null)
+        public async Task<List<TechnicianTrendPoint>> GetTechnicianTrustTrends(DateTime start, DateTime end, int? technicianId = null)
         {
             var logs = _db.TechnicianTrustLogs
                 .Where(l => l.RecordedAt >= start && l.RecordedAt <= end)
@@ -51,7 +52,7 @@ namespace MVP_Core.Services.Admin
                 logs = logs.Where(l => l.TechnicianId == technicianId.Value).ToList();
             var techs = _db.Technicians.ToList();
             var points = logs
-                .GroupBy(l => new { l.TechnicianId, Date = l.RecordedAt.Date })
+                .GroupBy(l => new { l.TechnicianId, l.RecordedAt.Date })
                 .Select(g => new MVP_Core.Pages.Admin.TechnicianTrendPoint
                 {
                     TechnicianId = g.Key.TechnicianId,

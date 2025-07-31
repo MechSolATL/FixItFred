@@ -1,7 +1,7 @@
 // FixItFred Patch: Synced DTO references, resolved ambiguities, and corrected collection access for Dispatcher UI.
 using System;
 
-namespace MVP_Core.Models.Admin
+namespace Models.Admin
 {
     public class DispatcherNotification
     {

@@ -1,10 +1,10 @@
+using Data.Models;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Data.Models;
-using MVP_Core.Services;
+using Services;
 using System;
 using System.Collections.Generic;
 
-namespace MVP_Core.Pages.Admin
+namespace Pages.Admin
 {
     /// <summary>
     /// Represents the QuickTest page model for testing technician KPIs.

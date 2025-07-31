@@ -1,4 +1,4 @@
-namespace MVP_Core.Helpers
+namespace Helpers
 {
     public static class HealthStatusHelper
     {

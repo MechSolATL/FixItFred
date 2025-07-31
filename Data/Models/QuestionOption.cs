@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
-namespace MVP_Core.Data.Models
+namespace Data.Models
 {
     public class QuestionOption
     {

@@ -1,12 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Data.Models;
-using MVP_Core.Services;
 using System.Collections.Generic;
 using System.Linq;
-using System; // Sprint 84.7.2 — Live Filter + UI Overlay
+using System;
+using Services;
+using Data.Models;
 
-namespace MVP_Core.Pages.Technician
+namespace Pages.Technician
 {
     // Sprint 84.7.2 — Live Filter + UI Overlay
     [Microsoft.AspNetCore.Authorization.Authorize(Roles = "Admin,Technician")]
@@ -29,7 +29,7 @@ namespace MVP_Core.Pages.Technician
         public List<CustomerReview> FilteredReviews { get; set; } = new();
         public ReviewStats Stats { get; set; } = new();
         public int[] HeatmapRatings { get; set; } = new int[5];
-        public MVP_Core.Data.Models.Technician TechnicianDetail { get; set; } // Sprint 84.7.2 — Live Filter + UI Overlay
+        public Data.Models.Technician TechnicianDetail { get; set; } // Sprint 84.7.2 — Live Filter + UI Overlay
         public int? SelectedReviewId { get; set; } // Sprint 84.7.2 — Live Filter + UI Overlay
 
         public void OnGet(int? technicianId, string? tier, int? reviewId)

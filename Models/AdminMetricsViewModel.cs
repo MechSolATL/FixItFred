@@ -1,5 +1,5 @@
 // Sprint 85.2 — Admin Metrics Dashboard Integration
-namespace MVP_Core.Models
+namespace Models
 {
     public class AdminMetricsViewModel
     {

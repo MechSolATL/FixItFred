@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using MVP_Core.Data;
-using MVP_Core.Data.Models;
+using Data;
+using Data.Models;
 
-namespace MVP_Core.Services
+namespace Services
 {
     public class CertificationService
     {

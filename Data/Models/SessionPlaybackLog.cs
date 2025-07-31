@@ -1,5 +1,5 @@
 // Created by FixItFred for Sprint 70.5 — Session replay metadata
-namespace MVP_Core.Data.Models;
+namespace Data.Models;
 public class SessionPlaybackLog
 {
     public int Id { get; set; }

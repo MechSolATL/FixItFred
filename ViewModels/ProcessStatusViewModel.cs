@@ -1,6 +1,6 @@
 using System;
 
-namespace MVP_Core.ViewModels
+namespace ViewModels
 {
     public enum ProcessHealthStatus
     {

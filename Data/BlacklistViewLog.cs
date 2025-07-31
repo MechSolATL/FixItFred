@@ -1,4 +1,4 @@
-namespace MVP_Core.Data
+namespace Data
 {
     public class BlacklistViewLog
     {

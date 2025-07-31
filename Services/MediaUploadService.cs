@@ -1,11 +1,12 @@
-using MVP_Core.Data.Models;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Data;
+using Data.Models;
 
-namespace MVP_Core.Services
+namespace Services
 {
     /// <summary>
     /// MediaUploadService: Handles saving media files to /wwwroot/media/{requestId}/ and tracking in DB.

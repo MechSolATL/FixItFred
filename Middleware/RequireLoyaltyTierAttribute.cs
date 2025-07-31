@@ -1,15 +1,15 @@
 // Sprint 84.2 — Tier Enforcement
+using Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using MVP_Core.Data;
 using MVP_Core.Data.Models;
-using MVP_Core.Services.Admin;
+using Services.Admin;
 using System;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
-namespace MVP_Core.Middleware
+namespace Middleware
 {
     public class RequireLoyaltyTierAttribute : Attribute, IAsyncPageFilter
     {

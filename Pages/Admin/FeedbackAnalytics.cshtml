@@ -3,8 +3,8 @@
 @inject MVP_Core.Services.FeedbackAnalyticsService AnalyticsService
 @{
     ViewData["Title"] = "Feedback Analytics";
-    var reviews = Model.Reviews != null && Model.Reviews.Any() ? Model.Reviews : new List<MVP_Core.Data.Models.CustomerReview>();
-    var flagged = Model.FlaggedReviews != null && Model.FlaggedReviews.Any() ? Model.FlaggedReviews : new List<MVP_Core.Data.Models.CustomerReview>();
+    var reviews = Model.Reviews != null && Model.Reviews.Any() ? Model.Reviews : new List<Data.Models.CustomerReview>();
+    var flagged = Model.FlaggedReviews != null && Model.FlaggedReviews.Any() ? Model.FlaggedReviews : new List<Data.Models.CustomerReview>();
     var avgByService = reviews.GroupBy(r => r.ServiceRequestId)
         .Select(g => new { ServiceRequestId = g.Key, AvgRating = g.Average(r => r.Rating) }).ToList();
 }

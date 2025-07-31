@@ -1,13 +1,14 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Data.Models;
-using MVP_Core.Services.Admin;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
 using System;
+using Data;
+using Data.Models;
+using Services.Admin;
 
-namespace MVP_Core.Pages.Admin
+namespace Pages.Admin
 {
     public class AwardCenterModel : PageModel
     {
@@ -19,7 +20,7 @@ namespace MVP_Core.Pages.Admin
             _db = db;
         }
         public List<TechnicianAwardLog> Awards { get; set; } = new();
-        public List<MVP_Core.Data.Models.Technician> Technicians { get; set; } = new();
+        public List<Data.Models.Technician> Technicians { get; set; } = new();
         [BindProperty(SupportsGet = true)]
         public int? FilterTechnicianId { get; set; }
         [BindProperty(SupportsGet = true)]

@@ -1,9 +1,8 @@
-using MVP_Core.Data.Models;
 using System;
 using Microsoft.Extensions.Logging;
-using MVP_Core.Services;
+using Data.Models;
 
-namespace MVP_Core.Services
+namespace Services
 {
     public class AuditLogger
     {

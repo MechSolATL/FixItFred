@@ -12,14 +12,15 @@
 // [2025-07-25T00:00:00Z] — ServiceZones property exposed and Razor reference corrected for Dispatcher view.
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Models;
-using MVP_Core.Data.Models;
-using MVP_Core.Services.Dispatcher;
-using MVP_Core.Services.Admin;
 using System.Collections.Generic;
 using System.Linq;
+using Data.Models;
+using Models;
+using Data;
+using Services.Dispatcher;
+using Services.Admin;
 
-namespace MVP_Core.Pages.Admin
+namespace Pages.Admin
 {
     [Authorize(Roles = "Admin,Dispatcher")]
     public class DispatcherModel : PageModel

@@ -1,11 +1,11 @@
 // Sprint 32.2 - Security + Audit Harden
-using MVP_Core.Data;
 using MVP_Core.Data.Models;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Threading.Tasks;
+using Data;
 
-namespace MVP_Core.Services
+namespace Services
 {
     public interface IAuditTrailLogger
     {

@@ -1,4 +1,4 @@
-namespace MVP_Core.Pages.Shared.Partials
+namespace Pages.Shared.Partials
 {
     public class _SupportBoxModel : PageModel
     {

@@ -3,7 +3,7 @@ using System;
 
 #nullable disable
 
-namespace MVP_Core.Migrations
+namespace Migrations
 {
     // Sprint 90.1
     public partial class Sprint901_LLMTools : Migration

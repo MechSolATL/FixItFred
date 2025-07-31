@@ -1,5 +1,5 @@
 // MVP_Core/Services/BackupReminderService.cs
-namespace MVP_Core.Services
+namespace Services
 {
     public class BackupReminderService : IHostedService, IDisposable
     {

@@ -1,4 +1,4 @@
-namespace MVP_Core.Services.Admin
+namespace Services.Admin
 {
     public class PatchBadgeHostedService : IHostedService
     {

@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Models;
-using MVP_Core.Services.Analytics;
-using MVP_Core.Data;
 using Microsoft.EntityFrameworkCore;
+using Services.Analytics;
+using Models;
+using Data;
 
-namespace MVP_Core.Pages.Admin
+namespace Pages.Admin
 {
     // Sprint 86.5 — Flow Audit Page
     public class FlowAuditModel : PageModel

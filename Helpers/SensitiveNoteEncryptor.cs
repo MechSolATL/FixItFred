@@ -5,7 +5,7 @@ using System.Security.Cryptography;
 using System.Text;
 using Microsoft.AspNetCore.DataProtection;
 
-namespace MVP_Core.Helpers
+namespace Helpers
 {
     // Sprint 85.7 — Admin Log Hardening & Encryption
     public static class SensitiveNoteEncryptor

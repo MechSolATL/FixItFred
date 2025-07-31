@@ -3,18 +3,18 @@
 // =========================
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Data;
-using MVP_Core.Data.Models;
-using MVP_Core.Services;
-using MVP_Core.Services.Email;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Text.Json;
+using Data;
+using Services.Email;
+using Services;
+using Data.Models;
 
-namespace MVP_Core.Pages
+namespace Pages
 {
     public class VerifyModel : PageModel
     {

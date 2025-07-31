@@ -5,11 +5,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Data;
-using MVP_Core.Models;
 using MVP_Core.Data.Models;
+using Models;
+using Data;
 
-namespace MVP_Core.Pages.Admin
+namespace Pages.Admin
 {
     // Sprint 85.5 — Trust Incident Timeline
     public class TrustTimelineModel : PageModel
@@ -36,7 +36,7 @@ namespace MVP_Core.Pages.Admin
                     Date = x.TriggeredAt,
                     Category = "Trust Drop",
                     Note = $"Score dropped from {x.PreviousScore} to {x.CurrentScore}",
-                    Severity = (x.CurrentScore < x.PreviousScore - 10) ? "High" : "Medium",
+                    Severity = x.CurrentScore < x.PreviousScore - 10 ? "High" : "Medium",
                     LinkedLogId = x.Id
                 });
 

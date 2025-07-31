@@ -4,16 +4,16 @@
 // Added null checks and safe navigation for all nullable references per CS8601, CS8602, CS8603, CS8604
 // Each change is marked with FixItFred comment and timestamp
 
-using MVP_Core.Services;
-using MVP_Core.Services.Admin;
-using MVP_Core.Data.Models;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Services;
+using Data.Models;
+using Services.Admin;
 
-namespace MVP_Core.Pages.Admin
+namespace Pages.Admin
 {
     /// <summary>
     /// PageModel for UploadMedia. Injects MediaUploadService and DispatcherService via DI.

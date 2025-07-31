@@ -1,7 +1,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace MVP_Core.Models
+namespace Models
 {
     // Sprint 86.6 — Mentor Reply Log
     public class MentorReplyLog

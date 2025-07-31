@@ -1,12 +1,12 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using MVP_Core.Models.ViewModels;
-using MVP_Core.Data;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using System;
+using Models.ViewModels;
+using Data;
 
-namespace MVP_Core.Services.Metrics
+namespace Services.Metrics
 {
     public class ForecastingEngine
     {
@@ -47,7 +47,7 @@ namespace MVP_Core.Services.Metrics
             var thirtyDaysAgo = DateTime.UtcNow.AddDays(-30);
             var latePaid = await _db.BillingInvoiceRecords.CountAsync(i => i.PaidDate != null && i.PaidDate > i.DueDate && i.PaidDate >= thirtyDaysAgo);
             var totalPaid = await _db.BillingInvoiceRecords.CountAsync(i => i.PaidDate != null && i.PaidDate >= thirtyDaysAgo);
-            return totalPaid > 0 ? (100.0 * latePaid / totalPaid) : 0.0;
+            return totalPaid > 0 ? 100.0 * latePaid / totalPaid : 0.0;
         }
     }
 }

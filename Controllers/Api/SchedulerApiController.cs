@@ -1,13 +1,13 @@
+using Data;
 using Microsoft.AspNetCore.Mvc;
-using MVP_Core.Data;
 using MVP_Core.Data.Models;
 using MVP_Core.Models.Admin;
-using MVP_Core.Services.Admin;
+using Services.Admin;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MVP_Core.Controllers.Api
+namespace Controllers.Api
 {
     [ApiController]
     [Route("api/scheduler")]

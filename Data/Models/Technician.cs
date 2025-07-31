@@ -1,9 +1,9 @@
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 using System.Collections.Generic;
-using System; // Sprint 84.7.2 — Live Filter + UI Overlay
+using System;
 
-namespace MVP_Core.Data.Models
+namespace Data.Models
 {
     public class Technician
     {

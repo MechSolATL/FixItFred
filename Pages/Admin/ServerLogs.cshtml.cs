@@ -1,8 +1,10 @@
 // MVP_Core/Pages/Admin/ServerLogsModel.cs
 
+using Data;
+using Data.Models;
 using System.Text.Json;
 
-namespace MVP_Core.Pages.Admin
+namespace Pages.Admin
 {
     public class ServerLogsModel : PageModel
     {

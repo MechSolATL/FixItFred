@@ -1,6 +1,7 @@
-using MVP_Core.Services;
+using Helpers;
+using Services;
 
-namespace MVP_Core.Pages.Tools
+namespace Pages.Tools
 {
     [ValidateAntiForgeryToken]
     public class HashPasswordModel : PageModel

@@ -1,4 +1,4 @@
-namespace MVP_Core.Models.Mobile
+namespace Models.Mobile
 {
     public class NextJobDto
     {

@@ -2,11 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using MVP_Core.Models;
-using MVP_Core.Data;
 using Microsoft.EntityFrameworkCore;
+using Models;
+using Data;
 
-namespace MVP_Core.Services.Analytics
+namespace Services.Analytics
 {
     // Sprint 86.5 — Action Log Service for Flow Analytics
     public class ActionLogService

@@ -1,8 +1,8 @@
 using System.Collections.Generic;
-using MVP_Core.Data.Models;
-using MVP_Core.Services.Dispatcher;
+using Data.Models;
+using Services.Dispatcher;
 
-namespace MVP_Core.Models
+namespace Models
 {
     public class DispatcherViewModel
     {

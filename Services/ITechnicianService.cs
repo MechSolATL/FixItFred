@@ -1,11 +1,11 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using MVP_Core.Data.Models;
 using System; // Sprint 84.7.2 — Live Filter + UI Overlay
 using System.Security.Claims;
-using TechnicianModel = MVP_Core.Data.Models.Technician;
+using TechnicianModel = Data.Models.Technician;
+using Data.Models;
 
-namespace MVP_Core.Services
+namespace Services
 {
     public interface ITechnicianService
     {

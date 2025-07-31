@@ -1,12 +1,12 @@
-using MVP_Core.Data.Models;
-using MVP_Core.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System;
 using System.Linq;
+using Data;
+using Data.Models;
 
-namespace MVP_Core.Services.Admin
+namespace Services.Admin
 {
     // Sprint 81: Null safety hardening for SanityShieldService.cs
     public class SanityShieldService

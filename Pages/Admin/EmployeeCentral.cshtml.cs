@@ -1,23 +1,22 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Data;
-using MVP_Core.Data.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
-using MVP_Core.Hubs;
 using Newtonsoft.Json;
+using Hubs;
+using Data;
 
-namespace MVP_Core.Pages.Admin
+namespace Pages.Admin
 {
     public class EmployeeCentralModel : PageModel
     {
         private readonly ApplicationDbContext _db;
         private readonly IHubContext<NotificationHub> _hubContext;
-        public List<MVP_Core.Data.Models.Technician> TechnicianList { get; set; } = new();
+        public List<Data.Models.Technician> TechnicianList { get; set; } = new();
         public List<ActivityLogDto> ActivityTimeline { get; set; } = new();
         public int SevereFlagCount { get; set; }
         public double AvgTrustScore { get; set; }

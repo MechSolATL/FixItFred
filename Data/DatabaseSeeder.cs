@@ -1,4 +1,6 @@
-namespace MVP_Core.Data
+using Data.Models;
+
+namespace Data
 {
     public static class DatabaseSeeder
     {

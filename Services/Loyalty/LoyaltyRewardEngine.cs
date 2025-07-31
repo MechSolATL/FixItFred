@@ -1,11 +1,11 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Data;
 using Microsoft.EntityFrameworkCore;
-using MVP_Core.Data;
 using MVP_Core.Data.Models;
 
-namespace MVP_Core.Services.Loyalty
+namespace Services.Loyalty
 {
     public class LoyaltyRewardEngine
     {
@@ -33,7 +33,7 @@ namespace MVP_Core.Services.Loyalty
 
             foreach (var milestone in milestones)
             {
-                if ((progress.ProgressCount >= (milestone.Points ?? 0)) &&
+                if (progress.ProgressCount >= (milestone.Points ?? 0) &&
                     !_context.MilestoneAuditLogs.Any(x =>
                         x.TechnicianId == technicianId &&
                         x.MilestoneId == milestone.Id &&

@@ -1,13 +1,13 @@
 // Sprint 83.6-RoastRoulette
-using MVP_Core.Data;
 using MVP_Core.Data.Models;
-using MVP_Core.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
+using Data;
+using Services;
 
-namespace MVP_Core.Pages.Roast
+namespace Pages.Roast
 {
     // Sprint 83.6-RoastRoulette
     public class RandomModel : PageModel

@@ -1,6 +1,6 @@
 using System.Text.Json;
 
-namespace MVP_Core.Helpers
+namespace Helpers
 {
     public static class SessionHelper
     {

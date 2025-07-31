@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using MVP_Core.Data;
 using MVP_Core.Data.Models;
-using MVP_Core.ViewModels.Compliance;
 using Microsoft.EntityFrameworkCore;
+using ViewModels;
+using Data;
 
-namespace MVP_Core.Services.Compliance
+namespace Services.Compliance
 {
     public class ComplianceEnforcementService
     {

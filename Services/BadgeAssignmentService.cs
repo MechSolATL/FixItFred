@@ -1,11 +1,11 @@
-using MVP_Core.Data;
-using MVP_Core.Data.Models.PatchAnalytics;
+using Data;
+using Data.Models.PatchAnalytics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MVP_Core.Services
+namespace Services
 {
     // Sprint 91.22.4 - BadgeAssignment
     public class BadgeAssignmentService

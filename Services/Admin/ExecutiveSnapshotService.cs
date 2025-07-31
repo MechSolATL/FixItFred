@@ -2,12 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using MVP_Core.Data;
 using MVP_Core.Data.Models;
-using MVP_Core.Pages.Admin;
 using Microsoft.EntityFrameworkCore;
+using Data;
+using Pages.Admin;
 
-namespace MVP_Core.Services.Admin
+namespace Services.Admin
 {
     public class ExecutiveSnapshotService
     {

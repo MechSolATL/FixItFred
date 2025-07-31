@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.SignalR;
 using MVP_Core.Services.Admin;
 using System.Threading.Tasks;
 
-namespace MVP_Core.Hubs
+namespace Hubs
 {
     public class RequestHub : Hub
     {

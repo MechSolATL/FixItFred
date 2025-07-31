@@ -1,7 +1,7 @@
 using System;
 using System.Threading.Tasks;
 
-namespace MVP_Core.Services.Admin
+namespace Services.Admin
 {
     /// <summary>
     /// Generates compliance audit reports (PDF/CSV).

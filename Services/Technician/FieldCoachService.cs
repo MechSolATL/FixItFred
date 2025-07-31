@@ -1,11 +1,11 @@
 using System;
 using System.Threading.Tasks;
-using MVP_Core.Data;
 using MVP_Core.Models;
 using Microsoft.EntityFrameworkCore;
-using MVP_Core.Services.Loyalty;
+using Services.Loyalty;
+using Data;
 
-namespace MVP_Core.Services.Technician
+namespace Services.Technician
 {
     // Sprint 86.7 — Field Coach Service for Technician AI Companion
     public class FieldCoachService

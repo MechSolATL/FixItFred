@@ -2,16 +2,16 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Services.Mentorship;
-using MVP_Core.Services.Analytics;
-using MVP_Core.Data;
-using MVP_Core.Models;
-using MVP_Core.Data.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using Services.Mentorship;
+using Services.Analytics;
+using Data.Models;
+using Models;
+using Data;
 
-namespace MVP_Core.Pages.Admin
+namespace Pages.Admin
 {
     // Sprint 86.6 — Send To Mentor PageModel
     public class SendToMentorModel : PageModel

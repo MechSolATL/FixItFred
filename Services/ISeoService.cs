@@ -1,8 +1,8 @@
-namespace MVP_Core.Services
+namespace Services
 {
     public interface ISeoService
     {
-        Task<SeoMeta> GetSeoMetaAsync(string pageName);
-        Task<SeoMeta> GetSeoByPageNameAsync(string pageName);
+        Task<string> GetSeoForPageAsync(string pageName);
+        Task<string> GetSeoByPageNameAsync(string pageName);
     }
 }

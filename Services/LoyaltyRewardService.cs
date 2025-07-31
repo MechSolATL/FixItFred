@@ -1,10 +1,10 @@
-using MVP_Core.Data.Models;
-using MVP_Core.Data;
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using Data;
+using Data.Models;
 
-namespace MVP_Core.Services
+namespace Services
 {
     /// <summary>
     /// Handles loyalty points, reward tiers, and promo generation for customers.

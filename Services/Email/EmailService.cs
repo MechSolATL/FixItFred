@@ -1,8 +1,9 @@
+using Data.Models;
 using System.Net;
 using System.Net.Mail;
 using System.Text.RegularExpressions;
 
-namespace MVP_Core.Services.Email
+namespace Services.Email
 {
     public class EmailService
     {

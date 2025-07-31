@@ -1,13 +1,13 @@
 // Sprint 91.8 - Part 5.B
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Data;
-using MVP_Core.Data.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
+using Data;
+using Data.Models;
 
-namespace MVP_Core.Pages.Admin
+namespace Pages.Admin
 {
     // Sprint 90.1 — Admin view for recent prompt trace logs
     public class PromptTracesModel : PageModel

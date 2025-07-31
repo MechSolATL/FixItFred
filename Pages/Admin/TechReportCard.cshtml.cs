@@ -1,7 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Data;
-using MVP_Core.Data.Models;
 using MVP_Core.Services.Admin;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -13,13 +11,15 @@ using OfficeOpenXml;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
+using Data;
+using Data.Models;
 
-namespace MVP_Core.Pages.Admin
+namespace Pages.Admin
 {
     public class TechReportCardModel : PageModel
     {
         private readonly ApplicationDbContext _db;
-        public List<MVP_Core.Data.Models.Technician> TechnicianList { get; set; } = new();
+        public List<Data.Models.Technician> TechnicianList { get; set; } = new();
         public List<TechnicianReportCard> ReportCards { get; set; } = new();
         public int? SelectedTechId { get; set; }
         public DateTime? StartDate { get; set; }
@@ -69,7 +69,7 @@ namespace MVP_Core.Pages.Admin
                     }
                     Response.Headers.Append("Content-Disposition", "attachment; filename=TechReportCard.csv");
                     Response.ContentType = "text/csv";
-                    await Response.Body.WriteAsync(System.Text.Encoding.UTF8.GetBytes(csv.ToString()));
+                    await Response.Body.WriteAsync(Encoding.UTF8.GetBytes(csv.ToString()));
                 }
                 else if (export == "excel")
                 {

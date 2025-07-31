@@ -1,11 +1,11 @@
-using MVP_Core.Data;
-using MVP_Core.Data.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using MVP_Core.Pages.Technician; // Sprint 84.7.2 — Live Filter + UI Overlay
+using Pages.Technician;
+using Data;
+using Data.Models;
 
-namespace MVP_Core.Services
+namespace Services
 {
     // Sprint 84.5 — Technician Leaderboard + Rivalry Engine
     public class TechnicianLeaderboardService : ITechnicianLeaderboardService // Sprint 84.7.2 — Live Filter + UI Overlay

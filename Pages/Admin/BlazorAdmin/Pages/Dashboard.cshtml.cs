@@ -1,13 +1,13 @@
+using Data;
+using Data.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Data;
-using MVP_Core.Data.Models;
-using MVP_Core.Services;
+using Services;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MVP_Core.Pages.Admin.BlazorAdmin
+namespace Pages.Admin.BlazorAdmin.Pages
 {
     public class DashboardModel : PageModel
     {

@@ -1,10 +1,12 @@
+using Data.Models;
+using Data.Models.Seo;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using MVP_Core.Data.Models;
-using PageModel = MVP_Core.Data.Models.Page;
+using Models.Admin;
+using PageModel = Data.Models.Page;
 
-namespace MVP_Core.Data
+namespace Data
 {
     /// <summary>
     /// Unified database context for Service-Atlanta + Identity.
@@ -63,16 +65,16 @@ namespace MVP_Core.Data
         public DbSet<ScheduleHistory> ScheduleHistories { get; set; } = null!;
         public DbSet<NotificationsSent> NotificationsSent { get; set; } = null!;
         public DbSet<ETAHistoryEntry> ETAHistoryEntries { get; set; } = null!;
-        public DbSet<MVP_Core.Data.TechTrackingLog> TechTrackingLogs { get; set; } = null!; // Sprint 30E - Secure Technician GPS API
+        public DbSet<TechTrackingLog> TechTrackingLogs { get; set; } = null!; // Sprint 30E - Secure Technician GPS API
         // Sprint 32.2 - Security + Audit Harden
-        public DbSet<MVP_Core.Data.Models.AuditLogEntry> AuditLogEntries { get; set; } = null!;
+        public DbSet<AuditLogEntry> AuditLogEntries { get; set; } = null!;
         // Sprint 34.2 - SLA Escalation Log Model
         public DbSet<EscalationLogEntry> EscalationLogs { get; set; } = null!;
         // Sprint 35 - Technician Reward Scoring System
         public DbSet<TechnicianScoreEntry> TechnicianScoreEntries { get; set; } = null!;
         public DbSet<TechnicianDeviceRegistration> TechnicianDeviceRegistrations { get; set; } = null!;
         // FixItFred — Sprint 46.1 Build Stabilization
-        public DbSet<MVP_Core.Data.Models.JobMessageEntry> JobMessages { get; set; } = null!;
+        public DbSet<JobMessageEntry> JobMessages { get; set; } = null!;
         public DbSet<TechnicianPayRecord> TechnicianPayRecords { get; set; } = null!;
         public DbSet<CertificationRecord> CertificationRecords { get; set; } = null!;
         public DbSet<SkillBadge> SkillBadges { get; set; } = null!;
@@ -88,7 +90,7 @@ namespace MVP_Core.Data
         public DbSet<ReferralCode> ReferralCodes { get; set; } = null!;
         public DbSet<ReferralEventLog> ReferralEventLogs { get; set; } = null!;
         public DbSet<NotificationQueue> NotificationQueues { get; set; } = null!; // Sprint 55.0: Notification queue model
-        public DbSet<MVP_Core.Data.Models.TechnicianAuditLog> TechnicianAuditLogs { get; set; } = null!;
+        public DbSet<TechnicianAuditLog> TechnicianAuditLogs { get; set; } = null!;
         public DbSet<PromotionEvent> PromotionEvents { get; set; } = null!;
         public DbSet<CustomerBonusLog> CustomerBonusLogs { get; set; } = null!;
         public DbSet<FeedbackSurveyTemplate> FeedbackSurveyTemplates { get; set; } = null!;
@@ -173,12 +175,12 @@ namespace MVP_Core.Data
         public DbSet<UserOnboardingStatus> UserOnboardingStatuses { get; set; } = null!; // Sprint 84.0 — OnboardingStatus Schema
         // Sprint 84.9 — Drop Alert Logic + TrustScore Delta Detection
         public DbSet<TechnicianAlertLog> TechnicianAlertLogs { get; set; } = null!;
-        public DbSet<MVP_Core.Models.QuoteMessage> QuoteMessages { get; set; } = null!;
-        public DbSet<MVP_Core.Models.Whisper> Whispers { get; set; } = null!;
-        public DbSet<MVP_Core.Models.LeaderboardEntry> LeaderboardEntries { get; set; } = null!;
-        public DbSet<MVP_Core.Models.TechPulseLog> TechPulseLogs { get; set; } = null!;
-        public DbSet<MVP_Core.Models.UserActionLog> UserActionLogs { get; set; } = null!;
-        public DbSet<MVP_Core.Models.MentorReplyLog> MentorReplyLogs { get; set; } = null!;
+        public DbSet<Models.QuoteMessage> QuoteMessages { get; set; } = null!;
+        public DbSet<Models.Whisper> Whispers { get; set; } = null!;
+        public DbSet<Models.LeaderboardEntry> LeaderboardEntries { get; set; } = null!;
+        public DbSet<Models.TechPulseLog> TechPulseLogs { get; set; } = null!;
+        public DbSet<Models.UserActionLog> UserActionLogs { get; set; } = null!;
+        public DbSet<Models.MentorReplyLog> MentorReplyLogs { get; set; } = null!;
         public DbSet<TechMilestone> TechMilestones { get; set; } = null!;
         public DbSet<TechProgress> TechProgresses { get; set; } = null!;
         public DbSet<MilestoneAuditLog> MilestoneAuditLogs { get; set; } = null!;
@@ -188,21 +190,21 @@ namespace MVP_Core.Data
         public DbSet<TenantModules> TenantModules { get; set; } = null!;
         public DbSet<ComplianceOverrideLog> ComplianceOverrideLogs { get; set; } = null!;
         public DbSet<ComplianceAlertLog> ComplianceAlertLogs { get; set; } = null!;
-        public DbSet<MVP_Core.Data.Models.NovaIntel.NovaDecisionMemory> NovaDecisionMemories { get; set; } = null!;
+        public DbSet<Models.NovaIntel.NovaDecisionMemory> NovaDecisionMemories { get; set; } = null!;
         // public DbSet<MVP_Core.Data.Models.Loyalty.TechnicianBadge> TechnicianBadges { get; set; } = null!;
         // public DbSet<MVP_Core.Data.Models.Loyalty.BadgeDefinition> BadgeDefinitions { get; set; } = null!;
-        public DbSet<MVP_Core.Data.Models.ToolInventory> ToolInventories { get; set; } = null!;
-        public DbSet<MVP_Core.Data.Models.ToolTransferLog> ToolTransferLogs { get; set; } = null!;
+        public DbSet<ToolInventory> ToolInventories { get; set; } = null!;
+        public DbSet<ToolTransferLog> ToolTransferLogs { get; set; } = null!;
         // Sprint 90.1
-        public DbSet<MVP_Core.Data.Models.PromptVersion> PromptVersions { get; set; } = null!;
-        public DbSet<MVP_Core.Data.Models.PromptExperiment> PromptExperiments { get; set; } = null!;
-        public DbSet<MVP_Core.Data.Models.PromptTraceLog> PromptTraceLogs { get; set; } = null!;
-        public DbSet<MVP_Core.Data.Models.LLMModelProvider> LLMModelProviders { get; set; } = null!;
-        public DbSet<MVP_Core.Data.Models.KnownFix> KnownFixes { get; set; } = null!; // Sprint 91.17 - TroubleshootingBrain
-        public DbSet<MVP_Core.Data.Models.TroubleshootingAttemptLog> TroubleshootingAttemptLogs { get; set; } = null!; // Sprint 91.17 - TroubleshootingBrain
+        public DbSet<PromptVersion> PromptVersions { get; set; } = null!;
+        public DbSet<PromptExperiment> PromptExperiments { get; set; } = null!;
+        public DbSet<PromptTraceLog> PromptTraceLogs { get; set; } = null!;
+        public DbSet<LLMModelProvider> LLMModelProviders { get; set; } = null!;
+        public DbSet<KnownFix> KnownFixes { get; set; } = null!; // Sprint 91.17 - TroubleshootingBrain
+        public DbSet<TroubleshootingAttemptLog> TroubleshootingAttemptLogs { get; set; } = null!; // Sprint 91.17 - TroubleshootingBrain
         // Sprint 91.23 - Technician Reports
-        public DbSet<MVP_Core.Data.Models.TechnicianReport> TechnicianReports { get; set; } = null!;
-        public DbSet<MVP_Core.Data.Models.TechnicianReportFeedback> TechnicianReportFeedbacks { get; set; } = null!;
+        public DbSet<TechnicianReport> TechnicianReports { get; set; } = null!;
+        public DbSet<TechnicianReportFeedback> TechnicianReportFeedbacks { get; set; } = null!;
         public DbSet<ReviewResponseLog> ReviewResponseLogs { get; set; } = null!;
         public DbSet<PatchSystemLog> PatchSystemLogs { get; set; } = null!;
         #endregion

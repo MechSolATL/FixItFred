@@ -1,8 +1,9 @@
+using Data;
 using System;
 using System.Collections.Generic;
-using TechnicianModel = MVP_Core.Data.Models.Technician;
+using TechnicianModel = Data.Models.Technician;
 
-namespace MVP_Core.Services.Dispatcher
+namespace Services.Dispatcher
 {
     // Pin for map display
     public class TechMapPin
@@ -34,7 +35,7 @@ namespace MVP_Core.Services.Dispatcher
                     Name = t.FullName,
                     Latitude = t.Latitude ?? 0,
                     Longitude = t.Longitude ?? 0,
-                    Status = t.CurrentJobCount == 0 ? "Idle" : (t.CurrentJobCount < t.MaxJobCapacity ? "Working" : "Busy")
+                    Status = t.CurrentJobCount == 0 ? "Idle" : t.CurrentJobCount < t.MaxJobCapacity ? "Working" : "Busy"
                 });
             }
             return pins;

@@ -1,17 +1,17 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Data;
 using MVP_Core.Data.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
+using Data;
 
-namespace MVP_Core.Pages.Admin
+namespace Pages.Admin
 {
     public class SecondChanceTechsModel : PageModel
     {
         private readonly ApplicationDbContext _db; // Sprint 79.2
         public SecondChanceTechsModel(ApplicationDbContext db)
         {
-            _db = db ?? throw new System.ArgumentNullException(nameof(db)); // Sprint 79.2
+            _db = db ?? throw new ArgumentNullException(nameof(db)); // Sprint 79.2
         }
         public void OnGet() { }
         public IActionResult OnPost()

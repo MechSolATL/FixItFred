@@ -1,6 +1,6 @@
 using System;
 
-namespace MVP_Core.Models.ViewModels
+namespace Models.ViewModels
 {
     public class DiagnosticsAlertResult
     {

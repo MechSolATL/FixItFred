@@ -2,7 +2,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace MVP_Core.Models
+namespace Models
 {
     // Sprint 85.1 — Trust Rebuild Suggestion Engine Core
     public class TrustRebuildSuggestion

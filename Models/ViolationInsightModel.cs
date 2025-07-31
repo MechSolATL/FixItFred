@@ -1,6 +1,6 @@
 using System;
 
-namespace MVP_Core.Models
+namespace Models
 {
     public enum ViolationPatternType
     {

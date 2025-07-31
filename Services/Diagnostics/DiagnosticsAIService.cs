@@ -2,11 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using MVP_Core.Data;
-using MVP_Core.Models.ViewModels;
+using Data;
+using Models.ViewModels;
 using MVP_Core.ViewModels;
 
-namespace MVP_Core.Services.Diagnostics
+namespace Services.Diagnostics
 {
     public class DiagnosticsAIService
     {

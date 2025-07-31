@@ -3,7 +3,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace MVP_Core.Models.Dispatch
+namespace Models.Dispatch
 {
     // FixItFred: Removed duplicate model (EF conflicts with Data.Models)
     // public class ScheduleQueue { ... }

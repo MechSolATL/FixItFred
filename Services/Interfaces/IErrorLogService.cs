@@ -1,4 +1,4 @@
-namespace MVP_Core.Services.Interfaces
+namespace Services.Interfaces
 {
     public interface IErrorLogService
     {

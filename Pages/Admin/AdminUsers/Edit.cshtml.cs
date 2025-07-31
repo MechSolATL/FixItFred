@@ -1,11 +1,11 @@
+using Data.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Data.Models;
 using MVP_Core.Services.Admin;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace MVP_Core.Pages.Admin.AdminUsers
+namespace Pages.Admin.AdminUsers
 {
     public class EditModel : PageModel
     {
