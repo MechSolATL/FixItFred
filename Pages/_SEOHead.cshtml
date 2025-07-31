@@ -1,0 +1,24 @@
+@using MVP_Core.Services.Interfaces
+@inject ISeoService _seoService
+
+@{
+    var pagePath = Context.Request.Path;
+    var seoData = await _seoService.GetSeoForPageAsync(pagePath) ?? new MVP_Core.Data.Models.SeoData {
+        Title = "Service-Atlanta | Smart Plumbing & HVAC",
+        Description = "Responsive home services powered by AI-driven diagnostics and real-time technician dispatch.",
+        Keywords = "plumbing, HVAC, Atlanta, diagnostics, AI, field service",
+        Robots = "index, follow"
+    };
+}
+
+<title>@seoData.Title</title>
+<meta name="description" content="@seoData.Description" />
+<meta name="keywords" content="@seoData.Keywords" />
+<meta name="robots" content="@seoData.Robots" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta charset="utf-8" />
+
+<!-- Trace Injection -->
+@if (seoData.Title == "Service-Atlanta | Smart Plumbing & HVAC") {
+    <meta name="diagnostics" content="Fallback SEO injected at @DateTime.UtcNow.ToString("s") UTC" />
+}
