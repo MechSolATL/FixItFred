@@ -1,1 +1,2 @@
-Placeholder for Live Tech Tracking
+// Injecting LiveTracking module logic
+// Placeholder content will be replaced with actual service logic and Razor integration.

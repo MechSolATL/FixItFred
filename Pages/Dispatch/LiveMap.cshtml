@@ -1,0 +1,21 @@
+@page
+@model LiveMapModel
+@{
+    Layout = "/Pages/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Live Technician Tracking";
+}
+<partial name="_SEOHead" />
+<h1>Technician Live Location</h1>
+
+@if (Model.Technician != null)
+{
+    <p><strong>@Model.Technician.Name</strong> is en route.</p>
+    <p>ETA: @Model.Technician.EstimatedArrival.ToLocalTime().ToShortTimeString()</p>
+    <iframe width="100%" height="400"
+            src="https://maps.google.com/maps?q=@Model.Technician.Latitude,@Model.Technician.Longitude&z=15&output=embed">
+    </iframe>
+}
+else
+{
+    <p>No technician data available.</p>
+}
