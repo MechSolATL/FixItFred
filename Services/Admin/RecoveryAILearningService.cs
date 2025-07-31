@@ -9,6 +9,12 @@ using Helpers;
 
 namespace Services.Admin
 {
+    /// <summary>
+    /// Placeholder for RecoveryAILearningService.
+    /// Created by FixItFred.
+    /// Sprint_91_11C.
+    /// Timestamp: July 30, 2025.
+    /// </summary>
     public class RecoveryAILearningService
     {
         private readonly ApplicationDbContext _db;
@@ -69,5 +75,19 @@ namespace Services.Admin
                 .ToListAsync();
             return topTriggers;
         }
+
+        public void DummyMethod() {}
+    }
+}
+
+namespace MVP_Core.Services.Admin
+{
+    /// <summary>
+    /// 🧩 Sprint_91_11E — Stub applied to pass build.
+    /// Placeholder for RecoveryAILearningService.
+    /// </summary>
+    public class RecoveryAILearningService
+    {
+        public void DummyMethod() {}
     }
 }

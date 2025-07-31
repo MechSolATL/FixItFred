@@ -1,7 +1,7 @@
 using MVP_Core.Data.Models;
 using MVP_Core.Data;
 using Microsoft.Extensions.Logging;
-using Services.Admin;
+using MVP_Core.Services.Admin;
 using MVP_Core.DTOs.Reports;
 using System;
 using System.Collections.Generic;

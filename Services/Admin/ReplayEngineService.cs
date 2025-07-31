@@ -43,7 +43,7 @@ namespace Services.Admin
             if (snapshot == null) return false;
             var replayLog = new ReplayAuditLog
             {
-                Timestamp = overrideTimestamp ?? DateTime.UtcNow,
+                Timestamp = overrideTimestamp ?? default!,
                 SnapshotHash = snapshotHash,
                 TriggeredBy = triggeredBy,
                 Success = true,

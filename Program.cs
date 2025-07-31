@@ -176,7 +176,7 @@ app.MapControllerRoute(
 app.MapBlazorHub();
 app.MapHub<MVP_Core.Hubs.RequestHub>("/hubs/requests");
 app.MapHub<MVP_Core.Hubs.ETAHub>("/etahub");
-// Sprint 41.3 – Real-Time Message Broadcast
+// Sprint 41.3 ï¿½ Real-Time Message Broadcast
 app.MapHub<MVP_Core.Hubs.JobMessageHub>("/hubs/jobmessages");
 app.MapHub<MVP_Core.Hubs.RewardNotificationHub>("/hubs/rewardnotifications");
 app.MapHub<MVP_Core.Hubs.NotificationHub>("/notificationHub"); // Register NotificationHub for SignalR
@@ -196,7 +196,7 @@ using (var scope = app.Services.CreateScope())
     MVP_Core.Data.Seeders.PagesSeeder.Seed(db);
 
 #if DEBUG
-    // FixItFred: Sprint 30D.3 — Trigger Live QA Test Run for ScheduleQueue/Dispatcher/SignalR 2024-07-25
+    // FixItFred: Sprint 30D.3 ï¿½ Trigger Live QA Test Run for ScheduleQueue/Dispatcher/SignalR 2024-07-25
     var dispatcherService = scope.ServiceProvider.GetRequiredService<DispatcherService>();
     var dispatchEngine = scope.ServiceProvider.GetRequiredService<NotificationDispatchEngine>();
     MVP_Core.Data.Seeders.DatabaseSeeder.SeedTestServiceRequests(db, dispatcherService, dispatchEngine);

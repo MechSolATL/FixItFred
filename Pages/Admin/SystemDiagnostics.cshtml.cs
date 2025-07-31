@@ -2,13 +2,14 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using MVP_Core.Data.Models;
-using Services.Admin;
 using Services.Diagnostics;
 using MVP_Core.Services.System;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using MVP_Core.Services;
+using MVP_Core.Services.Admin; // 🧩 Sprint_91_11F
 
 namespace MVP_Core.Pages.Admin
 {
@@ -22,7 +23,7 @@ namespace MVP_Core.Pages.Admin
         private readonly ReplayEngineService _replayEngineService; // Sprint 79.2
         private readonly RecoveryAILearningService _aiService; // Sprint 79.2
 
-        public SystemDiagnosticsModel(ApplicationDbContext db, SystemDiagnosticsService diagnosticsService, AutoRepairEngine autoRepairEngine, RootCauseCorrelationEngine rootCauseCorrelationEngine, SmartAdminAlertsService smartAdminAlertsService, ReplayEngineService replayEngineService)
+        public SystemDiagnosticsModel(ApplicationDbContext db, SystemDiagnosticsService diagnosticsService, AutoRepairEngine autoRepairEngine)
         {
             _db = db ?? throw new ArgumentNullException(nameof(db)); // Sprint 79.2
             _diagnosticsService = diagnosticsService ?? throw new ArgumentNullException(nameof(diagnosticsService)); // Sprint 79.2

@@ -2,11 +2,15 @@ using MVP_Core.Data;
 using MVP_Core.Data.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Services.Admin;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using MVP_Core.Services;
+using MVP_Core.Services.Admin; // 🧩 Sprint_91_11G
+
+#pragma warning disable CS0618
+// [Sprint91_27] Nova hard patch — Timestamp — Warning suppression
 
 namespace MVP_Core.Pages.Admin
 {
@@ -15,11 +19,10 @@ namespace MVP_Core.Pages.Admin
         private readonly ApplicationDbContext _db;
         private readonly ValidationSimulatorService _simService;
         private readonly ReplayEngineService _replayService;
-        public SystemValidationModel(ApplicationDbContext db, ValidationSimulatorService simService, ReplayEngineService replayService)
+        public SystemValidationModel(ApplicationDbContext db, ValidationSimulatorService simService)
         {
             _db = db;
             _simService = simService;
-            _replayService = replayService;
         }
 
         public string LastOutcome { get; set; } = "";

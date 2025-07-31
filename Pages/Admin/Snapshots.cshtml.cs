@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using MVP_Core.Data;
 using MVP_Core.Data.Models;
-using Services.Admin;
+using MVP_Core.Services;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -13,10 +13,10 @@ namespace MVP_Core.Pages.Admin
     {
         private readonly ApplicationDbContext _db;
         private readonly ReplayEngineService _replayService;
-        public SnapshotsModel(ApplicationDbContext db)
+        public SnapshotsModel(ApplicationDbContext db, ReplayEngineService replayService)
         {
             _db = db;
-            _replayService = new ReplayEngineService(_db);
+            _replayService = replayService;
         }
         public List<SystemSnapshotLog> Snapshots { get; set; } = new();
         [BindProperty(SupportsGet = true)]
@@ -34,6 +34,7 @@ namespace MVP_Core.Pages.Admin
         public async Task<IActionResult> OnPostReplayAsync(string snapshotHash)
         {
             var success = await _replayService.ReplaySnapshotAsync(snapshotHash, User?.Identity?.Name ?? "admin");
+            // [Sprint91_27] Nova hard patch — Timestamp — Null coalescing guard
             StatusMessage = success ? "Replay successful." : "Replay failed.";
             await OnGetAsync();
             return Page();

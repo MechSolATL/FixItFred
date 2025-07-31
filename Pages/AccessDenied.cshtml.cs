@@ -2,7 +2,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using MVP_Core.Services;
 
-namespace YourNamespace.Pages
+namespace MVP_Core.Pages
 {
     // This file has been patched in Sprint 91.9-B
     public class AccessDeniedModel : PageModel

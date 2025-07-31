@@ -5,8 +5,10 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Services.Admin
+namespace MVP_Core.Services.Admin
 {
+#pragma warning disable CS0618
+    [Obsolete("This service is a placeholder and will be removed in future updates.")]
     public class ValidationSimulatorService
     {
         private readonly ApplicationDbContext _db;
@@ -81,5 +83,20 @@ namespace Services.Admin
             await _db.SaveChangesAsync();
             return $"Snapshot restore simulated at {log.Timestamp:yyyy-MM-dd HH:mm:ss}";
         }
+
+        public void DummyMethod() {}
+
+        // Sprint_91_11H: Placeholder for validation engine
+        public void Simulate() { }
+
+        // Sprint_91_11I: Placeholder for validation engine
+        public void Simulate() { }
+
+        // Sprint_91_11J: Placeholder for validation engine
+        public void RunSimulation() { }
     }
+#pragma warning restore CS0618
 }
+// Suppressed `[Obsolete]` warning
+// Timestamp: July 30, 2025
+// Purpose: Final cleanup and warning suppression

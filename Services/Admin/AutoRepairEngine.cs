@@ -4,7 +4,7 @@ using MVP_Core.Data;
 using MVP_Core.Data.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace Services.Admin
+namespace MVP_Core.Services.Admin
 {
     /// <summary>
     /// Detects damaged Razor Pages, service classes, or database schema mismatches. Offers rollback to last working version.
@@ -19,7 +19,12 @@ namespace Services.Admin
             _alertsService = alertsService;
         }
 
-        public async Task<bool> RunAutoRepairAsync(string? triggeredBy = null)
+        /// <summary>
+        /// Runs the automatic repair process.
+        /// </summary>
+        /// <param name="triggeredBy">Optional. The user or system component that triggered the repair.</param>
+        /// <returns>Task representing the asynchronous operation, with a boolean result indicating success or failure.</returns>
+        public async Task<bool> RunAutoRepairAsync(string triggeredBy = null)
         {
             // Simulate auto-repair logic
             var snapshot = new SystemSnapshotLog
@@ -36,6 +41,12 @@ namespace Services.Admin
             return true;
         }
 
+        /// <summary>
+        /// Rewinds the system to a previous snapshot.
+        /// </summary>
+        /// <param name="snapshotId">The ID of the snapshot to rewind to.</param>
+        /// <param name="triggeredBy">Optional. The user or system component that triggered the rewind.</param>
+        /// <returns>Task representing the asynchronous operation, with a boolean result indicating success or failure.</returns>
         public async Task<bool> RewindToSnapshotAsync(int snapshotId, string? triggeredBy = null)
         {
             var snapshot = await _db.SystemSnapshotLogs.FindAsync(snapshotId);
