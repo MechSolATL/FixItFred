@@ -1,10 +1,12 @@
-@page "/_Host"
+﻿@page "/_Host"
 @namespace MVP_Core.Pages
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @inject MVP_Core.Services.ISeoService SeoService
 @{
     Layout = null;
+    ViewData["Title"] ??= "Service Atlanta Dev Portal";
 }
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -16,48 +18,64 @@
     <link rel="stylesheet" href="/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="/css/site.css" />
     <link rel="stylesheet" href="/MVP_Core.styles.css" />
+    <title>@ViewData["Title"]</title>
 </head>
 <body>
     <div class="dev-links container mt-4">
-        <h4 class="mb-3">?? Dev Quick Links</h4>
+        <h4 class="mb-3">🧪 Dev Quick Links</h4>
         <ul class="list-unstyled">
-            <li><strong>?? Frontend Pages:</strong></li>
-            <li><a href="/" target="_blank">?? Home (Landing)</a></li>
-            <li><a href="/AdminLogin" target="_blank">?? Admin Login Page</a></li>
-            <li><a href="/Profile/ProfileReview" target="_blank">?? Profile Review Wizard</a></li>
-            <li><a href="/Services/Plumbing" target="_blank">??? Plumbing Start</a></li>
-            <li><a href="/Services/PlumbingFinal" target="_blank">?? Plumbing Final</a></li>
-            <li><a href="/Shared/ThankYou" target="_blank">?? Thank You Page</a></li>
-            <li><a href="/Shared/ThankYouSuccess" target="_blank">? Thank You Success</a></li>
-            <li><a href="/Confirmation" target="_blank">?? Confirmation Page</a></li>
-            <li class="mt-4"><strong>?? Matchups Admin:</strong></li>
-            <li><a href="/Matchups/Add" target="_blank">? Add Heat Pump Matchup</a></li>
-            <li><a href="/Matchups/Search" target="_blank">?? Search Matchups</a></li>
-            <li class="mt-4"><strong>?? Admin Internal:</strong></li>
-            <li><a href="/Admin/ServiceRequests" target="_blank">?? Admin Service Requests</a></li>
-            <li><a href="/Admin/BackupLog" target="_blank">??? Backup Logs</a></li>
-            <li><a href="/Admin/AuditLogs" target="_blank">??? Audit Logs</a></li>
-            <li><a href="/Admin/ProfileReview" target="_blank">?? Admin Profile Review</a></li>
-            <li class="mt-4"><strong>?? Tools & Testers:</strong></li>
-            <li><a href="/Tools/HashPassword" target="_blank">?? Password Hasher</a></li>
-            <li class="mt-4"><strong>??? API Endpoints:</strong></li>
-            <li><a href="/api/PlumbingQuestion" target="_blank">?? Root Plumbing Questions</a></li>
-            <li><a href="/api/PlumbingQuestion/followup?parentId=1&answer=Yes" target="_blank">? Follow-Up Questions</a></li>
-            <li><a href="/api/session/load-answers" target="_blank">?? Load Session Answers</a></li>
-            <li class="mt-4"><strong>?? SMS / Verification Testing:</strong></li>
-            <li><a href="/api/sms/send-verification" target="_blank">?? Send SMS Verification</a></li>
-            <li class="mt-4"><strong>?? Maintenance:</strong></li>
-            <li><a href="/Error" target="_blank">?? Error Page</a></li>
+            <li><strong>🌐 Frontend Pages:</strong></li>
+            <li><a href="/" target="_blank">🏠 Home (Landing)</a></li>
+            <li><a href="/AdminLogin" target="_blank">🔐 Admin Login Page</a></li>
+            <li><a href="/Profile/ProfileReview" target="_blank">🧾 Profile Review Wizard</a></li>
+            <li><a href="/Services/Plumbing" target="_blank">🚿 Plumbing Start</a></li>
+            <li><a href="/Services/PlumbingFinal" target="_blank">🧰 Plumbing Final</a></li>
+            <li><a href="/Shared/ThankYou" target="_blank">🙏 Thank You Page</a></li>
+            <li><a href="/Shared/ThankYouSuccess" target="_blank">✅ Thank You Success</a></li>
+            <li><a href="/Confirmation" target="_blank">📬 Confirmation Page</a></li>
+
+            <li class="mt-4"><strong>📊 Matchups Admin:</strong></li>
+            <li><a href="/Matchups/Add" target="_blank">➕ Add Heat Pump Matchup</a></li>
+            <li><a href="/Matchups/Search" target="_blank">🔍 Search Matchups</a></li>
+
+            <li class="mt-4"><strong>🛠️ Admin Internal:</strong></li>
+            <li><a href="/Admin/ServiceRequests" target="_blank">📂 Admin Service Requests</a></li>
+            <li><a href="/Admin/BackupLog" target="_blank">🧾 Backup Logs</a></li>
+            <li><a href="/Admin/AuditLogs" target="_blank">🧠 Audit Logs</a></li>
+            <li><a href="/Admin/ProfileReview" target="_blank">🕵️ Admin Profile Review</a></li>
+
+            <li class="mt-4"><strong>🧪 Tools & Testers:</strong></li>
+            <li><a href="/Tools/HashPassword" target="_blank">🔑 Password Hasher</a></li>
+
+            <li class="mt-4"><strong>📡 API Endpoints:</strong></li>
+            <li><a href="/api/PlumbingQuestion" target="_blank">📌 Root Plumbing Questions</a></li>
+            <li><a href="/api/PlumbingQuestion/followup?parentId=1&answer=Yes" target="_blank">↩️ Follow-Up Questions</a></li>
+            <li><a href="/api/session/load-answers" target="_blank">📄 Load Session Answers</a></li>
+
+            <li class="mt-4"><strong>📲 SMS / Verification Testing:</strong></li>
+            <li><a href="/api/sms/send-verification" target="_blank">📨 Send SMS Verification</a></li>
+
+            <li class="mt-4"><strong>🧰 Maintenance:</strong></li>
+            <li><a href="/Error" target="_blank">🚨 Error Page</a></li>
+
+            <li class="mt-4"><strong>📁 Demo Links:</strong></li>
+            <li><a href="/TestSeoCompliance" target="_blank">🔍 Test SEO Compliance</a></li>
+            <li><a href="/AccessDenied" target="_blank">⛔ Access Denied</a></li>
+            <li><a href="/Customer/ServiceHistory" target="_blank">📘 Service History</a></li>
         </ul>
     </div>
+
     <main class="container-fluid mt-4">
         <h1>Welcome to Service Atlanta MVP-Core</h1>
         <p>This is the default host page. Please navigate using the links above.</p>
     </main>
+
     <script>
         document.addEventListener('contextmenu', event => event.preventDefault());
         document.addEventListener('keydown', function (event) {
-            if (event.ctrlKey && ['u', 's', 'p'].includes(event.key.toLowerCase()) || event.key === 'F12' || (event.ctrlKey && event.shiftKey && event.key.toLowerCase() === 'i')) {
+            if (event.ctrlKey && ['u', 's', 'p'].includes(event.key.toLowerCase()) ||
+                event.key === 'F12' ||
+                (event.ctrlKey && event.shiftKey && event.key.toLowerCase() === 'i')) {
                 event.preventDefault();
             }
         });
