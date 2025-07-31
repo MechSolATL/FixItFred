@@ -9,7 +9,7 @@ using System.Linq;
 
 namespace MVP_Core.Pages.Admin
 {
-    // Sprint 90.1
+    // Sprint 90.1 — Admin view for recent prompt trace logs
     public class PromptTracesModel : PageModel
     {
         private readonly ApplicationDbContext _context;

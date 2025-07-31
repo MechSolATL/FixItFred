@@ -1,42 +1,38 @@
 @page
-@model PromptTracesModel
+@model MVP_Core.Pages.Admin.PromptTracesModel
 @{
-    // Sprint 91.8 - Part 5.B
     ViewData["Title"] = "Prompt Trace Logs";
-    Layout = "_AdminLayout";
+    Layout = "/Pages/Shared/_AdminLayout.cshtml";
 }
 
-<h2 class="mb-4">?? OpenAI Prompt Execution Logs</h2>
+<h2>Prompt Execution Logs</h2>
 
-<table class="table table-striped table-bordered">
-    <thead class="thead-dark">
-        <tr>
-            <th>#</th>
-            <th>Prompt (truncated)</th>
-            <th>Model</th>
-            <th>Tokens</th>
-            <th>Executed At</th>
-        </tr>
-    </thead>
-    <tbody>
-        @if (Model.Traces.Any())
-        {
-            int index = 1;
-            foreach (var trace in Model.Traces)
+@if (Model.Traces == null || !Model.Traces.Any())
+{
+    <div class="alert alert-warning">No prompt traces found.</div>
+}
+else
+{
+    <table class="table table-bordered table-hover table-sm mt-3">
+        <thead class="table-dark">
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Executed At</th>
+                <th scope="col">Prompt (Preview)</th>
+                <th scope="col">Output (Snippet)</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (int i = 0; i < Model.Traces.Count; i++)
             {
+                var trace = Model.Traces[i];
                 <tr>
-                    <td>@index</td>
-                    <td>@(trace.Input.Length > 60 ? trace.Input.Substring(0, 60) + "…" : trace.Input)</td>
-                    <td>@trace.ModelUsed</td>
-                    <td>@trace.ResponseTokens</td>
-                    <td>@trace.ExecutedAt.ToLocalTime()</td>
+                    <td>@(i + 1)</td>
+                    <td>@trace.ExecutedAt.ToString("g")</td>
+                    <td>@(trace.Prompt?.Length > 60 ? trace.Prompt.Substring(0, 60) + "…" : trace.Prompt)</td>
+                    <td>@(trace.Output?.Length > 60 ? trace.Output.Substring(0, 60) + "…" : trace.Output)</td>
                 </tr>
-                index++;
             }
-        }
-        else
-        {
-            <tr><td colspan="5" class="text-center">No prompt traces found.</td></tr>
-        }
-    </tbody>
-</table>
+        </tbody>
+    </table>
+}
