@@ -1,0 +1,18 @@
+@page
+@model MVP_Core.Pages.Services.ServiceRequest.StartModel
+@{
+    Layout = "/Pages/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Start Service Request";
+}
+<partial name="_SEOHead" />
+<h1>Start Your Service Request</h1>
+<form method="post">
+    <label>Service Type:</label>
+    <select asp-for="ServiceType">
+        <option>Plumbing</option>
+        <option>HVAC</option>
+        <option>Filtration</option>
+    </select>
+    <button type="submit">Next</button>
+</form>
+// [Sprint92_02] Added by FixItFred on behalf of Nova
