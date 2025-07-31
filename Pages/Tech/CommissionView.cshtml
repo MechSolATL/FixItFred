@@ -1,0 +1,29 @@
+@page
+@model MVP_Core.Pages.Tech.CommissionViewModel
+@{
+    ViewData["Title"] = "Commission Calculator";
+}
+
+<h2>Commission Calculator</h2>
+
+<form method="post">
+    <div>
+        <label>Sale Amount</label>
+        <input asp-for="SaleAmount" />
+    </div>
+    <div>
+        <label>Technician Rank</label>
+        <select asp-for="TechnicianRank">
+            <option>Platinum</option>
+            <option>Gold</option>
+            <option>Silver</option>
+            <option>Bronze</option>
+        </select>
+    </div>
+    <button type="submit">Calculate</button>
+</form>
+
+@if (Model.Commission > 0)
+{
+    <p>Commission: <strong>@Model.Commission.ToString("C")</strong></p>
+}
