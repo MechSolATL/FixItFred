@@ -1,7 +1,7 @@
 // Sprint 85.5 — Trust Incident Timeline
 using System;
 
-namespace MVP_Core.Models
+namespace Models
 {
     // Sprint 85.5 — Trust Incident Timeline
     public class TrustTimelineEntry

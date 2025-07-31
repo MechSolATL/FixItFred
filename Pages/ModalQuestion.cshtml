@@ -1,4 +1,4 @@
-@model MVP_Core.Data.Models.QuestionModalViewModel
+@model Data.Models.QuestionModalViewModel
 
 <div class="modal fade show d-block" tabindex="-1" role="dialog" style="background-color: rgba(0,0,0,0.5);">
     <div class="modal-dialog modal-dialog-centered" role="document">
@@ -21,7 +21,7 @@
                             case "dropdown":
                                 <select class="form-select" asp-for="CurrentAnswer">
                                     <option value="">--Select--</option>
-                                    @foreach (var option in Model.CurrentQuestion.Options ?? new List<MVP_Core.Data.Models.QuestionOption>())
+                                    @foreach (var option in Model.CurrentQuestion.Options ?? new List<Data.Models.QuestionOption>())
                                     {
                                         <option value="@option.OptionText" selected="@(Model.CurrentAnswer == option.OptionText)">
                                             @option.OptionText

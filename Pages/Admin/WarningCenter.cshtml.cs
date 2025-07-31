@@ -1,13 +1,14 @@
-using MVP_Core.Data.Models;
-using MVP_Core.Services.Admin;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
 using System;
+using Data;
+using Data.Models;
+using Services.Admin;
 
-namespace MVP_Core.Pages.Admin
+namespace Pages.Admin
 {
     public class WarningCenterModel : PageModel
     {
@@ -32,7 +33,7 @@ namespace MVP_Core.Pages.Admin
         public DateTime? FromDate => DateTime.TryParse(FromDateString, out var dt) ? dt : null;
         public DateTime? ToDate => DateTime.TryParse(ToDateString, out var dt) ? dt : null;
 
-        public List<MVP_Core.Data.Models.Technician> Technicians { get; set; } = new List<MVP_Core.Data.Models.Technician>();
+        public List<Data.Models.Technician> Technicians { get; set; } = new List<Data.Models.Technician>();
         public List<TechnicianWarningLog> WarningLogs { get; set; } = new List<TechnicianWarningLog>();
 
         public async Task OnGetAsync()

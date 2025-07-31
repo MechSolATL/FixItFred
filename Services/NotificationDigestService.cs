@@ -1,11 +1,10 @@
 // Sprint 44 – Message Export + Digest
-using MVP_Core.Data;
-using MVP_Core.Services;
+using Data;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MVP_Core.Services
+namespace Services
 {
     public class NotificationDigestService
     {

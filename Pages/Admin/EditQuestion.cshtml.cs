@@ -1,10 +1,10 @@
+using Data;
+using Data.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Data;
-using MVP_Core.Data.Models;
 using System.Threading.Tasks;
 
-namespace MVP_Core.Pages.Admin
+namespace Pages.Admin
 {
     public class EditQuestionModel : PageModel
     {

@@ -1,12 +1,13 @@
 // Sprint 54.1: Estimate PDF generation, signature save, decision status, notification trigger
-using MVP_Core.Data.Models;
-using MVP_Core.Services.Admin;
-using MVP_Core.Services.Dispatch;
+using Data;
+using Data.Models;
+using Services.Admin;
+using Services.Dispatch;
 using System;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace MVP_Core.Services
+namespace Services
 {
     public class EstimateService
     {

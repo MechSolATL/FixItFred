@@ -1,6 +1,8 @@
+using Data;
+using Data.Models;
 using System.Text.RegularExpressions;
 
-namespace MVP_Core.Middleware
+namespace Middleware
 {
     public class PageVisitLoggerMiddleware
     {

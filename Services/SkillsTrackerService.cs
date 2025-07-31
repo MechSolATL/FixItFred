@@ -1,23 +1,23 @@
-using MVP_Core.Data;
-using MVP_Core.Data.Models;
 using System.Collections.Generic;
 using System.Linq;
 using System;
+using Data;
+using Data.Models;
 
-namespace MVP_Core.Services
+namespace Services
 {
     /// <summary>
     /// Service for managing skill tracks and progress for technicians.
     /// </summary>
     public class SkillsTrackerService
     {
-        private readonly MVP_Core.Data.ApplicationDbContext _db;
+        private readonly ApplicationDbContext _db;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SkillsTrackerService"/> class.
         /// </summary>
         /// <param name="db">The application database context.</param>
-        public SkillsTrackerService(MVP_Core.Data.ApplicationDbContext db)
+        public SkillsTrackerService(ApplicationDbContext db)
         {
             _db = db;
         }
@@ -27,7 +27,7 @@ namespace MVP_Core.Services
         /// </summary>
         /// <param name="technicianId">The ID of the technician.</param>
         /// <returns>A list of assigned skill tracks.</returns>
-        public List<MVP_Core.Data.Models.SkillTrack> GetAssignedTracks(int technicianId)
+        public List<SkillTrack> GetAssignedTracks(int technicianId)
         {
             return _db.SkillTracks.Where(t => t.AssignedTo.Contains(technicianId)).ToList();
         }
@@ -37,7 +37,7 @@ namespace MVP_Core.Services
         /// </summary>
         /// <param name="technicianId">The ID of the technician.</param>
         /// <returns>A list of skill progress entries.</returns>
-        public List<MVP_Core.Data.Models.SkillProgress> GetProgressForTechnician(int technicianId)
+        public List<SkillProgress> GetProgressForTechnician(int technicianId)
         {
             return _db.SkillProgresses.Where(p => p.TechnicianId == technicianId).ToList();
         }
@@ -46,7 +46,7 @@ namespace MVP_Core.Services
         /// Retrieves all available skill tracks.
         /// </summary>
         /// <returns>A list of all skill tracks.</returns>
-        public List<MVP_Core.Data.Models.SkillTrack> GetAllTracks()
+        public List<SkillTrack> GetAllTracks()
         {
             return _db.SkillTracks.ToList();
         }
@@ -55,7 +55,7 @@ namespace MVP_Core.Services
         /// Retrieves all technicians.
         /// </summary>
         /// <returns>A list of all technicians.</returns>
-        public List<MVP_Core.Data.Models.Technician> GetAllTechnicians()
+        public List<Technician> GetAllTechnicians()
         {
             return _db.Technicians.ToList();
         }
@@ -71,7 +71,7 @@ namespace MVP_Core.Services
             var track = _db.SkillTracks.FirstOrDefault(t => t.Id == skillTrackId);
             if (track == null) return false;
             if (!track.AssignedTo.Contains(technicianId)) track.AssignedTo.Add(technicianId);
-            _db.SkillProgresses.Add(new MVP_Core.Data.Models.SkillProgress { TechnicianId = technicianId, SkillTrackId = skillTrackId, Status = "Assigned" });
+            _db.SkillProgresses.Add(new SkillProgress { TechnicianId = technicianId, SkillTrackId = skillTrackId, Status = "Assigned" });
             _db.SaveChanges();
             return true;
         }

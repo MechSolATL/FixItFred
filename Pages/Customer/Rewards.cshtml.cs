@@ -1,15 +1,15 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Services;
-using MVP_Core.Data.Models;
 using System.Collections.Generic;
-using MVP_Core.Services.Email;
-using MVP_Core.Services.Admin;
 using MVP_Core.Services.Dispatch;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
+using Services.Email;
+using Data.Models;
+using Services;
+using Services.Admin;
 
-namespace MVP_Core.Pages.Customer
+namespace Pages.Customer
 {
     public class RewardsModel : PageModel
     {

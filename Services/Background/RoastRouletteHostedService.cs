@@ -4,11 +4,11 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using MVP_Core.Data;
-using MVP_Core.Services.HumorOps;
-using MVP_Core.Services.Admin;
+using Data;
+using Services.HumorOps;
+using Services.Admin;
 
-namespace MVP_Core.Services.Background
+namespace Services.Background
 {
     public class RoastRouletteHostedService : BackgroundService
     {

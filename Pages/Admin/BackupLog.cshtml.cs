@@ -1,4 +1,7 @@
-namespace MVP_Core.Pages.Admin
+using Data;
+using Data.Models;
+
+namespace Pages.Admin
 {
     [ValidateAntiForgeryToken] // Applied globally for Razor Pages
     public class BackupLogModel : PageModel

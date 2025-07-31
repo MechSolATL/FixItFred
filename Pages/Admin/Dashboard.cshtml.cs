@@ -1,18 +1,19 @@
 using Services.Dispatch;
 using Services.Storage;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Data;
-using MVP_Core.Data.Models;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using MVP_Core.Services.Admin;
 using Microsoft.EntityFrameworkCore;
 using System;
-using MVP_Core.Models;
-using MVP_Core.Data.Models.PatchAnalytics;
+using Data.Models.PatchAnalytics;
+using Models;
+using Data;
+using Models.Admin;
+using Data.Models;
+using Services.Admin;
 
-namespace MVP_Core.Pages.Admin
+namespace Pages.Admin
 {
     public class DashboardModel : PageModel
     {
@@ -55,6 +56,9 @@ namespace MVP_Core.Pages.Admin
         public AdminMetricsViewModel Metrics { get; set; } = new();
         public List<(string TechName, TechnicianBadge Badge)> CurrentBadgeHolders { get; set; } = new();
 
+        public Seo Seo { get; set; } = new Seo();
+        public string ViewTitle { get; set; } = "Untitled";
+
         public async Task OnGetAsync()
         {
             IQueryable<ServiceRequest> query = _context.ServiceRequests.AsQueryable();
@@ -68,7 +72,7 @@ namespace MVP_Core.Pages.Admin
             Alerts = await _smartAdminAlertsService.TriggerAlertsAsync() ?? new List<string>();
             ActiveAlerts = await _smartAdminAlertsService.GetActiveAlertsAsync(AdminUserId);
             // Inject escalation count
-            var escalationMatrix = new MVP_Core.Services.Admin.DispatcherEscalationMatrix(_context);
+            var escalationMatrix = new DispatcherEscalationMatrix(_context);
             PendingEscalationCount = escalationMatrix.GetPendingEscalationCount();
 
             // Sprint 85.0 � Admin Drop Alert UI + Toast Integration

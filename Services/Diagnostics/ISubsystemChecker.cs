@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
-using MVP_Core.ViewModels;
+using ViewModels;
 
-namespace MVP_Core.Services.Diagnostics
+namespace Services.Diagnostics
 {
     // Sprint 89.2: Interface for subsystem health checks
     public interface ISubsystemChecker

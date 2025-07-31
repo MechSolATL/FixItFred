@@ -1,15 +1,15 @@
 // Sprint 49.0 Patch Log: SLA Analytics PageModel + Leaderboard + CSV Export (Fixed for build)
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Services.Admin;
-using MVP_Core.DTOs.Reports;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.IO;
 using System.Text;
 using System;
+using DTOs.Reports;
+using Services.Admin;
 
-namespace MVP_Core.Pages.Admin
+namespace Pages.Admin
 {
     public class SLAAnalyticsModel : PageModel
     {

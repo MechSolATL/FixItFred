@@ -1,12 +1,12 @@
-using MVP_Core.Services.Admin;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.IO;
+using Services.Admin;
 
-namespace MVP_Core.Pages.Admin
+namespace Pages.Admin
 {
     public class InvestorReportsModel : PageModel
     {

@@ -1,9 +1,9 @@
-using MVP_Core.Services.Admin;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Services.Admin;
 
-namespace MVP_Core.Pages.Admin
+namespace Pages.Admin
 {
     /// <summary>
     /// PageModel for Technician Load Heatmap view. Pulls technician load summary and supports live updates.

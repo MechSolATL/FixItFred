@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
-namespace MVP_Core.Pages.Technician
+namespace Pages.Technician
 {
     // FixItFred: Sprint 30E.2 - GPS Update Logic
     [Authorize(Roles = "Technician")]

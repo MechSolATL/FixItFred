@@ -1,4 +1,6 @@
-namespace MVP_Core.Data.Contexts
+using Data.Models.Seo;
+
+namespace Data.Contexts
 {
     public class SeoDbContext : DbContext
     {

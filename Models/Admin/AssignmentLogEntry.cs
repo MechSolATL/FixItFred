@@ -1,4 +1,4 @@
-namespace MVP_Core.Models.Admin
+namespace Models.Admin
 {
     // FixItFred — Sprint 44 Final Model Recovery (AssignmentLogEntry)
     public class AssignmentLogEntry

@@ -1,24 +1,22 @@
-using MVP_Core.Data;
-using MVP_Core.Data.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using MVP_Core.Services;
-using MVP_Core.Services.Admin; // 🧩 Sprint_91_11G
+using Data;
+using Data.Models;
 
 #pragma warning disable CS0618
 // [Sprint91_27] Nova hard patch — Timestamp — Warning suppression
 
-namespace MVP_Core.Pages.Admin
+namespace Pages.Admin
 {
     public class SystemValidationModel : PageModel
     {
         private readonly ApplicationDbContext _db;
         private readonly ValidationSimulatorService _simService;
-        private readonly ReplayEngineService _replayService;
+        private readonly Services.Admin.ReplayEngineService _replayService;
         public SystemValidationModel(ApplicationDbContext db, ValidationSimulatorService simService)
         {
             _db = db;
@@ -30,6 +28,15 @@ namespace MVP_Core.Pages.Admin
         public List<SystemSnapshotLog> LastSnapshots { get; set; } = new();
         public List<AdminAlertLog> LastAlerts { get; set; } = new();
         public List<ReplayAuditLog> ReplayAuditLogs { get; set; } = new();
+
+        public SeoMetadata Seo { get; set; } = new SeoMetadata();
+
+        public string Title => Seo.Title;
+        public string MetaDescription => Seo.MetaDescription;
+        public string Keywords => Seo.Keywords;
+        public string Robots => Seo.Robots;
+
+        public string ViewTitle { get; set; } = "Untitled";
 
         public async Task OnGetAsync()
         {

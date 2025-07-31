@@ -1,15 +1,16 @@
 // FixItFred: Sprint 30B - Real-Time Dispatch
 // Created: 2025-07-25
-using MVP_Core.Data.Models;
 using Microsoft.AspNetCore.SignalR;
-using MVP_Core.Hubs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using MVP_Core.Services.FollowUp;
+using Hubs;
+using Services.FollowUp;
+using Data;
+using Data.Models;
 
-namespace MVP_Core.Services.Dispatch
+namespace Services.Dispatch
 {
     public class NotificationDispatchEngine
     {
@@ -53,13 +54,13 @@ namespace MVP_Core.Services.Dispatch
         {
             await _hubContext.Clients.All.SendAsync("UpdateTechnicianLocation", new {
                 id = technicianId,
-                name = name,
-                lat = lat,
-                lng = lng,
-                status = status,
-                jobs = jobs,
-                eta = eta,
-                currentJob = currentJob
+                name,
+                lat,
+                lng,
+                status,
+                jobs,
+                eta,
+                currentJob
             });
         }
 

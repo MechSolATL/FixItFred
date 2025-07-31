@@ -1,7 +1,12 @@
-using MVP_Core.Services.Email;
-using MVP_Core.Services;
+using Data;
+using Data.Models;
+using Data.Models.Seo;
+using Data.Models.ViewModels;
+using Helpers;
+using Services;
+using Services.Email;
 
-namespace MVP_Core.Pages.Services
+namespace Pages.Services
 {
     [IgnoreAntiforgeryToken]
     public class ThankYouModel : PageModel

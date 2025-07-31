@@ -1,5 +1,3 @@
-using MVP_Core.Data;
-using MVP_Core.Data.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Text;
 using System.Text.Json;
@@ -8,8 +6,10 @@ using System.Collections.Generic;
 using System;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Data;
+using Data.Models;
 
-namespace MVP_Core.Services
+namespace Services
 {
     public class PatchIdentityUpdateResult
     {
@@ -79,7 +79,7 @@ namespace MVP_Core.Services
                 Badges = tech.Badges,
                 CompletedJobs = completedJobs,
                 Callbacks = callbacks,
-                CloseRate = totalJobs > 0 ? (completedJobs / (double)totalJobs) : 0,
+                CloseRate = totalJobs > 0 ? completedJobs / (double)totalJobs : 0,
                 AvgReviewScore = avgReview,
                 ReviewCount = reviews.Count,
                 Skills = skills,
@@ -154,7 +154,7 @@ namespace MVP_Core.Services
             var jobs = await _db.ServiceRequests.Where(r => r.AssignedTechnicianId == techId).ToListAsync();
             foreach (var job in jobs)
             {
-                var eta = job.ScheduledAt.HasValue && job.ClosedAt.HasValue ? (job.ClosedAt <= job.ScheduledAt ? "On Time" : "Delayed") : "N/A";
+                var eta = job.ScheduledAt.HasValue && job.ClosedAt.HasValue ? job.ClosedAt <= job.ScheduledAt ? "On Time" : "Delayed" : "N/A";
                 var delay = job.ScheduledAt.HasValue && job.ClosedAt.HasValue && job.ClosedAt > job.ScheduledAt ? (job.ClosedAt - job.ScheduledAt)?.TotalMinutes.ToString("F1") : "0";
                 sb.AppendLine($"{job.Id},{job.ServiceType},{job.Status},{eta},{job.ScheduledAt},{job.ClosedAt},{delay}");
             }
@@ -172,7 +172,7 @@ namespace MVP_Core.Services
                 var jobs = await _db.ServiceRequests.Where(r => r.AssignedTechnicianId == techId).ToListAsync();
                 foreach (var job in jobs)
                 {
-                    var eta = job.ScheduledAt.HasValue && job.ClosedAt.HasValue ? (job.ClosedAt <= job.ScheduledAt ? "On Time" : "Delayed") : "N/A";
+                    var eta = job.ScheduledAt.HasValue && job.ClosedAt.HasValue ? job.ClosedAt <= job.ScheduledAt ? "On Time" : "Delayed" : "N/A";
                     var delay = job.ScheduledAt.HasValue && job.ClosedAt.HasValue && job.ClosedAt > job.ScheduledAt ? (job.ClosedAt - job.ScheduledAt)?.TotalMinutes.ToString("F1") : "0";
                     sb.AppendLine($"{profile.FullName},{job.Id},{job.ServiceType},{job.Status},{eta},{job.ScheduledAt},{job.ClosedAt},{delay}");
                 }
@@ -302,8 +302,8 @@ namespace MVP_Core.Services
                     }
                 }
             }
-            double etaSuccessRate = jobsWithEta > 0 ? (jobsOnTime / (double)jobsWithEta) : 0;
-            double avgDelay = delayedJobs > 0 ? (totalDelayMinutes / delayedJobs) : 0;
+            double etaSuccessRate = jobsWithEta > 0 ? jobsOnTime / (double)jobsWithEta : 0;
+            double avgDelay = delayedJobs > 0 ? totalDelayMinutes / delayedJobs : 0;
             return (closeRateTrends, callbackTrends, etaSuccessRate, avgDelay);
         }
 
@@ -332,7 +332,7 @@ namespace MVP_Core.Services
             }
 
             var grouped = requests
-                .GroupBy(r => new { Day = (int)r.CreatedAt.DayOfWeek, Hour = r.CreatedAt.Hour })
+                .GroupBy(r => new { Day = (int)r.CreatedAt.DayOfWeek, r.CreatedAt.Hour })
                 .Select(g => new TechnicianHeatmapCell
                 {
                     DayOfWeek = g.Key.Day,

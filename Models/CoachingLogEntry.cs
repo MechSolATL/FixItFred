@@ -3,7 +3,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace MVP_Core.Models
+namespace Models
 {
     // Sprint 85.2 — Coaching Logbook System
     // Sprint 85.7 — Admin Log Hardening & Encryption

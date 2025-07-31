@@ -1,10 +1,10 @@
-using MVP_Core.Data;
-using MVP_Core.Data.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Threading.Tasks;
+using Data;
+using Data.Models;
 
-namespace MVP_Core.Services.Admin
+namespace Services.Admin
 {
     public class RoutingOverlayService
     {

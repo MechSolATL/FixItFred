@@ -4,11 +4,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Data;
-using MVP_Core.Data.Models;
 using Microsoft.EntityFrameworkCore;
+using Data;
+using Data.Models;
 
-namespace MVP_Core.Pages.Admin
+namespace Pages.Admin
 {
     public class BreakComplianceModel : PageModel
     {

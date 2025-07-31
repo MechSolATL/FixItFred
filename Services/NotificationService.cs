@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
-using MVP_Core.Data.Models;
-namespace MVP_Core.Services
+using Data.Models;
+
+namespace Services
 {
     public interface INotificationService
     {

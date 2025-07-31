@@ -1,4 +1,7 @@
-namespace MVP_Core.Pages.Admin
+using Data;
+using Data.Models;
+
+namespace Pages.Admin
 {
     public class HeatPumpMatchupsModel : PageModel
     {

@@ -1,14 +1,14 @@
+using Data;
+using Data.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Data;
-using MVP_Core.Data.Models;
-using MVP_Core.Services.Admin;
+using Services.Admin;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MVP_Core.Pages.Admin
+namespace Pages.Admin
 {
     public class TechForecastModel : PageModel
     {
@@ -28,7 +28,7 @@ namespace MVP_Core.Pages.Admin
         [BindProperty(SupportsGet = true)]
         public int? TechnicianId { get; set; }
 
-        public List<MVP_Core.Data.Models.Technician> Technicians { get; set; } = new List<MVP_Core.Data.Models.Technician>();
+        public List<Data.Models.Technician> Technicians { get; set; } = new List<Data.Models.Technician>();
         public List<TechnicianForecastLog> Forecasts { get; set; } = new List<TechnicianForecastLog>();
 
         public async Task OnGetAsync()

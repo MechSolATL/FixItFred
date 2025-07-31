@@ -1,13 +1,13 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Services;
-using MVP_Core.Data.Models;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using System;
+using Services;
+using Data.Models;
 
-namespace MVP_Core.Pages.Customer
+namespace Pages.Customer
 {
     public class DisputeCenterModel : PageModel
     {

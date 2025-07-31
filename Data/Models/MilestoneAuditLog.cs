@@ -1,7 +1,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace MVP_Core.Data.Models
+namespace Data.Models
 {
     // Sprint 87.1 — Records when milestones were unlocked or updated (audit/history)
     public class MilestoneAuditLog

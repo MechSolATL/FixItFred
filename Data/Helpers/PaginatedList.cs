@@ -1,4 +1,4 @@
-namespace MVP_Core.Data.Helpers
+namespace Data.Helpers
 {
     public class PaginatedList<T> : List<T>
     {

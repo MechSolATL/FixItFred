@@ -1,4 +1,4 @@
-namespace MVP_Core.Pages.Shared
+namespace Pages.Shared
 {
     public class ThankYouSuccessModel : PageModel
     {

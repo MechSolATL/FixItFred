@@ -1,12 +1,12 @@
 // Sprint 85.2 — Resolved FlaggedCustomer Timestamp for Admin Metrics
-using MVP_Core.Data;
 using System;
 using System.Linq;
-using MVP_Core.Models;
 using System.Threading.Tasks;
-using MVP_Core.Data.DTO.Analytics;
+using Models;
+using Data.DTO.Analytics;
+using Data;
 
-namespace MVP_Core.Services.Admin
+namespace Services.Admin
 {
     // Sprint 85.2 — Resolved FlaggedCustomer Timestamp for Admin Metrics
     public class AdminAnalyticsService

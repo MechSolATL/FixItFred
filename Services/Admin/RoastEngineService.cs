@@ -1,8 +1,8 @@
-using MVP_Core.Data;
 using MVP_Core.Data.Models;
 using Microsoft.EntityFrameworkCore;
+using Data;
 
-namespace MVP_Core.Services.Admin
+namespace Services.Admin
 {
     public class RoastEngineService
     {
@@ -128,7 +128,7 @@ namespace MVP_Core.Services.Admin
                 // Past Roasts Delivered
                 var roasts = await _db.NewHireRoastLogs.Where(x => x.EmployeeId == empId && x.IsDelivered).CountAsync();
                 // Fusion formula (weights can be tuned)
-                double roastRank = (double)karma * 0.25 + (double)trust * 0.25 + (100.0 / (1 + speed)) * 0.2 + (10.0 / (1 + escalations)) * 0.15 + roasts * 0.15;
+                double roastRank = karma * 0.25 + (double)trust * 0.25 + 100.0 / (1 + speed) * 0.2 + 10.0 / (1 + escalations) * 0.15 + roasts * 0.15;
                 scores[empId] = Math.Round(roastRank, 2);
             }
             return scores;

@@ -1,8 +1,8 @@
 @* FixItFred — Sprint 46.1 Build Correction + Compliance: Use TechnicianStatusDto for dropdown *@
-@model MVP_Core.Data.Models.ViewModels.TechnicianDropdownViewModel
+@model Data.Models.ViewModels.TechnicianDropdownViewModel
 <select asp-for="SelectedTechnicianId" class="form-control">
     <option value="">-- Select Technician --</option>
-    @foreach (var tech in Model.Technicians ?? Enumerable.Empty<MVP_Core.Models.Admin.TechnicianStatusDto>())
+    @foreach (var tech in Model.Technicians ?? Enumerable.Empty<Models.Admin.TechnicianStatusDto>())
     {
         <option value="@tech.TechnicianId">@tech.Name</option>
     }

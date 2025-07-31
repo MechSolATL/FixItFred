@@ -1,15 +1,15 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Services;
+using Services;
 
-namespace MVP_Core.Pages.Admin
+namespace Pages.Admin
 {
     public class DeleteTechnicianModel : PageModel
     {
         private readonly ITechnicianService _techService;
 
         [BindProperty]
-        public MVP_Core.Data.Models.Technician? Technician { get; set; }
+        public Data.Models.Technician? Technician { get; set; }
 
         public DeleteTechnicianModel(ITechnicianService techService)
         {

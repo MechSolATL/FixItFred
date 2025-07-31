@@ -1,13 +1,13 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Data.Models;
-using MVP_Core.Services;
-using MVP_Core.Data;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using Data;
+using Services;
+using Data.Models;
 
-namespace MVP_Core.Pages.Admin
+namespace Pages.Admin
 {
     public class PromotionsModel : PageModel
     {

@@ -1,12 +1,12 @@
-using MVP_Core.Data.Models;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using MVP_Core.Services.Admin;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc;
+using Data.Models;
+using Services.Admin;
 
-namespace MVP_Core.Pages.Admin
+namespace Pages.Admin
 {
     public class DelayMatrixModel : PageModel
     {

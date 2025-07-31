@@ -1,6 +1,6 @@
 using System;
 
-namespace MVP_Core.Data.Models
+namespace Data.Models
 {
     // Sprint 73.8: Roast Responder Metrics
     public class RoastReactionLog

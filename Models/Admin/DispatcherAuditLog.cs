@@ -1,7 +1,7 @@
 // FixItFred – Sprint 44 Build Restoration
 using System;
 
-namespace MVP_Core.Models.Admin
+namespace Models.Admin
 {
     /// <summary>
     /// Represents an audit log entry for dispatcher actions.

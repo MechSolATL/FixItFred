@@ -1,3 +1,5 @@
+using Data.Models;
+
 public class RecoveryScenarioLog
 {
     public int Id { get; set; }

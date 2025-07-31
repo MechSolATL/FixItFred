@@ -1,11 +1,11 @@
-using MVP_Core.Data;
 using MVP_Core.Data.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Data;
 
-namespace MVP_Core.Services.Admin
+namespace Services.Admin
 {
     public class TechnicianTrustEngineService
     {
@@ -31,12 +31,12 @@ namespace MVP_Core.Services.Admin
             decimal flagWeight = 0.1m;
 
             // Calculate scores
-            decimal behaviorScore = 100 - (recentBehavior.Count * 5);
-            decimal warningScore = 100 - (recentWarnings.Count * 10);
+            decimal behaviorScore = 100 - recentBehavior.Count * 5;
+            decimal warningScore = 100 - recentWarnings.Count * 10;
             decimal responseScore = recentResponses.Count > 0 ? 100 : 80;
-            decimal flagScore = 100 - (flagCount * 7);
+            decimal flagScore = 100 - flagCount * 7;
 
-            decimal trustScore = (behaviorScore * behaviorWeight) + (warningScore * warningWeight) + (responseScore * responseWeight) + (flagScore * flagWeight);
+            decimal trustScore = behaviorScore * behaviorWeight + warningScore * warningWeight + responseScore * responseWeight + flagScore * flagWeight;
             trustScore = Math.Max(0, Math.Min(100, trustScore));
             return trustScore;
         }

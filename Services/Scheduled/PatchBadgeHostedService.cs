@@ -4,11 +4,10 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using MVP_Core.Services;
-using MVP_Core.Data;
-using MVP_Core.Data.Models.PatchAnalytics;
+using Data.Models.PatchAnalytics;
+using Data;
 
-namespace MVP_Core.Services.Scheduled
+namespace Services.Scheduled
 {
     // Sprint 91.22.4 - PatchBadgeHostedService
     public class PatchBadgeHostedService : BackgroundService

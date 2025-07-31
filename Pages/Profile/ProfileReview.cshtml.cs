@@ -1,7 +1,10 @@
 // File: MVP-Core/Pages/Profile/ProfileReview.cshtml.cs
-using MVP_Core.Services;
 
-namespace MVP_Core.Pages.Profile
+// File: MVP-Core/Pages/Profile/ProfileReview.cshtml.cs
+using Data.Models;
+using Services;
+
+namespace Pages.Profile
 {
     [ValidateAntiForgeryToken]
     public class ProfileReviewModel : PageModel

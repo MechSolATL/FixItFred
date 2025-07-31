@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.SignalR;
 using System.Threading.Tasks;
 
-namespace MVP_Core.Hubs
+namespace Hubs
 {
     // FixItFred — Sprint 46.1 Build Stabilization
     public class JobMessageHub : Hub

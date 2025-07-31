@@ -1,12 +1,12 @@
 using MVP_Core.Data.Models;
-using MVP_Core.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System;
 using System.Linq;
+using Data;
 
-namespace MVP_Core.Services.Admin
+namespace Services.Admin
 {
     public class ScheduleConflictDetectionService
     {

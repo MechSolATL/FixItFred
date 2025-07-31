@@ -1,12 +1,13 @@
-using MVP_Core.Data.Models;
-using MVP_Core.Services.Admin;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.DependencyInjection;
 using System.Collections.Generic;
 using System.Linq;
+using Data;
+using Services.Admin;
+using Data.Models;
 
-namespace MVP_Core.Pages.Admin
+namespace Pages.Admin
 {
     public class SyncIncentivesModel : PageModel
     {
@@ -14,12 +15,12 @@ namespace MVP_Core.Pages.Admin
         public SyncIncentiveEngine SyncIncentiveEngine { get; set; }
         public SyncIncentivesModel(ApplicationDbContext db)
         {
-            _db = db ?? throw new System.ArgumentNullException(nameof(db)); // Sprint 79.5: Injected _db for SyncIncentiveEngine
+            _db = db ?? throw new ArgumentNullException(nameof(db)); // Sprint 79.5: Injected _db for SyncIncentiveEngine
             SyncIncentiveEngine = new SyncIncentiveEngine(_db); // Sprint 79.5: Injected _db for SyncIncentiveEngine
         }
-        public List<MVP_Core.Data.Models.Technician> GetTechniciansByIds(IEnumerable<int> ids)
+        public List<Data.Models.Technician> GetTechniciansByIds(IEnumerable<int> ids)
         {
-            return _db?.Technicians?.Where(t => ids.Contains(t.Id)).ToList() ?? new List<MVP_Core.Data.Models.Technician>(); // Sprint 79.5: Injected _db for SyncIncentiveEngine
+            return _db?.Technicians?.Where(t => ids.Contains(t.Id)).ToList() ?? new List<Data.Models.Technician>(); // Sprint 79.5: Injected _db for SyncIncentiveEngine
         }
         public void OnGet()
         {

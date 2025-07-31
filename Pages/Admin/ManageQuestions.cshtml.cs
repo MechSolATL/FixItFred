@@ -1,12 +1,12 @@
-using MVP_Core.Data;
-using MVP_Core.Data.Models;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Data;
+using Data.Models;
 
-namespace MVP_Core.Pages.Admin
+namespace Pages.Admin
 {
     public class ManageQuestionsModel : PageModel
     {

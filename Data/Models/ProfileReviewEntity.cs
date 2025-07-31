@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace MVP_Core.Data.Models
+namespace Data.Models
 {
     [Table("ProfileReviews")]
     public class ProfileReviewEntity

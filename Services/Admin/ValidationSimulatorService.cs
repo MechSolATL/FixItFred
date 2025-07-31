@@ -1,11 +1,11 @@
-using MVP_Core.Data;
 using MVP_Core.Data.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Data;
 
-namespace MVP_Core.Services.Admin
+namespace Services.Admin
 {
 #pragma warning disable CS0618
     [Obsolete("This service is a placeholder and will be removed in future updates.")]
@@ -62,7 +62,6 @@ namespace MVP_Core.Services.Admin
             var drift = new SlaDriftSnapshot
             {
                 Timestamp = DateTime.UtcNow
-                // Only Timestamp is set, as other properties do not exist in the model
             };
             _db.SlaDriftSnapshots.Add(drift);
             await _db.SaveChangesAsync();
@@ -89,11 +88,8 @@ namespace MVP_Core.Services.Admin
         // Sprint_91_11H: Placeholder for validation engine
         public void Simulate() { }
 
-        // Sprint_91_11I: Placeholder for validation engine
-        public void Simulate() { }
-
-        // Sprint_91_11J: Placeholder for validation engine
-        public void RunSimulation() { }
+        // Overloaded Simulate method with modelId parameter
+        public void Simulate(string modelId = "") { }
     }
 #pragma warning restore CS0618
 }

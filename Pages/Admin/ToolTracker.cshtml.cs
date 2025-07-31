@@ -1,15 +1,16 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Services.Admin;
 using MVP_Core.Data.DTO.Tools;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Data.DTO.Tools;
+using Services.Admin;
 
-namespace MVP_Core.Pages.Admin
+namespace Pages.Admin
 {
     [Authorize(Roles = "Admin,Dispatcher")] // Sprint 91.7 Part 6.3
     public class ToolTrackerModel : PageModel
@@ -46,7 +47,7 @@ namespace MVP_Core.Pages.Admin
             if (!string.IsNullOrEmpty(FilterTechnicianId) && Guid.TryParse(FilterTechnicianId, out var techId))
                 Tools = Tools.Where(t => t.AssignedTechnicianId == techId).ToList();
             if (!string.IsNullOrEmpty(SearchTerm))
-                Tools = Tools.Where(t => t.Name.Contains(SearchTerm, System.StringComparison.OrdinalIgnoreCase)).ToList();
+                Tools = Tools.Where(t => t.Name.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase)).ToList();
             TechnicianOptions = allTools.Where(t => t.AssignedTechnicianId != null && !string.IsNullOrEmpty(t.AssignedTechnicianName))
                 .GroupBy(t => new { t.AssignedTechnicianId, t.AssignedTechnicianName })
                 .Select(g => new SelectListItem { Value = g.Key.AssignedTechnicianId.ToString()!, Text = g.Key.AssignedTechnicianName! })

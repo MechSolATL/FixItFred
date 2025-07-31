@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace MVP_Core.Data.Models
+namespace Data.Models
 {
     public class TechnicianProfileDto
     {

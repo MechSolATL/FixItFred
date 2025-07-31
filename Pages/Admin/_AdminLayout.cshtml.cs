@@ -1,4 +1,4 @@
-namespace MVP_Core.Pages.Admin
+namespace Pages.Admin
 {
     public class _AdminLayoutModel : PageModel
     {

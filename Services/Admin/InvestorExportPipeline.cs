@@ -4,10 +4,9 @@ using System.Threading.Tasks;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
-using MVP_Core.Services.Admin;
 using System.Collections.Generic;
 
-namespace MVP_Core.Services.Admin
+namespace Services.Admin
 {
     public static class InvestorExportPipeline
     {

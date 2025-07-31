@@ -1,4 +1,4 @@
-namespace MVP_Core.Views.Account
+namespace Views.Account
 {
     public class LoginModel : PageModel
     {

@@ -1,9 +1,9 @@
-using MVP_Core.Data;
-using MVP_Core.Data.Models;
-using MVP_Core.Data.ViewModels;
 using Microsoft.EntityFrameworkCore;
+using Data;
+using Data.ViewModels;
+using Data.Models;
 
-namespace MVP_Core.Services.Admin
+namespace Services.Admin
 {
     public class TechnicianResponseService
     {

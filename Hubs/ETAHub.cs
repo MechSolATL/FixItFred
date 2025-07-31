@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using System.Threading.Tasks;
 
-namespace MVP_Core.Hubs
+namespace Hubs
 {
     [AllowAnonymous] // FixItFred: Set to [Authorize] for production security
     public class ETAHub : Hub
@@ -38,13 +38,13 @@ namespace MVP_Core.Hubs
             // Broadcast to all dispatcher clients (or by zone if needed)
             await Clients.All.SendAsync("UpdateTechnicianLocation", new {
                 id = technicianId,
-                name = name,
-                lat = lat,
-                lng = lng,
-                status = status,
-                jobs = jobs,
-                eta = eta,
-                currentJob = currentJob
+                name,
+                lat,
+                lng,
+                status,
+                jobs,
+                eta,
+                currentJob
             });
         }
     }

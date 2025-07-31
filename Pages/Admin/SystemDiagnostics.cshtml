@@ -1,9 +1,9 @@
 @page
 @model MVP_Core.Pages.Admin.SystemDiagnosticsModel
-@inject global::Services.Admin.AutoRepairEngine AutoRepairEngine
-@inject global::Services.Diagnostics.RootCauseCorrelationEngine RootCauseCorrelationEngine
-@inject global::Services.Admin.SmartAdminAlertsService SmartAdminAlertsService
-@inject global::Services.Admin.ReplayEngineService ReplayEngineService
+@using MVP_Core.Services.Admin
+@inject MVP_Core.Services.Admin.AutoRepairEngine AutoRepairEngine
+@inject MVP_Core.Services.Admin.SmartAdminAlertsService SmartAdminAlertsService
+@inject MVP_Core.Services.Admin.ReplayEngineService ReplayEngine
 @{
     ViewData["Title"] = "System Diagnostics";
 }
@@ -124,9 +124,9 @@
         {
             var statusClass = log.StatusLevel switch
             {
-                MVP_Core.Data.Models.DiagnosticStatusLevel.OK => "table-success",
-                MVP_Core.Data.Models.DiagnosticStatusLevel.Warning => "table-warning",
-                MVP_Core.Data.Models.DiagnosticStatusLevel.Error => "table-danger",
+                Data.Models.DiagnosticStatusLevel.OK => "table-success",
+                Data.Models.DiagnosticStatusLevel.Warning => "table-warning",
+                Data.Models.DiagnosticStatusLevel.Error => "table-danger",
                 _ => ""
             };
             <tr class="@statusClass">

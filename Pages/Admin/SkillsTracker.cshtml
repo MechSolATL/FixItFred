@@ -58,7 +58,7 @@
         <tbody>
         @foreach (var tech in allTechs)
         {
-            var progress = techProgress.ContainsKey(tech.Id) ? techProgress[tech.Id] : new List<MVP_Core.Data.Models.SkillProgress>();
+            var progress = techProgress.ContainsKey(tech.Id) ? techProgress[tech.Id] : new List<Data.Models.SkillProgress>();
             foreach (var prog in progress)
             {
                 var track = allTracks.FirstOrDefault(t => t.Id == prog.SkillTrackId);

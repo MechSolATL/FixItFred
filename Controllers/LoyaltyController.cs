@@ -1,10 +1,10 @@
+using Data;
 using Microsoft.AspNetCore.Mvc;
-using MVP_Core.Data;
 using MVP_Core.Data.Models;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MVP_Core.Controllers
+namespace Controllers
 {
     [ApiController]
     [Route("api/loyalty")]

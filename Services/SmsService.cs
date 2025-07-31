@@ -1,7 +1,7 @@
 using Twilio;
 using Twilio.Rest.Api.V2010.Account;
 
-namespace MVP_Core.Services
+namespace Services
 {
     /// <summary>
     /// Provides SMS functionality via Twilio for optional verification.

@@ -1,15 +1,15 @@
-using MVP_Core.Data;
-using MVP_Core.Data.Models;
-using MVP_Core.Services.Config;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using TechnicianModel = MVP_Core.Data.Models.Technician;
+using TechnicianModel = Data.Models.Technician;
+using Data;
+using Services.Config;
+using Data.Models;
 
-namespace MVP_Core.Services
+namespace Services
 {
     public class LoadBalancingService
     {
@@ -79,8 +79,8 @@ namespace MVP_Core.Services
                 .Where(n => n != null)
                 .ToHashSet(StringComparer.OrdinalIgnoreCase);
             double skillScore = reqSkills.Length == 0 ? 1.0 : reqSkills.Count(s => techSkillNames.Contains(s)) / (double)Math.Max(1, reqSkills.Length);
-            double loadScore = tech.MaxJobCapacity > 0 ? 1 - ((double)tech.CurrentJobCount / tech.MaxJobCapacity) : 1.0;
-            return (skillScore * 0.7) + (loadScore * 0.3);
+            double loadScore = tech.MaxJobCapacity > 0 ? 1 - (double)tech.CurrentJobCount / tech.MaxJobCapacity : 1.0;
+            return skillScore * 0.7 + loadScore * 0.3;
         }
 
         public async Task<TechnicianModel?> AutoAssignTechnicianAsync(ServiceRequest req)

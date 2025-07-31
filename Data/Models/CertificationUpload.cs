@@ -1,7 +1,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace MVP_Core.Data.Models
+namespace Data.Models
 {
     public class CertificationUpload
     {
@@ -16,7 +16,7 @@ namespace MVP_Core.Data.Models
         public string VerificationStatus { get; set; } = "Pending"; // Pending, Verified, Rejected, Expired
         public string CertificationName { get; set; } = string.Empty;
         public bool IsExpired => ExpiryDate != null && ExpiryDate < DateTime.UtcNow;
-        public string DocumentPath => $"/uploads/certs/{System.IO.Path.GetFileName(FilePath)}";
+        public string DocumentPath => $"/uploads/certs/{Path.GetFileName(FilePath)}";
         public string LicenseNumber { get; set; } = string.Empty;
         public DateTime IssueDate { get; set; } = DateTime.MinValue;
         public bool IsVerified => VerificationStatus == "Verified";

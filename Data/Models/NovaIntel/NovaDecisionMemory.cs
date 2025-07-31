@@ -1,6 +1,6 @@
 using System;
 
-namespace MVP_Core.Data.Models.NovaIntel
+namespace Data.Models.NovaIntel
 {
     public class NovaDecisionMemory
     {

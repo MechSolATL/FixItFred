@@ -13,11 +13,12 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
-using MVP_Core.Data;
-using MVP_Core.Data.Models;
-using MVP_Core.Services;
+using Helpers;
+using Data.Models;
+using Data;
+using Services;
 
-namespace MVP_Core.Pages
+namespace Pages
 {
     public class AdminLoginModel : PageModel
     {
@@ -92,7 +93,7 @@ namespace MVP_Core.Pages
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
 
             // 🔄 Check profile freshness for redirect logic
-            return (adminUser.LastProfileReviewDate == null || adminUser.LastProfileReviewDate <= DateTime.UtcNow.AddDays(-30))
+            return adminUser.LastProfileReviewDate == null || adminUser.LastProfileReviewDate <= DateTime.UtcNow.AddDays(-30)
                 ? RedirectToPage("/Admin/ProfileReview")
                 : RedirectToPage("/Admin/Index");
         }

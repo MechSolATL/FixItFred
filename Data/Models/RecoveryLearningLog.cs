@@ -1,7 +1,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace MVP_Core.Data.Models
+namespace Data.Models
 {
     public class RecoveryLearningLog
     {
@@ -14,5 +14,9 @@ namespace MVP_Core.Data.Models
         [MaxLength(1000)]
         public string TriggerContextJson { get; set; } = string.Empty;
         public int? LinkedRequestId { get; set; }
+        public int Count { get; set; }
+        public DateTime LastRecorded { get; set; }
+        public string ErrorObject { get; set; } = string.Empty;
+        public string ServiceRequest { get; set; } = string.Empty;
     }
 }

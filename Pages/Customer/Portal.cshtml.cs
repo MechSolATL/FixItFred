@@ -1,23 +1,23 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Services;
-using MVP_Core.Data.Models;
-using MVP_Core.Data;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using Data;
+using Data.Models;
+using Services;
 
-namespace MVP_Core.Pages.Customer
+namespace Pages.Customer
 {
     public class PortalModel : PageModel
     {
         private readonly CustomerPortalService _portalService;
         private readonly ApplicationDbContext _db;
         private readonly PromotionEngineService _promoService;
-        public MVP_Core.Data.Models.Customer? Customer { get; set; }
-        public List<MVP_Core.Data.Models.ServiceRequest> Requests { get; set; } = new();
-        public List<MVP_Core.Data.Models.LoyaltyPointTransaction> Loyalty { get; set; } = new();
-        public MVP_Core.Data.Models.RewardTier? CurrentTier { get; set; }
+        public Data.Models.Customer? Customer { get; set; }
+        public List<ServiceRequest> Requests { get; set; } = new();
+        public List<LoyaltyPointTransaction> Loyalty { get; set; } = new();
+        public RewardTier? CurrentTier { get; set; }
         public bool HasPendingFollowUp { get; set; } = false;
         public bool ReviewBannerActive { get; set; } = false;
         public PortalModel(CustomerPortalService portalService, ApplicationDbContext db, PromotionEngineService promoService)

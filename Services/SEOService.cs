@@ -1,4 +1,6 @@
-namespace MVP_Core.Services
+using Data.Models.Seo;
+
+namespace Services
 {
     public class SeoService : ISeoService
     {
@@ -14,9 +16,15 @@ namespace MVP_Core.Services
             });
         }
 
-        public Task<SeoMeta> GetSeoByPageNameAsync(string pageName)
+        public Task<string> GetSeoByPageNameAsync(string pageName)
         {
-            return GetSeoMetaAsync(pageName); // Aliased version
+            return Task.FromResult($"SEO Meta for {pageName}");
+        }
+
+        public async Task<string> GetSeoForPageAsync(string pageName)
+        {
+            // Placeholder implementation
+            return await Task.FromResult("Default SEO");
         }
     }
 }

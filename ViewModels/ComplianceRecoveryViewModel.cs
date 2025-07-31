@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
 
-namespace MVP_Core.ViewModels.Compliance
+namespace ViewModels
 {
     public class ExpiredDocument
     {

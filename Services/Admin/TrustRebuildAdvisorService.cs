@@ -1,10 +1,10 @@
 // Sprint 85.1 — Trust Rebuild Suggestion Engine Core
-using MVP_Core.Models;
 using System.Collections.Generic;
 using System;
 using System.Linq;
+using Models;
 
-namespace MVP_Core.Services.Admin
+namespace Services.Admin
 {
     // Sprint 85.1 — Trust Rebuild Suggestion Engine Core
     public class TrustRebuildAdvisorService

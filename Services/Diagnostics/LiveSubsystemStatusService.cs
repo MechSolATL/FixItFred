@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
-using MVP_Core.ViewModels;
+using ViewModels;
 
-namespace MVP_Core.Services.Diagnostics
+namespace Services.Diagnostics
 {
     // Sprint 89.2: Live polling and mock subsystem checks
     public class LiveSubsystemStatusService : ISubsystemChecker

@@ -1,10 +1,10 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Services.Admin;
-using MVP_Core.Data.Models;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Data.Models;
+using Services.Admin;
 
-namespace MVP_Core.Pages.Admin
+namespace Pages.Admin
 {
     public class FusedDisputesModel : PageModel
     {

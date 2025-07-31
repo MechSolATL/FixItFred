@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace MVP_Core.Migrations
+namespace Migrations
 {
     /// <inheritdoc />
     public partial class Sprint30E_TechLocation : Migration

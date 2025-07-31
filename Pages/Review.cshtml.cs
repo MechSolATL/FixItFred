@@ -1,7 +1,8 @@
 using System.Text.Json;
-using MVP_Core.Services;
+using Data.Models;
+using Services;
 
-namespace MVP_Core.Pages
+namespace Pages
 {
     [ValidateAntiForgeryToken]
     public class ReviewModel : PageModel

@@ -1,4 +1,4 @@
-namespace MVP_Core.Data.Models.ViewModels
+namespace Data.Models.ViewModels
 {
     public class QuestionWithOptionsModel
     {

@@ -1,13 +1,13 @@
 // FixItFred Patch Log — Sprint 29B-Expand: Admin Manual ETA Override
 // [2025-07-25T00:00:00Z] — Added secure admin ETA override logic for multi-zone ETA broadcast.
+using Hubs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.SignalR;
-using MVP_Core.Hubs;
 using System.Threading.Tasks;
 
-namespace MVP_Core.Pages.Admin
+namespace Pages.Admin
 {
     [Authorize(Roles = "Admin")]
     public class OverrideETAModel : PageModel

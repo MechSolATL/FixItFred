@@ -1,10 +1,11 @@
-using MVP_Core.Services;
-using MVP_Core.Data.Models;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
+using Helpers;
+using Data.Models.Seo;
+using Services;
 
-namespace MVP_Core.Pages
+namespace Pages
 {
     public class IndexModel : PageModel
     {

@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Collections.Generic;
 
-namespace MVP_Core.Pages.QA
+namespace Pages.QA
 {
     // Sprint 32.3 - QA Milestone Setup
     public class ReleaseChecklistModel : PageModel

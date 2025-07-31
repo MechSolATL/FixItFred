@@ -1,6 +1,8 @@
+using Data;
+using Data.Models;
 using Microsoft.Net.Http.Headers;
 
-namespace MVP_Core.Controllers
+namespace Controllers
 {
     [Route("stream")]
     public class BackgroundImageController : Controller

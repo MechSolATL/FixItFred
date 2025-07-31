@@ -7,7 +7,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace MVP_Core.Models.Admin
+namespace Models.Admin
 {
     public class DispatcherResult
     {

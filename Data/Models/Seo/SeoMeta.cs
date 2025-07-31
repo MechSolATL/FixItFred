@@ -2,7 +2,7 @@
 
 using System.ComponentModel.DataAnnotations;
 
-namespace MVP_Core.Data.Models
+namespace Data.Models.Seo
 {
     public class SeoMeta
     {

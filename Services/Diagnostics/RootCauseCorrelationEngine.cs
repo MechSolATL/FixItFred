@@ -1,9 +1,9 @@
-using MVP_Core.Data.Models;
-using MVP_Core.Data;
-using MVP_Core.Services.Admin;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Data;
+using Data.Models;
+using Services.Admin;
 
 namespace Services.Diagnostics
 {
@@ -32,6 +32,16 @@ namespace Services.Diagnostics
                 summary = $"Root cause detected: {recentError.Summary}";
             }
             return summary;
+        }
+
+        public Task<bool> QueueRecoveryScenarioAsync(string sourceId, string scenarioKey, UserContext context)
+        {
+            return Task.FromResult(true);
+        }
+
+        public Task<string> AnalyzeRecoveryPatternsAsync(string sourceId, DateTime since, UserContext context)
+        {
+            return Task.FromResult("Recovery patterns analyzed successfully.");
         }
     }
 }

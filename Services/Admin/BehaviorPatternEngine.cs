@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using MVP_Core.Models;
-using MVP_Core.Data;
 using MVP_Core.Data.Models;
-using MVP_Core.Services.Analytics;
+using Models;
+using Services.Analytics;
+using Data;
 
-namespace MVP_Core.Services.Admin
+namespace Services.Admin
 {
     public class BehaviorPatternEngine
     {

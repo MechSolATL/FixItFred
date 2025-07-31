@@ -1,6 +1,6 @@
 using System;
 
-namespace MVP_Core.Data.Models.PatchAnalytics
+namespace Data.Models.PatchAnalytics
 {
     public class TechnicianBadge
     {

@@ -1,7 +1,7 @@
 // Sprint 91.17 - TroubleshootingBrain
 using System;
 
-namespace MVP_Core.Data.Models
+namespace Data.Models
 {
     /// <summary>
     /// Represents a log entry for troubleshooting attempts made by technicians.
@@ -36,7 +36,7 @@ namespace MVP_Core.Data.Models
         /// <summary>
         /// Gets or sets the notes provided by the technician during the troubleshooting attempt.
         /// </summary>
-        public string TechNotes { get; set; }
+        public string? TechNotes { get; set; }
 
         /// <summary>
         /// Gets or sets the timestamp of the troubleshooting attempt.

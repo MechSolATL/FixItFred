@@ -1,11 +1,12 @@
+using Data;
+using Data.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Data.Models;
-using MVP_Core.Services.Admin;
+using Services.Admin;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace MVP_Core.Pages.Pulse
+namespace Pages.Pulse
 {
     public class IntegrityFormModel : PageModel
     {

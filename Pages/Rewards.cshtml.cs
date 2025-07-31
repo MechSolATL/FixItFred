@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Services;
-using MVP_Core.Data.Models;
 using System.Collections.Generic;
+using Data.Models;
+using Services;
 
-namespace MVP_Core.Pages
+namespace Pages
 {
     /// <summary>
     /// PageModel for Rewards page. Displays loyalty status, transactions, and reviews.

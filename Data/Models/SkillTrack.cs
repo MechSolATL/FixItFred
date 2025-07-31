@@ -2,7 +2,7 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.Collections.Generic;
 
-namespace MVP_Core.Data.Models
+namespace Data.Models
 {
     public class SkillTrack
     {

@@ -1,11 +1,11 @@
 // Sprint 76.1 Patch: PageModel for Anonymous Review Trigger logs
+using Data;
+using Data.Models;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Data;
-using MVP_Core.Data.Models;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace MVP_Core.Pages.Admin.HR
+namespace Pages.Admin.HR
 {
     public class AnonymousReviewsModel : PageModel
     {

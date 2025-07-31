@@ -1,11 +1,11 @@
-using MVP_Core.Data.Models;
-using MVP_Core.Data;
 using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
-using TechnicianModel = MVP_Core.Data.Models.Technician;
+using TechnicianModel = Data.Models.Technician;
+using Data;
+using Data.Models;
 
-namespace MVP_Core.Services.Admin
+namespace Services.Admin
 {
     public class RoutePlaybackService
     {

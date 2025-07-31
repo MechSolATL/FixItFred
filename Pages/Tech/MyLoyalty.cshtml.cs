@@ -1,14 +1,14 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
-using MVP_Core.Data;
-using MVP_Core.Data.Models;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using Data;
+using Data.Models;
 
-namespace MVP_Core.Pages.Tech
+namespace Pages.Tech
 {
     public class MyLoyaltyModel : PageModel
     {

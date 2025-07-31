@@ -1,12 +1,12 @@
 using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using MVP_Core.Data;
-using MVP_Core.Data.Models;
 using MVP_Core.Helpers;
 using Microsoft.EntityFrameworkCore;
+using Data.Models;
+using Data;
 
-namespace MVP_Core.Services.Tenant
+namespace Services.Tenant
 {
     public class TenantResolver
     {

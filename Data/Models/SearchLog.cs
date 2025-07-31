@@ -1,4 +1,4 @@
-namespace MVP_Core.Data.Models
+namespace Data.Models
 {
     /// <summary>
     /// Logs each public or admin search request for auditing and analytics.

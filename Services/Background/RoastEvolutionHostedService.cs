@@ -1,13 +1,13 @@
-using MVP_Core.Data;
 using MVP_Core.Services.Admin;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Data;
 
-namespace MVP_Core.Services.Background
+namespace Services.Background
 {
-    public class RoastEvolutionHostedService : Microsoft.Extensions.Hosting.IHostedService
+    public class RoastEvolutionHostedService : IHostedService
     {
         private readonly IServiceProvider _serviceProvider;
         private Timer _timer;

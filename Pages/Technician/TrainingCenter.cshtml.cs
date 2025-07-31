@@ -1,18 +1,19 @@
+using Data.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Services;
+using Services;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace MVP_Core.Pages.Technician
+namespace Pages.Technician
 {
     public class TrainingCenterModel : PageModel
     {
         private readonly SkillsTrackerService _skillsService;
         private readonly CertificationService _certService;
-        public List<MVP_Core.Data.Models.SkillTrack> AssignedTracks { get; set; } = new();
-        public List<MVP_Core.Data.Models.SkillProgress> Progress { get; set; } = new();
-        public List<MVP_Core.Data.Models.CertificationUpload> Certs { get; set; } = new();
+        public List<SkillTrack> AssignedTracks { get; set; } = new();
+        public List<SkillProgress> Progress { get; set; } = new();
+        public List<CertificationUpload> Certs { get; set; } = new();
         public bool HasRequiredMedia { get; set; } = false; // Sprint 69.0: Expose compliance status
         public TrainingCenterModel(SkillsTrackerService skillsService, CertificationService certService)
         {
@@ -27,7 +28,7 @@ namespace MVP_Core.Pages.Technician
             AssignedTracks = _skillsService.GetAssignedTracks(techId);
             Progress = _skillsService.GetProgressForTechnician(techId);
             Certs = _certService.GetCertifications(techId);
-            MVP_Core.Data.Models.ServiceRequest openRequest = null; // Placeholder
+            ServiceRequest openRequest = null; // Placeholder
             if (openRequest != null)
                 HasRequiredMedia = openRequest.HasRequiredMedia;
         }

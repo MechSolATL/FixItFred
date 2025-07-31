@@ -1,15 +1,15 @@
 // Sprint 85.6 — Coaching Impact Insights Phase 2
 using System.Collections.Generic;
 using System.Linq;
-using MVP_Core.Models;
-using MVP_Core.Services.Admin;
-using MVP_Core.Data.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System;
-using MVP_Core.Helpers;
+using Helpers;
+using Models;
+using Data;
+using Services.Admin;
 
-namespace MVP_Core.Pages.Admin
+namespace Pages.Admin
 {
     public class CoachingLogModel : PageModel
     {
@@ -20,7 +20,7 @@ namespace MVP_Core.Pages.Admin
             _logService = logService;
             _db = db;
         }
-        public List<MVP_Core.Data.Models.Technician> Technicians { get; set; } = new();
+        public List<Data.Models.Technician> Technicians { get; set; } = new();
         public List<string> Tiers { get; set; } = new();
         public List<string> Supervisors { get; set; } = new();
         public List<CoachingLogEntry> Entries { get; set; } = new();
@@ -76,7 +76,7 @@ namespace MVP_Core.Pages.Admin
             {
                 filtered = filtered.Where(e => e.SupervisorName == supervisor).ToList();
             }
-            var csv = MVP_Core.Services.Admin.CsvExportHelper.ExportCoachingLogs(filtered);
+            var csv = Services.Admin.CsvExportHelper.ExportCoachingLogs(filtered);
             return File(System.Text.Encoding.UTF8.GetBytes(csv), "text/csv", $"CoachingLogs_{DateTime.UtcNow:yyyyMMdd}.csv");
         }
         public IActionResult OnPost()

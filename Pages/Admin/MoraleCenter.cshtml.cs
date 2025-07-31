@@ -1,18 +1,18 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using MVP_Core.Data.Models;
-using MVP_Core.Services.Admin;
+using Services.Admin;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace MVP_Core.Pages.Admin
+namespace Pages.Admin
 {
     public class MoraleCenterModel : PageModel
     {
         private readonly TechnicianMoraleService _moraleService; // Sprint 79.3: CS8618/CS860X warning cleanup
         public MoraleCenterModel(TechnicianMoraleService moraleService)
         {
-            _moraleService = moraleService ?? throw new System.ArgumentNullException(nameof(moraleService)); // Sprint 79.3: CS8618/CS860X warning cleanup
+            _moraleService = moraleService ?? throw new ArgumentNullException(nameof(moraleService)); // Sprint 79.3: CS8618/CS860X warning cleanup
             MoraleLogs = new List<TechnicianMoraleLog>(); // Sprint 79.3: CS8618/CS860X warning cleanup
             Notes = string.Empty; // Sprint 79.3: CS8618/CS860X warning cleanup
         }

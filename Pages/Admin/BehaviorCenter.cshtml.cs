@@ -1,8 +1,8 @@
+using Data;
+using Data.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Data;
-using MVP_Core.Data.Models;
-using MVP_Core.Services.Admin;
+using Services.Admin;
 using System;
 using System.Collections.Generic;
 using System.Linq;

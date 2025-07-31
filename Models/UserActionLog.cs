@@ -1,6 +1,6 @@
 using System;
 
-namespace MVP_Core.Models
+namespace Models
 {
     // Sprint 86.5 — User Action Log for Flow Compliance & Mentorship Analytics
     public class UserActionLog

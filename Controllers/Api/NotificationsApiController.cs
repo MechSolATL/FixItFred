@@ -1,13 +1,13 @@
 // Sprint 44 – Message Export + Digest
 using Microsoft.AspNetCore.Mvc;
-using MVP_Core.Services;
-using MVP_Core.Data;
 using MVP_Core.Data.Models;
 using System.Threading.Tasks;
 using System.Linq;
 using System;
+using Data;
+using Services;
 
-namespace MVP_Core.Controllers.Api
+namespace Controllers.Api
 {
     [ApiController]
     [Route("api/notifications")]

@@ -1,4 +1,5 @@
-namespace MVP_Core.Services.Interfaces {
+namespace Services.Interfaces
+{
     public interface INotificationService {
         Task SendAsync(string toUser, string message);
     }

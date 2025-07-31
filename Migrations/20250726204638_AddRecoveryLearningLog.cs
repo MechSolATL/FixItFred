@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace MVP_Core.Migrations
+namespace Migrations
 {
     /// <inheritdoc />
     public partial class AddRecoveryLearningLog : Migration

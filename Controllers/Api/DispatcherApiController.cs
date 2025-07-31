@@ -1,11 +1,11 @@
 // Sprint 48.2 Patch Log: SuggestBestTech API endpoint
 using Microsoft.AspNetCore.Mvc;
-using MVP_Core.Services.Admin;
 using MVP_Core.Models.Admin;
 using Microsoft.AspNetCore.SignalR;
-using MVP_Core.Hubs;
+using Hubs;
+using Services.Admin;
 
-namespace MVP_Core.Controllers.Api
+namespace Controllers.Api
 {
     [Route("api/dispatcher")]
     [ApiController]

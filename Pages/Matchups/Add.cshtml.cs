@@ -1,9 +1,12 @@
 // =========================
 // File: Pages/Matchups/Add.cshtml.cs
 // =========================
+using Data;
+using Data.Models;
+using Data.Models.Seo;
 using Microsoft.AspNetCore.Authorization;
 
-namespace MVP_Core.Pages.Matchups
+namespace Pages.Matchups
 {
     [Authorize(Roles = "Admin")]
     public class AddModel : PageModel

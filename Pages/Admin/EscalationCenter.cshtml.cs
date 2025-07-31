@@ -1,11 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using MVP_Core.Data.Models;
-using MVP_Core.Services.Admin;
+using Services.Admin;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace MVP_Core.Pages.Admin
+namespace Pages.Admin
 {
     public class EscalationCenterModel : PageModel
     {

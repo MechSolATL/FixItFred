@@ -2,8 +2,9 @@ using MVP_Core.Data.Models;
 using System.Collections.Generic;
 using System.Linq;
 using System;
+using Data;
 
-namespace MVP_Core.Services
+namespace Services
 {
     /// <summary>
     /// Handles logic for technician-dispatcher messaging threads, sending, and read status.

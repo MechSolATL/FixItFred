@@ -1,10 +1,10 @@
 using System.Net;
 using System.Net.Mail;
 using System.Security.Cryptography;
+using Data;
 using Microsoft.EntityFrameworkCore;
-using MVP_Core.Controllers.Api;
 
-namespace MVP_Core.Controllers.Api
+namespace Controllers.Api
 {
     /// <summary>
     /// Handles the generation, storage, and delivery of email verification codes.

@@ -1,10 +1,10 @@
 // [FixItFred] Stabilization Patch: Purpose, service/model usage, and fix summary
 // Purpose: Explicitly reference MVP_Core.Models.Mobile.NextJobDto to resolve ambiguity.
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Services.Admin;
-using MVP_Core.Models.Mobile;
+using Models.Mobile;
+using Services.Admin;
 
-namespace MVP_Core.Pages.Mobile
+namespace Pages.Mobile
 {
     public class NextJobModel : PageModel
     {

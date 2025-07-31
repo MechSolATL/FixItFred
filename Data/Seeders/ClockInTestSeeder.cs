@@ -1,9 +1,8 @@
 using MVP_Core.Data.Models;
-using MVP_Core.Data;
 using System;
 using System.Linq;
 
-namespace MVP_Core.Data.Seeders
+namespace Data.Seeders
 {
     public static class ClockInTestSeeder
     {

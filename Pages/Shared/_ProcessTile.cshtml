@@ -1,17 +1,17 @@
-@model MVP_Core.ViewModels.ProcessStatusViewModel
+@model ViewModels.ProcessStatusViewModel
 @{
     string statusClass = Model.Status switch
     {
-        MVP_Core.ViewModels.ProcessHealthStatus.Healthy => "process-tile-healthy",
-        MVP_Core.ViewModels.ProcessHealthStatus.Warning => "process-tile-warning",
-        MVP_Core.ViewModels.ProcessHealthStatus.Critical => "process-tile-critical",
+        ViewModels.ProcessHealthStatus.Healthy => "process-tile-healthy",
+        ViewModels.ProcessHealthStatus.Warning => "process-tile-warning",
+        ViewModels.ProcessHealthStatus.Critical => "process-tile-critical",
         _ => "process-tile-unknown"
     };
     string badgeIcon = Model.Status switch
     {
-        MVP_Core.ViewModels.ProcessHealthStatus.Healthy => "??",
-        MVP_Core.ViewModels.ProcessHealthStatus.Warning => "??",
-        MVP_Core.ViewModels.ProcessHealthStatus.Critical => "??",
+        ViewModels.ProcessHealthStatus.Healthy => "??",
+        ViewModels.ProcessHealthStatus.Warning => "??",
+        ViewModels.ProcessHealthStatus.Critical => "??",
         _ => "?"
     };
 }

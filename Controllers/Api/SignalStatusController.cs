@@ -1,11 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
-using MVP_Core.Data;
 using MVP_Core.Data.Models;
 using System.Threading.Tasks;
 using System.Linq;
 using System;
+using Data;
 
-namespace MVP_Core.Controllers.Api
+namespace Controllers.Api
 {
     [ApiController]
     [Route("api/signal")]

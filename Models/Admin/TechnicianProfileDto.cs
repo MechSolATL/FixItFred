@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Collections.Generic;
 using System;
 
-namespace MVP_Core.Models.Admin
+namespace Models.Admin
 {
     public class TechnicianProfileDto
     {

@@ -10,5 +10,7 @@ namespace MVP_Core.Data.Models.Reports
         public DateTime FromDate { get; set; }
         public DateTime ToDate { get; set; }
         public string Summary { get; set; }
+        public byte[] Content { get; set; }
+        public string FileName { get; set; }
     }
 }

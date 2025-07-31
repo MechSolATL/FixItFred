@@ -1,9 +1,10 @@
-using MVP_Core.Data.Models;
 using System.Collections.Generic;
 using System.Linq;
 using System;
+using Data;
+using Data.Models;
 
-namespace MVP_Core.Services
+namespace Services
 {
     /// <summary>
     /// TechnicianFeedbackService: Handles feedback submission, retrieval, and rating calculations for technicians.

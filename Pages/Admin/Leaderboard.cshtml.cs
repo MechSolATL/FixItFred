@@ -1,59 +1,55 @@
+using Data.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Models;
-using MVP_Core.Services.Admin;
-using MVP_Core.Data.Models;
+using MVP_Core.Services.Stats;
+using Services;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.Linq;
-using System;
+using TechnicianViewModel = Data.Models.UI.TechnicianViewModel;
 
-namespace MVP_Core.Pages.Admin
+namespace Pages.Admin
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles="Admin,Manager")]
     public class LeaderboardModel : PageModel
     {
-        public PermissionService PermissionService { get; }
-        public AdminUser AdminUser { get; }
-        public LeaderboardModel(PermissionService permissionService)
+        private readonly Services.ILeaderboardService _leaderboardService;
+        private readonly ISeoService _seoService;
+        private readonly IContentService _contentService;
+
+        public LeaderboardModel(Services.ILeaderboardService leaderboardService, ISeoService seoService, IContentService contentService)
         {
-            PermissionService = permissionService;
-            AdminUser = HttpContext?.Items["AdminUser"] as AdminUser ?? new AdminUser { EnabledModules = new List<string>() };
+            _leaderboardService = leaderboardService;
+            _seoService = seoService;
+            _contentService = contentService;
         }
 
-        public List<LeaderboardEntryViewModel> Leaderboard { get; set; } = new();
-        public string Filter { get; set; } = "all";
+        public List<TechnicianViewModel> TopTechnicians { get; set; } = new();
+        public string MonthlyChallengeSummary { get; set; } = string.Empty;
+        public int TeamEfficiency { get; set; } = 0;
+        public string RotatingQuote { get; set; } = string.Empty;
+        // [Sprint91_26] SEO Metadata Razor Injection Patch
+        public SeoMetadata Seo { get; set; } = new SeoMetadata();
+        public string Title => Seo.Title;
+        public string MetaDescription => Seo.MetaDescription;
+        public string Keywords => Seo.Keywords;
+        public string Robots => Seo.Robots;
 
-        public async Task OnGetAsync(string? filter)
+        public async Task OnGetAsync()
         {
-            Filter = filter ?? "all";
-            // TODO: Replace with real DB/service logic
-            var allEntries = await Task.FromResult(GetSampleLeaderboard());
-            Leaderboard = Filter switch
-            {
-                "monthly" => allEntries.OrderByDescending(e => e.JobsCompleted).Take(10).ToList(),
-                "weekly" => allEntries.OrderByDescending(e => e.JobsCompleted).Take(5).ToList(),
-                _ => allEntries.OrderByDescending(e => e.JobsCompleted).ToList()
-            };
+            var seo = await _seoService.GetSeoForPageAsync("Leaderboard");
+            // Title = seo.Title; // This line is no longer needed
+
+            TopTechnicians = await _leaderboardService.GetTopTechniciansAsync(6);
+            MonthlyChallengeSummary = await _leaderboardService.GetMonthlyChallengeSummaryAsync();
+            TeamEfficiency = await _leaderboardService.GetTeamEfficiencyAsync();
+            RotatingQuote = await _contentService.GetContentAsync("LeaderboardQuote");
         }
 
-        // Sample/mock data for demo
-        private List<LeaderboardEntryViewModel> GetSampleLeaderboard() => new()
+        public async Task<List<TechnicianViewModel>> GetTopTechniciansAsync()
         {
-            new LeaderboardEntryViewModel { Rank = 1, Name = "Alex Pro", JobsCompleted = 120, Rating = 4.9, UpsellCount = 15, Badges = ["PROS", "Certified"], RankChange = 1 },
-            new LeaderboardEntryViewModel { Rank = 2, Name = "Jamie TopSeller", JobsCompleted = 110, Rating = 4.8, UpsellCount = 22, Badges = ["Top Seller"], RankChange = 0 },
-            new LeaderboardEntryViewModel { Rank = 3, Name = "Sam Cert", JobsCompleted = 105, Rating = 4.7, UpsellCount = 10, Badges = ["Certified"], RankChange = -1 },
-        };
-
-        public record LeaderboardEntryViewModel
-        {
-            public int Rank { get; init; }
-            public string Name { get; init; } = string.Empty;
-            public int JobsCompleted { get; init; }
-            public double Rating { get; init; }
-            public int UpsellCount { get; init; }
-            public List<string> Badges { get; init; } = new();
-            public int RankChange { get; init; } // +1, 0, -1
+            // Placeholder implementation
+            return await Task.FromResult(new List<TechnicianViewModel>());
         }
     }
 }

@@ -1,4 +1,4 @@
-namespace MVP_Core.Data.Models
+namespace Data.Models
 {
     /// <summary>
     /// Represents a confirmed entry in the public or internal blacklist system.

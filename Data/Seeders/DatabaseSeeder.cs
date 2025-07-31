@@ -1,9 +1,11 @@
-using MVP_Core.Data.Models;
-using MVP_Core.Services.Admin;
-using MVP_Core.Services.Dispatch;
+using Data;
+using Data.Models;
+using Helpers;
+using Services.Admin;
+using Services.Dispatch;
 using System.Linq;
 
-namespace MVP_Core.Data.Seeders
+namespace Data.Seeders
 {
     public static class DatabaseSeeder
     {
@@ -332,7 +334,7 @@ namespace MVP_Core.Data.Seeders
             int i = 0;
             foreach (var req in requests)
             {
-                var tech = (i++ % 2 == 0) ? tech1 : tech2;
+                var tech = i++ % 2 == 0 ? tech1 : tech2;
                 var queue = new ScheduleQueue
                 {
                     TechnicianId = tech.Id,
@@ -346,7 +348,7 @@ namespace MVP_Core.Data.Seeders
                     CreatedAt = req.CreatedAt
                 };
                 // FixItFred: Sprint 34.1 - SLA Auto Calculation
-                new MVP_Core.Services.Admin.DispatcherService(db, null).SetSLAExpiresAt(queue);
+                new DispatcherService(db, null).SetSLAExpiresAt(queue);
                 db.ScheduleQueues.Add(queue);
                 db.ETAHistoryEntries.Add(new ETAHistoryEntry
                 {
@@ -375,28 +377,32 @@ namespace MVP_Core.Data.Seeders
             if (db.EscalationLogs.Any()) return;
             var now = DateTime.UtcNow;
             db.EscalationLogs.AddRange(
-                new MVP_Core.Data.Models.EscalationLogEntry {
+                new EscalationLogEntry
+                {
                     ScheduleQueueId = 1,
                     TriggeredBy = "admin1",
                     Reason = "SLA breach",
                     ActionTaken = "ETA extended, tech notified",
                     CreatedAt = now.AddMinutes(-60)
                 },
-                new MVP_Core.Data.Models.EscalationLogEntry {
+                new EscalationLogEntry
+                {
                     ScheduleQueueId = 2,
                     TriggeredBy = "admin2",
                     Reason = "Customer escalation",
                     ActionTaken = "Job reassigned",
                     CreatedAt = now.AddMinutes(-45)
                 },
-                new MVP_Core.Data.Models.EscalationLogEntry {
+                new EscalationLogEntry
+                {
                     ScheduleQueueId = 3,
                     TriggeredBy = "admin1",
                     Reason = "Repeated delay",
                     ActionTaken = "Supervisor override",
                     CreatedAt = now.AddMinutes(-30)
                 },
-                new MVP_Core.Data.Models.EscalationLogEntry {
+                new EscalationLogEntry
+                {
                     ScheduleQueueId = 4,
                     TriggeredBy = "admin3",
                     Reason = "Zone alert",
@@ -494,14 +500,16 @@ namespace MVP_Core.Data.Seeders
             // Zone with mixed statuses: ZoneB (techs with negative, zero, max score)
             // Escalation logs for edge triggers
             db.EscalationLogs.AddRange(
-                new MVP_Core.Data.Models.EscalationLogEntry {
+                new EscalationLogEntry
+                {
                     ScheduleQueueId = jobs[0].Id,
                     TriggeredBy = "qa-admin",
                     Reason = "SLA breach",
                     ActionTaken = "Auto escalation",
                     CreatedAt = now.AddMinutes(-10)
                 },
-                new MVP_Core.Data.Models.EscalationLogEntry {
+                new EscalationLogEntry
+                {
                     ScheduleQueueId = jobs[3].Id,
                     TriggeredBy = "qa-admin",
                     Reason = "Zone alert",

@@ -1,9 +1,9 @@
 using System;
 using System.Threading.Tasks;
-using MVP_Core.Data;
+using Data;
 using MVP_Core.Models;
 
-namespace MVP_Core.Services.Technician
+namespace Services.Technician
 {
     // Sprint 86.7 — Auto Notification Service for Technician AI Companion
     public class AutoNotificationService

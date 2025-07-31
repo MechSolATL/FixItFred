@@ -1,10 +1,10 @@
-using MVP_Core.Data;
-using MVP_Core.Data.Models.PatchAnalytics;
+using Data;
+using Data.Models.PatchAnalytics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace MVP_Core.Services
+namespace Services
 {
     public class PatchReputationEngine
     {
@@ -35,7 +35,7 @@ namespace MVP_Core.Services
             var tech = _db.Technicians.FirstOrDefault(t => t.Id == technicianId);
             if (tech != null)
             {
-                tech.PatchReputationScore = (tech.PatchReputationScore ?? 0) + points;
+                tech.PatchReputationScore = (tech.PatchReputationScore.HasValue ? tech.PatchReputationScore.Value : 0) + points;
                 _db.SaveChanges();
             }
         }

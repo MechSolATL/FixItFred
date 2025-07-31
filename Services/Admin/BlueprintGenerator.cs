@@ -1,8 +1,7 @@
 using System;
 using System.IO;
-using MVP_Core.Services.Admin;
 
-namespace MVP_Core.Services.Admin
+namespace Services.Admin
 {
     // Sprint 90.0: Utility to generate Service-Atlanta Revitalize MasterPlan PDF from Markdown
     public static class BlueprintGenerator

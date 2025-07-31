@@ -2,7 +2,7 @@
 // [2024-07-25T00:30:00Z] — Custom validation attribute for ETA range.
 using System;
 using System.ComponentModel.DataAnnotations;
-namespace MVP_Core.Models.Shared
+namespace Models.Shared
 {
     public class ValidEtaRangeAttribute : ValidationAttribute
     {

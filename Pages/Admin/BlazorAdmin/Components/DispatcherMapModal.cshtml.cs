@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System;
 
-namespace MVP_Core.Pages.Admin.BlazorAdmin.Components
+namespace Pages.Admin.BlazorAdmin.Components
 {
     public class DispatcherMapModalModel : PageModel
     {

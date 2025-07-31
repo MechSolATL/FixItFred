@@ -1,12 +1,12 @@
 using MVP_Core.Data.Models;
-using MVP_Core.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System;
 using System.Linq;
+using Data;
 
-namespace MVP_Core.Services.Admin
+namespace Services.Admin
 {
     public class TechnicianKarmaService
     {
@@ -25,7 +25,7 @@ namespace MVP_Core.Services.Admin
             var response = await _db.TechnicianResponseLogs.CountAsync(x => x.TechnicianId == technicianId && x.Timestamp > DateTime.UtcNow.AddDays(-30));
             var audit = await _db.TechnicianAuditLogs.CountAsync(x => x.TechnicianId == technicianId && x.Timestamp > DateTime.UtcNow.AddDays(-30));
             // Example weights
-            int score = trust + morale - (warnings * 5) - (flags * 3) + (response * 2) - (audit * 1);
+            int score = trust + morale - warnings * 5 - flags * 3 + response * 2 - audit * 1;
             score = Math.Max(0, Math.Min(100, score));
             return score;
         }

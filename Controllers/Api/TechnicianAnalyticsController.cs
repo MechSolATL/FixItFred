@@ -1,11 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
-using MVP_Core.Services;
-using MVP_Core.Data.Models;
 using System;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using Data.Models;
+using Services;
 
-namespace MVP_Core.Controllers.Api
+namespace Controllers.Api
 {
     [ApiController]
     [Route("api/technician")]

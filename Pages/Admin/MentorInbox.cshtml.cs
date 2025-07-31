@@ -2,14 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Data;
-using MVP_Core.Models;
-using MVP_Core.Data.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
+using Data.Models;
+using Models;
+using Data;
 
-namespace MVP_Core.Pages.Admin
+namespace Pages.Admin
 {
     // Sprint 86.6 — Mentor Inbox PageModel
     public class MentorInboxModel : PageModel

@@ -8,7 +8,7 @@
     <label>Technician:</label>
     <select asp-for="TechnicianId">
         <option value="">Select Technician</option>
-        @foreach (var tech in Model.TechnicianList ?? new List<MVP_Core.Data.Models.Technician>()) // Sprint 79.4: Razor null safety and sync
+        @foreach (var tech in Model.TechnicianList ?? new List<Data.Models.Technician>()) // Sprint 79.4: Razor null safety and sync
         {
             <option value="@tech.Id">@tech.FullName</option>
         }

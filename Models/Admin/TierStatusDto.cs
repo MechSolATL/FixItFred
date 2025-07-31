@@ -1,6 +1,6 @@
 using System;
 
-namespace MVP_Core.Models.Admin
+namespace Models.Admin
 {
     // Sprint 84.2: Technician Tier Status DTO
     public class TierStatusDto

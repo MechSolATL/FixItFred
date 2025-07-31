@@ -1,12 +1,12 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Data;
-using MVP_Core.Data.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 using System.Collections.Generic;
 using System.Text;
+using Data;
+using Data.Models;
 
-namespace MVP_Core.Pages.Admin
+namespace Pages.Admin
 {
     public class ReferralsModel : PageModel
     {

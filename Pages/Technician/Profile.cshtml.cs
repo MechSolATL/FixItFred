@@ -1,17 +1,17 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Services;
-using MVP_Core.Data.Models;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Data.Models;
+using Services;
 
-namespace MVP_Core.Pages.Technician
+namespace Pages.Technician
 {
     public class ProfileModel : PageModel
     {
         private readonly ITechnicianProfileService _profileService;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        public MVP_Core.Data.Models.TechnicianProfileDto? PatchProfile { get; set; }
+        public TechnicianProfileDto? PatchProfile { get; set; }
         [BindProperty]
         public string? Nickname { get; set; }
         [BindProperty]
@@ -19,6 +19,12 @@ namespace MVP_Core.Pages.Technician
         public string? PatchPreview { get; set; }
         public string? PatchIdentityError { get; set; }
         public int BanterFlagCount { get; set; }
+
+        // [Sprint91_Recovery_P8] Nova Razor binding patch
+        public Seo Seo { get; set; } = new Seo();
+        public string TierStatus { get; set; } = "Basic";
+        public string ViewTitle { get; set; } = "Profile";
+        public string? ReturnUrl { get; set; }
 
         public ProfileModel(ITechnicianProfileService profileService, IHttpContextAccessor httpContextAccessor)
         {
@@ -60,7 +66,7 @@ namespace MVP_Core.Pages.Technician
             return RedirectToPage();
         }
 
-        private string GetPatchPreview(MVP_Core.Data.Models.TechnicianProfileDto? profile)
+        private string GetPatchPreview(TechnicianProfileDto? profile)
         {
             if (profile == null) return "";
             var name = !string.IsNullOrWhiteSpace(profile.Nickname) && profile.NicknameApproved ? profile.Nickname : profile.FullName.Split(' ')[0];

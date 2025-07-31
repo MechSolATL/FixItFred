@@ -1,9 +1,10 @@
 using System;
 using System.Collections.Generic;
-using MVP_Core.Data.Models;
+using Data;
+using Data.Models;
 using Newtonsoft.Json;
 
-namespace MVP_Core.Services.Admin
+namespace Services.Admin
 {
     public class IntegrityScoringService
     {

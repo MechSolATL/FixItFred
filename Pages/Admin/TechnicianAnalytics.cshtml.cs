@@ -1,17 +1,18 @@
+using Data.Models;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Services;
+using Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MVP_Core.Pages.Admin
+namespace Pages.Admin
 {
     public class TechnicianAnalyticsModel : PageModel
     {
         private readonly TechnicianProfileService _profileService;
         private readonly ITechnicianService _techService;
-        public List<MVP_Core.Data.Models.Technician> Technicians { get; set; } = new();
+        public List<Data.Models.Technician> Technicians { get; set; } = new();
         public List<int> SelectedTechIds { get; set; } = new();
         public Dictionary<int, TechnicianAnalyticsDto> Analytics { get; set; } = new();
         public DateTime StartDate { get; set; }
@@ -40,7 +41,7 @@ namespace MVP_Core.Pages.Admin
             }).OrderBy(t => t.FullName).ToList();
             // Parse selected techs
             SelectedTechIds = string.IsNullOrEmpty(techIds)
-                ? (Technicians.Count > 0 ? new List<int> { Technicians[0].Id } : new List<int>())
+                ? Technicians.Count > 0 ? new List<int> { Technicians[0].Id } : new List<int>()
                 : techIds.Split(',').Select(int.Parse).ToList();
             // Load analytics for selected techs
             Analytics.Clear();

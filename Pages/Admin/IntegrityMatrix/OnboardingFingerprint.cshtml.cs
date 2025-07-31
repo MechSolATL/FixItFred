@@ -1,10 +1,11 @@
+using Data;
+using Data.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Data.Models;
-using MVP_Core.Services.Admin;
+using Services.Admin;
 using System.Linq;
 
-namespace MVP_Core.Pages.Admin.IntegrityMatrix
+namespace Pages.Admin.IntegrityMatrix
 {
     public class OnboardingFingerprintModel : PageModel
     {

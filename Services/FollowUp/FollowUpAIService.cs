@@ -3,9 +3,9 @@ using System.Threading.Tasks;
 using System;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
-using MVP_Core.Services.FollowUp;
+using Data;
 
-namespace MVP_Core.Services.FollowUp
+namespace Services.FollowUp
 {
     public class FollowUpAIService
     {

@@ -1,9 +1,9 @@
-using MVP_Core.Data;
+using Data;
 using MVP_Core.Data.Models;
 using System;
 using System.Linq;
 
-namespace MVP_Core.Services
+namespace Services
 {
     public class AutoPrepEngine
     {

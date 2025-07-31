@@ -1,6 +1,6 @@
-using MVP_Core.Data.DTO.Analytics;
+using Data.DTO.Analytics;
 
-namespace MVP_Core.Pages.Admin
+namespace Pages.Admin
 {
     public class AdminAnalyticsViewModel
     {

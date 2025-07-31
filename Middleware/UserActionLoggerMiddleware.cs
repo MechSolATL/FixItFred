@@ -1,12 +1,12 @@
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Threading.Tasks;
-using MVP_Core.Services.Analytics;
 using MVP_Core.Models;
 using MVP_Core.Data.Models;
 using System.Security.Claims;
+using Services.Analytics;
 
-namespace MVP_Core.Middleware
+namespace Middleware
 {
     // Sprint 86.5 — Middleware to log every user action for flow compliance
     public class UserActionLoggerMiddleware

@@ -1,4 +1,6 @@
-namespace MVP_Core.Pages.Admin
+using Data;
+
+namespace Pages.Admin
 {
     public class ManagePagesModel : PageModel
     {
@@ -9,7 +11,7 @@ namespace MVP_Core.Pages.Admin
             _dbContext = dbContext;
         }
 
-        public List<MVP_Core.Data.Models.Page> Pages { get; set; } = [];
+        public List<Data.Models.Page> Pages { get; set; } = [];
 
         [TempData]
         public string? Message { get; set; }

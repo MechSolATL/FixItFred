@@ -3,14 +3,13 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
-using MVP_Core.Data;
 using MVP_Core.Data.Models;
 using Microsoft.AspNetCore.SignalR;
-using MVP_Core.Hubs;
 using System.Linq;
-using MVP_Core.Services;
+using Hubs;
+using Data;
 
-namespace MVP_Core.Services
+namespace Services
 {
     public class SlaEscalationService : BackgroundService
     {

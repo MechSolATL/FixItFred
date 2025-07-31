@@ -1,13 +1,12 @@
-using MVP_Core.Data;
-using MVP_Core.Data.Models;
-using MVP_Core.Services; // For INotificationService
 using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
-using MVP_Core.Hubs; // <-- Add this for ManagerActionHub
+using Hubs;
+using Data;
+using Data.Models;
 
-namespace MVP_Core.Services.Admin
+namespace Services.Admin
 {
     // Sprint 91.7.8.2: Manager action execution, audit, and notification
     public class ManagerInterventionService

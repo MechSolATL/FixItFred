@@ -1,11 +1,11 @@
 // FixItFred Patch Log — Sprint 27
 // [2024-07-25T00:00:00Z] — TechnicianMapModel scaffolded for map view. Loads technician geolocation/status for Razor page.
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Models.Admin;
-using MVP_Core.Services.Admin;
+using Models.Admin;
+using Services.Admin;
 using System.Collections.Generic;
 
-namespace MVP_Core.Pages.Admin
+namespace Pages.Admin
 {
     public class TechnicianMapModel : PageModel
     {

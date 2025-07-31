@@ -1,13 +1,13 @@
-using MVP_Core.Data;
-using MVP_Core.Data.Models;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
 using System.Threading.Tasks;
+using Data;
+using Data.Models;
 
-namespace MVP_Core.Pages.Admin
+namespace Pages.Admin
 {
     public class RoutePlaybackModel : PageModel
     {
@@ -21,7 +21,7 @@ namespace MVP_Core.Pages.Admin
         public int? TechnicianId { get; set; }
         [BindProperty(SupportsGet = true)]
         public int? ServiceRequestId { get; set; }
-        public List<MVP_Core.Data.Models.Technician> Technicians { get; set; } = new();
+        public List<Data.Models.Technician> Technicians { get; set; } = new();
         public List<ServiceRequest> Jobs { get; set; } = new();
         public string TrailGeoJson { get; set; } = "";
         public string TrailPointsJson { get; set; } = "";

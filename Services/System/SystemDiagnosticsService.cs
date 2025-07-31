@@ -1,26 +1,26 @@
-using MVP_Core.Data.Models;
-using MVP_Core.Data;
 using Microsoft.Extensions.Logging;
-using MVP_Core.Services.Admin;
-using MVP_Core.DTOs.Reports;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Security.Cryptography;
 using System.Text;
+using DTOs.Reports;
+using Data;
+using Data.Models;
+using Services.Admin;
 
-namespace MVP_Core.Services.System
+namespace Services.System
 {
     public class SystemDiagnosticsService
     {
         private readonly ApplicationDbContext _db;
         private readonly IServiceProvider _serviceProvider;
         private readonly ILogger<SystemDiagnosticsService> _logger;
-        private readonly AutoRepairEngine _autoRepairEngine;
+        private readonly Data.Models.AutoRepairEngine _autoRepairEngine;
         private readonly SmartAdminAlertsService _alertsService;
 
-        public SystemDiagnosticsService(ApplicationDbContext db, IServiceProvider serviceProvider, ILogger<SystemDiagnosticsService> logger, AutoRepairEngine autoRepairEngine, SmartAdminAlertsService alertsService)
+        public SystemDiagnosticsService(ApplicationDbContext db, IServiceProvider serviceProvider, ILogger<SystemDiagnosticsService> logger, Data.Models.AutoRepairEngine autoRepairEngine, SmartAdminAlertsService alertsService)
         {
             _db = db;
             _serviceProvider = serviceProvider;

@@ -1,7 +1,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace MVP_Core.Data.Models
+namespace Data.Models
 {
     /// <summary>
     /// Logs customer bonuses earned from promotions and loyalty events.

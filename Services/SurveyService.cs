@@ -1,11 +1,10 @@
-using MVP_Core.Data;
-using MVP_Core.Data.Models;
-using MVP_Core.Services;
+using Data;
+using Data.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace MVP_Core.Services
+namespace Services
 {
     public class SurveyService
     {

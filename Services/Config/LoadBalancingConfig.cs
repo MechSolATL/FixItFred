@@ -1,4 +1,4 @@
-namespace MVP_Core.Services.Config
+namespace Services.Config
 {
     public class LoadBalancingWeights
     {

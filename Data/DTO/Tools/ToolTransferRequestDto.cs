@@ -1,5 +1,5 @@
 // Sprint 91.7 Part 6.1 — DTO Definition for Tool Transfers
-namespace MVP_Core.Data.DTO.Tools
+namespace Data.DTO.Tools
 {
     public class ToolTransferRequestDto
     {

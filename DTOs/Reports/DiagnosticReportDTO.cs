@@ -1,4 +1,4 @@
-namespace MVP_Core.DTOs.Reports
+namespace DTOs.Reports
 {
     public class DiagnosticReportDTO
     {

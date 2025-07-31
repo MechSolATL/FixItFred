@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Services;
 using System.Collections.Generic;
-using MVP_Core.Data.Models;
+using Data.Models;
+using Services;
 
-namespace MVP_Core.Pages.Customer
+namespace Pages.Customer
 {
     // Sprint 84.6: Customer Tier Viewer scaffold
     public class TierStatusModel : PageModel

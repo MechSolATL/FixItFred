@@ -1,13 +1,12 @@
-using MVP_Core.Data;
-using MVP_Core.Data.Models;
-using MVP_Core.Hubs;
 using Microsoft.AspNetCore.SignalR;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Hubs;
+using Data;
 
-namespace MVP_Core.Services
+namespace Services
 {
     // Sprint 91.7: TechnicianTrackingService for live location and ETA logic
     public class TechnicianTrackingService
@@ -116,7 +115,7 @@ namespace MVP_Core.Services
         }
 
         // Sprint 91.7: Mock status logic
-        private string MockStatus(MVP_Core.Data.Models.Technician tech)
+        private string MockStatus(Data.Models.Technician tech)
         {
             var statuses = new[] { "En Route", "Working", "Idle", "Delayed" };
             return statuses[tech.Id % statuses.Length];

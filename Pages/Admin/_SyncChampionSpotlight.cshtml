@@ -5,7 +5,7 @@
     var scores = SyncIncentiveEngine.CalculateAllSyncScores();
     var techs = scores.Select(s => s.TechnicianId).ToList();
     var db = Context.RequestServices.GetService(typeof(ApplicationDbContext)) as ApplicationDbContext;
-    var techList = db?.Technicians.Where(t => techs.Contains(t.Id)).ToList() ?? new List<MVP_Core.Data.Models.Technician>();
+    var techList = db?.Technicians.Where(t => techs.Contains(t.Id)).ToList() ?? new List<Data.Models.Technician>();
     var champion = scores.OrderByDescending(s => s.SyncSuccessRate).FirstOrDefault();
     var championTech = techList.FirstOrDefault(t => t.Id == champion?.TechnicianId);
 }

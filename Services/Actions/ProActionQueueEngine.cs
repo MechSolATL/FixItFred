@@ -1,10 +1,10 @@
 using System.Collections.Generic;
-using MVP_Core.Models.ViewModels;
-using MVP_Core.Data;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
+using Models.ViewModels;
+using Data;
 
-namespace MVP_Core.Services.Actions
+namespace Services.Actions
 {
     // Sprint 89.1 — Phase 3A: ProActionQueueEngine created for tactical decision generation
     public class ProActionQueueEngine

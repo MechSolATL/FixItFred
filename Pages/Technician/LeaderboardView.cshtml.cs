@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Services;
+using Services;
 using System.Collections.Generic;
 
-namespace MVP_Core.Pages.Technician
+namespace Pages.Technician
 {
     // Sprint 84.5.1 — Razor Rename: Leaderboard.cshtml to LeaderboardView.cshtml (encoding fix)
     public class LeaderboardViewModel : PageModel

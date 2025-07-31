@@ -1,18 +1,19 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.ViewModels;
-using MVP_Core.Models.ViewModels;
-using MVP_Core.Services.Metrics;
-using MVP_Core.Services.Actions;
-using MVP_Core.Services.Diagnostics;
-using MVP_Core.Services.Compliance;
-using MVP_Core.Data;
-using MVP_Core.Data.Models;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
+using ViewModels;
+using Services.Compliance;
+using Services.Diagnostics;
+using Services.Metrics;
+using Data.Models.NovaIntel;
+using Services.Actions;
+using Models.ViewModels;
+using Data;
+using Data.Models;
 
-namespace MVP_Core.Pages.Global
+namespace Pages.Global
 {
     public class CommandModel : PageModel
     {
@@ -42,9 +43,9 @@ namespace MVP_Core.Pages.Global
         public List<ProActionCardViewModel> ProActions { get; set; } = new();
         public List<ProcessStatusViewModel> ProcessStatuses { get; set; } = new();
         public List<Tenant> LockedOutTenants { get; set; } = new();
-        public List<MVP_Core.Data.Models.ComplianceAlertLog> AlertSummary { get; set; } = new();
+        public List<ComplianceAlertLog> AlertSummary { get; set; } = new();
         public List<DiagnosticsAlertResult> DiagnosticsAlerts { get; set; } = new();
-        public List<MVP_Core.Data.Models.NovaIntel.NovaDecisionMemory> DecisionMemory { get; set; } = new();
+        public List<NovaDecisionMemory> DecisionMemory { get; set; } = new();
         public async Task OnGetAsync()
         {
             Metrics = await _metricsEngine.GetGlobalMetricsAsync();

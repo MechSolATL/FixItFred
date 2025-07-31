@@ -1,12 +1,11 @@
-using MVP_Core.Data;
+using Data;
 using MVP_Core.Data.Models;
-using MVP_Core.Services.Admin;
-using MVP_Core.Services.Dispatch;
+using Services.Dispatch;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MVP_Core.Services.Admin
+namespace Services.Admin
 {
     // Sprint 84.2 — Reward Trigger Engine
     public class RewardTriggerService

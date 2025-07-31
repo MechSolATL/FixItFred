@@ -4,12 +4,12 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Data;
+using Data.Models;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using MVP_Core.Data;
-using MVP_Core.Data.Models;
-using MVP_Core.Services.Admin;
-using MVP_Core.Services.Dispatch;
+using Services.Admin;
+using Services.Dispatch;
 
 // Sprint 34.3 - SLA Monitoring Loop
 /// <summary>

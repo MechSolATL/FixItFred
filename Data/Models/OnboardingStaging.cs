@@ -2,7 +2,7 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace MVP_Core.Data.Models
+namespace Data.Models
 {
     // Sprint 83.3: SmartControlUX Gatekeeper Wizard
     public class OnboardingStaging

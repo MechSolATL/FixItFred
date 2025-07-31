@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.SignalR;
 
-namespace MVP_Core.Hubs
+namespace Hubs
 {
     public class ManagerActionHub : Hub { }
 }

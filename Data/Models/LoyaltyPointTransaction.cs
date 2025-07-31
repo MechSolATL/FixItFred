@@ -2,7 +2,7 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace MVP_Core.Data.Models
+namespace Data.Models
 {
     /// <summary>
     /// Tracks loyalty points earned/spent, type, date, and customer/technician reference.

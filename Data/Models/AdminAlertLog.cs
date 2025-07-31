@@ -1,5 +1,5 @@
 // Restored by FixItFred per Nova Directive — Sprint 70.4
-namespace MVP_Core.Data.Models;
+namespace Data.Models;
 public class AdminAlertLog
 {
     /// <summary>

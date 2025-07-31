@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Builder;
 
-namespace MVP_Core.Middleware
+namespace Middleware
 {
     public static class SecurityHeadersExtensions
     {

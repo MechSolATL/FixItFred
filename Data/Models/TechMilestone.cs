@@ -1,7 +1,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace MVP_Core.Data.Models
+namespace Data.Models
 {
     // Sprint 87.1 — Defines each unlockable achievement, badge, or level
     public class TechMilestone

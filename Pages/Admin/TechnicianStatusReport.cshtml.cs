@@ -3,11 +3,12 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using DomainTechnicianBehaviorLog = MVP_Core.Models.TechnicianBehaviorLog;
-using MVP_Core.Services.Admin;
-using MVP_Core.Data.Models;
+using DomainTechnicianBehaviorLog = Models.TechnicianBehaviorLog;
+using Data.Models;
+using Data;
+using Services.Admin;
 
-namespace MVP_Core.Pages.Admin
+namespace Pages.Admin
 {
     /// <summary>
     /// Represents the Technician Status Report page model for viewing compliance statistics and flagged logs.
@@ -15,7 +16,7 @@ namespace MVP_Core.Pages.Admin
     [Authorize(Roles = "Admin")]
     public class TechnicianStatusReportModel : PageModel
     {
-        private readonly MVP_Core.Services.Admin.TechnicianAuditService _auditService;
+        private readonly Services.Admin.TechnicianAuditService _auditService;
         private readonly ApplicationDbContext _db;
 
         /// <summary>
@@ -44,7 +45,7 @@ namespace MVP_Core.Pages.Admin
         /// <param name="auditService">The technician audit service.</param>
         /// <param name="db">The application database context.</param>
         /// <param name="permissionService">The permission service.</param>
-        public TechnicianStatusReportModel(MVP_Core.Services.Admin.TechnicianAuditService auditService, ApplicationDbContext db, PermissionService permissionService)
+        public TechnicianStatusReportModel(Services.Admin.TechnicianAuditService auditService, ApplicationDbContext db, PermissionService permissionService)
         {
             _auditService = auditService;
             _db = db;

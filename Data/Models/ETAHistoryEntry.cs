@@ -2,7 +2,7 @@
 // Sprint 30A patch — added tracking fields used in Razor view
 using System;
 
-namespace MVP_Core.Data.Models
+namespace Data.Models
 {
     public class ETAHistoryEntry
     {

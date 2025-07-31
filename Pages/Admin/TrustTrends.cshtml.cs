@@ -1,14 +1,14 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc;
-using MVP_Core.Services.Admin;
-using MVP_Core.Data.Models;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System;
 using System.Linq;
 using System.Text;
+using Services.Admin;
+using Data;
 
-namespace MVP_Core.Pages.Admin
+namespace Pages.Admin
 {
     // Sprint 85.0 — Trust Trends Chart Logic + Filters
     public class TrustTrendsModel : PageModel
@@ -22,7 +22,7 @@ namespace MVP_Core.Pages.Admin
         }
         [BindProperty(SupportsGet = true)] public int? TechnicianId { get; set; }
         [BindProperty(SupportsGet = true)] public int DateRangeIndex { get; set; } = 29;
-        public List<MVP_Core.Data.Models.Technician> Technicians { get; set; } = new();
+        public List<Data.Models.Technician> Technicians { get; set; } = new();
         public DateTime StartDate => DateTime.UtcNow.Date.AddDays(-DateRangeIndex);
         public DateTime EndDate => DateTime.UtcNow.Date;
         public List<TechnicianTrendPoint> TrendData { get; set; } = new();

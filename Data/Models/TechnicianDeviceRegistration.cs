@@ -1,7 +1,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace MVP_Core.Data.Models
+namespace Data.Models
 {
     // Sprint 45 – Technician Device Registration for Push Notifications
     public class TechnicianDeviceRegistration

@@ -3,7 +3,7 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace MVP_Core.Data.Models
+namespace Data.Models
 {
     // Sprint 84.0 — OnboardingStatus Schema
     public class UserOnboardingStatus

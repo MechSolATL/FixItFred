@@ -17,26 +17,28 @@
 // Error Codes Resolved: CS0104, CS8603
 // Summary: Explicitly aliased Data.Models.TechnicianProfileDto as DataTechnicianProfileDto. All usages in DispatcherService now use MVP_Core.Models.Admin.TechnicianProfileDto. Nullability warning CS8603 fixed by returning string.Empty or safe fallback instead of null.
 // Do not override previous logs — appended below each existing log block.
-using AdminTechnicianProfileDto = MVP_Core.Models.Admin.TechnicianProfileDto;
-using DataTechnicianProfileDto = MVP_Core.Data.Models.TechnicianProfileDto;
-using DataDto = MVP_Core.Data.Models.TechnicianProfileDto;
-using MVP_Core.Models.Admin;
+using AdminTechnicianProfileDto = Models.Admin.TechnicianProfileDto;
+using DataTechnicianProfileDto = Data.Models.TechnicianProfileDto;
+using DataDto = Data.Models.TechnicianProfileDto;
 using MVP_Core.Models.Mobile;
 using System.Collections.Generic;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using MVP_Core.Data.Models;
-using MVP_Core.Data;
 using Microsoft.EntityFrameworkCore;
+using Models.Admin;
+using DTOs.Reports;
+using Data;
+using Services;
+using Data.Models;
 
-namespace MVP_Core.Services.Admin
+namespace Services.Admin
 {
     public class DispatcherService
     {
-        private static List<MVP_Core.Models.Admin.DispatcherAuditLog> _auditLog = new();
-        private static List<MVP_Core.Models.Admin.DispatcherBroadcast> _broadcasts = new();
-        private static List<MVP_Core.Models.Admin.TechnicianStatusDto> _techHeartbeats = new()
+        private static List<DispatcherAuditLog> _auditLog = new();
+        private static List<DispatcherBroadcast> _broadcasts = new();
+        private static List<TechnicianStatusDto> _techHeartbeats = new()
         {
             new MVP_Core.Models.Admin.TechnicianStatusDto { TechnicianId = 1, Name = "Alice Smith", Status = "Available", LastPing = DateTime.UtcNow.AddMinutes(-5) },
             new MVP_Core.Models.Admin.TechnicianStatusDto { TechnicianId = 2, Name = "Bob Jones", Status = "On Job", LastPing = DateTime.UtcNow.AddMinutes(-12) },
@@ -44,7 +46,7 @@ namespace MVP_Core.Services.Admin
             new MVP_Core.Models.Admin.TechnicianStatusDto { TechnicianId = 4, Name = "Dana Patel", Status = "Unavailable", LastPing = DateTime.UtcNow.AddMinutes(-8) },
             new MVP_Core.Models.Admin.TechnicianStatusDto { TechnicianId = 5, Name = "Evan Kim", Status = "Available", LastPing = DateTime.UtcNow.AddMinutes(-18) }
         };
-        private static List<MVP_Core.Models.Admin.AssignmentLogEntry> _assignmentLogs = new();
+        private static List<AssignmentLogEntry> _assignmentLogs = new();
         private readonly TechnicianMessageService _messageService;
         private readonly ApplicationDbContext _db;
         private readonly TechnicianFeedbackService _feedbackService;
@@ -244,8 +246,8 @@ namespace MVP_Core.Services.Admin
         public string GetGeoLink(int requestId)
         {
             // Stub: mock lat/long
-            double lat = 33.7490 + (requestId % 10) * 0.01;
-            double lng = -84.3880 + (requestId % 10) * 0.01;
+            double lat = 33.7490 + requestId % 10 * 0.01;
+            double lng = -84.3880 + requestId % 10 * 0.01;
             return $"https://maps.google.com/?q={lat},{lng}";
         }
 
@@ -329,7 +331,7 @@ namespace MVP_Core.Services.Admin
                 requests = requests.Where(r => r.Status == "Assigned" || r.Status == "Dispatched").ToList();
             if (!string.IsNullOrEmpty(filters.SearchTerm))
                 requests = requests.Where(r => (r.Technician?.Contains(filters.SearchTerm, StringComparison.OrdinalIgnoreCase) ?? false)
-                    || (r.Id.ToString().Contains(filters.SearchTerm, StringComparison.OrdinalIgnoreCase))
+                    || r.Id.ToString().Contains(filters.SearchTerm, StringComparison.OrdinalIgnoreCase)
                     ).ToList();
             // Sprint 39.2 - Skill tag filtering
             if (filters.SkillTags != null && filters.SkillTags.Any())
@@ -337,7 +339,7 @@ namespace MVP_Core.Services.Admin
                 // Only include requests where the assigned technician (if any) has all required tags
                 var techProfiles = _techHeartbeats.ToDictionary(t => t.Name, t => new List<string> { "Plumbing", "Heating", "Air Conditioning", "Water Filtration" }); // Mock: all techs have all tags
                 requests = requests.Where(r => string.IsNullOrEmpty(r.Technician) ||
-                    (techProfiles.ContainsKey(r.Technician) && filters.SkillTags.All(tag => techProfiles[r.Technician].Contains(tag)))
+                    techProfiles.ContainsKey(r.Technician) && filters.SkillTags.All(tag => techProfiles[r.Technician].Contains(tag))
                 ).ToList();
             }
             if (!string.IsNullOrEmpty(filters.SortBy))
@@ -380,7 +382,7 @@ namespace MVP_Core.Services.Admin
                 .Where(t => t.Specialty == zone && t.IsActive)
                 .ToList()
                 .Where(t => _db.ScheduleQueues.Count(q => q.TechnicianId == t.Id && (q.Status == ScheduleStatus.Pending || q.Status == ScheduleStatus.Dispatched)) < maxJobsPerTech)
-                .Where(t => requiredTags == null || !requiredTags.Any() || (t.Skills != null && requiredTags.All(tag => t.Skills.Contains(tag))))
+                .Where(t => requiredTags == null || !requiredTags.Any() || t.Skills != null && requiredTags.All(tag => t.Skills.Contains(tag)))
                 .OrderBy(t => _db.ScheduleQueues.Count(q => q.TechnicianId == t.Id && (q.Status == ScheduleStatus.Pending || q.Status == ScheduleStatus.Dispatched)))
                 .ToList();
             return candidates.FirstOrDefault(); // CS8603 fix: returns null if no candidate
@@ -395,9 +397,9 @@ namespace MVP_Core.Services.Admin
             int techJobs = _db.ScheduleQueues.Count(q => q.TechnicianId == tech.TechnicianId && (q.Status == ScheduleStatus.Pending || q.Status == ScheduleStatus.Dispatched));
             // --- Working hours: 7am-7pm, if outside, add 30 min buffer ---
             int hour = now.Hour;
-            int workingHourPenalty = (hour < 7 || hour > 19) ? 30 : 0;
+            int workingHourPenalty = hour < 7 || hour > 19 ? 30 : 0;
             // --- Base travel time: 12 min + 2 min per job in zone ---
-            int baseTravelTime = 12 + (jobsInZone * 2);
+            int baseTravelTime = 12 + jobsInZone * 2;
             // --- Tech load penalty: +3 min per active job ---
             int loadPenalty = techJobs * 3;
             // --- SLA penalty: +5 min if any jobs in zone are nearing SLA ---
@@ -414,7 +416,7 @@ namespace MVP_Core.Services.Admin
             {
                 precision = 0.7; // fallback precision for SLA risk
             }
-            int totalMinutes = (int)Math.Round((baseTravelTime * precision) + (loadPenalty * precision) + slaPenalty + delayMinutes + workingHourPenalty + lastPingPenalty);
+            int totalMinutes = (int)Math.Round(baseTravelTime * precision + loadPenalty * precision + slaPenalty + delayMinutes + workingHourPenalty + lastPingPenalty);
             await Task.CompletedTask; // CS1998 fix: ensure async compliance
             return now.AddMinutes(totalMinutes);
         }
@@ -520,7 +522,7 @@ namespace MVP_Core.Services.Admin
             {
                 double score = 100;
                 // --- SLA history: penalize if recent delays/callbacks (mock: use DispatchScore)
-                score += (tech.DispatchScore - 80); // Above 80 is bonus, below is penalty
+                score += tech.DispatchScore - 80; // Above 80 is bonus, below is penalty
                 // --- Tech load balancing: penalize for each active job ---
                 int techJobs = techJobCounts[tech.TechnicianId];
                 score -= techJobs * 15;
@@ -658,7 +660,7 @@ namespace MVP_Core.Services.Admin
             // Sprint 79.7: DispatcherService cleanup - CS8603 null guard
             return Task.FromResult<object>(new { });
         }
-        public Task<List<MVP_Core.DTOs.Reports.SatisfactionAnalyticsDto>> GetSatisfactionAnalyticsAsync(
+        public Task<List<SatisfactionAnalyticsDto>> GetSatisfactionAnalyticsAsync(
             DateTime? start = null,
             DateTime? end = null,
             string? technician = null,
@@ -667,14 +669,14 @@ namespace MVP_Core.Services.Admin
             string groupBy = "Technician")
         {
             // Stub: Return empty analytics list
-            return Task.FromResult(new List<MVP_Core.DTOs.Reports.SatisfactionAnalyticsDto>());
+            return Task.FromResult(new List<SatisfactionAnalyticsDto>());
         }
 
         // FixItFred — Sprint 46.1 Build Stabilization
-        public Task<List<MVP_Core.DTOs.Reports.SlaTrendDto>> GetSlaTrendsAsync(DateTime? start = null, DateTime? end = null, string? technician = null, string? serviceType = null, string? outcome = null, string groupBy = "Technician")
+        public Task<List<DTOs.Reports.SlaTrendDto>> GetSlaTrendsAsync(DateTime? start = null, DateTime? end = null, string? technician = null, string? serviceType = null, string? outcome = null, string groupBy = "Technician")
         {
             // Stub: Return empty SLA trend list
-            return Task.FromResult(new List<MVP_Core.DTOs.Reports.SlaTrendDto>());
+            return Task.FromResult(new List<DTOs.Reports.SlaTrendDto>());
         }
 
         // FixItFred — Sprint 46.1 Build Stabilization
@@ -787,7 +789,7 @@ namespace MVP_Core.Services.Admin
         }
 
         // Sprint 48.2: SLA Warning Broadcast via SignalR
-        public async Task BroadcastSLAWarningAsync(int serviceRequestId, string message, Microsoft.AspNetCore.SignalR.IHubContext<MVP_Core.Hubs.RequestHub> hubContext)
+        public async Task BroadcastSLAWarningAsync(int serviceRequestId, string message, Microsoft.AspNetCore.SignalR.IHubContext<Hubs.RequestHub> hubContext)
         {
             var req = _db.ServiceRequests.FirstOrDefault(r => r.Id == serviceRequestId);
             if (req == null) return;
@@ -918,10 +920,10 @@ namespace MVP_Core.Services.Admin
             // TODO: Replace Console.WriteLine with actual persistence or SignalR dispatch logic
         }
         // Sprint 83.4: Restored method to fix CS1061
-        public List<MVP_Core.Data.Models.DispatcherNotification> GetNotifications()
+        public List<Data.Models.DispatcherNotification> GetNotifications()
         {
             // Map NotificationDto to DispatcherNotification
-            return new List<MVP_Core.Data.Models.DispatcherNotification> {
+            return new List<Data.Models.DispatcherNotification> {
                 new MVP_Core.Data.Models.DispatcherNotification {
                     Id = 1,
                     Message = "System online.",

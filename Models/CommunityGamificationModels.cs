@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json;
 
-namespace MVP_Core.Models
+namespace Models
 {
     // Sprint 85.9 — Community Gamification Models
     public record QuoteMessage

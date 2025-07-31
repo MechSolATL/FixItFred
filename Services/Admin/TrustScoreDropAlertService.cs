@@ -1,12 +1,11 @@
-using MVP_Core.Data;
-using MVP_Core.Data.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using MVP_Core.Services.Admin;
+using Data;
+using Models.Admin;
 
-namespace MVP_Core.Services.Admin
+namespace Services.Admin
 {
     // Sprint 84.9 — Drop Alert Logic + TrustScore Delta Detection
     // Sprint 85.3 — Triggered Coaching Suggestions
@@ -29,7 +28,7 @@ namespace MVP_Core.Services.Admin
             {
                 int? lastKnown = tech.LastKnownHeatScore;
                 int current = tech.HeatScore;
-                int drop = lastKnown.HasValue ? (lastKnown.Value - current) : 0;
+                int drop = lastKnown.HasValue ? lastKnown.Value - current : 0;
                 if (lastKnown.HasValue && drop >= 15)
                 {
                     // Sprint 85.3 — Triggered Coaching Suggestions

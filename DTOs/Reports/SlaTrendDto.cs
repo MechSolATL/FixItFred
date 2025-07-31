@@ -1,5 +1,5 @@
 // FixItFred — Sprint 46.1 Build Stabilization
-namespace MVP_Core.DTOs.Reports
+namespace DTOs.Reports
 {
     public class SlaTrendDto
     {

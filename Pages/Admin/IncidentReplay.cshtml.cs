@@ -1,12 +1,13 @@
-using MVP_Core.Data.Models;
-using MVP_Core.Services.Admin;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
+using Data;
+using Data.Models;
+using Services.Admin;
 
-namespace MVP_Core.Pages.Admin
+namespace Pages.Admin
 {
     public class IncidentReplayModel : PageModel
     {
@@ -21,7 +22,7 @@ namespace MVP_Core.Pages.Admin
         [BindProperty]
         public int? SelectedTechnicianId { get; set; }
         public List<TechnicianIncidentReplay> Replays { get; set; } = new();
-        public List<MVP_Core.Data.Models.Technician> Technicians { get; set; } = new();
+        public List<Data.Models.Technician> Technicians { get; set; } = new();
 
         public async Task OnGetAsync()
         {

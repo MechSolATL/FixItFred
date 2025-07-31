@@ -1,4 +1,4 @@
-namespace MVP_Core.Models.ViewModels
+namespace Models.ViewModels
 {
     // Sprint 89.1 — Phase 3B: ProActionCardViewModel added for action rendering
     public class ProActionCardViewModel

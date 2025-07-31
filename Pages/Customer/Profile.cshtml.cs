@@ -1,14 +1,15 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Services;
 using Microsoft.AspNetCore.Mvc;
+using Data;
+using Services;
 
-namespace MVP_Core.Pages.Customer
+namespace Pages.Customer
 {
     public class ProfileModel : PageModel
     {
         private readonly CustomerPortalService _portalService; // Sprint78.7-ProfileNullSafetyPatch: Constructor injection
         private readonly ApplicationDbContext _db; // Sprint78.7-ProfileNullSafetyPatch: Constructor injection
-        public MVP_Core.Data.Models.Customer? Customer { get; set; } // Sprint78.7-ProfileNullSafetyPatch: Nullable property
+        public Data.Models.Customer? Customer { get; set; } // Sprint78.7-ProfileNullSafetyPatch: Nullable property
         public ProfileModel(CustomerPortalService portalService, ApplicationDbContext db)
         {
             _portalService = portalService ?? throw new ArgumentNullException(nameof(portalService)); // Sprint78.7-ProfileNullSafetyPatch: Null guard

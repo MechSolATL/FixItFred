@@ -1,15 +1,15 @@
 // FixItFred Patch Log — Sprint 26.4C
 // [2025-07-25T00:00:00Z] — Manual re-annotation handler added for SchedulerQueue. Triggers AnnotateScheduleQueueAsync.
+using Data.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Data.Models; // FixItFred: Use Data.Models for ScheduleQueue
-using MVP_Core.Services.Dispatch;
+using Services.Dispatch;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MVP_Core.Pages.Admin
+namespace Pages.Admin
 {
     public class SchedulerQueueModel : PageModel
     {
@@ -46,7 +46,7 @@ namespace MVP_Core.Pages.Admin
             {
                 // Compose message
                 string message = $"You have been assigned to job #{technician.ServiceRequestId}.";
-                var scheduler = HttpContext.RequestServices.GetService(typeof(MVP_Core.Services.NotificationSchedulerService)) as MVP_Core.Services.NotificationSchedulerService;
+                var scheduler = HttpContext.RequestServices.GetService(typeof(Services.NotificationSchedulerService)) as Services.NotificationSchedulerService;
                 if (scheduler != null)
                 {
                     await scheduler.QueueNotificationAsync(

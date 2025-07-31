@@ -1,10 +1,10 @@
-using MVP_Core.Data.ViewModels;
-using MVP_Core.Services.Admin;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc;
 using System.Text;
+using Data.ViewModels;
+using Services.Admin;
 
-namespace MVP_Core.Pages.Admin
+namespace Pages.Admin
 {
     public class ResponseScoreModel : PageModel
     {

@@ -1,4 +1,4 @@
-namespace MVP_Core.Views.Request
+namespace Views.Request
 {
     public class ServiceRequestModel : PageModel
     {

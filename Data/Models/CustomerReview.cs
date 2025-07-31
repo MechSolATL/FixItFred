@@ -1,7 +1,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace MVP_Core.Data.Models
+namespace Data.Models
 {
     /// <summary>
     /// Stores customer feedback, rating, and job reference for loyalty/review system.

@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.SignalR;
 using System.Threading.Tasks;
 
-namespace MVP_Core.Hubs
+namespace Hubs
 {
     /// <summary>
     /// SignalR hub for real-time reward notifications to customers.

@@ -1,6 +1,8 @@
+using Data;
+using Data.Models;
 using MVP_Core.Middleware;
 
-namespace MVP_Core.Pages.Admin
+namespace Pages.Admin
 {
     // Sprint 84.2 — Tier Enforcement
     [RequireLoyaltyTier("Bronze")]

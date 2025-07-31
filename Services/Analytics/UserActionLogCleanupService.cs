@@ -2,10 +2,10 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
-using MVP_Core.Data;
 using Microsoft.EntityFrameworkCore;
+using Data;
 
-namespace MVP_Core.Services.Analytics
+namespace Services.Analytics
 {
     // Sprint 86.5 — Background cleanup for old user action logs
     public class UserActionLogCleanupService : BackgroundService

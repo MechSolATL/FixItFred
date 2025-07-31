@@ -1,14 +1,14 @@
-using MVP_Core.Data;
-using MVP_Core.Data.Models;
-using MVP_Core.Services.Admin;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
+using Data.Models;
+using Data;
+using Services.Admin;
 
-namespace MVP_Core.Pages.Admin
+namespace Pages.Admin
 {
     public class RoastEvolutionModel : PageModel
     {
@@ -22,7 +22,7 @@ namespace MVP_Core.Pages.Admin
 
         public RoastEvolutionModel(ApplicationDbContext db)
         {
-            _db = db ?? throw new System.ArgumentNullException(nameof(db)); // Sprint 79.3: CS8618/CS860X warning cleanup
+            _db = db ?? throw new ArgumentNullException(nameof(db)); // Sprint 79.3: CS8618/CS860X warning cleanup
             _engine = new RoastEvolutionEngine(_db, new RoastFeedbackService(_db)); // Sprint 79.3: CS8618/CS860X warning cleanup
             RoastTemplates = new List<RoastTemplate>(); // Sprint 79.3: CS8618/CS860X warning cleanup
             EvolutionLogs = new List<RoastEvolutionLog>(); // Sprint 79.3: CS8618/CS860X warning cleanup
@@ -47,7 +47,7 @@ namespace MVP_Core.Pages.Admin
                     RoastTemplateId = roast.Id,
                     EditType = "ManualPromote",
                     Editor = User?.Identity?.Name ?? "Admin", // Sprint 79.3: CS8618/CS860X warning cleanup
-                    Timestamp = System.DateTime.UtcNow,
+                    Timestamp = DateTime.UtcNow,
                     Notes = "Manual promote.",
                     Promoted = true,
                     PreviousMessage = roast.Message,
@@ -69,7 +69,7 @@ namespace MVP_Core.Pages.Admin
                     RoastTemplateId = roast.Id,
                     EditType = "ManualRetire",
                     Editor = User?.Identity?.Name ?? "Admin", // Sprint 79.3: CS8618/CS860X warning cleanup
-                    Timestamp = System.DateTime.UtcNow,
+                    Timestamp = DateTime.UtcNow,
                     Notes = "Manual retire.",
                     Retired = true,
                     PreviousMessage = roast.Message,

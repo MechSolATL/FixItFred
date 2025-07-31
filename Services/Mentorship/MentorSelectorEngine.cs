@@ -1,13 +1,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using MVP_Core.Data;
 using MVP_Core.Models;
-using MVP_Core.Data.Models;
-using MVP_Core.Services.Analytics;
 using Microsoft.EntityFrameworkCore;
+using Services.Analytics;
+using Data.Models;
+using Data;
 
-namespace MVP_Core.Services.Mentorship
+namespace Services.Mentorship
 {
     // Sprint 86.6 — Mentor Selector Engine
     public class MentorSelectorEngine

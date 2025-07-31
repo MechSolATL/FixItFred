@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace MVP_Core.Pages.Shared
+namespace Pages.Shared
 {
     public class MainLayoutModel : PageModel
     {

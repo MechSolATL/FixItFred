@@ -1,20 +1,20 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Services;
+using Services;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace MVP_Core.Pages.Admin
+namespace Pages.Admin
 {
     public class SkillsTrackerModel : PageModel
     {
         private readonly SkillsTrackerService _skillsService;
         private readonly CertificationService _certService;
-        public List<MVP_Core.Data.Models.SkillTrack> AllTracks { get; set; } = new();
-        public List<MVP_Core.Data.Models.Technician> AllTechs { get; set; } = new();
-        public List<MVP_Core.Data.Models.CertificationUpload> PendingCerts { get; set; } = new();
-        public Dictionary<int, List<MVP_Core.Data.Models.SkillProgress>> TechProgress { get; set; } = new();
-        public List<MVP_Core.Data.Models.CertificationUpload> ExpiredCerts { get; set; } = new();
+        public List<Data.Models.SkillTrack> AllTracks { get; set; } = new();
+        public List<Data.Models.Technician> AllTechs { get; set; } = new();
+        public List<Data.Models.CertificationUpload> PendingCerts { get; set; } = new();
+        public Dictionary<int, List<Data.Models.SkillProgress>> TechProgress { get; set; } = new();
+        public List<Data.Models.CertificationUpload> ExpiredCerts { get; set; } = new();
         public SkillsTrackerModel(SkillsTrackerService skillsService, CertificationService certService)
         {
             _skillsService = skillsService;

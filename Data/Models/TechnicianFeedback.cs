@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace MVP_Core.Data.Models
+namespace Data.Models
 {
     /// <summary>
     /// TechnicianFeedback: Stores ratings (1-5) and optional notes for technician performance on a specific job.

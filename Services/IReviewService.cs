@@ -1,8 +1,8 @@
-using MVP_Core.Data.Models;
 using System.Collections.Generic;
 using System;
+using Data.Models;
 
-namespace MVP_Core.Services
+namespace Services
 {
     // Sprint 84.7.2 — Live Filter + UI Overlay
     public interface IReviewService

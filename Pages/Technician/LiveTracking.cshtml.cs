@@ -1,12 +1,12 @@
+using Data;
+using Data.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Data;
-using MVP_Core.Data.Models;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 
-namespace MVP_Core.Pages.Technician
+namespace Pages.Technician
 {
     // Sprint 30E.5 - Technician Mobile Tracking View UI
     [Authorize(Roles = "Technician")]

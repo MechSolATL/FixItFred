@@ -1,10 +1,10 @@
-using MVP_Core.Data;
+using Data;
 using MVP_Core.Data.Models;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MVP_Core.Services.Admin
+namespace Services.Admin
 {
     public class LateClockInDetectorService
     {

@@ -2,9 +2,16 @@
 // File: Pages/Matchups/Search.cshtml.cs
 // ===============================
 
-using MVP_Core.Services;
 
-namespace MVP_Core.Pages.Matchups
+// ===============================
+// File: Pages/Matchups/Search.cshtml.cs
+// ===============================
+
+using Data;
+using Data.Models;
+using Services;
+
+namespace Pages.Matchups
 {
     public class SearchModel : PageModel
     {

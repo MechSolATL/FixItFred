@@ -1,4 +1,7 @@
-namespace MVP_Core.Controllers
+using Data;
+using Data.Models;
+
+namespace Controllers
 {
     [Route("robots.txt")]
     public class RobotsController : Controller

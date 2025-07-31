@@ -2,7 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace MVP_Core.Migrations
+namespace Migrations
 {
     public partial class AddProsBadgeStatus_84 : Migration
     {

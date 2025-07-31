@@ -1,12 +1,12 @@
-using MVP_Core.Data;
-using MVP_Core.Data.Models;
-using MVP_Core.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Collections.Generic;
 using System.Linq;
+using Data;
+using Data.Models;
+using Services;
 
-namespace MVP_Core.Pages.Customer
+namespace Pages.Customer
 {
     public class PostJobSurveyModel : PageModel
     {

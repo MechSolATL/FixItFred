@@ -1,12 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Data;
 using MVP_Core.Data.Models;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using System;
+using Data;
 
-namespace MVP_Core.Pages.Admin
+namespace Pages.Admin
 {
     public class SetupWizardModel : PageModel
     {
@@ -43,10 +43,10 @@ namespace MVP_Core.Pages.Admin
             public bool CommunityFeed { get; set; } = false;
             public bool HeatPumpMatchups { get; set; } = false;
             public override string ToString() => string.Join(", ",
-                (TechnicianTracking ? "TechnicianTracking" : null),
-                (AccountingView ? "AccountingView" : null),
-                (CommunityFeed ? "CommunityFeed" : null),
-                (HeatPumpMatchups ? "HeatPumpMatchups" : null)
+                TechnicianTracking ? "TechnicianTracking" : null,
+                AccountingView ? "AccountingView" : null,
+                CommunityFeed ? "CommunityFeed" : null,
+                HeatPumpMatchups ? "HeatPumpMatchups" : null
             ).Replace(", ,", ",").Trim(',');
         }
 

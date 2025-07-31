@@ -1,12 +1,13 @@
-using MVP_Core.Data.Models;
-using MVP_Core.Services.Admin;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
+using Data;
+using Data.Models;
+using Services.Admin;
 
-namespace MVP_Core.Pages.Admin
+namespace Pages.Admin
 {
     public class SkillMatrixModel : PageModel
     {
@@ -20,7 +21,7 @@ namespace MVP_Core.Pages.Admin
 
         [BindProperty(SupportsGet = true)]
         public int TechnicianId { get; set; }
-        public List<MVP_Core.Data.Models.Technician> Technicians { get; set; } = new List<MVP_Core.Data.Models.Technician>();
+        public List<Data.Models.Technician> Technicians { get; set; } = new List<Data.Models.Technician>();
         [BindProperty]
         public List<TechnicianSkillMatrix> SkillMatrix { get; set; } = new List<TechnicianSkillMatrix>();
 

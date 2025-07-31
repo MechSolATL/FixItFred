@@ -1,11 +1,11 @@
-using MVP_Core.Data;
-using MVP_Core.Data.Models;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using Data.Models;
+using Data;
 
-namespace MVP_Core.Services.Admin
+namespace Services.Admin
 {
     public class IdleSessionMonitorService
     {

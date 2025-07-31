@@ -1,5 +1,5 @@
 // Sprint 76.1 Patch: Model for logging ego vector events and scores for managers/employees
-namespace MVP_Core.Data.Models
+namespace Data.Models
 {
     public class EgoVectorLog
     {

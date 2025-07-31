@@ -1,6 +1,8 @@
-using MVP_Core.Services.Email;
+using Data.Models;
+using Services;
+using Services.Email;
 
-namespace MVP_Core.Controllers
+namespace Controllers
 {
     public class RequestController(ServiceRequestService serviceRequestService, EmailService emailService) : Controller
     {

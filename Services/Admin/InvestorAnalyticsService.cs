@@ -1,12 +1,12 @@
-using MVP_Core.Data;
 using MVP_Core.Data.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Data;
 
-namespace MVP_Core.Services.Admin
+namespace Services.Admin
 {
     public class InvestorAnalyticsService
     {
@@ -25,7 +25,7 @@ namespace MVP_Core.Services.Admin
             if (!string.IsNullOrEmpty(serviceType))
                 query = query.Where(x => x.Status == "Paid" && x.CustomerName.Contains(serviceType)); // ServiceType mapping may need adjustment
             var result = await query
-                .GroupBy(x => new { Month = x.InvoiceDate.Month, Year = x.InvoiceDate.Year })
+                .GroupBy(x => new { x.InvoiceDate.Month, x.InvoiceDate.Year })
                 .Select(g => new RevenueSummary
                 {
                     Year = g.Key.Year,

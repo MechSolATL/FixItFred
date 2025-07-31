@@ -6,8 +6,8 @@
 @{
     Layout = "/Pages/Shared/_Layout.cshtml";
     var email = User.Identity?.Name ?? string.Empty; // Sprint 82: RazorViewFortification
-    var requests = Model.Requests ?? new List<MVP_Core.Data.Models.ServiceRequest>(); // Sprint 82: RazorViewFortification
-    var technicians = Model.Technicians ?? new List<MVP_Core.Data.Models.Technician>(); // Sprint 82: RazorViewFortification
+    var requests = Model.Requests ?? new List<Data.Models.ServiceRequest>(); // Sprint 82: RazorViewFortification
+    var technicians = Model.Technicians ?? new List<Data.Models.Technician>(); // Sprint 82: RazorViewFortification
     var filterDate = Request.Query["date"].ToString();
     var filterType = Request.Query["type"].ToString();
     var filterTech = Request.Query["tech"].ToString();

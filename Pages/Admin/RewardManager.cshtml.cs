@@ -1,10 +1,10 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Services;
 using MVP_Core.Data.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
+using Services;
 
-namespace MVP_Core.Pages.Admin
+namespace Pages.Admin
 {
     /// <summary>
     /// PageModel for RewardManager admin page. Allows tier management.

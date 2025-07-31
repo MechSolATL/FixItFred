@@ -1,11 +1,11 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Services.Admin;
-using MVP_Core.Data;
 using System.Collections.Generic;
 using System.Linq;
+using Data;
+using Services.Admin;
 
-namespace MVP_Core.Pages.Admin
+namespace Pages.Admin
 {
     [Authorize(Roles = "Admin,Dispatcher")]
     public class TechTrackingModel : PageModel
@@ -14,8 +14,8 @@ namespace MVP_Core.Pages.Admin
         private readonly PermissionService _permissionService;
         private readonly ApplicationDbContext _db;
 
-        public List<MVP_Core.Data.Models.Technician> Technicians { get; set; } = new();
-        public List<MVP_Core.Data.TechTrackingLog> TechTrackingLogs { get; set; } = new();
+        public List<Data.Models.Technician> Technicians { get; set; } = new();
+        public List<TechTrackingLog> TechTrackingLogs { get; set; } = new();
 
         public TechTrackingModel(PermissionService permissionService, ApplicationDbContext db)
         {

@@ -1,6 +1,6 @@
 using System;
 using System.ComponentModel.DataAnnotations.Schema;
-using MVP_Core.Data.Models;
+using Data.Models;
 
 namespace MVP_Core.Modules.Patch.Models
 {

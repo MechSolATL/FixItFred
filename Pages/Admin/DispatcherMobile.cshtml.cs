@@ -1,10 +1,10 @@
 // Sprint 49.0 Patch Log: Mobile Dispatcher View PageModel
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Services.Admin;
-using MVP_Core.Models.Admin;
 using System.Collections.Generic;
+using Models.Admin;
+using Services.Admin;
 
-namespace MVP_Core.Pages.Admin
+namespace Pages.Admin
 {
     public class DispatcherMobileModel : PageModel
     {

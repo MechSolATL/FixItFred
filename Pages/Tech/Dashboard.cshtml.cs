@@ -2,15 +2,15 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Data;
-using MVP_Core.Data.Models;
-using MVP_Core.Data.DTO.Tools;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Security.Claims;
+using Data.DTO.Tools;
+using Data;
+using Data.Models;
 
-namespace MVP_Core.Pages.Tech
+namespace Pages.Tech
 {
     [Authorize(Roles = "Technician")]
     public class DashboardModel : PageModel

@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using MVP_Core.ViewModels;
+using ViewModels;
 
-namespace MVP_Core.Services.Diagnostics
+namespace Services.Diagnostics
 {
     public class ProcessMonitorService
     {

@@ -1,8 +1,9 @@
-using MVP_Core.Data.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Text;
+using Data;
+using Data.Models;
 
-namespace MVP_Core.Services.Admin
+namespace Services.Admin
 {
     public class SyncIncentiveEngine
     {

@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace MVP_Core.Data.DTO.Analytics
+namespace Data.DTO.Analytics
 {
     public class ZoneAlertHeatmapDto
     {

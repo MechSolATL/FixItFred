@@ -1,11 +1,10 @@
 // Sprint 47.1 Patch Log: Skill tracker and leaderboard service for admin dashboard.
-using MVP_Core.Data;
-using MVP_Core.Data.Models;
+using Data;
 using System.Collections.Generic;
 using System.Linq;
-using TechnicianModel = MVP_Core.Data.Models.Technician;
+using TechnicianModel = Data.Models.Technician;
 
-namespace MVP_Core.Services
+namespace Services
 {
     public class SkillLeaderboardService
     {
@@ -29,7 +28,7 @@ namespace MVP_Core.Services
                 .Where(x => x.Tech != null)
                 .OrderByDescending(x => x.Points)
                 .Take(topN)
-                .Select(x => ((TechnicianModel)x.Tech!, x.Points))
+                .Select(x => (x.Tech!, x.Points))
                 .ToList();
             return leaderboard;
         }

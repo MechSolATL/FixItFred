@@ -1,16 +1,16 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Data;
-using MVP_Core.Data.Models;
-using MVP_Core.Helpers;
 using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
 using Microsoft.AspNetCore.SignalR;
-using MVP_Core.Hubs;
-using MVP_Core.Services;
+using Helpers;
+using Hubs;
+using Data;
+using Data.Models;
+using Services;
 
-namespace MVP_Core.Pages
+namespace Pages
 {
     [ValidateAntiForgeryToken]
     public class SubmitModel : PageModel

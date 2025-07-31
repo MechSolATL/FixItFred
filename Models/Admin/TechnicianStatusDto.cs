@@ -1,4 +1,4 @@
-namespace MVP_Core.Models.Admin
+namespace Models.Admin
 {
     public class TechnicianStatusDto
     {

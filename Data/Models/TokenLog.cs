@@ -1,4 +1,4 @@
-namespace MVP_Core.Data.Models
+namespace Data.Models
 {
     /// <summary>
     /// Represents a log entry for token-related actions, such as retrieval, refresh, or expiration.

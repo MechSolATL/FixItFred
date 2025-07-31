@@ -2,29 +2,29 @@
 @model MVP_Core.Pages.Admin.DashboardModel
 @inject global::Services.Dispatch.SlaDriftAnalyzerService SlaDriftAnalyzerService
 @inject global::Services.Storage.StorageMonitorService StorageMonitorService
-@inject global::Services.Admin.ComplianceReportService ComplianceReportService
-@inject global::Services.Admin.SmartAdminAlertsService SmartAdminAlertsService
+@inject MVP_Core.Services.Admin.ComplianceReportService ComplianceService
+@inject MVP_Core.Services.Admin.SmartAdminAlertsService SmartAdminAlertsService
 @inject MVP_Core.Data.ApplicationDbContext Db
 @using MVP_Core.Services.Tenant
 @inject TenantResolver TenantResolver
 @{
     ViewData["Title"] = "Admin Dashboard";
     Layout = "~/Pages/Shared/_Layout.cshtml";
-    // Sprint 83.4-TraceFix: Resolved CS8072 — Refactored expression tree to avoid ?. operator
+    // Sprint 83.4-TraceFix: Resolved CS8072 ï¿½ Refactored expression tree to avoid ?. operator
     var onboarding = Db.OnboardingStagings.FirstOrDefault(o => o.UserId == (User != null && User.Identity != null ? User.Identity.Name : null));
     var userId = User?.Identity?.Name;
     var onboardingStatus = userId != null ? Db.UserOnboardingStatuses.FirstOrDefault(u => u.UserId.ToString() == userId) : null;
     var modules = TenantResolver.TenantModules;
 }
 
-<!-- Sprint 85.2 — Admin Metrics Dashboard Integration -->
+<!-- Sprint 85.2 ï¿½ Admin Metrics Dashboard Integration -->
 @await Html.PartialAsync("/Pages/Shared/_MetricsCards.cshtml", Model.Metrics)
-<!-- End Sprint 85.2 — Admin Metrics Dashboard Integration -->
+<!-- End Sprint 85.2 ï¿½ Admin Metrics Dashboard Integration -->
 
 <div class="container mt-5">
     <h1 class="text-center mb-4">?? Service Requests Dashboard</h1>
 
-    <!-- Sprint 85.0 — Admin Drop Alert UI + Toast Integration -->
+    <!-- Sprint 85.0 ï¿½ Admin Drop Alert UI + Toast Integration -->
     <div class="mb-4">
         <h4>Recent TrustScore Drop Alerts
             @if (Model.DropAlertCount >= 3)
@@ -66,7 +66,7 @@
             <div class="alert alert-success">No TrustScore drops in the past 7 days.</div>
         }
     </div>
-    <!-- End Sprint 85.0 — Admin Drop Alert UI + Toast Integration -->
+    <!-- End Sprint 85.0 ï¿½ Admin Drop Alert UI + Toast Integration -->
 
     <!-- P.R.O.S. Certified Badge -->
     @if (onboarding != null && onboarding.IsVerified)
@@ -150,7 +150,7 @@
             <span class="me-2"><i class="fas fa-bell"></i></span>
             <span class="me-2"><i class="fas fa-bolt"></i></span>
             <span class="me-2"><i class="fas fa-shield-alt"></i></span>
-            <!-- Sprint 85.0 — Admin Drop Alert UI + Toast Integration: TrustMap badge icon -->
+            <!-- Sprint 85.0 ï¿½ Admin Drop Alert UI + Toast Integration: TrustMap badge icon -->
             <a href="/Admin/TrustMap" class="ms-3 position-relative" title="TrustMap">
                 <i class="fas fa-map-marked-alt fa-lg"></i>
                 @if (Model.DropAlertCount >= 3)
@@ -272,8 +272,8 @@
         <strong>Feedback Spotlight:</strong>
         <ul>
         @{
-            var loyaltyDb = Model != null && Model.HttpContext != null ? Model.HttpContext.RequestServices.GetService(typeof(MVP_Core.Data.ApplicationDbContext)) as MVP_Core.Data.ApplicationDbContext : null;
-            var reviews = loyaltyDb != null ? loyaltyDb.CustomerReviews.ToList() : new List<MVP_Core.Data.Models.CustomerReview>();
+            var loyaltyDb = Model != null && Model.HttpContext != null ? Model.HttpContext.RequestServices.GetService(typeof(Data.ApplicationDbContext)) as Data.ApplicationDbContext : null;
+            var reviews = loyaltyDb != null ? loyaltyDb.CustomerReviews.ToList() : new List<Data.Models.CustomerReview>();
             var spotlight = reviews.OrderByDescending(r => r.SentimentScore ?? 0).FirstOrDefault();
             if (spotlight != null)
             {
@@ -341,7 +341,7 @@
 @section Scripts {
     <script src="/js/dashboard-alerts.js"></script>
     <script>
-        // Sprint 85.0 — Admin Drop Alert UI + Toast Integration
+        // Sprint 85.0 ï¿½ Admin Drop Alert UI + Toast Integration
         window.latestDropAlerts = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.LatestDropAlerts.Select(a => new {
             technicianId = a.TechnicianId,
             previousScore = a.PreviousScore,

@@ -1,4 +1,4 @@
-namespace MVP_Core.Pages.Legal
+namespace Pages.Legal
 {
     public class LicenseModel : PageModel
     {

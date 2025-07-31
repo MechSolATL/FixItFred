@@ -1,7 +1,8 @@
 using MVP_Core.Data.Models;
 using Microsoft.EntityFrameworkCore;
+using Data;
 
-namespace MVP_Core.Services.Admin
+namespace Services.Admin
 {
     public class TechnicianEscalationService
     {

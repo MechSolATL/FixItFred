@@ -2,11 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Data;
+using Data.Models.NovaIntel;
 using Microsoft.EntityFrameworkCore;
-using MVP_Core.Data;
-using MVP_Core.Data.Models.NovaIntel;
 
-namespace MVP_Core.Services.Nova
+namespace Services.Nova
 {
     public class NovaIntelMemoryService
     {

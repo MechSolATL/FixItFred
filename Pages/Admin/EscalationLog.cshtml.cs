@@ -1,12 +1,12 @@
-using MVP_Core.Data;
-using MVP_Core.Data.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Data;
+using Data.Models;
 
-namespace MVP_Core.Pages.Admin
+namespace Pages.Admin
 {
     [Authorize(Roles = "Admin")]
     public class EscalationLogModel : PageModel

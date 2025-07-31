@@ -1,6 +1,6 @@
-using MVP_Core.Services;
+using Services;
 
-namespace MVP_Core.Pages.Shared
+namespace Pages.Shared
 {
     public class ThankYouModel : PageModel
     {

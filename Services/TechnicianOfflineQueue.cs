@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using MVP_Core.Data.Models;
 
-namespace MVP_Core.Services
+namespace Services
 {
     /// <summary>
     /// TechnicianOfflineQueue: Stores pending compliance checks for offline mode.

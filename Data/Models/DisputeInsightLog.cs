@@ -1,5 +1,5 @@
 // Created by FixItFred for Sprint 70.5 — Insight tracking for dispute reviews
-namespace MVP_Core.Data.Models;
+namespace Data.Models;
 public class DisputeInsightLog
 {
     public int Id { get; set; }

@@ -3,14 +3,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Data;
 using MVP_Core.Data.Models;
 using MVP_Core.Services.Admin;
-using MVP_Core.Services.Email;
+using Services.Email;
 
-namespace MVP_Core.Pages.Admin.Pros
+namespace Pages.Admin.Pros
 {
     public class GrantBadgeModel : PageModel
     {

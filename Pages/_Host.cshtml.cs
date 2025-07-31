@@ -1,4 +1,7 @@
-namespace MVP_Core.Pages
+using Data.Models.Seo;
+using Services;
+
+namespace Pages
 {
     public class _HostModel : PageModel
     {

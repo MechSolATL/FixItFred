@@ -9,8 +9,8 @@
         return;
     }
     var email = User.Identity?.Name ?? string.Empty;
-    var loyalty = PortalService.GetLoyaltyTransactions(email) ?? new List<MVP_Core.Data.Models.LoyaltyPointTransaction>();
-    var tiers = PortalService.GetRewardTiers() ?? new List<MVP_Core.Data.Models.RewardTier>();
+    var loyalty = PortalService.GetLoyaltyTransactions(email) ?? new List<Data.Models.LoyaltyPointTransaction>();
+    var tiers = PortalService.GetRewardTiers() ?? new List<Data.Models.RewardTier>();
     var currentTier = tiers.LastOrDefault(t => loyalty.Sum(l => l.Points) >= t.PointsRequired);
     var nextTier = tiers.FirstOrDefault(t => t.PointsRequired > (loyalty.Sum(l => l.Points)));
     var totalPoints = loyalty.Sum(l => l.Points);

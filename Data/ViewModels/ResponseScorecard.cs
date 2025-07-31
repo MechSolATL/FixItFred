@@ -1,4 +1,4 @@
-namespace MVP_Core.Data.ViewModels
+namespace Data.ViewModels
 {
     public class ResponseScorecard
     {

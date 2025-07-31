@@ -2,7 +2,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace MVP_Core.Data.Models
+namespace Data.Models
 {
     /// <summary>
     /// Represents a version of a prompt used in the application.
@@ -96,72 +96,6 @@ namespace MVP_Core.Data.Models
         /// Gets or sets the user who created the experiment.
         /// </summary>
         public string? CreatedBy { get; set; }
-    }
-
-    /// <summary>
-    /// Represents a log entry for a prompt trace.
-    /// </summary>
-    public class PromptTraceLog
-    {
-        /// <summary>
-        /// Gets or sets the unique identifier for the prompt trace log.
-        /// </summary>
-        [Key]
-        public int Id { get; set; }
-
-        /// <summary>
-        /// Gets or sets the identifier of the associated prompt version.
-        /// </summary>
-        [Required]
-        public int PromptVersionId { get; set; }
-
-        /// <summary>
-        /// Gets or sets the associated prompt version.
-        /// </summary>
-        public PromptVersion PromptVersion { get; set; } = null!;
-
-        /// <summary>
-        /// Gets or sets the identifier of the associated experiment.
-        /// </summary>
-        public int? ExperimentId { get; set; }
-
-        /// <summary>
-        /// Gets or sets the associated experiment.
-        /// </summary>
-        public PromptExperiment? Experiment { get; set; }
-
-        /// <summary>
-        /// Gets or sets the user identifier for the trace log.
-        /// </summary>
-        [Required]
-        public string UserId { get; set; } = string.Empty;
-
-        /// <summary>
-        /// Gets or sets the session identifier for the trace log.
-        /// </summary>
-        [Required]
-        public string SessionId { get; set; } = string.Empty;
-
-        /// <summary>
-        /// Gets or sets the input provided during the trace.
-        /// </summary>
-        [Required]
-        public string Input { get; set; } = string.Empty;
-
-        /// <summary>
-        /// Gets or sets the output generated during the trace.
-        /// </summary>
-        public string? Output { get; set; }
-
-        /// <summary>
-        /// Gets or sets the JSON trace data.
-        /// </summary>
-        public string? TraceJson { get; set; }
-
-        /// <summary>
-        /// Gets or sets the creation timestamp of the trace log.
-        /// </summary>
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }
 
     /// <summary>

@@ -4,20 +4,20 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 // FixItFred: Remove all ambiguous using for TechnicianAuditService, use fully qualified name
-using DomainTechnicianBehaviorLog = MVP_Core.Models.TechnicianBehaviorLog;
-using MVP_Core.Services.Admin;
-using MVP_Core.Data.Models;
+using DomainTechnicianBehaviorLog = Models.TechnicianBehaviorLog;
+using Data.Models;
+using Services.Admin;
 
-namespace MVP_Core.Pages.Admin
+namespace Pages.Admin
 {
     [Authorize(Roles = "Admin")]
     public class FlagReviewQueueModel : PageModel
     {
-        private readonly MVP_Core.Services.Admin.TechnicianAuditService _auditService;
+        private readonly Services.Admin.TechnicianAuditService _auditService;
         public PermissionService PermissionService { get; }
         public AdminUser AdminUser { get; }
         public List<DomainTechnicianBehaviorLog> FlaggedLogs { get; set; } = new();
-        public FlagReviewQueueModel(MVP_Core.Services.Admin.TechnicianAuditService auditService, PermissionService permissionService)
+        public FlagReviewQueueModel(Services.Admin.TechnicianAuditService auditService, PermissionService permissionService)
         {
             _auditService = auditService;
             PermissionService = permissionService;

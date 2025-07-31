@@ -1,4 +1,7 @@
-namespace MVP_Core.Controllers.Api
+using Data;
+using Data.Models;
+
+namespace Controllers.Api
 {
     [ApiController]
     [Route("api/click-log")]

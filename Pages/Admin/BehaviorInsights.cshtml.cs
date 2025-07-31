@@ -4,12 +4,12 @@ using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using MVP_Core.Models;
-using MVP_Core.Services.Admin;
-using MVP_Core.Data;
-using MVP_Core.Data.Models;
+using Models;
+using Data.Models;
+using Data;
+using Services.Admin;
 
-namespace MVP_Core.Pages.Admin
+namespace Pages.Admin
 {
     public class BehaviorInsightsModel : PageModel
     {

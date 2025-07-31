@@ -1,9 +1,9 @@
 // Sprint 32.2 - Security + Audit Harden
 using Microsoft.AspNetCore.Http;
 using System.Threading.Tasks;
-using MVP_Core.Services;
+using Services;
 
-namespace MVP_Core.Middleware
+namespace Middleware
 {
     public class AuditTrailLoggerMiddleware
     {

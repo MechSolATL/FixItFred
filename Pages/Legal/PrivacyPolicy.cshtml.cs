@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace MVP_Core.Pages.Legal
+namespace Pages.Legal
 {
     public class PrivacyPolicyModel : PageModel
     {

@@ -2,11 +2,12 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using Data.Models;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
 
-namespace MVP_Core.Services.Admin
+namespace Services.Admin
 {
     public static class SprintPdfArchive
     {

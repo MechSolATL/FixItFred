@@ -1,0 +1,13 @@
+{
+  "sprint": "Sprint92",
+  "tasks": [
+    "RazorModelBindingFix",
+    "AutoServiceWiring",
+    "SmartReplayStrategyInjection"
+  ],
+  "defaultBehavior": {
+    "enableDiagnostics": true,
+    "autoStageMetadata": true,
+    "prioritizeFailingBuildTargets": true
+  }
+}

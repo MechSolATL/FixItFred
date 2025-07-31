@@ -1,6 +1,6 @@
 using System;
 
-namespace MVP_Core.Data.Models
+namespace Data.Models
 {
     // Remove duplicate StressLevel enum, now defined in AccountabilityDelayLog.cs
     public class WellBeingPulseLog

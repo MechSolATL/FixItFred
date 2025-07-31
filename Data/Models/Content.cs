@@ -1,4 +1,4 @@
-namespace MVP_Core.Data.Models
+namespace Data.Models
 {
     /// <summary>
     /// Represents dynamic content blocks used throughout the site.

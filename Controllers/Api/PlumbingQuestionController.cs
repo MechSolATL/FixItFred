@@ -1,4 +1,7 @@
-namespace MVP_Core.Controllers.Api
+using Data.Models.ViewModels;
+using Services;
+
+namespace Controllers.Api
 {
     [Route("api/[controller]")]
     [ApiController]
