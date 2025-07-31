@@ -1,1 +1,46 @@
-{"sprint":"Sprint92","scope":["Razor","Diagnostics","Service AI patch automation"],"tasks":["RazorModelBindingFix","AutoServiceWiring","SmartReplayStrategyInjection"],"defaultBehavior":{"enableDiagnostics":true,"autoStageCopilotMetadata":true,"prioritizeFailingBuildTargets":true}}
+{
+  "description": "DiagnosticsAI + Core Sprint92 Copilot Orchestration",
+  "sprint": "Sprint92",
+  "scope": [ "Razor", "Diagnostics", "Service AI patch automation" ],
+  "tasks": [ "RazorModelBindingFix", "AutoServiceWiring", "SmartReplayStrategyInjection" ],
+  "defaultBehavior": {
+    "enableDiagnostics": true,
+    "autoStageCopilotMetadata": true,
+    "prioritizeFailingBuildTargets": true
+  },
+  "enforcements": {
+    "namespacePrefix": "MVP_Core.Services",
+    "constructorInjectionOnly": true,
+    "razorLayoutRequired": "/Pages/Shared/_Layout.cshtml",
+    "seoRequired": true,
+    "noStaticDependencies": true,
+    "noAndChainShell": true
+  },
+  "aiRoles": {
+    "Nova": {
+      "role": "CTO",
+      "permissions": [ "architect", "command" ],
+      "enforces": [ "sprint boundaries", "copilot compliance", "error-free builds" ]
+    },
+    "FixItFred": {
+      "role": "AI Engineer",
+      "triggers": [ "Nova" ],
+      "logsAllChanges": true,
+      "tagsAllCommits": true
+    }
+  },
+  "razor": {
+    "seoInjectionFile": "Pages/_SEOHead.cshtml",
+    "traceEnabled": true
+  },
+  "compiler": {
+    "warningsAsErrors": true,
+    "nullCoalescingRequired": true,
+    "obsoleteMustBeMarked": true
+  },
+  "backupStrategy": {
+    "tagEveryXSprints": 10,
+    "tagAfterZeroWarningBuild": true
+  }
+}
+AI patch automation"],"tasks":["RazorModelBindingFix","AutoServiceWiring","SmartReplayStrategyInjection"],"defaultBehavior":{"enableDiagnostics":true,"autoStageCopilotMetadata":true,"prioritizeFailingBuildTargets":true}}
