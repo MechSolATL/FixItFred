@@ -1,35 +1,37 @@
 using System;
-using System.IO;
-using System.Linq;
-using Microsoft.AspNetCore.Mvc.Razor;
+using System.Collections.Generic;
+using System.Reflection;
 
-namespace FixItFredDiagnostics
+namespace MVP_Core.Services.Diagnostics
 {
-    public class DiagnosticsRunner
+    /// <summary>
+    /// Entry point for executing all registered diagnostic modules via IServiceModule.
+    /// </summary>
+    public static class DiagnosticsRunner
     {
-        public void RunDiagnostics()
+        public static void RunAllDiagnostics(IServiceProvider serviceProvider)
         {
-            // Trigger scans across Razor Pages
-            var razorFiles = Directory.GetFiles("Razor Pages/Admin", "*.cshtml.cs", SearchOption.AllDirectories);
-            foreach (var file in razorFiles)
+            Console.WriteLine("🔍 Running diagnostics for all IServiceModules...");
+            var scanner = new ServiceModuleScanner();
+            var modules = scanner.ScanForModules();
+
+            foreach (var module in modules)
             {
-                CheckForUnresolvedPartials(file);
-                ValidateSeoMetadata(file);
+                Console.WriteLine($"🛠️ Diagnosing: {module.FullName}");
+                var instance = Activator.CreateInstance(module);
+                var runMethod = module.GetMethod("RunDiagnostics", BindingFlags.Public | BindingFlags.Instance);
+
+                if (runMethod != null)
+                {
+                    runMethod.Invoke(instance, new object[] { serviceProvider });
+                }
+                else
+                {
+                    Console.WriteLine($"⚠️ Skipped: {module.FullName} has no 'RunDiagnostics' method.");
+                }
             }
-        }
 
-        private void CheckForUnresolvedPartials(string filePath)
-        {
-            // Logic to check unresolved Razor partials
-            // This is a placeholder for actual implementation
-            Console.WriteLine($"Checking unresolved partials in {filePath}...");
-        }
-
-        private void ValidateSeoMetadata(string filePath)
-        {
-            // Logic to validate SeoMetadata properties
-            // This is a placeholder for actual implementation
-            Console.WriteLine($"Validating SeoMetadata in {filePath}...");
+            Console.WriteLine("✅ Diagnostics complete.");
         }
     }
 }
