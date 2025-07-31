@@ -1,0 +1,30 @@
+@page
+@model LeaderboardUIModel
+@{
+    Layout = "/Pages/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Technician Leaderboard";
+}
+<h1>Technician Leaderboard</h1>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Completed Jobs</th>
+            <th>Rating</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var entry in Model.Leaderboard)
+    {
+        <tr>
+            <td>@entry.Name</td>
+            <td>@entry.CompletedJobs</td>
+            <td>@entry.Rating.ToString("0.0")</td>
+        </tr>
+    }
+    </tbody>
+</table>
+@if (!Model.Leaderboard.Any())
+{
+    <p>No leaderboard data available.</p>
+}
