@@ -1,0 +1,1 @@
+{"sprint":"Sprint92","scope":["Razor","Diagnostics","Service AI patch automation"],"tasks":["RazorModelBindingFix","AutoServiceWiring","SmartReplayStrategyInjection"],"defaultBehavior":{"enableDiagnostics":true,"autoStageCopilotMetadata":true,"prioritizeFailingBuildTargets":true}}
