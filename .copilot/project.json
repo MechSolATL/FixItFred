@@ -43,4 +43,4 @@
     "tagAfterZeroWarningBuild": true
   }
 }
-AI patch automation"],"tasks":["RazorModelBindingFix","AutoServiceWiring","SmartReplayStrategyInjection"],"defaultBehavior":{"enableDiagnostics":true,"autoStageCopilotMetadata":true,"prioritizeFailingBuildTargets":true}}
+}
