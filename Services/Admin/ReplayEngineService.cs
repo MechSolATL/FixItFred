@@ -5,15 +5,19 @@ using MVP_Core.Data;
 using MVP_Core.Data.Models;
 using Helpers;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace MVP_Core.Services.Admin
 {
     public class ReplayEngineService
     {
         private readonly ApplicationDbContext _db;
-        public ReplayEngineService(ApplicationDbContext db)
+        private readonly ILogger<ReplayEngineService> _logger;
+
+        public ReplayEngineService(ApplicationDbContext db, ILogger<ReplayEngineService> logger)
         {
             _db = db;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public async Task<string> CaptureSnapshotAsync(object data, string type, string summary, string createdBy)
