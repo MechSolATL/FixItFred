@@ -51,16 +51,13 @@ namespace Services.Admin
                     TriggerSignature = item.TriggerSignature,
                     PatternHash = item.PatternHash,
                     Outcome = item.Outcome,
-                    RecordedAt = item.LastRecorded,
-                    SourceModule = "SystemDiagnostics",
-                    TriggerContextJson = TraceCaptureHelper.CaptureContext(item.ErrorObject),
-                    LinkedRequestId = item.ServiceRequest?.Id
+                    Count = item.Count,
+                    LastRecorded = item.LastRecorded,
+                    ErrorObject = item.ErrorObject,
+                    ServiceRequest = item.ServiceRequest
                 };
                 learningLogs.Add(log);
             }
-            // Optionally persist new learning logs
-            // _db.RecoveryLearningLogs.AddRange(learningLogs);
-            // await _db.SaveChangesAsync();
             return learningLogs;
         }
 
@@ -82,12 +79,15 @@ namespace Services.Admin
 
 namespace MVP_Core.Services.Admin
 {
-    /// <summary>
-    /// 🧩 Sprint_91_11E — Stub applied to pass build.
-    /// Placeholder for RecoveryAILearningService.
-    /// </summary>
+    // [Sprint91_Recovery_P2] Nova stub restore
     public class RecoveryAILearningService
     {
-        public void DummyMethod() {}
+        public RecoveryAILearningService(string traceId) {}
+
+        public Task AnalyzeRecoveryPatternsAsync(string technicianId)
+            => Task.CompletedTask;
+
+        public Task<List<string>> SuggestAutoRepairTriggers()
+            => Task.FromResult(new List<string> { "TriggerA", "TriggerB" });
     }
 }

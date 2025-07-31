@@ -22,6 +22,9 @@ namespace MVP_Core.Pages.Admin
         [BindProperty(SupportsGet = true)]
         public string SearchTerm { get; set; } = string.Empty;
         public string StatusMessage { get; set; } = string.Empty;
+        public Seo Seo { get; set; } = new Seo();
+        public string ViewTitle { get; set; } = "Untitled";
+        public string TierStatus { get; set; } = "Standard";
         public async Task OnGetAsync()
         {
             var query = _db.SystemSnapshotLogs.AsQueryable();

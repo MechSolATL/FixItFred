@@ -6,8 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using MVP_Core.Services;
-using MVP_Core.Services.Admin; // 🧩 Sprint_91_11G
+using MVP_Core.Services.Admin; // [Sprint91_28.6] Nova: ReplayEngineService ambiguity resolved
 
 #pragma warning disable CS0618
 // [Sprint91_27] Nova hard patch — Timestamp — Warning suppression
@@ -18,7 +17,7 @@ namespace MVP_Core.Pages.Admin
     {
         private readonly ApplicationDbContext _db;
         private readonly ValidationSimulatorService _simService;
-        private readonly ReplayEngineService _replayService;
+        private readonly MVP_Core.Services.Admin.ReplayEngineService _replayService;
         public SystemValidationModel(ApplicationDbContext db, ValidationSimulatorService simService)
         {
             _db = db;
@@ -30,6 +29,9 @@ namespace MVP_Core.Pages.Admin
         public List<SystemSnapshotLog> LastSnapshots { get; set; } = new();
         public List<AdminAlertLog> LastAlerts { get; set; } = new();
         public List<ReplayAuditLog> ReplayAuditLogs { get; set; } = new();
+
+        public Seo Seo { get; set; } = new Seo();
+        public string ViewTitle { get; set; } = "Untitled";
 
         public async Task OnGetAsync()
         {

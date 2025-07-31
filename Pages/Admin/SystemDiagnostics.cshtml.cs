@@ -8,8 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using MVP_Core.Services;
-using MVP_Core.Services.Admin; // 🧩 Sprint_91_11F
+using MVP_Core.Services.Admin; // [Sprint91_28.6] Nova: ReplayEngineService ambiguity resolved
 
 namespace MVP_Core.Pages.Admin
 {
@@ -20,7 +19,7 @@ namespace MVP_Core.Pages.Admin
         private readonly AutoRepairEngine _autoRepairEngine; // Sprint 79.2
         private readonly RootCauseCorrelationEngine _rootCauseCorrelationEngine; // Sprint 79.2
         private readonly SmartAdminAlertsService _smartAdminAlertsService; // Sprint 79.2
-        private readonly ReplayEngineService _replayEngineService; // Sprint 79.2
+        private readonly MVP_Core.Services.Admin.ReplayEngineService _replayEngineService; // Sprint 79.2
         private readonly RecoveryAILearningService _aiService; // Sprint 79.2
 
         public SystemDiagnosticsModel(ApplicationDbContext db, SystemDiagnosticsService diagnosticsService, AutoRepairEngine autoRepairEngine)
@@ -58,6 +57,8 @@ namespace MVP_Core.Pages.Admin
         public int TotalPatternsLearned { get; set; } // Sprint 79.2
         public string MostCommonOutcome { get; set; } = ""; // Sprint 79.2
         public RecoveryLearningLog LatestPattern { get; set; } = new RecoveryLearningLog(); // Sprint 79.2
+        public Seo Seo { get; set; } = new Seo();
+        public string ViewTitle { get; set; } = "Untitled";
 
         public async Task<IActionResult> OnGetAsync(string filterRange)
         {

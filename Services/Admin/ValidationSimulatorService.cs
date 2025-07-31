@@ -89,11 +89,8 @@ namespace MVP_Core.Services.Admin
         // Sprint_91_11H: Placeholder for validation engine
         public void Simulate() { }
 
-        // Sprint_91_11I: Placeholder for validation engine
-        public void Simulate() { }
-
-        // Sprint_91_11J: Placeholder for validation engine
-        public void RunSimulation() { }
+        // Overloaded Simulate method with modelId parameter
+        public void Simulate(string modelId = "") { }
     }
 #pragma warning restore CS0618
 }

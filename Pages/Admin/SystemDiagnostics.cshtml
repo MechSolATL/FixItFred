@@ -1,9 +1,9 @@
 @page
 @model MVP_Core.Pages.Admin.SystemDiagnosticsModel
-@inject global::Services.Admin.AutoRepairEngine AutoRepairEngine
-@inject global::Services.Diagnostics.RootCauseCorrelationEngine RootCauseCorrelationEngine
-@inject global::Services.Admin.SmartAdminAlertsService SmartAdminAlertsService
-@inject global::Services.Admin.ReplayEngineService ReplayEngineService
+@using MVP_Core.Services.Admin
+@inject MVP_Core.Services.Admin.AutoRepairEngine AutoRepairEngine
+@inject MVP_Core.Services.Admin.SmartAdminAlertsService SmartAdminAlertsService
+@inject MVP_Core.Services.Admin.ReplayEngineService ReplayEngine
 @{
     ViewData["Title"] = "System Diagnostics";
 }

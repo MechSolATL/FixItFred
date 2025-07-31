@@ -20,6 +20,12 @@ namespace MVP_Core.Pages.Technician
         public string? PatchIdentityError { get; set; }
         public int BanterFlagCount { get; set; }
 
+        // [Sprint91_Recovery_P8] Nova Razor binding patch
+        public Seo Seo { get; set; } = new Seo();
+        public string TierStatus { get; set; } = "Basic";
+        public string ViewTitle { get; set; } = "Profile";
+        public string? ReturnUrl { get; set; }
+
         public ProfileModel(ITechnicianProfileService profileService, IHttpContextAccessor httpContextAccessor)
         {
             _profileService = profileService;

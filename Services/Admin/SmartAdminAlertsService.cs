@@ -78,13 +78,7 @@ namespace MVP_Core.Services.Admin
             return alerts.Count > 0 ? alerts : new List<string> { "No critical alerts.", "System stable." };
         }
 
-        // Sprint_91_11H: Placeholder for smart alert generation logic
-        public void Alert() { }
-
-        // Sprint_91_11I: Placeholder for smart alert generation logic
-        public void Alert() { }
-
-        // Sprint_91_11J: Placeholder for smart alert generation logic
-        public void GenerateAlert() { }
+        // Custom alert method (does nothing)
+        public void Alert(string message, string level = "info") { }
     }
 }

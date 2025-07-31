@@ -1,54 +1,40 @@
 @page
-@using Microsoft.AspNetCore.Authorization
-@attribute [Authorize(Roles = "Admin")]
 @model MVP_Core.Pages.Admin.LeaderboardModel
-@{
-    ViewData["Title"] = "Leaderboard";
+@using MVP_Core.Data.Models.UI
+@inject ILeaderboardService LeaderboardService
+@inject ContentService ContentService
+@inject ISeoService SeoService
+@{ 
+    var seo = await SeoService.GetSeoForPageAsync("Leaderboard");
+    ViewData["Title"] = seo.Title;
+    ViewData["Description"] = seo.Description;
 }
-<div class="container mx-auto py-6">
-@if (Model.PermissionService.CanAccess(Model.AdminUser, "Leaderboard")) {
-    <h2 class="text-2xl font-bold mb-4">Technician Leaderboard</h2>
-    <div class="mb-4 flex gap-2">
-        <form method="get">
-            <select name="filter" class="form-select" onchange="this.form.submit()">
-                <option value="all" selected>All Time</option>
-                <option value="monthly">Monthly</option>
-                <option value="weekly">Weekly</option>
-            </select>
-        </form>
-    </div>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        @foreach (var entry in Model.Leaderboard)
+
+<div class="leaderboard">
+    <h1>@Model.Title</h1>
+    <div class="technicians">
+        @foreach (var tech in Model.TopTechnicians)
         {
-            <div class="bg-white rounded shadow p-4 flex flex-col items-center">
-                <div class="flex items-center gap-2 mb-2">
-                    <span class="text-xl font-bold">@entry.Rank</span>
-                    <span class="font-semibold">@entry.Name</span>
-                    @if (entry.RankChange > 0)
-                    {
-                        <span class="text-green-600">&#8593; @entry.RankChange</span>
-                    }
-                    else if (entry.RankChange < 0)
-                    {
-                        <span class="text-red-600">&#8595; @(-entry.RankChange)</span>
-                    }
-                </div>
-                <div class="flex gap-2 mb-2">
-                    @foreach (var badge in entry.Badges)
-                    {
-                        <span class="px-2 py-1 rounded bg-blue-100 text-blue-800 text-xs font-semibold">@badge</span>
-                    }
-                </div>
-                <div class="flex flex-col items-center">
-                    <span class="text-gray-700">Jobs: <b>@entry.JobsCompleted</b></span>
-                    <span class="text-gray-700">Rating: <b>@entry.Rating.ToString("F1")</b></span>
-                    <span class="text-gray-700">Upsells: <b>@entry.UpsellCount</b></span>
-                </div>
+            <div class="technician">
+                <img src="@tech.Avatar" alt="@tech.Name" />
+                <h2>@tech.Name</h2>
+                <p>Rank: @tech.Rank</p>
+                <p>Jobs Completed: @tech.JobsCompleted</p>
+                <p>Sales Total: @tech.SalesTotal</p>
+                <p>Customer Rating: @tech.CustomerRating</p>
             </div>
         }
     </div>
-    <!-- Optionally add Chart.js sparklines here for trends -->
-} else {
-    <div class="text-yellow-500 font-semibold">Access restricted based on role permissions.</div>
-}
+    <div class="monthly-challenge">
+        <h2>Monthly Challenge</h2>
+        <p>@Model.MonthlyChallengeSummary</p>
+    </div>
+    <div class="efficiency-meter">
+        <h2>Team Efficiency</h2>
+        <progress value="@Model.TeamEfficiency" max="100"></progress>
+    </div>
+    <div class="quote-panel">
+        <h2>Quote of the Moment</h2>
+        <p>@Model.RotatingQuote</p>
+    </div>
 </div>

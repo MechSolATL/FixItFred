@@ -14,6 +14,11 @@ namespace MVP_Core.Pages
             _seoService = seoService;
         }
 
+        public Seo Seo { get; set; } = new Seo();
+        public string TierStatus { get; set; } = "Basic";
+        public string ViewTitle { get; set; } = "Access Denied";
+        public string? ReturnUrl { get; set; }
+
         public async Task OnGetAsync()
         {
             var seo = await _seoService.GetSeoByPageNameAsync("AccessDenied");

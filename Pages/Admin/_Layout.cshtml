@@ -1,0 +1,22 @@
+@using MVP_Core.Services
+@inject IDeviceResolver DeviceResolver
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>@ViewData["Title"]</title>
+    <meta name="description" content="@ViewData["Description"]" />
+    <link rel="stylesheet" href="/css/site.css" />
+</head>
+<body>
+    <header>
+        <h1>@ViewData["Title"]</h1>
+    </header>
+    <main>
+        @RenderBody()
+    </main>
+    <footer>
+        <p>&copy; 2025 MechSolATL</p>
+    </footer>
+</body>
+</html>

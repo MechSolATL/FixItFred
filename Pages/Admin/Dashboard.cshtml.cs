@@ -55,6 +55,9 @@ namespace MVP_Core.Pages.Admin
         public AdminMetricsViewModel Metrics { get; set; } = new();
         public List<(string TechName, TechnicianBadge Badge)> CurrentBadgeHolders { get; set; } = new();
 
+        public Seo Seo { get; set; } = new Seo();
+        public string ViewTitle { get; set; } = "Untitled";
+
         public async Task OnGetAsync()
         {
             IQueryable<ServiceRequest> query = _context.ServiceRequests.AsQueryable();

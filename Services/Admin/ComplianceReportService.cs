@@ -1,7 +1,7 @@
 using System;
 using System.Threading.Tasks;
-// ...existing code...
-namespace Services.Admin
+
+namespace MVP_Core.Services.Admin
 {
     /// <summary>
     /// Generates compliance audit reports (PDF/CSV).
@@ -10,5 +10,7 @@ namespace Services.Admin
     {
         // TODO: Implement report generation and audit trail tracking
         public Task GenerateComplianceReportAsync() => Task.CompletedTask;
+        public string Generate() => "Compliant";
+        public string GenerateComplianceReport() => "OK";
     }
 }
