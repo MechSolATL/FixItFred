@@ -1,17 +1,25 @@
 @page
-// FixItFred Patch Log � Sprint 25
-// [2024-07-25T00:00:00Z] � Verified & corrected Razor structure and SEO injection.
 @model AccessDeniedModel
 @{
-    ViewData["Title"] = "Access Denied";
+    ViewData["Title"] = Model.Seo?.Title ?? "Access Denied";
     Layout = "/Pages/Shared/_Layout.cshtml";
-    /*
-    @inject ISEOService SEO
-    <title>@SEO.Title</title>
-    <meta name="description" content="@SEO.MetaDescription" />
-    <meta name="keywords" content="@SEO.Keywords" />
-    <meta name="robots" content="@SEO.Robots" />
-    */
 }
+
+<!--
+🔧 Sprint: #Sprint_91_11A_SeoCompliance_AccessDenied
+✅ Purpose: Enforced full SEO metadata injection for AccessDenied.cshtml.
+🧠 Logic: Loads dynamic SEO meta fields via OnGetAsync from the SEO service.
+🛡️ Outcome: Hardened Razor Page SEO compliance, confirmed layout integrity.
+📅 Executed: 2025-07-31T[time auto-fill]
+-->
+<!-- SEO Metadata Injection -->
+@if (Model.Seo != null)
+{
+    <title>@Model.Seo.Title</title>
+    <meta name="description" content="@Model.Seo.MetaDescription" />
+    <meta name="keywords" content="@Model.Seo.Keywords" />
+    <meta name="robots" content="@Model.Seo.Robots" />
+}
+
 <h2>Access Denied</h2>
 <p>You do not have permission to access this page.</p>
