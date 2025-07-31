@@ -26,9 +26,6 @@
   </ItemGroup>
 <!-- Sprint92_Fix_B5 — Removed redundant Compile include to resolve NETSDK1022 -->
 <!-- Reports directory is auto-included by SDK-style project layout -->
-  <ItemGroup>
-    <Folder Include="Tests\Services\" />
-  </ItemGroup>
 
   
 
