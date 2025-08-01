@@ -1,10 +1,7 @@
-using Data;
-using Data.Models;
-using Data.Models.Seo;
 using Microsoft.AspNetCore.Authorization;
-using Services;
+using MVP_Core.Services;
 
-namespace Pages.Admin
+namespace MVP_Core.Pages.Admin
 {
     [Authorize(Policy = "AdminPolicy")]
     [ValidateAntiForgeryToken]
@@ -22,13 +19,6 @@ namespace Pages.Admin
             _seoService = seoService;
             _deviceResolver = deviceResolver;
         }
-
-        public SeoMetadata Seo { get; set; } = new SeoMetadata();
-
-        public string Title => Seo.Title;
-        public string MetaDescription => Seo.MetaDescription;
-        public string Keywords => Seo.Keywords;
-        public string Robots => Seo.Robots;
 
         public async Task OnGetAsync()
         {

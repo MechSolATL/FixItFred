@@ -1,14 +1,14 @@
 // Sprint 91.17 - TroubleshootingBrain
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using MVP_Core.Data;
+using MVP_Core.Data.Models;
+using MVP_Core.Services;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Threading.Tasks;
-using Data;
-using Data.Models;
-using Services;
 
-namespace Pages.Admin
+namespace MVP_Core.Pages.Admin
 {
     /// <summary>
     /// Represents the Razor Page model for troubleshooting equipment issues.
@@ -51,7 +51,7 @@ namespace Pages.Admin
         /// Gets or sets the AI-suggested fix for the issue.
         /// </summary>
         [BindProperty]
-        public string AISuggestedFix { get; set; } = string.Empty;
+        public string AISuggestedFix { get; set; }
 
         /// <summary>
         /// Gets or sets the feedback result provided by the technician.
@@ -63,7 +63,7 @@ namespace Pages.Admin
         /// Gets or sets the notes provided by the technician.
         /// </summary>
         [BindProperty]
-        public string? TechNotes { get; set; }
+        public string TechNotes { get; set; }
 
         /// <summary>
         /// Gets or sets the known fix for the issue.
@@ -101,7 +101,7 @@ namespace Pages.Admin
         {
             // Simulate tech ID for demo
             var techId = Guid.NewGuid();
-            bool? wasSuccessful = FeedbackResult == "Worked" ? true : FeedbackResult == "DidntWork" ? false : null;
+            bool? wasSuccessful = FeedbackResult == "Worked" ? true : FeedbackResult == "DidntWork" ? false : (bool?)null;
             await _llmService.LogTroubleshootingAttemptAsync(techId, $"{ErrorCode}|{EquipmentType}|{Manufacturer}", AISuggestedFix, wasSuccessful, TechNotes);
             if (wasSuccessful == true)
             {

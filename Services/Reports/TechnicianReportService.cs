@@ -1,13 +1,14 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using MVP_Core.Data;
+using MVP_Core.Data.Models;
+using MVP_Core.Data.Models.Reports;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Data;
-using Data.Models;
 
 // Sprint 91.23 - Technician Report Library
-namespace Services.Reports
+namespace MVP_Core.Services.Reports
 {
     public class TechnicianReportService
     {
@@ -63,10 +64,10 @@ namespace Services.Reports
         }
 
         // ✅ Added by FixItFred — Sprint92_RecoveryFixes
-        public async Task<MVP_Core.Data.Models.Reports.ReportResult> GenerateSingleReport(Guid technicianId, DateTime fromDate, DateTime toDate)
+        public async Task<ReportResult> GenerateSingleReport(Guid technicianId, DateTime fromDate, DateTime toDate)
         {
             // TODO: Replace with actual logic
-            return await Task.FromResult(new MVP_Core.Data.Models.Reports.ReportResult
+            return await Task.FromResult(new ReportResult
             {
                 TechnicianId = technicianId,
                 FromDate = fromDate,
@@ -79,7 +80,7 @@ namespace Services.Reports
         public async Task<ReportComparison> GenerateComparisonReport(Guid[] technicianIds, DateTime fromDate, DateTime toDate)
         {
             // TODO: Replace with real aggregation logic
-            return await Task.FromResult(new MVP_Core.Data.Models.Reports.ReportComparison
+            return await Task.FromResult(new ReportComparison
             {
                 TechnicianIds = technicianIds.ToList(),
                 FromDate = fromDate,
