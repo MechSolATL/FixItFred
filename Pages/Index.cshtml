@@ -1,20 +1,44 @@
 @page "/"
+<<<<<<< HEAD
 @model Pages.IndexModel
 @inject Services.ISeoService SeoService
+=======
+@* [FixItFredComment:Sprint1005 - UI responsiveness corrected] Enhanced mobile responsiveness for landing page *@
+@model MVP_Core.Pages.IndexModel
+@inject MVP_Core.Services.ISeoService SeoService
+>>>>>>> d104d38
 
 @{
     // Layout is set via _ViewStart.cshtml for device compliance
     await Html.PartialAsync("/Pages/Shared/_SEOHead.cshtml");
 }
 
-<div class="position-absolute top-0 end-0 m-3">
-    <a href="/Account/Login" class="btn btn-primary">Log In</a>
+<!-- [FixItFredComment:Sprint1005 - UI responsiveness corrected] Improved mobile-friendly header navigation -->
+<div class="position-absolute top-0 end-0 m-2 m-md-3">
+    <a href="/Account/Login" class="btn btn-primary btn-sm btn-md-auto">Log In</a>
 </div>
 
-<div class="text-center mt-5">
-    <h1>Welcome to Service Atlanta</h1>
-    <p class="lead">Your one-stop solution for expert Plumbing, HVAC, and Filtration Services</p>
-    <button class="btn btn-success btn-lg" onclick="openModal('Plumbing')">Start Plumbing Service</button>
+<!-- [FixItFredComment:Sprint1005 - UI responsiveness corrected] Enhanced mobile layout and typography -->
+<div class="container-fluid text-center mt-4 mt-md-5 px-3">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-8">
+            <h1 class="display-4 display-md-3 mb-3 mb-md-4">Welcome to Service Atlanta</h1>
+            <p class="lead fs-5 fs-md-4 mb-4 mb-md-5">Your one-stop solution for expert Plumbing, HVAC, and Filtration Services</p>
+            
+            <!-- [FixItFredComment:Sprint1005 - UI responsiveness corrected] Added responsive service buttons -->
+            <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                <button class="btn btn-success btn-lg" onclick="openModal('Plumbing')">
+                    <i class="bi bi-wrench me-2 d-none d-sm-inline"></i>Start Plumbing Service
+                </button>
+                <button class="btn btn-info btn-lg" onclick="openModal('HVAC')">
+                    <i class="bi bi-thermometer-half me-2 d-none d-sm-inline"></i>HVAC Service
+                </button>
+                <button class="btn btn-warning btn-lg" onclick="openModal('Filtration')">
+                    <i class="bi bi-droplet me-2 d-none d-sm-inline"></i>Water Filtration
+                </button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <!-- Modal Loads Here -->

@@ -1,17 +1,17 @@
 @page
-// FixItFred Patch Log — Sprint 25
-// [2024-07-25T00:00:00Z] — Verified & corrected Razor structure and SEO injection.
+// FixItFred Patch Log ï¿½ Sprint 25
+// [2024-07-25T00:00:00Z] ï¿½ Verified & corrected Razor structure and SEO injection.
+@* [FixItFredComment:Sprint1003 - SEO Meta Injection] Added proper SEO metadata and canonical links *@
 @model AdminLoginModel
 @{
     ViewData["Title"] = "Admin Login";
+    ViewData["MetaDescription"] = "Secure admin login portal for Service Atlanta management system";
+    ViewData["Keywords"] = "admin login, service atlanta, management portal, secure access";
+    ViewData["Robots"] = "noindex, nofollow"; // Admin pages should not be indexed
     Layout = "/Pages/Shared/_Layout.cshtml";
-    /*
-    @inject ISEOService SEO
-    <title>@SEO.Title</title>
-    <meta name="description" content="@SEO.MetaDescription" />
-    <meta name="keywords" content="@SEO.Keywords" />
-    <meta name="robots" content="@SEO.Robots" />
-    */
+    
+    // [FixItFredComment:Sprint1003 - SEO Meta Injection] Include SEO head partial
+    await Html.PartialAsync("/Pages/Shared/_SEOHead.cshtml");
 }
 
 <h2>Admin Login</h2>

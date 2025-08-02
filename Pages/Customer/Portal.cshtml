@@ -1,9 +1,18 @@
 @page
+<<<<<<< HEAD
 @model Pages.Customer.PortalModel
 @inject Services.CustomerPortalService PortalService
 @inject Data.ApplicationDbContext Db
 @inject Services.PromotionEngineService PromoService
 @inject Services.DisputeService DisputeService
+=======
+@* [FixItFredComment:Sprint1005 - UI responsiveness corrected] Enhanced mobile responsiveness with Tailwind-style classes *@
+@model MVP_Core.Pages.Customer.PortalModel
+@inject MVP_Core.Services.CustomerPortalService PortalService
+@inject MVP_Core.Data.ApplicationDbContext Db
+@inject MVP_Core.Services.PromotionEngineService PromoService
+@inject MVP_Core.Services.DisputeService DisputeService
+>>>>>>> d104d38
 <div class="offline-banner" style="display:none;"></div>
 <main role="main" tabindex="-1" aria-label="Customer Portal Main Content">
 @{
@@ -46,7 +55,7 @@
             @foreach (var promo in qualifiedPromos)
             {
                 <li>
-                    <span class="fw-bold">@promo.Title</span> — @promo.Description
+                    <span class="fw-bold">@promo.Title</span> ï¿½ @promo.Description
                     <form method="post" asp-page-handler="ClaimBonus" asp-route-promoId="@promo.Id" style="display:inline">
                         <button type="submit" class="btn btn-sm btn-success ms-2" aria-label="Claim @promo.Title Bonus" style="min-height:44px;">Claim Bonus</button>
                     </form>
@@ -63,7 +72,7 @@
             @foreach (var log in activeBonusLogs)
             {
                 <li>
-                    <span class="fw-bold">@log.RewardType</span> — Earned: @log.DateEarned:g
+                    <span class="fw-bold">@log.RewardType</span> ï¿½ Earned: @log.DateEarned:g
                     <form method="post" asp-page-handler="ClaimBonusLog" asp-route-bonusLogId="@log.Id" style="display:inline">
                         <button type="submit" class="btn btn-sm btn-warning ms-2" aria-label="Claim @log.RewardType Bonus" style="min-height:44px;">Claim Now</button>
                     </form>
@@ -95,12 +104,13 @@
 </nav>
 <div class="container-fluid p-3">
     <section aria-label="Welcome and CTAs" class="mb-3">
-        <div class="flex-col md:flex-row d-flex justify-content-between align-items-start flex-wrap mb-3">
-            <h2>Welcome, @customer?.Name</h2>
-            <div class="cta-group" role="group" aria-label="Main actions">
-                <a href="/Review" class="btn btn-lg btn-primary mx-1 mb-2" aria-label="Leave a Review" style="min-height:44px;"><i class="bi bi-star" aria-hidden="true"></i> Leave a Review</a>
-                <a href="/Submit" class="btn btn-lg btn-info mx-1 mb-2" aria-label="Schedule New Appointment" style="min-height:44px;"><i class="bi bi-calendar-plus" aria-hidden="true"></i> Schedule New Appointment</a>
-                <a href="/Rewards" class="btn btn-lg btn-warning mx-1 mb-2" aria-label="Claim Bonus" style="min-height:44px;"><i class="bi bi-gift" aria-hidden="true"></i> Claim Bonus</a>
+        <!-- [FixItFredComment:Sprint1005 - UI responsiveness corrected] Improved flex layout for mobile -->
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-start flex-wrap mb-3">
+            <h2 class="mb-2 mb-md-0">Welcome, @customer?.Name</h2>
+            <div class="cta-group w-100 w-md-auto" role="group" aria-label="Main actions">
+                <a href="/Review" class="btn btn-lg btn-primary mx-1 mb-2 flex-fill flex-md-grow-0" aria-label="Leave a Review" style="min-height:44px;"><i class="bi bi-star" aria-hidden="true"></i> Leave a Review</a>
+                <a href="/Submit" class="btn btn-lg btn-info mx-1 mb-2 flex-fill flex-md-grow-0" aria-label="Schedule New Appointment" style="min-height:44px;"><i class="bi bi-calendar-plus" aria-hidden="true"></i> Schedule New Appointment</a>
+                <a href="/Rewards" class="btn btn-lg btn-warning mx-1 mb-2 flex-fill flex-md-grow-0" aria-label="Claim Bonus" style="min-height:44px;"><i class="bi bi-gift" aria-hidden="true"></i> Claim Bonus</a>
             </div>
         </div>
     </section>
@@ -138,7 +148,7 @@
                     <b>@currentTier?.Name ?? "None"</b><br />
                     <span>Points: @loyalty.Sum(l => l.Points)</span><br />
                     <div class="mt-2 mini-analytics">
-                        <span class="badge bg-success me-2">You’ve saved $@savedAmount:F2 in rewards</span>
+                        <span class="badge bg-success me-2">Youï¿½ve saved $@savedAmount:F2 in rewards</span>
                         <span class="badge bg-info">Average rating given: @avgRating:F1 stars</span>
                     </div>
                 </div>
@@ -180,7 +190,7 @@
                 var etaEnd = eta.AddMinutes(30); // Show a 30-min window
                 <div class="alert alert-success text-center mb-3" role="alert">
                     <b>Live Update:</b> Your technician is on the way! Track status in real time.<br />
-                    <span class="fw-bold">Estimated Arrival:</span> @eta:t – @etaEnd:t
+                    <span class="fw-bold">Estimated Arrival:</span> @eta:t ï¿½ @etaEnd:t
                 </div>
             }
         </div>
@@ -201,6 +211,7 @@
     </section>
 </div>
 <style>
+/* [FixItFredComment:Sprint1005 - UI responsiveness corrected] Enhanced mobile-first responsive styles */
 .cta-group { display: flex; flex-wrap: wrap; gap: 0.5rem; }
 .tier-banner { border-radius: 0.5rem; padding: 1rem; color: #222; box-shadow: 0 0 8px rgba(0,0,0,0.08); margin-bottom: 1rem; }
 .sparkle {
@@ -208,16 +219,50 @@
     background: url('/assets/sparkle.gif') no-repeat center center; background-size: contain;
     animation: glow 1.2s infinite alternate;
 }
-keyframes glow {
+@keyframes glow {
     0% { filter: drop-shadow(0 0 2px #fff); }
     100% { filter: drop-shadow(0 0 12px #ffd700); }
 }
 .mini-analytics .badge { font-size: 1rem; margin-bottom: 0.5rem; }
-media (max-width: 768px) {
-    .cta-group { flex-direction: column; align-items: stretch; }
-    .tier-banner { font-size: 1.2rem; }
-    .mini-analytics .badge { font-size: 0.95rem; }
+
+/* [FixItFredComment:Sprint1005 - UI responsiveness corrected] Improved mobile breakpoints and layout */
+@media (max-width: 768px) {
+    .cta-group { 
+        flex-direction: column; 
+        align-items: stretch; 
+        width: 100%; 
+    }
+    .tier-banner { 
+        font-size: 1.2rem; 
+        padding: 0.75rem; 
+        text-align: center; 
+    }
+    .mini-analytics .badge { 
+        font-size: 0.95rem; 
+        display: block; 
+        margin-bottom: 0.5rem; 
+    }
+    .card-body h5 {
+        font-size: 1.1rem;
+    }
+    .btn-lg {
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+    }
 }
+
+@media (max-width: 576px) {
+    .container-fluid {
+        padding: 0.5rem !important;
+    }
+    .tier-banner {
+        font-size: 1rem;
+    }
+    .card {
+        margin-bottom: 1rem;
+    }
+}
+
 .high-contrast, .high-contrast * {
     background: #000 !important;
     color: #fff !important;

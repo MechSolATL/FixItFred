@@ -1,6 +1,6 @@
-// Sprint 26.5 Patch Log: CS860x/CS8625/CS1998/CS0219 fixes — Nullability, async, and unused variable corrections for Nova review.
-// Sprint 26.6 Patch Log: CS8073 fix — Corrected logic for struct null comparison. DateTime cannot be null, so check for default value instead. Previous comments preserved below.
-// Sprint 46.2 – Customer Ticket Analytics Backend
+// Sprint 26.5 Patch Log: CS860x/CS8625/CS1998/CS0219 fixes ï¿½ Nullability, async, and unused variable corrections for Nova review.
+// Sprint 26.6 Patch Log: CS8073 fix ï¿½ Corrected logic for struct null comparison. DateTime cannot be null, so check for default value instead. Previous comments preserved below.
+// Sprint 46.2 ï¿½ Customer Ticket Analytics Backend
 // Sprint 81: Null safety hardening for CustomerTicketAnalyticsService.cs
 using Data;
 using System;
@@ -8,8 +8,9 @@ using System.Linq;
 
 namespace Services
 {
-    // Sprint 46.2 – Customer Ticket Analytics Backend
-    public class CustomerTicketAnalyticsService
+    // Sprint 46.2 ï¿½ Customer Ticket Analytics Backend
+    // [FixItFredComment:Sprint1004 - DI registration verified] Implemented interface for proper DI registration
+    public class CustomerTicketAnalyticsService : ICustomerTicketAnalyticsService
     {
         private readonly ApplicationDbContext _db;
         public CustomerTicketAnalyticsService(ApplicationDbContext db)
@@ -17,13 +18,13 @@ namespace Services
             _db = db ?? throw new ArgumentNullException(nameof(db));
         }
 
-        // Sprint 46.2 – Get total ticket count for a customer
+        // Sprint 46.2 ï¿½ Get total ticket count for a customer
         public int GetTicketCountForCustomer(int customerId)
         {
             return _db.ServiceRequests.Count(r => r.Email != null && _db.Customers.Any(c => c.Id == customerId && c.Email == r.Email));
         }
 
-        // Sprint 46.2 – Get average response time (in minutes) for a customer
+        // Sprint 46.2 ï¿½ Get average response time (in minutes) for a customer
         public double GetAverageResponseTime(int customerId)
         {
             // No FirstResponseAt in ServiceRequest, so use FirstViewedAt as proxy
@@ -34,7 +35,7 @@ namespace Services
             return requests.Average(r => (r.FirstViewedAt.Value - r.RequestedAt).TotalMinutes);
         }
 
-        // Sprint 46.2 – Get satisfaction rating trend (last 10 tickets, most recent first)
+        // Sprint 46.2 ï¿½ Get satisfaction rating trend (last 10 tickets, most recent first)
         public int[] GetSatisfactionRatingTrend(int customerId)
         {
             var customer = _db.Customers.FirstOrDefault(c => c.Id == customerId);

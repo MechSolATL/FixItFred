@@ -27,8 +27,16 @@ builder.Services.AddScoped<SystemDiagnosticsService>();
 builder.Services.AddScoped<IRootCauseCorrelationEngine, RootCauseCorrelationEngine>();
 builder.Services.AddScoped<IReplayEngineService, ReplayEngineService>();
 builder.Services.AddScoped<ISmartAdminAlertsService, SmartAdminAlertsService>();
+<<<<<<< HEAD
 // [Sprint1002_FixItFred] Fixed to register correct AutoRepairEngine from Services.Admin
 builder.Services.AddScoped<Services.Admin.AutoRepairEngine>();
+=======
+// [FixItFredComment:Sprint1004 - DI registration verified] Added proper interface-based service registrations
+builder.Services.AddScoped<INotificationSchedulerService, NotificationSchedulerService>();
+builder.Services.AddScoped<ICustomerTicketAnalyticsService, CustomerTicketAnalyticsService>();
+builder.Services.AddScoped<ISkillLeaderboardService, SkillLeaderboardService>();
+builder.Services.AddScoped<Data.Models.AutoRepairEngine>();
+>>>>>>> d104d38
 builder.Services.AddScoped<ComplianceReportService>();
 // [Sprint1002_FixItFred] Added missing service registrations to resolve DI errors
 builder.Services.AddScoped<Services.Admin.TechnicianAuditService>();
