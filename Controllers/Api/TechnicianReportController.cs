@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
-using MVP_Core.Services.Reports;
-using MVP_Core.Services;
-using MVP_Core.Data.Models;
+using Services.Reports;
+using Services;
+using Data.Models;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System;

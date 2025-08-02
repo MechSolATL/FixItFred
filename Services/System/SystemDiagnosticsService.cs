@@ -17,10 +17,11 @@ namespace Services.System
         private readonly ApplicationDbContext _db;
         private readonly IServiceProvider _serviceProvider;
         private readonly ILogger<SystemDiagnosticsService> _logger;
-        private readonly Data.Models.AutoRepairEngine _autoRepairEngine;
+        // [Sprint1002_FixItFred] Fixed to use correct AutoRepairEngine from Services.Admin
+        private readonly Services.Admin.AutoRepairEngine _autoRepairEngine;
         private readonly SmartAdminAlertsService _alertsService;
 
-        public SystemDiagnosticsService(ApplicationDbContext db, IServiceProvider serviceProvider, ILogger<SystemDiagnosticsService> logger, Data.Models.AutoRepairEngine autoRepairEngine, SmartAdminAlertsService alertsService)
+        public SystemDiagnosticsService(ApplicationDbContext db, IServiceProvider serviceProvider, ILogger<SystemDiagnosticsService> logger, Services.Admin.AutoRepairEngine autoRepairEngine, SmartAdminAlertsService alertsService)
         {
             _db = db;
             _serviceProvider = serviceProvider;

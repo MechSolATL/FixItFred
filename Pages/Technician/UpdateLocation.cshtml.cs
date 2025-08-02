@@ -1,5 +1,5 @@
-using MVP_Core.Data.Models;
-using MVP_Core.Services;
+using Data.Models;
+using Services;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

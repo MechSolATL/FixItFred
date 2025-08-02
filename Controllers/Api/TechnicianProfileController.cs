@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using MVP_Core.Data.Models;
+using Data.Models;
 using Services;
 
 namespace Controllers.Api

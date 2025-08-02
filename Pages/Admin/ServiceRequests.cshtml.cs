@@ -1,6 +1,6 @@
 using Data;
 using Data.Models;
-using MVP_Core.Middleware;
+using Middleware;
 
 namespace Pages.Admin
 {

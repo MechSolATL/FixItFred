@@ -30,7 +30,7 @@ namespace Pages.Admin
             EndDate = string.IsNullOrEmpty(end) ? DateTime.UtcNow : DateTime.Parse(end);
             // Load all techs for dropdown
             var techViewModels = await _techService.GetAllAsync();
-            Technicians = techViewModels.Select(t => new MVP_Core.Data.Models.Technician
+            Technicians = techViewModels.Select(t => new Data.Models.Technician
             {
                 Id = t.Id,
                 FullName = t.FullName,

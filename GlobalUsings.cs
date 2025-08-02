@@ -15,9 +15,11 @@ global using Microsoft.AspNetCore.Mvc.RazorPages;
 global using Microsoft.EntityFrameworkCore;
 // =====================================
 // Project-Specific Namespaces
+// [Sprint1002_FixItFred] Fixed namespace references to match actual project structure
 // =====================================
-global using MVP_Core.Data;
-global using MVP_Core.Data.Models;
-global using MVP_Core.Data.Models.ViewModels;
-global using MVP_Core.Helpers;
-global using MVP_Core.Services;
+global using Data;
+global using Data.Models;
+global using Data.Models.Seo;
+global using Models;
+global using Helpers;
+global using Services;

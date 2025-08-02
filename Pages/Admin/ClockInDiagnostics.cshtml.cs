@@ -1,4 +1,4 @@
-using MVP_Core.Services.Admin;
+using Services.Admin;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Collections.Generic;
 using System.Linq;

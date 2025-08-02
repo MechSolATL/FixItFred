@@ -1,6 +1,6 @@
 // Sprint 44 – Message Export + Digest
 using Microsoft.AspNetCore.Mvc;
-using MVP_Core.Data.Models;
+using Data.Models;
 using System.Threading.Tasks;
 using System.Linq;
 using System;

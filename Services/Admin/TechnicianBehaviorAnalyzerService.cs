@@ -22,10 +22,11 @@ namespace Services.Admin
         /// <summary>
         /// Analyze technician patterns and return detected behavior logs.
         /// </summary>
-        public async Task<List<TechnicianBehaviorLog>> AnalyzeTechnicianPatternsAsync()
+        // [Sprint1002_FixItFred] Explicitly qualified to resolve ambiguous reference
+        public async Task<List<Data.Models.TechnicianBehaviorLog>> AnalyzeTechnicianPatternsAsync()
         {
             var auditLogs = await _db.TechnicianAuditLogs.ToListAsync();
-            var behaviorLogs = new List<TechnicianBehaviorLog>();
+            var behaviorLogs = new List<Data.Models.TechnicianBehaviorLog>();
             var grouped = auditLogs.GroupBy(l => l.TechnicianId);
             foreach (var group in grouped)
             {

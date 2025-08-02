@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Data;
 using Models.ViewModels;
-using MVP_Core.ViewModels;
+using ViewModels;
 
 namespace Services.Diagnostics
 {

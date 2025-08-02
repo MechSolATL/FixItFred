@@ -15,7 +15,7 @@
 // FixItFred — Sprint 46.1 Build Correction + Compliance
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Models.Admin;
+using Models.Admin;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Threading.Tasks;
-using MVP_Core.Models;
-using MVP_Core.Data.Models;
+using Models;
+using Data.Models;
 using System.Security.Claims;
 using Services.Analytics;
 

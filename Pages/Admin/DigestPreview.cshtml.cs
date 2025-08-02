@@ -1,5 +1,5 @@
 // Sprint 44 – Message Export + Digest
-using MVP_Core.Data;
+using Data;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Collections.Generic;
 using System.Threading.Tasks;

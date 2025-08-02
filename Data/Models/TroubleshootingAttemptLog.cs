@@ -1,7 +1,7 @@
 // Sprint 91.17 - TroubleshootingBrain
 using System;
 
-namespace MVP_Core.Data.Models
+namespace Data.Models
 {
     /// <summary>
     /// Represents a log entry for troubleshooting attempts made by technicians.

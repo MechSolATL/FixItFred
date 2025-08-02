@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Data;
+using Data;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Data.Models;

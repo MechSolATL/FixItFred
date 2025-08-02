@@ -3,7 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Data;
 using Microsoft.EntityFrameworkCore;
-using MVP_Core.Data.Models;
+using Data.Models;
 
 namespace Services.Loyalty
 {

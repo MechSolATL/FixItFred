@@ -6,7 +6,7 @@ using Data;
 using Data.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Services;
+using Services;
 
 namespace Pages.Admin
 {

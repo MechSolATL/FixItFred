@@ -56,7 +56,8 @@ namespace Pages.Admin
         public AdminMetricsViewModel Metrics { get; set; } = new();
         public List<(string TechName, TechnicianBadge Badge)> CurrentBadgeHolders { get; set; } = new();
 
-        public Seo Seo { get; set; } = new Seo();
+        // [Sprint1002_FixItFred] Fixed to use correct SeoMeta class
+        public SeoMeta Seo { get; set; } = new SeoMeta();
         public string ViewTitle { get; set; } = "Untitled";
 
         public async Task OnGetAsync()

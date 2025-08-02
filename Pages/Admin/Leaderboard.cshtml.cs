@@ -2,7 +2,7 @@ using Data.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Services.Stats;
+using Services.Stats;
 using Services;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -29,7 +29,7 @@ namespace Pages.Admin
         public int TeamEfficiency { get; set; } = 0;
         public string RotatingQuote { get; set; } = string.Empty;
         // [Sprint91_26] SEO Metadata Razor Injection Patch
-        public SeoMetadata Seo { get; set; } = new SeoMetadata();
+        public SeoMeta Seo { get; set; } = new SeoMeta();
         public string Title => Seo.Title;
         public string MetaDescription => Seo.MetaDescription;
         public string Keywords => Seo.Keywords;

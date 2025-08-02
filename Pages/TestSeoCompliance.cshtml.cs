@@ -8,7 +8,7 @@
 // - Ensures compliance with Service-Atlanta SEO and layout protocols
 
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Data.Models;
+using Data.Models;
 using Services;
 
 namespace Pages

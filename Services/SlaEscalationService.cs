@@ -3,7 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
-using MVP_Core.Data.Models;
+using Data.Models;
 using Microsoft.AspNetCore.SignalR;
 using System.Linq;
 using Hubs;

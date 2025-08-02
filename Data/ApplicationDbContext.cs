@@ -73,7 +73,7 @@ namespace Data
         // Sprint 35 - Technician Reward Scoring System
         public DbSet<TechnicianScoreEntry> TechnicianScoreEntries { get; set; } = null!;
         public DbSet<TechnicianDeviceRegistration> TechnicianDeviceRegistrations { get; set; } = null!;
-        // FixItFred — Sprint 46.1 Build Stabilization
+        // FixItFred ï¿½ Sprint 46.1 Build Stabilization
         public DbSet<JobMessageEntry> JobMessages { get; set; } = null!;
         public DbSet<TechnicianPayRecord> TechnicianPayRecords { get; set; } = null!;
         public DbSet<CertificationRecord> CertificationRecords { get; set; } = null!;
@@ -172,15 +172,16 @@ namespace Data
         public DbSet<FeatureSuggestion> FeatureSuggestions { get; set; } = null!; // Sprint 83.4: FeatureSuggestion model
         // Sprint 83.6-RoastRoulette
         public DbSet<RoastDeliveryLog> RoastDeliveryLogs { get; set; } = null!;
-        public DbSet<UserOnboardingStatus> UserOnboardingStatuses { get; set; } = null!; // Sprint 84.0 — OnboardingStatus Schema
-        // Sprint 84.9 — Drop Alert Logic + TrustScore Delta Detection
+        public DbSet<UserOnboardingStatus> UserOnboardingStatuses { get; set; } = null!; // Sprint 84.0 ï¿½ OnboardingStatus Schema
+        // Sprint 84.9 ï¿½ Drop Alert Logic + TrustScore Delta Detection
         public DbSet<TechnicianAlertLog> TechnicianAlertLogs { get; set; } = null!;
-        public DbSet<Models.QuoteMessage> QuoteMessages { get; set; } = null!;
-        public DbSet<Models.Whisper> Whispers { get; set; } = null!;
-        public DbSet<Models.LeaderboardEntry> LeaderboardEntries { get; set; } = null!;
-        public DbSet<Models.TechPulseLog> TechPulseLogs { get; set; } = null!;
-        public DbSet<Models.UserActionLog> UserActionLogs { get; set; } = null!;
-        public DbSet<Models.MentorReplyLog> MentorReplyLogs { get; set; } = null!;
+        // [Sprint1002_FixItFred] Fixed model references to use correct Models namespace
+        public DbSet<QuoteMessage> QuoteMessages { get; set; } = null!;
+        public DbSet<Whisper> Whispers { get; set; } = null!;
+        public DbSet<LeaderboardEntry> LeaderboardEntries { get; set; } = null!;
+        public DbSet<TechPulseLog> TechPulseLogs { get; set; } = null!;
+        public DbSet<UserActionLog> UserActionLogs { get; set; } = null!;
+        public DbSet<MentorReplyLog> MentorReplyLogs { get; set; } = null!;
         public DbSet<TechMilestone> TechMilestones { get; set; } = null!;
         public DbSet<TechProgress> TechProgresses { get; set; } = null!;
         public DbSet<MilestoneAuditLog> MilestoneAuditLogs { get; set; } = null!;
@@ -191,8 +192,8 @@ namespace Data
         public DbSet<ComplianceOverrideLog> ComplianceOverrideLogs { get; set; } = null!;
         public DbSet<ComplianceAlertLog> ComplianceAlertLogs { get; set; } = null!;
         public DbSet<Models.NovaIntel.NovaDecisionMemory> NovaDecisionMemories { get; set; } = null!;
-        // public DbSet<MVP_Core.Data.Models.Loyalty.TechnicianBadge> TechnicianBadges { get; set; } = null!;
-        // public DbSet<MVP_Core.Data.Models.Loyalty.BadgeDefinition> BadgeDefinitions { get; set; } = null!;
+        // public DbSet<Data.Models.Loyalty.TechnicianBadge> TechnicianBadges { get; set; } = null!;
+        // public DbSet<Data.Models.Loyalty.BadgeDefinition> BadgeDefinitions { get; set; } = null!;
         public DbSet<ToolInventory> ToolInventories { get; set; } = null!;
         public DbSet<ToolTransferLog> ToolTransferLogs { get; set; } = null!;
         // Sprint 90.1
@@ -352,7 +353,7 @@ namespace Data
             _ = modelBuilder.Entity<OnboardingStaging>().ToTable("OnboardingStaging"); // Sprint 83.3: SmartControlUX Gatekeeper Wizard
             _ = modelBuilder.Entity<FeatureSuggestion>().ToTable("FeatureSuggestions"); // Sprint 83.4: FeatureSuggestion model
             _ = modelBuilder.Entity<RoastDeliveryLog>().ToTable("RoastDeliveryLogs"); // Sprint 83.6-RoastRoulette
-            // Sprint 84.9 — Drop Alert Logic + TrustScore Delta Detection
+            // Sprint 84.9 ï¿½ Drop Alert Logic + TrustScore Delta Detection
             modelBuilder.Entity<TechnicianAlertLog>().ToTable("TechnicianAlertLogs");
 
             modelBuilder.Entity<LoyaltyPointTransaction>()

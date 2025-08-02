@@ -4,6 +4,8 @@ using Microsoft.EntityFrameworkCore;
 using System.IO;
 using System.Linq;
 using Data;
+// [Sprint1002_FixItFred] Added missing using for BackgroundService
+using Microsoft.Extensions.Hosting;
 
 namespace Services.Admin
 {

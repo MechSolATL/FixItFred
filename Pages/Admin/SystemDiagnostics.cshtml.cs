@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using MVP_Core.Services.Admin;
+using Services.Admin;
 using Interfaces;
 using Services.System;
 using Data;
@@ -58,7 +58,7 @@ namespace Pages.Admin
         public string ViewTitle { get; set; } = "Untitled";
 
         // [Sprint91_26] SEO Razor Binding Fix
-        public SeoMetadata Seo { get; set; } = new SeoMetadata();
+        public SeoMeta Seo { get; set; } = new SeoMeta();
         public string Title => Seo.Title;
         public string MetaDescription => Seo.MetaDescription;
         public string Keywords => Seo.Keywords;

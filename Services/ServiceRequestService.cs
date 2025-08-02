@@ -82,7 +82,7 @@ namespace Services
                 return request.Id;
             }
             // Convert Data.Models.TechnicianProfileDto to TechnicianStatusDto for PredictETA
-            var techStatus = new MVP_Core.Models.Admin.TechnicianStatusDto {
+            var techStatus = new Models.Admin.TechnicianStatusDto {
                 TechnicianId = tech.Id,
                 Name = tech.FullName ?? string.Empty,
                 Status = tech.Specialty ?? string.Empty,

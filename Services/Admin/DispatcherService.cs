@@ -1,26 +1,26 @@
 // Sprint 26.5 Patch Log: CS860x/CS8625/CS1998/CS0219 fixes — Nullability, async, and unused variable corrections for Nova review.
 // FixItFred Patch: Synced DTO references, resolved ambiguities, and corrected collection access for Dispatcher UI.
-// FixItFred Patch Log: Forced explicit use of MVP_Core.Models.Admin.TechnicianProfileDto for all DTO references.
+// FixItFred Patch Log: Forced explicit use of Models.Admin.TechnicianProfileDto for all DTO references.
 // FixItFred Patch Log — DispatcherResult Initializer & DTO Ambiguity Fix
 // 2024-07-24
 // Error Codes Addressed: CS9035, CS0104
-// Purpose: Ensure all DispatcherResult object initializers set required members and explicitly use MVP_Core.Models.Admin.TechnicianProfileDto.
+// Purpose: Ensure all DispatcherResult object initializers set required members and explicitly use Models.Admin.TechnicianProfileDto.
 // FixItFred Patch Log — TechnicianProfileDto Ambiguity Fix
 // 2024-07-24
 // Error Codes Addressed: CS0104
-// Purpose: Explicitly reference MVP_Core.Models.Admin.TechnicianProfileDto everywhere in DispatcherService.cs
+// Purpose: Explicitly reference Models.Admin.TechnicianProfileDto everywhere in DispatcherService.cs
 // FixItFred Patch Log — CS0104 Ambiguity Fix for TechnicianProfileDto
 // 2024-07-24T21:16:00Z
 // Applied Fixes: CS0104
-// Notes: Explicitly imported and referenced MVP_Core.Models.Admin.TechnicianProfileDto to resolve ambiguous type reference at line 408 and elsewhere.
+// Notes: Explicitly imported and referenced Models.Admin.TechnicianProfileDto to resolve ambiguous type reference at line 408 and elsewhere.
 // FixItFred Patch Log — Sprint 24.5 Error Cleanse [2024-07-24T21:40:00Z]
 // Error Codes Resolved: CS0104, CS8603
-// Summary: Explicitly aliased Data.Models.TechnicianProfileDto as DataTechnicianProfileDto. All usages in DispatcherService now use MVP_Core.Models.Admin.TechnicianProfileDto. Nullability warning CS8603 fixed by returning string.Empty or safe fallback instead of null.
+// Summary: Explicitly aliased Data.Models.TechnicianProfileDto as DataTechnicianProfileDto. All usages in DispatcherService now use Models.Admin.TechnicianProfileDto. Nullability warning CS8603 fixed by returning string.Empty or safe fallback instead of null.
 // Do not override previous logs — appended below each existing log block.
 using AdminTechnicianProfileDto = Models.Admin.TechnicianProfileDto;
 using DataTechnicianProfileDto = Data.Models.TechnicianProfileDto;
 using DataDto = Data.Models.TechnicianProfileDto;
-using MVP_Core.Models.Mobile;
+using Models.Mobile;
 using System.Collections.Generic;
 using System;
 using System.Linq;
@@ -40,11 +40,11 @@ namespace Services.Admin
         private static List<DispatcherBroadcast> _broadcasts = new();
         private static List<TechnicianStatusDto> _techHeartbeats = new()
         {
-            new MVP_Core.Models.Admin.TechnicianStatusDto { TechnicianId = 1, Name = "Alice Smith", Status = "Available", LastPing = DateTime.UtcNow.AddMinutes(-5) },
-            new MVP_Core.Models.Admin.TechnicianStatusDto { TechnicianId = 2, Name = "Bob Jones", Status = "On Job", LastPing = DateTime.UtcNow.AddMinutes(-12) },
-            new MVP_Core.Models.Admin.TechnicianStatusDto { TechnicianId = 3, Name = "Carlos Lee", Status = "Delayed", LastPing = DateTime.UtcNow.AddMinutes(-22) },
-            new MVP_Core.Models.Admin.TechnicianStatusDto { TechnicianId = 4, Name = "Dana Patel", Status = "Unavailable", LastPing = DateTime.UtcNow.AddMinutes(-8) },
-            new MVP_Core.Models.Admin.TechnicianStatusDto { TechnicianId = 5, Name = "Evan Kim", Status = "Available", LastPing = DateTime.UtcNow.AddMinutes(-18) }
+            new Models.Admin.TechnicianStatusDto { TechnicianId = 1, Name = "Alice Smith", Status = "Available", LastPing = DateTime.UtcNow.AddMinutes(-5) },
+            new Models.Admin.TechnicianStatusDto { TechnicianId = 2, Name = "Bob Jones", Status = "On Job", LastPing = DateTime.UtcNow.AddMinutes(-12) },
+            new Models.Admin.TechnicianStatusDto { TechnicianId = 3, Name = "Carlos Lee", Status = "Delayed", LastPing = DateTime.UtcNow.AddMinutes(-22) },
+            new Models.Admin.TechnicianStatusDto { TechnicianId = 4, Name = "Dana Patel", Status = "Unavailable", LastPing = DateTime.UtcNow.AddMinutes(-8) },
+            new Models.Admin.TechnicianStatusDto { TechnicianId = 5, Name = "Evan Kim", Status = "Available", LastPing = DateTime.UtcNow.AddMinutes(-18) }
         };
         private static List<AssignmentLogEntry> _assignmentLogs = new();
         private readonly TechnicianMessageService _messageService;
@@ -596,7 +596,7 @@ namespace Services.Admin
         public void LogDispatcherAction(string logEntry)
         {
             // For now, just add to in-memory audit log (could be extended to DB)
-            _auditLog.Add(new MVP_Core.Models.Admin.DispatcherAuditLog
+            _auditLog.Add(new Models.Admin.DispatcherAuditLog
             {
                 ActionType = logEntry,
                 Timestamp = DateTime.UtcNow,
@@ -608,7 +608,7 @@ namespace Services.Admin
         {
             // FixItFred — Sprint 44.4 Init Patch (AssignmentLogEntry)
             var userName = "System"; // In real context, fetch from HttpContext or caller
-            _assignmentLogs.Add(new MVP_Core.Models.Admin.AssignmentLogEntry
+            _assignmentLogs.Add(new Models.Admin.AssignmentLogEntry
             {
                 RequestId = requestId,
                 TechnicianId = technicianId,
@@ -924,7 +924,7 @@ namespace Services.Admin
         {
             // Map NotificationDto to DispatcherNotification
             return new List<Data.Models.DispatcherNotification> {
-                new MVP_Core.Data.Models.DispatcherNotification {
+                new Data.Models.DispatcherNotification {
                     Id = 1,
                     Message = "System online.",
                     SentBy = "System",

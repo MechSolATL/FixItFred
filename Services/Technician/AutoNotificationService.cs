@@ -1,7 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using Data;
-using MVP_Core.Models;
+using Models;
 
 namespace Services.Technician
 {

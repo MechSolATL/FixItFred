@@ -188,7 +188,7 @@ namespace Data.Seeders
                 var tech = dispatcherService.FindAvailableTechnicianForZone(req.Zone);
                 if (tech != null)
                 {
-                    var techStatus = new MVP_Core.Models.Admin.TechnicianStatusDto {
+                    var techStatus = new Models.Admin.TechnicianStatusDto {
                         TechnicianId = tech.Id,
                         Name = tech.FullName,
                         Status = tech.Specialty,
@@ -365,8 +365,8 @@ namespace Data.Seeders
             db.SaveChanges();
             // Simulate location updates
             db.TechTrackingLogs.AddRange(
-                new MVP_Core.Data.TechTrackingLog { TechnicianId = tech1.Id, Timestamp = now.AddMinutes(-30), IP = "127.0.0.1", Latitude = 33.7, Longitude = -84.4, UserAgent = "QA-Agent" },
-                new MVP_Core.Data.TechTrackingLog { TechnicianId = tech2.Id, Timestamp = now.AddMinutes(-25), IP = "127.0.0.1", Latitude = 33.8, Longitude = -84.5, UserAgent = "QA-Agent" }
+                new Data.TechTrackingLog { TechnicianId = tech1.Id, Timestamp = now.AddMinutes(-30), IP = "127.0.0.1", Latitude = 33.7, Longitude = -84.4, UserAgent = "QA-Agent" },
+                new Data.TechTrackingLog { TechnicianId = tech2.Id, Timestamp = now.AddMinutes(-25), IP = "127.0.0.1", Latitude = 33.8, Longitude = -84.5, UserAgent = "QA-Agent" }
             );
             db.SaveChanges();
         }

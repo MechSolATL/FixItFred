@@ -1,4 +1,4 @@
-// [FixItFred] Patch Log: Forced explicit use of MVP_Core.Models.Admin.TechnicianProfileDto for all DTO references
+// [FixItFred] Patch Log: Forced explicit use of Models.Admin.TechnicianProfileDto for all DTO references
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;

@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Services.Admin;
+using Services.Admin;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;

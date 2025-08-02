@@ -1,8 +1,8 @@
 @page
 // FixItFred Patch Log — Sprint 28 Razor Validation
 // [2025-07-25T00:00:00Z] — Injected asp-validation-for for all form fields and ensured _ValidationSummary is present.
-@using MVP_Core.Data.Models // Corrected ServiceRequest namespace
-@using MVP_Core.Data.Models.ViewModels
+@using Data.Models // Corrected ServiceRequest namespace
+@using Data.Models.ViewModels
 @inject MVP_Core.Services.TechnicianFeedbackService FeedbackService
 @inject MVP_Core.Services.Admin.DispatcherService DispatcherService
 @model MVP_Core.Pages.Admin.SubmitFeedbackModel

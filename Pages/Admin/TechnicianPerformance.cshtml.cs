@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Models.Admin;
+using Models.Admin;
 using System;
 using System.Collections.Generic;
 using System.Linq;

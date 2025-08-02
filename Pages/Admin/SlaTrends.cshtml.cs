@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc;
-using MVP_Core.Models.Admin;
+using Models.Admin;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Services.Admin;

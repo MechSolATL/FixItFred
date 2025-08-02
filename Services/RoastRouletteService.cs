@@ -1,5 +1,5 @@
 // Sprint 83.6-RoastRoulette
-using MVP_Core.Data.Models;
+using Data.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;

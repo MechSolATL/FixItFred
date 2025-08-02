@@ -1,5 +1,5 @@
 // FixItFred Patch Log: CS8618 property patch, required/default initializers added to resolve warnings. All DTOs now safe for nullability.
-// FixItFred Patch: Resolved duplicate DTO conflicts by using canonical DTOs from MVP_Core.Models.Admin
+// FixItFred Patch: Resolved duplicate DTO conflicts by using canonical DTOs from Models.Admin
 // FixItFred Patch Log — DTO Required Member Defaults
 // 2024-07-24
 // Error Codes Addressed: CS9035
