@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using MVP_Core.Data.Enums;
+using Data.Enums;
 using Data;
 using Data.Models;
 

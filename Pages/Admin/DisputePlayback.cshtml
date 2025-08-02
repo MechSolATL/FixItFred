@@ -1,9 +1,9 @@
 @page
-@model MVP_Core.Pages.Admin.DisputePlaybackModel
-@using MVP_Core.Data.Models
-@inject MVP_Core.Services.Admin.DisputeInsightService DisputeInsightService
-@inject MVP_Core.Services.Admin.SessionPlaybackService SessionPlaybackService
-@inject MVP_Core.Data.ApplicationDbContext Db
+@model Pages.Admin.DisputePlaybackModel
+@using Data.Models
+@inject Services.Admin.DisputeInsightService DisputeInsightService
+@inject Services.Admin.SessionPlaybackService SessionPlaybackService
+@inject Data.ApplicationDbContext Db
 @{
     ViewData["Title"] = "Dispute Playback & Intelligence";
     var disputes = Model.Disputes;

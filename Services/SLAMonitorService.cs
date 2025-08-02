@@ -75,7 +75,7 @@ public class SLAMonitorService : BackgroundService
                         {
                             entry.TechnicianId = backupTech.Id;
                             entry.AssignedTechnicianName = backupTech.FullName ?? string.Empty;
-                            var techStatus = new MVP_Core.Models.Admin.TechnicianStatusDto {
+                            var techStatus = new Models.Admin.TechnicianStatusDto {
                                 TechnicianId = backupTech.Id,
                                 Name = backupTech.FullName ?? string.Empty,
                                 Status = backupTech.Specialty ?? string.Empty,

@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Data.Models;
+using Data.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 using Services;

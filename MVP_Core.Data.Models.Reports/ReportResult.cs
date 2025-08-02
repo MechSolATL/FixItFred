@@ -2,7 +2,7 @@
 
 using System;
 
-namespace MVP_Core.Data.Models.Reports
+namespace Data.Models.Reports
 {
     public class ReportResult
     {

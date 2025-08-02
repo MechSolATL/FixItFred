@@ -21,7 +21,7 @@ namespace Pages.Technician
         public int BanterFlagCount { get; set; }
 
         // [Sprint91_Recovery_P8] Nova Razor binding patch
-        public Seo Seo { get; set; } = new Seo();
+        public SeoMeta Seo { get; set; } = new SeoMeta();
         public string TierStatus { get; set; } = "Basic";
         public string ViewTitle { get; set; } = "Profile";
         public string? ReturnUrl { get; set; }

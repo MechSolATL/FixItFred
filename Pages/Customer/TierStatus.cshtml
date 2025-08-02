@@ -1,6 +1,6 @@
 @page
-@model MVP_Core.Pages.Customer.TierStatusModel
-@inject MVP_Core.Services.CustomerPortalService PortalService
+@model Pages.Customer.TierStatusModel
+@inject Services.CustomerPortalService PortalService
 @{
     Layout = "/Pages/Shared/_Layout.cshtml";
     if (!(User.Identity?.IsAuthenticated == true) || !User.HasClaim("IsCustomer", "true"))

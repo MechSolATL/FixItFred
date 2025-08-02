@@ -1,4 +1,4 @@
-namespace MVP_Core.Services.QuestionEngine
+namespace Services.QuestionEngine
 {
     public interface IQuestionService
     {

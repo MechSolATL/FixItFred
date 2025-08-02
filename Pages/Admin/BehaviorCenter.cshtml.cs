@@ -22,7 +22,8 @@ public class BehaviorCenterModel : PageModel
     [BindProperty(SupportsGet = true)] public string DateFilter { get; set; }
     [BindProperty(SupportsGet = true)] public string SeverityFilter { get; set; }
     [BindProperty(SupportsGet = true)] public bool AutoFlagEnabled { get; set; }
-    public List<TechnicianBehaviorLog> BehaviorLogs { get; set; } = new();
+    // [Sprint1002_FixItFred] Explicitly qualified to resolve ambiguous reference
+    public List<Data.Models.TechnicianBehaviorLog> BehaviorLogs { get; set; } = new();
     public string StatusMessage { get; set; }
 
     public async Task OnGetAsync()

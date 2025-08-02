@@ -1,7 +1,7 @@
 @page
-@model MVP_Core.Pages.RewardsModel
-@inject MVP_Core.Services.LoyaltyRewardService LoyaltyService
-@inject MVP_Core.Services.ReviewService ReviewService
+@model Pages.RewardsModel
+@inject Services.LoyaltyRewardService LoyaltyService
+@inject Services.ReviewService ReviewService
 @{
     Layout = "/Pages/Shared/_Layout.cshtml";
     var customerId = User?.Identity?.Name != null ? int.Parse(User.Identity.Name) : 0; // Replace with actual customer ID logic

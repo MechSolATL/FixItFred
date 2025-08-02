@@ -1,6 +1,6 @@
 ﻿using System;
 using System.IO;
-using MVP_Core.Services.Admin;
+using Services.Admin;
 
 namespace BlueprintGen
 {

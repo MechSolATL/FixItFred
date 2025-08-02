@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using MVP_Core.Data.Models;
+using Data.Models;
 
 namespace Services
 {

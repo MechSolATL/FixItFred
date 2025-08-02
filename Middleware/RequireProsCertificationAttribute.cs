@@ -2,7 +2,7 @@
 using Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using MVP_Core.Data.Models;
+using Data.Models;
 using System;
 using System.Linq;
 using System.Security.Claims;

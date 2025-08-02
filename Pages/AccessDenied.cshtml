@@ -1,5 +1,6 @@
 @page
-@model AccessDeniedModel
+@* [Sprint1002_FixItFred] Fixed model reference to use correct namespace *@
+@model Pages.AccessDeniedModel
 @{
     ViewData["Title"] = Model.Seo?.Title ?? "Access Denied";
     Layout = "/Pages/Shared/_Layout.cshtml";

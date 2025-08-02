@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Collections.Generic;
-using MVP_Core.Services.Dispatch;
+using Services.Dispatch;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;

@@ -44,7 +44,7 @@ namespace Pages
         public string ErrorMessage { get; set; } = string.Empty;
 
         // 🔍 Loaded SEO metadata
-        public SeoMetadata? Seo { get; set; }
+        public SeoMeta? Seo { get; set; }
 
         public async Task OnGetAsync()
         {

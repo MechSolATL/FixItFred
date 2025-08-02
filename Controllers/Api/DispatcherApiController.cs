@@ -1,6 +1,7 @@
 // Sprint 48.2 Patch Log: SuggestBestTech API endpoint
+// [Sprint1002_FixItFred] Fixed namespace reference to use correct Models.Admin
 using Microsoft.AspNetCore.Mvc;
-using MVP_Core.Models.Admin;
+using Models.Admin;
 using Microsoft.AspNetCore.SignalR;
 using Hubs;
 using Services.Admin;

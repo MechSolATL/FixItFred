@@ -18,7 +18,7 @@ namespace Pages.Admin
 
         public void OnGet()
         {
-            Technician = new MVP_Core.Data.Models.Technician { IsActive = true };
+            Technician = new Data.Models.Technician { IsActive = true };
         }
 
         public async Task<IActionResult> OnPostAsync()

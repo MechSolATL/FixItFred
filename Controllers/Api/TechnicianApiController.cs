@@ -78,7 +78,7 @@ namespace Controllers.Api
                 {
                     techProfile.Latitude = dto.Latitude;
                     techProfile.Longitude = dto.Longitude;
-                    var techStatus = new MVP_Core.Models.Admin.TechnicianStatusDto {
+                    var techStatus = new Models.Admin.TechnicianStatusDto {
                         TechnicianId = techProfile.Id,
                         Name = techProfile.FullName ?? string.Empty, // Sprint 79.7: TechnicianApiController cleanup
                         Status = techProfile.Specialty ?? string.Empty, // Sprint 79.7: TechnicianApiController cleanup

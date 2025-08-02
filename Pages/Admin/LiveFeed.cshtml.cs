@@ -1,4 +1,4 @@
-using MVP_Core.Data;
+using Data;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;

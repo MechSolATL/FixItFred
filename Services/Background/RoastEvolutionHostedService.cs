@@ -1,4 +1,4 @@
-using MVP_Core.Services.Admin;
+using Services.Admin;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Threading;

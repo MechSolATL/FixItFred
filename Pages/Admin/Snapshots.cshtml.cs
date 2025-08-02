@@ -28,7 +28,7 @@ namespace Pages.Admin
         public string StatusMessage { get; set; } = string.Empty;
 
         // ✅ Final Razor SEO Metadata Model
-        public SeoMetadata Seo { get; set; } = new SeoMetadata();
+        public SeoMeta Seo { get; set; } = new SeoMeta();
 
         public string Title => Seo.Title;
         public string MetaDescription => Seo.MetaDescription;

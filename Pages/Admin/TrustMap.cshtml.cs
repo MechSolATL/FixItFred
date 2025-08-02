@@ -1,6 +1,6 @@
 // Sprint 84.8 — TrustMap UI Scaffold
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MVP_Core.Data.Models;
+using Data.Models;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;

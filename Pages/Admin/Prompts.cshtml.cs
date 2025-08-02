@@ -24,7 +24,7 @@ namespace Pages.Admin
         [BindProperty]
         public string? PromptInput { get; set; }
         public string? Output { get; set; }
-        public Seo Seo { get; set; } = new Seo();
+        public SeoMeta Seo { get; set; } = new SeoMeta();
         public string TierStatus { get; set; } = "Basic";
         public string ViewTitle { get; set; } = "Prompts";
         public string? ReturnUrl { get; set; }

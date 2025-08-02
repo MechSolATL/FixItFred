@@ -14,10 +14,11 @@ namespace Pages.Admin
     public class FlagReviewQueueModel : PageModel
     {
         private readonly Services.Admin.TechnicianAuditService _auditService;
-        public PermissionService PermissionService { get; }
+        // [Sprint1002_FixItFred] Fully qualified to resolve namespace reference
+        public Services.Admin.PermissionService PermissionService { get; }
         public AdminUser AdminUser { get; }
         public List<DomainTechnicianBehaviorLog> FlaggedLogs { get; set; } = new();
-        public FlagReviewQueueModel(Services.Admin.TechnicianAuditService auditService, PermissionService permissionService)
+        public FlagReviewQueueModel(Services.Admin.TechnicianAuditService auditService, Services.Admin.PermissionService permissionService)
         {
             _auditService = auditService;
             PermissionService = permissionService;

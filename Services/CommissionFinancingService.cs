@@ -1,5 +1,5 @@
 // Sprint 26.6 Patch Log: Added commission and financing calculation methods for admin UI and backend.
-using MVP_Core.Data.Models;
+using Data.Models;
 using System;
 
 namespace Services

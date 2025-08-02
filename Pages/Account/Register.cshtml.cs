@@ -1,4 +1,4 @@
-using MVP_Core.Data.Models;
+using Data.Models;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -43,7 +43,7 @@ namespace Pages.Account
                 ErrorMessage = "Email already registered.";
                 return Page();
             }
-            var customer = new MVP_Core.Data.Models.Customer { Name = Name, Email = Email, Phone = Phone, Address = Address };
+            var customer = new Data.Models.Customer { Name = Name, Email = Email, Phone = Phone, Address = Address };
             _db.Customers.Add(customer);
             await _db.SaveChangesAsync();
             // Referral logic

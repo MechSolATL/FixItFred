@@ -1,11 +1,11 @@
 @page
-@model MVP_Core.Pages.Admin.DashboardModel
+@model Pages.Admin.DashboardModel
 @inject global::Services.Dispatch.SlaDriftAnalyzerService SlaDriftAnalyzerService
 @inject global::Services.Storage.StorageMonitorService StorageMonitorService
-@inject MVP_Core.Services.Admin.ComplianceReportService ComplianceService
-@inject MVP_Core.Services.Admin.SmartAdminAlertsService SmartAdminAlertsService
-@inject MVP_Core.Data.ApplicationDbContext Db
-@using MVP_Core.Services.Tenant
+@inject Services.Admin.ComplianceReportService ComplianceService
+@inject Services.Admin.SmartAdminAlertsService SmartAdminAlertsService
+@inject Data.ApplicationDbContext Db
+@using Services.Tenant
 @inject TenantResolver TenantResolver
 @{
     ViewData["Title"] = "Admin Dashboard";
@@ -285,8 +285,8 @@
 
     <!-- Sync Champion Spotlight Widget -->
     <div class="mb-3">
-        @using MVP_Core.Services.Admin
-        @using MVP_Core.Data.Models
+        @using Services.Admin
+        @using Data.Models
         @inject SyncIncentiveEngine SyncIncentiveEngine
         @await Html.PartialAsync("_SyncChampionSpotlight")
     </div>

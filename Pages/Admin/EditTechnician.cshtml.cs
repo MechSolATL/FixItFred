@@ -21,7 +21,7 @@ namespace Pages.Admin
             var techVm = await _techService.GetByIdAsync(id);
             if (techVm == null)
                 return NotFound();
-            Technician = new MVP_Core.Data.Models.Technician
+            Technician = new Data.Models.Technician
             {
                 Id = techVm.Id,
                 FullName = techVm.FullName,

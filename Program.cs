@@ -1,20 +1,14 @@
+// [Sprint1002_FixItFred] Fixed all namespace references to match actual project structure
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using MVP_Core.Controllers.Api;
-using MVP_Core.Services.Email;
+using Controllers.Api;
 using Wangkanai.Detection;
-using MVP_Core.Middleware;
-using MVP_Core.Helpers;
-using MVP_Core.Services.Dispatch;
-using MVP_Core.Services.FollowUp;
-using MVP_Core.Data.Seeders;
-using MVP_Core.Services.Loyalty;
+using Middleware;
 using static Services.Admin.AutoRepairEngine;
 using static Services.Admin.ComplianceReportService;
 using static Services.Admin.ValidationSimulatorService;
 using FixItFred.Extensions.Diagnostics;
 using Services.Diagnostics;
-using MVP_Core.Services.Diagnostics;
 using Services.Admin;
 using Services;
 using Services.System;
@@ -33,8 +27,13 @@ builder.Services.AddScoped<SystemDiagnosticsService>();
 builder.Services.AddScoped<IRootCauseCorrelationEngine, RootCauseCorrelationEngine>();
 builder.Services.AddScoped<IReplayEngineService, ReplayEngineService>();
 builder.Services.AddScoped<ISmartAdminAlertsService, SmartAdminAlertsService>();
-builder.Services.AddScoped<Data.Models.AutoRepairEngine>();
+// [Sprint1002_FixItFred] Fixed to register correct AutoRepairEngine from Services.Admin
+builder.Services.AddScoped<Services.Admin.AutoRepairEngine>();
 builder.Services.AddScoped<ComplianceReportService>();
+// [Sprint1002_FixItFred] Added missing service registrations to resolve DI errors
+builder.Services.AddScoped<Services.Admin.TechnicianAuditService>();
+builder.Services.AddScoped<Services.Admin.PermissionService>();
+builder.Services.AddScoped<ILeaderboardService, LeaderboardService>();
 #pragma warning disable CS0618
 builder.Services.AddScoped<ValidationSimulatorService>(); // ⚠️ [Obsolete] — monitor usage
 #pragma warning restore CS0618

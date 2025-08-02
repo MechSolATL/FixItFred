@@ -29,7 +29,7 @@ namespace Pages.Admin
         public List<AdminAlertLog> LastAlerts { get; set; } = new();
         public List<ReplayAuditLog> ReplayAuditLogs { get; set; } = new();
 
-        public SeoMetadata Seo { get; set; } = new SeoMetadata();
+        public SeoMeta Seo { get; set; } = new SeoMeta();
 
         public string Title => Seo.Title;
         public string MetaDescription => Seo.MetaDescription;

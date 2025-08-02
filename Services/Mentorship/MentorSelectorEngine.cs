@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using MVP_Core.Models;
+using Models;
 using Microsoft.EntityFrameworkCore;
 using Services.Analytics;
 using Data.Models;

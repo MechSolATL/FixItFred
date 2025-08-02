@@ -77,17 +77,6 @@ namespace Services.Admin
     }
 }
 
-namespace MVP_Core.Services.Admin
-{
-    // [Sprint91_Recovery_P2] Nova stub restore
-    public class RecoveryAILearningService
-    {
-        public RecoveryAILearningService(string traceId) {}
-
-        public Task AnalyzeRecoveryPatternsAsync(string technicianId)
-            => Task.CompletedTask;
-
-        public Task<List<string>> SuggestAutoRepairTriggers()
-            => Task.FromResult(new List<string> { "TriggerA", "TriggerB" });
-    }
-}
+// [Sprint1002_FixItFred] Removed duplicate RecoveryAILearningService stub class
+// This was causing CS0101 duplicate definition error
+// Sprint1002: Cleanup duplicate class definitions

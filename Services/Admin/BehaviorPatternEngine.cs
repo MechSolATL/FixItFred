@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using MVP_Core.Data.Models;
+using Data.Models;
 using Models;
 using Services.Analytics;
 using Data;

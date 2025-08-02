@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace MVP_Core.Services.QuestionEngine
+namespace Services.QuestionEngine
 {
     public class QuestionService : IQuestionService
     {

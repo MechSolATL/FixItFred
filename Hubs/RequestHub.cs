@@ -2,7 +2,7 @@
 // SignalR hub to broadcast new or reassigned service requests to connected dispatcher clients
 
 using Microsoft.AspNetCore.SignalR;
-using MVP_Core.Services.Admin;
+using Services.Admin;
 using System.Threading.Tasks;
 
 namespace Hubs

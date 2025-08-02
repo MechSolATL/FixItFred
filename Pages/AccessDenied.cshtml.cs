@@ -15,7 +15,7 @@ namespace Pages
             _seoService = seoService;
         }
 
-        public Seo Seo { get; set; } = new Seo();
+        public SeoMeta Seo { get; set; } = new SeoMeta();
         public string TierStatus { get; set; } = "Basic";
         public string ViewTitle { get; set; } = "Access Denied";
         public string? ReturnUrl { get; set; }

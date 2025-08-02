@@ -1,6 +1,6 @@
 using System;
 using System.Threading.Tasks;
-using MVP_Core.Models;
+using Models;
 using Microsoft.EntityFrameworkCore;
 using Services.Loyalty;
 using Data;

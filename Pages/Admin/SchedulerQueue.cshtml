@@ -1,9 +1,9 @@
 @page
 // FixItFred Patch Log — Sprint 26.4D
 // [2025-07-25T00:00:00Z] — Added polling timer for live technician status/ETA refresh (SignalR-ready stub).
-@model MVP_Core.Pages.Admin.SchedulerQueueModel
-@using MVP_Core.Services.Dispatch
-@inject MVP_Core.Services.Dispatch.NotificationDispatchEngine DispatchEngine
+@model Pages.Admin.SchedulerQueueModel
+@using Services.Dispatch
+@inject Services.Dispatch.NotificationDispatchEngine DispatchEngine
 @{
     Layout = "/Pages/Shared/_AdminLayout.cshtml";
     ViewData["Title"] = "Scheduler Queue";

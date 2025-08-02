@@ -1,7 +1,7 @@
 @page
-@using MVP_Core.Data.Models
-@inject MVP_Core.Data.ApplicationDbContext Db
-@model MVP_Core.Pages.Admin.AssignmentAnomaliesModel
+@using Data.Models
+@inject Data.ApplicationDbContext Db
+@model Pages.Admin.AssignmentAnomaliesModel
 @{
     ViewData["Title"] = "Assignment Anomalies";
     var flaggedAssignments = Db.DispatcherAssignmentLogs.Where(x => x.FlaggedForReview).ToList();

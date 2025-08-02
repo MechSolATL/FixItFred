@@ -1,6 +1,6 @@
-﻿using MVP_Core.Data;
-using MVP_Core.Data.Models;
-using MVP_Core.Data.Models.Reports;
+﻿using Data;
+using Data.Models;
+using Data.Models.Reports;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -8,7 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 // Sprint 91.23 - Technician Report Library
-namespace MVP_Core.Services.Reports
+namespace Services.Reports
 {
     public class TechnicianReportService
     {

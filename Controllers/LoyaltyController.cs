@@ -1,6 +1,6 @@
 using Data;
 using Microsoft.AspNetCore.Mvc;
-using MVP_Core.Data.Models;
+using Data.Models;
 using System.Linq;
 using System.Threading.Tasks;
 

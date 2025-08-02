@@ -1,7 +1,7 @@
 using Data;
 using Microsoft.AspNetCore.Mvc;
-using MVP_Core.Data.Models;
-using MVP_Core.Models.Admin;
+using Data.Models;
+using Models.Admin;
 using Services.Admin;
 using System;
 using System.Linq;
