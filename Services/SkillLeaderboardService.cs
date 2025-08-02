@@ -6,7 +6,8 @@ using TechnicianModel = Data.Models.Technician;
 
 namespace Services
 {
-    public class SkillLeaderboardService
+    // [FixItFredComment:Sprint1004 - DI registration verified] Implemented interface for proper DI registration
+    public class SkillLeaderboardService : ISkillLeaderboardService
     {
         private readonly ApplicationDbContext _db;
         public SkillLeaderboardService(ApplicationDbContext db)

@@ -11,8 +11,9 @@ namespace Services
 {
     /// <summary>
     /// Service for scheduling and processing notifications.
+    /// [FixItFredComment:Sprint1004 - DI registration verified] Implemented interface for proper DI registration
     /// </summary>
-    public class NotificationSchedulerService
+    public class NotificationSchedulerService : INotificationSchedulerService
     {
         private readonly ApplicationDbContext _db;
         private readonly NotificationDispatchEngine _dispatchEngine;

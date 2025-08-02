@@ -33,6 +33,10 @@ builder.Services.AddScoped<SystemDiagnosticsService>();
 builder.Services.AddScoped<IRootCauseCorrelationEngine, RootCauseCorrelationEngine>();
 builder.Services.AddScoped<IReplayEngineService, ReplayEngineService>();
 builder.Services.AddScoped<ISmartAdminAlertsService, SmartAdminAlertsService>();
+// [FixItFredComment:Sprint1004 - DI registration verified] Added proper interface-based service registrations
+builder.Services.AddScoped<INotificationSchedulerService, NotificationSchedulerService>();
+builder.Services.AddScoped<ICustomerTicketAnalyticsService, CustomerTicketAnalyticsService>();
+builder.Services.AddScoped<ISkillLeaderboardService, SkillLeaderboardService>();
 builder.Services.AddScoped<Data.Models.AutoRepairEngine>();
 builder.Services.AddScoped<ComplianceReportService>();
 #pragma warning disable CS0618
