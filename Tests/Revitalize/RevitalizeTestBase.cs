@@ -15,7 +15,11 @@ namespace Tests.Revitalize;
 /// </summary>
 public abstract class RevitalizeTestBase
 {
-    protected IServiceProvider CreateTestServiceProvider()
+    /// <summary>
+    /// [Sprint123_FixItFred] Fixed return type to ServiceProvider to enable using statement disposal
+    /// Creates a test service provider with all necessary dependencies for Revitalize testing
+    /// </summary>
+    protected ServiceProvider CreateTestServiceProvider()
     {
         var services = new ServiceCollection();
 

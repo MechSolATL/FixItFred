@@ -3,6 +3,7 @@ using Revitalize.Models;
 using Revitalize.Services;
 using Data;
 using Xunit;
+using RevitalizeServiceRequestService = Revitalize.Services.ServiceRequestService;
 
 namespace Tests.Revitalize;
 
@@ -19,7 +20,7 @@ public class RevitalizeBasicTests : RevitalizeTestBase
     {
         // Register Revitalize services for testing
         services.AddScoped<ITenantService, TenantService>();
-        services.AddScoped<IServiceRequestService, ServiceRequestService>();
+        services.AddScoped<IServiceRequestService, RevitalizeServiceRequestService>();
         services.AddScoped<IRevitalizeConfigService, RevitalizeConfigService>();
         services.AddScoped<IRevitalizeSeoService, RevitalizeSeoService>();
     }

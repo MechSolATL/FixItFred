@@ -3,7 +3,9 @@ using Revitalize.Models;
 namespace Revitalize.Services;
 
 /// <summary>
-/// Interface for service request management operations
+/// [Sprint123_FixItFred] Interface for service request management operations
+/// Core interface for Revitalize SaaS platform service request handling
+/// Supports multi-tenant architecture and Nova AI integration
 /// </summary>
 public interface IServiceRequestService
 {

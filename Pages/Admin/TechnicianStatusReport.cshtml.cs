@@ -7,6 +7,7 @@ using DomainTechnicianBehaviorLog = Models.TechnicianBehaviorLog;
 using Data.Models;
 using Data;
 using Services.Admin;
+using AdminTechnicianAuditService = Services.Admin.TechnicianAuditService;
 
 namespace Pages.Admin
 {
@@ -16,7 +17,7 @@ namespace Pages.Admin
     [Authorize(Roles = "Admin")]
     public class TechnicianStatusReportModel : PageModel
     {
-        private readonly Services.Admin.TechnicianAuditService _auditService;
+        private readonly AdminTechnicianAuditService _auditService;
         private readonly ApplicationDbContext _db;
 
         /// <summary>
@@ -45,7 +46,7 @@ namespace Pages.Admin
         /// <param name="auditService">The technician audit service.</param>
         /// <param name="db">The application database context.</param>
         /// <param name="permissionService">The permission service.</param>
-        public TechnicianStatusReportModel(Services.Admin.TechnicianAuditService auditService, ApplicationDbContext db, PermissionService permissionService)
+        public TechnicianStatusReportModel(AdminTechnicianAuditService auditService, ApplicationDbContext db, PermissionService permissionService)
         {
             _auditService = auditService;
             _db = db;

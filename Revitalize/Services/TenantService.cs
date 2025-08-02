@@ -3,7 +3,9 @@ using Revitalize.Models;
 namespace Revitalize.Services;
 
 /// <summary>
-/// Interface for tenant management operations
+/// [Sprint123_FixItFred] Interface for tenant management operations
+/// Core multi-tenancy support for Revitalize SaaS platform
+/// Provides CRUD operations and tenant isolation for service requests
 /// </summary>
 public interface ITenantService
 {

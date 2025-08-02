@@ -6,19 +6,20 @@ using System.Threading.Tasks;
 // FixItFred: Remove all ambiguous using for TechnicianAuditService, use fully qualified name
 using DomainTechnicianBehaviorLog = Models.TechnicianBehaviorLog;
 using Data.Models;
-using Services.Admin;
+using AdminTechnicianAuditService = Services.Admin.TechnicianAuditService;
+using AdminPermissionService = Services.Admin.PermissionService;
 
 namespace Pages.Admin
 {
     [Authorize(Roles = "Admin")]
     public class FlagReviewQueueModel : PageModel
     {
-        private readonly Services.Admin.TechnicianAuditService _auditService;
-        // [Sprint1002_FixItFred] Fully qualified to resolve namespace reference
-        public Services.Admin.PermissionService PermissionService { get; }
+        private readonly AdminTechnicianAuditService _auditService;
+        // [Sprint123_FixItFred] Using aliased namespace references to resolve compiler ambiguity
+        public AdminPermissionService PermissionService { get; }
         public AdminUser AdminUser { get; }
         public List<DomainTechnicianBehaviorLog> FlaggedLogs { get; set; } = new();
-        public FlagReviewQueueModel(Services.Admin.TechnicianAuditService auditService, Services.Admin.PermissionService permissionService)
+        public FlagReviewQueueModel(AdminTechnicianAuditService auditService, AdminPermissionService permissionService)
         {
             _auditService = auditService;
             PermissionService = permissionService;

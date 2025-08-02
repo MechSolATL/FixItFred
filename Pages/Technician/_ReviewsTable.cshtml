@@ -1,6 +1,6 @@
-@model Technician.ReviewsModel
+@model Pages.Technician.ReviewsModel
 @{
-    // Sprint 84.7.2 — Live Filter + UI Overlay
+    // Sprint 84.7.2 ï¿½ Live Filter + UI Overlay
 }
 <table class="table table-striped">
     <thead><tr><th>Date</th><th>Customer</th><th>Rating</th><th>Comment</th><th>Details</th></tr></thead>
@@ -8,7 +8,7 @@
     @foreach (var review in Model.FilteredReviews)
     {
         <tr>
-            <td>@(review.Timestamp?.ToShortDateString() ?? "—")</td>
+            <td>@(review.Timestamp?.ToShortDateString() ?? "ï¿½")</td>
             <td>@review.CustomerName</td>
             <td>@review.Rating</td>
             <td>@review.Comment</td>

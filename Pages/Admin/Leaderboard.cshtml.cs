@@ -13,11 +13,11 @@ namespace Pages.Admin
     [Authorize(Roles="Admin,Manager")]
     public class LeaderboardModel : PageModel
     {
-        private readonly Services.ILeaderboardService _leaderboardService;
+        private readonly ILeaderboardService _leaderboardService;
         private readonly ISeoService _seoService;
         private readonly IContentService _contentService;
 
-        public LeaderboardModel(Services.ILeaderboardService leaderboardService, ISeoService seoService, IContentService contentService)
+        public LeaderboardModel(ILeaderboardService leaderboardService, ISeoService seoService, IContentService contentService)
         {
             _leaderboardService = leaderboardService;
             _seoService = seoService;

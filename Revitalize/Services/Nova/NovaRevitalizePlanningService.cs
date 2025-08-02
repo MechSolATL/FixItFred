@@ -50,8 +50,8 @@ public class NovaRevitalizePlanningService : INovaRevitalizePlanningService
             CurrentMetrics = new TacticalMetrics
             {
                 TotalRequests = requests.Count(),
-                PendingRequests = requests.Count(r => r.Status == ServiceRequestStatus.Pending),
-                CompletedRequests = requests.Count(r => r.Status == ServiceRequestStatus.Completed),
+                PendingRequests = requests.Count(r => r.Status == RevitalizeServiceRequestStatus.Pending),
+                CompletedRequests = requests.Count(r => r.Status == RevitalizeServiceRequestStatus.Completed),
                 AverageCompletionTime = CalculateAverageCompletionTime(requests),
                 CustomerSatisfactionScore = 85.5m // Mock data
             },

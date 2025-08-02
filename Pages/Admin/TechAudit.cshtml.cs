@@ -7,6 +7,7 @@ using Data.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Services;
+using AdminTechnicianAuditService = Services.Admin.TechnicianAuditService;
 
 namespace Pages.Admin
 {
@@ -16,7 +17,7 @@ namespace Pages.Admin
     [Authorize(Roles = "Admin")]
     public class TechAuditModel : PageModel
     {
-        private readonly Services.Admin.TechnicianAuditService _auditService;
+        private readonly AdminTechnicianAuditService _auditService;
         internal readonly ApplicationDbContext _db;
 
         /// <summary>
@@ -24,7 +25,7 @@ namespace Pages.Admin
         /// </summary>
         /// <param name="db">The application database context.</param>
         /// <param name="auditService">The technician audit service.</param>
-        public TechAuditModel(ApplicationDbContext db, Services.Admin.TechnicianAuditService auditService)
+        public TechAuditModel(ApplicationDbContext db, AdminTechnicianAuditService auditService)
         {
             _db = db;
             _auditService = auditService;
