@@ -1,142 +1,163 @@
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.EntityFrameworkCore;
 using Revitalize.Models;
 using Revitalize.Services;
+using Data;
+using Xunit;
 
 namespace Tests.Revitalize;
 
 /// <summary>
-/// Basic tests for Revitalize SaaS functionality - Sprint121
-/// Note: These are integration-style tests that can be run manually
+/// Integration tests for Revitalize SaaS functionality using DI container - Sprint121
+/// Following Option B from PR feedback: Manual DI setup for unit-style tests with DI
 /// </summary>
 public class RevitalizeBasicTests
 {
-    /// <summary>
-    /// Test tenant creation and retrieval
-    /// </summary>
-    public static async Task<bool> TestTenantService()
+    private IServiceProvider CreateTestServiceProvider()
     {
-        var tenantService = new TenantService();
+        var services = new ServiceCollection();
+
+        // Add logging
+        services.AddLogging();
+
+        // Add in-memory database for testing
+        services.AddDbContext<ApplicationDbContext>(options =>
+            options.UseInMemoryDatabase($"TestDb_{Guid.NewGuid()}"));
+
+        // Add configuration
+        var configurationData = new Dictionary<string, string?>
+        {
+            ["Revitalize:PlatformName"] = "Test Revitalize Platform",
+            ["Revitalize:Version"] = "1.0.0-Test",
+            ["Revitalize:SaaSMode"] = "true",
+            ["Revitalize:MaxTenants"] = "50"
+        };
+        var configuration = new ConfigurationBuilder()
+            .AddInMemoryCollection(configurationData)
+            .Build();
+        services.AddSingleton<IConfiguration>(configuration);
+
+        // Register Revitalize services
+        services.AddScoped<ITenantService, TenantService>();
+        services.AddScoped<IServiceRequestService, ServiceRequestService>();
+        services.AddScoped<IRevitalizeConfigService, RevitalizeConfigService>();
+        services.AddScoped<IRevitalizeSeoService, RevitalizeSeoService>();
+
+        return services.BuildServiceProvider();
+    }
+
+    /// <summary>
+    /// Test tenant creation and retrieval using DI-injected service
+    /// </summary>
+    [Fact]
+    public async Task Should_Persist_Tenant_Using_TenantService()
+    {
+        using var serviceProvider = CreateTestServiceProvider();
+        using var scope = serviceProvider.CreateScope();
+        var tenantService = scope.ServiceProvider.GetRequiredService<ITenantService>();
         
-        try
+        // Create a test tenant
+        var newTenant = new RevitalizeTenant
         {
-            // Create a test tenant
-            var newTenant = new RevitalizeTenant
-            {
-                CompanyName = "Test Plumbing Co",
-                TenantCode = "TEST",
-                Description = "Test tenant for Revitalize"
-            };
-            
-            var created = await tenantService.CreateTenantAsync(newTenant);
-            if (created.TenantId <= 0) return false;
-            
-            // Retrieve the tenant
-            var retrieved = await tenantService.GetTenantAsync(created.TenantId);
-            if (retrieved == null || retrieved.CompanyName != "Test Plumbing Co") return false;
-            
-            // Get by code
-            var byCode = await tenantService.GetTenantByCodeAsync("TEST");
-            if (byCode == null || byCode.TenantId != created.TenantId) return false;
-            
-            return true;
-        }
-        catch
-        {
-            return false;
-        }
+            CompanyName = "Test Plumbing Co",
+            TenantCode = "TEST",
+            Description = "Test tenant for Revitalize"
+        };
+        
+        var created = await tenantService.CreateTenantAsync(newTenant);
+        Assert.True(created.TenantId > 0);
+        
+        // Retrieve the tenant
+        var retrieved = await tenantService.GetTenantAsync(created.TenantId);
+        Assert.NotNull(retrieved);
+        Assert.Equal("Test Plumbing Co", retrieved.CompanyName);
+        
+        // Get by code
+        var byCode = await tenantService.GetTenantByCodeAsync("TEST");
+        Assert.NotNull(byCode);
+        Assert.Equal(created.TenantId, byCode.TenantId);
     }
     
     /// <summary>
-    /// Test service request creation and management
+    /// Test service request creation and management using DI-injected service
     /// </summary>
-    public static async Task<bool> TestServiceRequestService()
+    [Fact]
+    public async Task Should_Persist_Request_Using_ServiceRequestService()
     {
-        var serviceRequestService = new ServiceRequestService();
+        using var serviceProvider = CreateTestServiceProvider();
+        using var scope = serviceProvider.CreateScope();
+        var serviceRequestService = scope.ServiceProvider.GetRequiredService<IServiceRequestService>();
         
-        try
+        // Create a test service request
+        var newRequest = new RevitalizeServiceRequest
         {
-            // Create a test service request
-            var newRequest = new RevitalizeServiceRequest
-            {
-                TenantId = 1,
-                Title = "Test Leak Repair",
-                Description = "Test service request",
-                ServiceType = RevitalizeServiceType.Plumbing,
-                Priority = RevitalizePriority.Medium,
-                CustomerName = "John Test",
-                CustomerPhone = "555-TEST"
-            };
-            
-            var created = await serviceRequestService.CreateServiceRequestAsync(newRequest);
-            if (created.ServiceRequestId <= 0) return false;
-            
-            // Retrieve the request
-            var retrieved = await serviceRequestService.GetServiceRequestAsync(created.ServiceRequestId);
-            if (retrieved == null || retrieved.Title != "Test Leak Repair") return false;
-            
-            // Test assignment
-            var assigned = await serviceRequestService.AssignTechnicianAsync(created.ServiceRequestId, 1);
-            if (!assigned) return false;
-            
-            // Verify assignment
-            var afterAssignment = await serviceRequestService.GetServiceRequestAsync(created.ServiceRequestId);
-            if (afterAssignment?.AssignedTechnicianId != 1) return false;
-            if (afterAssignment.Status != RevitalizeServiceRequestStatus.Assigned) return false;
-            
-            return true;
-        }
-        catch
-        {
-            return false;
-        }
+            TenantId = 1,
+            Title = "Test Leak Repair",
+            Description = "Test service request",
+            ServiceType = RevitalizeServiceType.Plumbing,
+            Priority = RevitalizePriority.Medium,
+            CustomerName = "John Test",
+            CustomerPhone = "555-TEST"
+        };
+        
+        var created = await serviceRequestService.CreateServiceRequestAsync(newRequest);
+        Assert.True(created.ServiceRequestId > 0);
+        
+        // Retrieve the request
+        var retrieved = await serviceRequestService.GetServiceRequestAsync(created.ServiceRequestId);
+        Assert.NotNull(retrieved);
+        Assert.Equal("Test Leak Repair", retrieved.Title);
+        
+        // Test assignment
+        var assigned = await serviceRequestService.AssignTechnicianAsync(created.ServiceRequestId, 1);
+        Assert.True(assigned);
+        
+        // Verify assignment
+        var afterAssignment = await serviceRequestService.GetServiceRequestAsync(created.ServiceRequestId);
+        Assert.NotNull(afterAssignment);
+        Assert.Equal(1, afterAssignment.AssignedTechnicianId);
+        Assert.Equal(RevitalizeServiceRequestStatus.Assigned, afterAssignment.Status);
     }
     
     /// <summary>
-    /// Test configuration service
+    /// Test configuration service using DI-injected service
     /// </summary>
-    public static bool TestRevitalizeConfigService()
+    [Fact]
+    public void Should_Access_RevitalizeConfigService_Via_DI()
     {
-        try
-        {
-            // This would require IConfiguration injection in a real test
-            // For now, just verify the class can be instantiated
-            var config = new Dictionary<string, string>
-            {
-                ["Revitalize:PlatformName"] = "Test Platform",
-                ["Revitalize:Version"] = "1.0.0",
-                ["Revitalize:SaaSMode"] = "true"
-            };
-            
-            // In a real implementation, we'd use Microsoft.Extensions.Configuration.Memory
-            // For now, just return true to indicate the test structure is valid
-            return true;
-        }
-        catch
-        {
-            return false;
-        }
+        using var serviceProvider = CreateTestServiceProvider();
+        using var scope = serviceProvider.CreateScope();
+        var configService = scope.ServiceProvider.GetRequiredService<IRevitalizeConfigService>();
+        
+        // Verify the service can be resolved from DI container
+        Assert.NotNull(configService);
+        
+        // Test basic configuration access
+        var platformName = configService.GetPlatformName();
+        Assert.False(string.IsNullOrEmpty(platformName));
+        Assert.Equal("Test Revitalize Platform", platformName);
     }
-    
+
     /// <summary>
-    /// Run all basic tests
+    /// Test that all Revitalize services are properly registered in DI container
     /// </summary>
-    public static async Task<bool> RunAllTests()
+    [Fact]
+    public void Should_Resolve_All_Revitalize_Services_From_DI()
     {
-        var results = new List<(string testName, bool passed)>();
+        using var serviceProvider = CreateTestServiceProvider();
+        using var scope = serviceProvider.CreateScope();
         
-        results.Add(("TenantService", await TestTenantService()));
-        results.Add(("ServiceRequestService", await TestServiceRequestService()));
-        results.Add(("RevitalizeConfigService", TestRevitalizeConfigService()));
+        // Verify all services can be resolved
+        var tenantService = scope.ServiceProvider.GetRequiredService<ITenantService>();
+        var serviceRequestService = scope.ServiceProvider.GetRequiredService<IServiceRequestService>();
+        var configService = scope.ServiceProvider.GetRequiredService<IRevitalizeConfigService>();
+        var seoService = scope.ServiceProvider.GetRequiredService<IRevitalizeSeoService>();
         
-        var passedCount = results.Count(r => r.passed);
-        var totalCount = results.Count;
-        
-        Console.WriteLine($"Revitalize Basic Tests Results: {passedCount}/{totalCount} passed");
-        
-        foreach (var (testName, passed) in results)
-        {
-            Console.WriteLine($"  {testName}: {(passed ? "PASS" : "FAIL")}");
-        }
-        
-        return passedCount == totalCount;
+        Assert.NotNull(tenantService);
+        Assert.NotNull(serviceRequestService);
+        Assert.NotNull(configService);
+        Assert.NotNull(seoService);
     }
 }

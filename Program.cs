@@ -86,3 +86,6 @@ public interface ISmartAdminAlertsService
 public class LeaderboardService : ILeaderboardService {}
 
 public interface ILeaderboardService {}
+
+// Make Program class public for testing with WebApplicationFactory
+public partial class Program { }
