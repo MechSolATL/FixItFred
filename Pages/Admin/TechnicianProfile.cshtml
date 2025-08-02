@@ -1,11 +1,11 @@
 @page
 @using Models.Admin
-@inject MVP_Core.Services.Admin.DispatcherService DispatcherService
-@inject MVP_Core.Services.TechnicianFeedbackService FeedbackService
-@inject MVP_Core.Services.CertificationService CertService
-@inject MVP_Core.Services.TechnicianPayService PayService
-@inject MVP_Core.Services.TechnicianBonusService BonusService
-@model MVP_Core.Pages.Admin.TechnicianProfileModel
+@inject Services.Admin.DispatcherService DispatcherService
+@inject Services.TechnicianFeedbackService FeedbackService
+@inject Services.CertificationService CertService
+@inject Services.TechnicianPayService PayService
+@inject Services.TechnicianBonusService BonusService
+@model Pages.Admin.TechnicianProfileModel
 @{
     int techId = Model.TechId;
     var profile = Model.Profile;

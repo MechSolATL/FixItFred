@@ -1,6 +1,6 @@
 @page
-@model MVP_Core.Pages.Admin.OfflineZoneMonitorModel
-@inject MVP_Core.Services.OfflineZoneTracker ZoneTracker
+@model Pages.Admin.OfflineZoneMonitorModel
+@inject Services.OfflineZoneTracker ZoneTracker
 @{
     ViewData["Title"] = "Offline Zone Monitor";
     var zones = ZoneTracker.GetAllZones().ToList();

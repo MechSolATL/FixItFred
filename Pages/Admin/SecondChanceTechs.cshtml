@@ -1,6 +1,6 @@
 @page
-@model MVP_Core.Pages.Admin.SecondChanceTechsModel
-@inject MVP_Core.Data.ApplicationDbContext Db
+@model Pages.Admin.SecondChanceTechsModel
+@inject Data.ApplicationDbContext Db
 @{
     ViewData["Title"] = "Second-Chance Technicians";
     var techs = Db.Technicians.Where(t => t.IsSecondChance).ToList();

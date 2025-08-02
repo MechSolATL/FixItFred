@@ -1,8 +1,8 @@
 @page
-@model MVP_Core.Pages.Admin.DisputeManagerModel
+@model Pages.Admin.DisputeManagerModel
 @using Data.Models
-@inject MVP_Core.Services.DisputeService DisputeService
-@inject MVP_Core.Services.ServiceRequestService ServiceRequestService
+@inject Services.DisputeService DisputeService
+@inject Services.ServiceRequestService ServiceRequestService
 @{
     ViewData["Title"] = "Dispute Manager";
     var disputes = Model.FilteredDisputes ?? new List<DisputeRecord>(); // Sprint 79.0: Razor null safety sync

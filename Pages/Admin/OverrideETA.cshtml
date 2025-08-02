@@ -4,7 +4,7 @@
 // [2025-07-25T00:00:00Z] — Added secure admin ETA override form for multi-zone ETA broadcast.
 @attribute [Authorize(Roles = "Admin")]
 @inject Microsoft.AspNetCore.SignalR.IHubContext<Hubs.ETAHub> ETAHubContext
-@model MVP_Core.Pages.Admin.OverrideETAModel
+@model Pages.Admin.OverrideETAModel
 @{
     ViewData["Title"] = "Manual ETA Override";
 }

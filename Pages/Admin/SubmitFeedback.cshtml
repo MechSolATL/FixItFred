@@ -3,9 +3,9 @@
 // [2025-07-25T00:00:00Z] — Injected asp-validation-for for all form fields and ensured _ValidationSummary is present.
 @using Data.Models // Corrected ServiceRequest namespace
 @using Data.Models.ViewModels
-@inject MVP_Core.Services.TechnicianFeedbackService FeedbackService
-@inject MVP_Core.Services.Admin.DispatcherService DispatcherService
-@model MVP_Core.Pages.Admin.SubmitFeedbackModel
+@inject Services.TechnicianFeedbackService FeedbackService
+@inject Services.Admin.DispatcherService DispatcherService
+@model Pages.Admin.SubmitFeedbackModel
 @{
     ViewData["Title"] = "Submit Technician Feedback";
     var status = TempData["FeedbackStatus"] as string ?? "";

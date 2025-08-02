@@ -30,6 +30,10 @@ builder.Services.AddScoped<ISmartAdminAlertsService, SmartAdminAlertsService>();
 // [Sprint1002_FixItFred] Fixed to register correct AutoRepairEngine from Services.Admin
 builder.Services.AddScoped<Services.Admin.AutoRepairEngine>();
 builder.Services.AddScoped<ComplianceReportService>();
+// [Sprint1002_FixItFred] Added missing service registrations to resolve DI errors
+builder.Services.AddScoped<Services.Admin.TechnicianAuditService>();
+builder.Services.AddScoped<Services.Admin.PermissionService>();
+builder.Services.AddScoped<ILeaderboardService, LeaderboardService>();
 #pragma warning disable CS0618
 builder.Services.AddScoped<ValidationSimulatorService>(); // ⚠️ [Obsolete] — monitor usage
 #pragma warning restore CS0618

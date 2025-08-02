@@ -1,8 +1,8 @@
 @page
-@model MVP_Core.Pages.Customer.DisputeCenterModel
+@model Pages.Customer.DisputeCenterModel
 @using Data.Models
-@inject MVP_Core.Services.DisputeService DisputeService
-@inject MVP_Core.Services.ServiceRequestService ServiceRequestService
+@inject Services.DisputeService DisputeService
+@inject Services.ServiceRequestService ServiceRequestService
 @{
     ViewData["Title"] = "Dispute Resolution Center";
     var completedRequests = Model.CompletedRequests;

@@ -1,7 +1,7 @@
 @* Sprint 84.6 — Review Display Integration *@
 @page
-@model MVP_Core.Pages.Admin.ReviewsModel
-@inject MVP_Core.Data.ApplicationDbContext Db
+@model Pages.Admin.ReviewsModel
+@inject Data.ApplicationDbContext Db
 @{
     ViewData["Title"] = "Review Management";
     var reviews = Db.CustomerReviews.OrderByDescending(r => r.SubmittedAt).Take(100).ToList();

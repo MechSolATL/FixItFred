@@ -1,8 +1,8 @@
 @page
-@model MVP_Core.Pages.Admin.CertificationLeaderboardModel
+@model Pages.Admin.CertificationLeaderboardModel
 @using Data.Models
-@inject MVP_Core.Services.CertificationService CertService
-@inject MVP_Core.Services.SkillsTrackerService SkillsService
+@inject Services.CertificationService CertService
+@inject Services.SkillsTrackerService SkillsService
 @{
     ViewData["Title"] = "Certification Leaderboard";
     var leaderboard = Model.Leaderboard;

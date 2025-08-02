@@ -1,8 +1,8 @@
 @page
 // FixItFred Patch Log: Corrected invalid reference to 'to' at line 67. All loop/variable references now valid DTOs.
 @using Models.Admin
-@inject MVP_Core.Services.Admin.DispatcherService DispatcherService
-@model MVP_Core.Pages.Admin.DispatcherHistoryModel
+@inject Services.Admin.DispatcherService DispatcherService
+@model Pages.Admin.DispatcherHistoryModel
 @{
     int requestId = 0;
     int.TryParse(Request.Query["requestId"], out requestId);

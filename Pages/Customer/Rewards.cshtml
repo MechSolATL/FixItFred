@@ -1,7 +1,7 @@
 @* Sprint 83.4: Detection code removed to restore build stability *@
 @page
-@model MVP_Core.Pages.Customer.RewardsModel
-@inject MVP_Core.Services.CustomerPortalService PortalService
+@model Pages.Customer.RewardsModel
+@inject Services.CustomerPortalService PortalService
 @{
     Layout = "/Pages/Shared/_Layout.cshtml";
     if (!(User.Identity?.IsAuthenticated == true) || !User.HasClaim("IsCustomer", "true")) // Sprint 82: RazorViewFortification

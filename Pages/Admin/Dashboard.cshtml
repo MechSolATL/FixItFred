@@ -1,10 +1,10 @@
 @page
-@model MVP_Core.Pages.Admin.DashboardModel
+@model Pages.Admin.DashboardModel
 @inject global::Services.Dispatch.SlaDriftAnalyzerService SlaDriftAnalyzerService
 @inject global::Services.Storage.StorageMonitorService StorageMonitorService
-@inject MVP_Core.Services.Admin.ComplianceReportService ComplianceService
-@inject MVP_Core.Services.Admin.SmartAdminAlertsService SmartAdminAlertsService
-@inject MVP_Core.Data.ApplicationDbContext Db
+@inject Services.Admin.ComplianceReportService ComplianceService
+@inject Services.Admin.SmartAdminAlertsService SmartAdminAlertsService
+@inject Data.ApplicationDbContext Db
 @using Services.Tenant
 @inject TenantResolver TenantResolver
 @{

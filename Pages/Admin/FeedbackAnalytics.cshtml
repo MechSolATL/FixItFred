@@ -1,6 +1,6 @@
 @page
-@model MVP_Core.Pages.Admin.FeedbackAnalyticsModel
-@inject MVP_Core.Services.FeedbackAnalyticsService AnalyticsService
+@model Pages.Admin.FeedbackAnalyticsModel
+@inject Services.FeedbackAnalyticsService AnalyticsService
 @{
     ViewData["Title"] = "Feedback Analytics";
     var reviews = Model.Reviews != null && Model.Reviews.Any() ? Model.Reviews : new List<Data.Models.CustomerReview>();

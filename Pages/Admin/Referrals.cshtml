@@ -1,6 +1,6 @@
 @page
-@model MVP_Core.Pages.Admin.ReferralsModel
-@inject MVP_Core.Data.ApplicationDbContext Db
+@model Pages.Admin.ReferralsModel
+@inject Data.ApplicationDbContext Db
 @{
     Layout = "/Pages/Admin/_AdminLayout.cshtml";
     var search = Request.Query["search"].ToString();
