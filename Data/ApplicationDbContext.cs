@@ -209,6 +209,11 @@ namespace Data
         public DbSet<TechnicianReportFeedback> TechnicianReportFeedbacks { get; set; } = null!;
         public DbSet<ReviewResponseLog> ReviewResponseLogs { get; set; } = null!;
         public DbSet<PatchSystemLog> PatchSystemLogs { get; set; } = null!;
+        
+        // Sprint121 - Revitalize SaaS Module Entities
+        public DbSet<Revitalize.Models.RevitalizeTenant> RevitalizeTenants { get; set; } = null!;
+        public DbSet<Revitalize.Models.RevitalizeServiceRequest> RevitalizeServiceRequests { get; set; } = null!;
+        public DbSet<Revitalize.Models.RevitalizeTechnicianProfile> RevitalizeTechnicianProfiles { get; set; } = null!;
         #endregion
 
         #region Fluent Table Mappings
@@ -364,6 +369,30 @@ namespace Data
                 .OnDelete(DeleteBehavior.SetNull);
 
             modelBuilder.Entity<RoastTemplate>().Property(r => r.Tier).HasConversion<string>();
+            
+            // Sprint121 - Revitalize SaaS Module Entity Mappings
+            _ = modelBuilder.Entity<Revitalize.Models.RevitalizeTenant>().ToTable("RevitalizeTenants");
+            _ = modelBuilder.Entity<Revitalize.Models.RevitalizeServiceRequest>().ToTable("RevitalizeServiceRequests");
+            _ = modelBuilder.Entity<Revitalize.Models.RevitalizeTechnicianProfile>().ToTable("RevitalizeTechnicianProfiles");
+            
+            // Configure Revitalize relationships
+            modelBuilder.Entity<Revitalize.Models.RevitalizeServiceRequest>()
+                .HasOne(sr => sr.Tenant)
+                .WithMany(t => t.ServiceRequests)
+                .HasForeignKey(sr => sr.TenantId)
+                .OnDelete(DeleteBehavior.Cascade);
+                
+            modelBuilder.Entity<Revitalize.Models.RevitalizeServiceRequest>()
+                .HasOne(sr => sr.AssignedTechnician)
+                .WithMany(t => t.AssignedRequests)
+                .HasForeignKey(sr => sr.AssignedTechnicianId)
+                .OnDelete(DeleteBehavior.SetNull);
+                
+            modelBuilder.Entity<Revitalize.Models.RevitalizeTechnicianProfile>()
+                .HasOne(tp => tp.Tenant)
+                .WithMany(t => t.Technicians)
+                .HasForeignKey(tp => tp.TenantId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
 
         #endregion

@@ -37,6 +37,13 @@ builder.Services.AddScoped<ILeaderboardService, LeaderboardService>();
 #pragma warning disable CS0618
 builder.Services.AddScoped<ValidationSimulatorService>(); // ⚠️ [Obsolete] — monitor usage
 #pragma warning restore CS0618
+
+// 🚀 Sprint121 - Revitalize SaaS Module Registration
+builder.Services.AddScoped<Revitalize.Services.ITenantService, Revitalize.Services.TenantService>();
+builder.Services.AddScoped<Revitalize.Services.IServiceRequestService, Revitalize.Services.ServiceRequestService>();
+builder.Services.AddScoped<Revitalize.Services.IRevitalizeConfigService, Revitalize.Services.RevitalizeConfigService>();
+builder.Services.AddScoped<Revitalize.Services.IRevitalizeSeoService, Revitalize.Services.RevitalizeSeoService>();
+builder.Services.AddScoped<Revitalize.Services.Nova.INovaRevitalizePlanningService, Revitalize.Services.Nova.NovaRevitalizePlanningService>();
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
