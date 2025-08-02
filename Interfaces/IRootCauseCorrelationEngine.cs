@@ -5,7 +5,7 @@ namespace Interfaces
     public interface IRootCauseCorrelationEngine
     {
         void AnalyzeRootCause(string data);
-        Task<bool> QueueRecoveryScenarioAsync(string sourceId, string scenarioKey, UserContext context);
-        Task<string> AnalyzeRecoveryPatternsAsync(string sourceId, DateTime since, UserContext context);
+        Task<bool> QueueRecoveryScenarioAsync(string sourceId, string scenarioKey, Models.UserContext context);
+        Task<string> AnalyzeRecoveryPatternsAsync(string sourceId, DateTime since, Models.UserContext context);
     }
 }
