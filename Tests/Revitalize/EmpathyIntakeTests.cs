@@ -8,7 +8,7 @@ namespace Tests.Revitalize;
 
 /// <summary>
 /// Tests for empathy intake functionality using DI-enabled test framework
-/// Sprint121: Tactical add-on for Lyra cognition testing
+/// Sprint121+122: Tactical add-on for Lyra cognition testing with persona traits
 /// </summary>
 [Trait("Category", "Empathy")]
 [Trait("Layer", "Service")]
@@ -109,5 +109,72 @@ public class EmpathyIntakeTests : RevitalizeTestBase
             Assert.NotNull(result);
             Assert.NotEmpty(result);
         }
+    }
+
+    /// <summary>
+    /// Test empathy responses for AnxiousCustomer persona
+    /// </summary>
+    [Fact]
+    [Trait("TestType", "Unit")]
+    [Trait("Persona", "AnxiousCustomer")]
+    public async Task Should_Handle_AnxiousCustomer_Scenarios()
+    {
+        using var serviceProvider = CreateTestServiceProvider();
+        using var scope = serviceProvider.CreateScope();
+        
+        var lyraCognition = scope.ServiceProvider.GetRequiredService<ILyraCognition>();
+        
+        // Test anxious customer scenarios
+        var result = await lyraCognition.ResolvePromptAsync("service failure");
+        Assert.NotNull(result);
+        Assert.Contains("sorry", result.ToLower());
+        
+        var billingResult = await lyraCognition.ResolvePromptAsync("billing issue");
+        Assert.NotNull(billingResult);
+        Assert.Contains("understand", billingResult.ToLower());
+    }
+
+    /// <summary>
+    /// Test empathy responses for FrustratedCustomer persona
+    /// </summary>
+    [Fact]
+    [Trait("TestType", "Unit")]
+    [Trait("Persona", "FrustratedCustomer")]
+    public async Task Should_Handle_FrustratedCustomer_Scenarios()
+    {
+        using var serviceProvider = CreateTestServiceProvider();
+        using var scope = serviceProvider.CreateScope();
+        
+        var lyraCognition = scope.ServiceProvider.GetRequiredService<ILyraCognition>();
+        
+        // Test frustrated customer scenarios
+        var result = await lyraCognition.ResolvePromptAsync("general complaint");
+        Assert.NotNull(result);
+        Assert.Contains("attention", result.ToLower());
+        
+        var urgentResult = await lyraCognition.ResolvePromptAsync("urgent request");
+        Assert.NotNull(urgentResult);
+    }
+
+    /// <summary>
+    /// Test empathy responses for TechnicallySavvy persona
+    /// </summary>
+    [Fact]
+    [Trait("TestType", "Unit")]
+    [Trait("Persona", "TechnicallySavvy")]
+    public async Task Should_Handle_TechnicallySavvy_Scenarios()
+    {
+        using var serviceProvider = CreateTestServiceProvider();
+        using var scope = serviceProvider.CreateScope();
+        
+        var lyraCognition = scope.ServiceProvider.GetRequiredService<ILyraCognition>();
+        
+        // Test technically savvy customer scenarios
+        var result = await lyraCognition.ResolvePromptAsync("service failure");
+        Assert.NotNull(result);
+        
+        var billingResult = await lyraCognition.ResolvePromptAsync("billing issue");
+        Assert.NotNull(billingResult);
+        Assert.Contains("help", billingResult.ToLower());
     }
 }
