@@ -1,8 +1,15 @@
 @page
+@* [FixItFredComment:Sprint1003 - SEO Meta Injection] Added proper SEO metadata and canonical links *@
 @model ErrorModel
 @{
     ViewData["Title"] = "Oops! Something Broke";
+    ViewData["MetaDescription"] = "Error page for Service Atlanta - Something went wrong but we're on it!";
+    ViewData["Keywords"] = "error, service atlanta, oops, help";
+    ViewData["Robots"] = "noindex, nofollow"; // Error pages should not be indexed
     Layout = "~/Pages/Shared/_Layout.cshtml"; // ? Corrected relative layout path
+    
+    // [FixItFredComment:Sprint1003 - SEO Meta Injection] Include SEO head partial
+    await Html.PartialAsync("/Pages/Shared/_SEOHead.cshtml");
 }
 
 @section Scripts {
@@ -50,13 +57,13 @@
     <h2 class="text-dark">SOMETHING WENT WRONG</h2>
 
     <p class="lead mt-3">
-        The page you’re looking for took a wrong turn at Albuquerque.<br />
-        It either doesn’t exist anymore or never did... kinda like your last contractor’s promises.
+        The page youï¿½re looking for took a wrong turn at Albuquerque.<br />
+        It either doesnï¿½t exist anymore or never did... kinda like your last contractorï¿½s promises.
     </p>
 
     <p class="text-muted">
-        If you clicked a link, congrats — you’ve discovered a broken trail.<br />
-        Don’t worry, we’ve already sent a team of angry code monkeys to investigate.
+        If you clicked a link, congrats ï¿½ youï¿½ve discovered a broken trail.<br />
+        Donï¿½t worry, weï¿½ve already sent a team of angry code monkeys to investigate.
     </p>
 
     <div class="mt-4">
@@ -68,7 +75,7 @@
 
     <h5 class="text-primary">?? Still sweating the details?</h5>
     <p>
-        Check out our Plumbing, Heating, Cooling & Water Filtration services —<br />
+        Check out our Plumbing, Heating, Cooling & Water Filtration services ï¿½<br />
         Always expert, always fair, and always way better than this error message.
     </p>
 

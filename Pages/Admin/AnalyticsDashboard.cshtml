@@ -1,8 +1,15 @@
 @page
+@* [FixItFredComment:Sprint1003 - SEO Meta Injection] Added proper SEO metadata and canonical links *@
 @model MVP_Core.Pages.Admin.AnalyticsDashboardModel
 @{
     Layout = "/Pages/Shared/_AdminLayout.cshtml";
     ViewData["Title"] = "Admin Analytics Dashboard";
+    ViewData["MetaDescription"] = "Service Atlanta admin analytics dashboard with KPIs, insights and performance metrics";
+    ViewData["Keywords"] = "admin analytics, dashboard, KPIs, service atlanta, performance metrics";
+    ViewData["Robots"] = "noindex, nofollow"; // Admin pages should not be indexed
+    
+    // [FixItFredComment:Sprint1003 - SEO Meta Injection] Include SEO head partial
+    await Html.PartialAsync("/Pages/Shared/_SEOHead.cshtml");
 }
 <link rel="stylesheet" href="/css/AdminAnalytics.css" />
 <div class="analytics-dashboard-container">
