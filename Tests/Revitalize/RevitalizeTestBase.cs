@@ -10,51 +10,67 @@ using Tests.TestSeeds;
 namespace Tests.Revitalize;
 
 /// <summary>
-/// Enhanced test base class with all tactical add-ons for DI-enabled testing
-/// Sprint121: Complete test framework with empathy data, mocks, and configuration
+/// [Sprint123_FixItFred_OmegaSweep] Enhanced test base class with comprehensive DI and empathy testing framework
+/// Provides complete testing infrastructure for Revitalize module including empathy data and mocks
+/// UX Connection: Supports testing of all customer-facing functionality and workflows
+/// Model Connection: Creates in-memory database with full Revitalize entity framework
+/// CLI Flag: Supports testing of RevitalizeCLI operations and cognitive seed processing
+/// Expected Outcome: Enables comprehensive testing of empathy features and service operations
+/// Cognitive Impact: Validates Nova AI integration and LyraEmpathyIntakeNarrator functionality
+/// Empathy Replay Impact: Tests persona-based response generation and customer satisfaction patterns
 /// </summary>
 public abstract class RevitalizeTestBase
 {
     /// <summary>
-    /// [Sprint123_FixItFred] Fixed return type to ServiceProvider to enable using statement disposal
-    /// Creates a test service provider with all necessary dependencies for Revitalize testing
+    /// [Sprint123_FixItFred_OmegaSweep] Creates a comprehensive test service provider with all dependencies
+    /// Sets up complete DI container with in-memory database, configuration, and mock services
+    /// UX Connection: Enables testing of complete user workflows from UI to data layer
+    /// Expected Outcome: Fully configured service provider for integration testing
+    /// Cognitive Impact: Includes Nova AI mock services for testing optimization features
+    /// Side Effects: Creates isolated test environment with empathy data seeding
     /// </summary>
+    /// <returns>Configured ServiceProvider for testing with proper disposal pattern</returns>
     protected ServiceProvider CreateTestServiceProvider()
     {
         var services = new ServiceCollection();
 
-        // Add logging
+        // Add logging for test diagnostics
         services.AddLogging();
 
-        // Add in-memory database for testing
+        // Add in-memory database for isolated testing
         services.AddDbContext<ApplicationDbContext>(options =>
             options.UseInMemoryDatabase($"TestDb_{Guid.NewGuid()}"));
 
-        // Enhanced configuration with feature flags and Lyra tuning options
+        // Enhanced configuration with complete feature flags and empathy settings
         var configurationData = new Dictionary<string, string?>
         {
-            // Revitalize configuration
+            // Revitalize platform configuration
             ["Revitalize:PlatformName"] = "Test Revitalize Platform",
             ["Revitalize:Version"] = "1.0.0-Test",
             ["Revitalize:SaaSMode"] = "true",
             ["Revitalize:MaxTenants"] = "50",
             ["Revitalize:EnableDebugReplay"] = "true",
+            ["Revitalize:DefaultTheme"] = "test-theme",
             
-            // Lyra configuration
+            // Lyra empathy configuration
             ["Lyra:PromptMode"] = "Expanded",
             ["Lyra:EnableEmpathy"] = "true",
             ["Lyra:ResponseTimeout"] = "5000",
+            ["Lyra:PersonaTraining"] = "true",
             
-            // FixItFred configuration
+            // FixItFred diagnostics configuration
             ["FixItFred:DiagnosticsEnabled"] = "true",
             ["FixItFred:HealthCheckInterval"] = "30",
+            ["FixItFred:LogLevel"] = "Debug",
             
-            // Feature flags
+            // Comprehensive feature flags for testing
             ["Features:MultiTenant"] = "true",
             ["Features:TechnicianTracking"] = "true",
             ["Features:CustomerPortal"] = "true",
             ["Features:Analytics"] = "true",
-            ["Features:EmpathyMode"] = "true"
+            ["Features:EmpathyMode"] = "true",
+            ["Features:NovaAI"] = "true",
+            ["Features:ReplayTranscriptStore"] = "true"
         };
         
         var configuration = new ConfigurationBuilder()
@@ -62,10 +78,10 @@ public abstract class RevitalizeTestBase
             .Build();
         services.AddSingleton<IConfiguration>(configuration);
 
-        // Register Revitalize services (if interfaces exist)
+        // Register Revitalize services for testing
         RegisterRevitalizeServices(services);
 
-        // Register mock services for testing
+        // Register comprehensive mock services for empathy testing
         services.AddScoped<ILyraCognition, LyraCognitionMock>();
         services.AddScoped<IFixItFredCLI, FixItFredCLIMock>();
 
@@ -73,33 +89,41 @@ public abstract class RevitalizeTestBase
     }
 
     /// <summary>
-    /// Seeds test data into the database context
+    /// [Sprint123_FixItFred_OmegaSweep] Seeds comprehensive test data for empathy and Revitalize testing
+    /// Populates in-memory database with empathy prompts, cognitive scenarios, and sample service data
+    /// UX Connection: Creates realistic test data for testing complete user workflows
+    /// Model Connection: Seeds all Revitalize entities with relationships for integration testing
+    /// Expected Outcome: Fully populated test database ready for comprehensive testing scenarios
+    /// Empathy Impact: Includes persona-based test data for validating empathy response accuracy
     /// </summary>
-    /// <param name="serviceProvider">Service provider for resolving dependencies</param>
+    /// <param name="serviceProvider">Service provider for resolving database context and dependencies</param>
     protected void SeedTestData(IServiceProvider serviceProvider)
     {
         using var scope = serviceProvider.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
         
-        // Ensure database is created
+        // Ensure database is created and schema is applied
         context.Database.EnsureCreated();
         
-        // Seed empathy test data
+        // Seed comprehensive empathy test data
         TestDataSeeder.SeedTestData(context);
         
-        // Seed Revitalize test data
+        // Seed Revitalize-specific test data
         TestDataSeeder.SeedRevitalizeTestData(context);
     }
 
     /// <summary>
-    /// Registers Revitalize services if their interfaces exist
-    /// Override in derived classes to add specific service registrations
+    /// [Sprint123_FixItFred_OmegaSweep] Registers Revitalize services for testing scenarios
+    /// Override in derived test classes to register specific service dependencies
+    /// UX Connection: Enables testing of complete service layer functionality
+    /// Expected Outcome: Properly configured DI container for service testing
+    /// Purpose: Provides extensibility point for test-specific service registration
     /// </summary>
-    /// <param name="services">Service collection</param>
+    /// <param name="services">Service collection for dependency registration</param>
     protected virtual void RegisterRevitalizeServices(IServiceCollection services)
     {
-        // This method can be overridden by specific test classes to register
-        // their required services. Base implementation is empty to avoid
-        // dependencies on services that may not exist yet.
+        // Base implementation provides framework for derived classes
+        // Specific test classes override this to register their required services
+        // This pattern avoids dependencies on services that may not exist in all test scenarios
     }
 }

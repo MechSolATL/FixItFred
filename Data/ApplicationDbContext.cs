@@ -316,7 +316,7 @@ namespace Data
                 .HasOne(t => t.Technician)
                 .WithMany()
                 .HasForeignKey(t => t.TechnicianId);
-            _ = modelBuilder.Entity<TechnicianBehaviorLog>().ToTable("TechnicianBehaviorLogs");
+            _ = modelBuilder.Entity<Data.Models.TechnicianBehaviorLog>().ToTable("TechnicianBehaviorLogs");
             _ = modelBuilder.Entity<TechnicianResponseLog>().ToTable("TechnicianResponseLogs");
             _ = modelBuilder.Entity<TechnicianTrustLog>().ToTable("TechnicianTrustLogs");
             _ = modelBuilder.Entity<TechnicianEscalationLog>().ToTable("TechnicianEscalationLogs");

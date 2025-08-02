@@ -34,7 +34,7 @@ namespace Services.Admin
                 var latePunchIns = group.Where(l => l.ActionType == TechnicianAuditActionType.PunchIn && l.Timestamp.Hour > 9).ToList();
                 if (latePunchIns.Count > 2)
                 {
-                    behaviorLogs.Add(new TechnicianBehaviorLog
+                    behaviorLogs.Add(new Data.Models.TechnicianBehaviorLog
                     {
                         TechnicianId = group.Key,
                         BehaviorType = "LatePunchIn",
@@ -49,7 +49,7 @@ namespace Services.Admin
                 {
                     if ((overrides[i].Timestamp - overrides[i - 1].Timestamp).TotalMinutes < 5)
                     {
-                        behaviorLogs.Add(new TechnicianBehaviorLog
+                        behaviorLogs.Add(new Data.Models.TechnicianBehaviorLog
                         {
                             TechnicianId = group.Key,
                             BehaviorType = "RapidManualOverride",
@@ -67,7 +67,7 @@ namespace Services.Admin
                     var idleMinutes = (punchIns[i + 1].Timestamp - punchOuts[i].Timestamp).TotalMinutes;
                     if (idleMinutes > 60)
                     {
-                        behaviorLogs.Add(new TechnicianBehaviorLog
+                        behaviorLogs.Add(new Data.Models.TechnicianBehaviorLog
                         {
                             TechnicianId = group.Key,
                             BehaviorType = "LongIdleSession",

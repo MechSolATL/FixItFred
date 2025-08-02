@@ -20,34 +20,34 @@ Diagnostics.FixItFredDiagnostics.StartupLogger.Log(builder);
 /// Core service configuration and dependency injection registration
 /// [Sprint123_FixItFred_OmegaSweep] Centralized service registration with proper documentation
 /// </summary>
-// 🚀 Core service configuration and DI registration
 builder.Services.AddRazorPages();
 builder.Services.AddHttpContextAccessor();
 
-// [Sprint123_FixItFred_OmegaSweep] Added UserContext service registration for ClaimsPrincipal access
-builder.Services.AddScoped<Interfaces.IUserContext, Services.UserContext>();
-builder.Services.AddScoped<Services.SEOService>(); // 📎 Handles dynamic SEO content per page
+// ✅ FixItFred & Revitalize services
+builder.Services.AddScoped<Interfaces.IUserContext, Services.DefaultUserContext>(); // 🔐 ClaimsPrincipal DI context
+builder.Services.AddScoped<Services.SEOService>();                                  // 📎 SEO binding per Razor Page
 builder.Services.AddScoped<Services.System.SystemDiagnosticsService>();
 builder.Services.AddScoped<Services.Admin.IRootCauseCorrelationEngine, Services.Admin.RootCauseCorrelationEngine>();
 builder.Services.AddScoped<Services.Admin.IReplayEngineService, Services.Admin.ReplayEngineService>();
 builder.Services.AddScoped<Services.Admin.ISmartAdminAlertsService, Services.Admin.SmartAdminAlertsService>();
-// [Sprint123_FixItFred] Resolved merge conflict - using proper Services.Admin.AutoRepairEngine implementation
+
+// ✅ AutoRepair and Diagnostics
 builder.Services.AddScoped<Services.Admin.AutoRepairEngine>();
-// [FixItFredComment:Sprint123 - DI registration verified] Added proper interface-based service registrations
 builder.Services.AddScoped<Services.INotificationSchedulerService, Services.NotificationSchedulerService>();
 builder.Services.AddScoped<Services.ICustomerTicketAnalyticsService, Services.CustomerTicketAnalyticsService>();
 builder.Services.AddScoped<Services.ISkillLeaderboardService, Services.SkillLeaderboardService>();
 builder.Services.AddScoped<Services.Admin.ComplianceReportService>();
-// [Sprint1002_FixItFred] Added missing service registrations to resolve DI errors
 builder.Services.AddScoped<Services.Admin.TechnicianAuditService>();
 builder.Services.AddScoped<Services.Admin.PermissionService>();
 builder.Services.AddScoped<Services.ILeaderboardService, Services.LeaderboardService>();
+
 #pragma warning disable CS0618
-builder.Services.AddScoped<Services.Admin.ValidationSimulatorService>(); // ⚠️ [Obsolete] — monitor usage
+builder.Services.AddScoped<Services.Admin.ValidationSimulatorService>(); // ⚠️ [Obsolete] — retained for legacy test support
 #pragma warning restore CS0618
 
-// [Sprint123_FixItFred_OmegaSweep] Register RevitalizeModule in IServiceModule chain
-builder.Services.AddRevitalizeServices();
+// ✅ Revitalize Registration
+builder.Services.AddRevitalizeServices(); // ⛓ Register full Revitalize module (Sprint123)
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
@@ -62,34 +62,27 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
 app.UseRouting();
 app.UseAuthorization();
-
 app.MapRazorPages();
-
 app.Run();
 
+// Stub classes for build compatibility — full implementations elsewhere
 public class AutoRepairEngine
 {
     public Task<bool> DetectCorruptionAsync(string dataSetId) => Task.FromResult(true);
     public Task<bool> RunAutoRepairAsync(string technicianId) => Task.FromResult(true);
 }
-
 public class ComplianceReportService {}
-
 public class ValidationSimulatorService {}
-
 public interface ISmartAdminAlertsService
 {
     Task TriggerAlertsAsync(string systemId);
     Task AcknowledgeAlertAsync(string alertId);
     Task<List<string>> GetActiveAlertsAsync();
 }
-
 public class LeaderboardService : ILeaderboardService {}
+public interface ILeaderboardService { }
 
-public interface ILeaderboardService {}
-
-// Make Program class public for testing with WebApplicationFactory
+// ✅ Required for WebApplicationFactory test hosting
 public partial class Program { }
