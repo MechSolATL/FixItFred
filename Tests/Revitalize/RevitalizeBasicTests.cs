@@ -1,7 +1,4 @@
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.EntityFrameworkCore;
 using Revitalize.Models;
 using Revitalize.Services;
 using Data;
@@ -12,49 +9,30 @@ namespace Tests.Revitalize;
 /// <summary>
 /// Integration tests for Revitalize SaaS functionality using DI container - Sprint121
 /// Following Option B from PR feedback: Manual DI setup for unit-style tests with DI
+/// Enhanced with tactical add-ons: traits, test seeding, and mock services
 /// </summary>
-public class RevitalizeBasicTests
+[Trait("Category", "Revitalize")]
+[Trait("Layer", "Service")]
+public class RevitalizeBasicTests : RevitalizeTestBase
 {
-    private IServiceProvider CreateTestServiceProvider()
+    protected override void RegisterRevitalizeServices(IServiceCollection services)
     {
-        var services = new ServiceCollection();
-
-        // Add logging
-        services.AddLogging();
-
-        // Add in-memory database for testing
-        services.AddDbContext<ApplicationDbContext>(options =>
-            options.UseInMemoryDatabase($"TestDb_{Guid.NewGuid()}"));
-
-        // Add configuration
-        var configurationData = new Dictionary<string, string?>
-        {
-            ["Revitalize:PlatformName"] = "Test Revitalize Platform",
-            ["Revitalize:Version"] = "1.0.0-Test",
-            ["Revitalize:SaaSMode"] = "true",
-            ["Revitalize:MaxTenants"] = "50"
-        };
-        var configuration = new ConfigurationBuilder()
-            .AddInMemoryCollection(configurationData)
-            .Build();
-        services.AddSingleton<IConfiguration>(configuration);
-
-        // Register Revitalize services
+        // Register Revitalize services for testing
         services.AddScoped<ITenantService, TenantService>();
         services.AddScoped<IServiceRequestService, ServiceRequestService>();
         services.AddScoped<IRevitalizeConfigService, RevitalizeConfigService>();
         services.AddScoped<IRevitalizeSeoService, RevitalizeSeoService>();
-
-        return services.BuildServiceProvider();
     }
 
     /// <summary>
     /// Test tenant creation and retrieval using DI-injected service
     /// </summary>
     [Fact]
+    [Trait("TestType", "Integration")]
     public async Task Should_Persist_Tenant_Using_TenantService()
     {
         using var serviceProvider = CreateTestServiceProvider();
+        SeedTestData(serviceProvider); // Seed empathy data for testing
         using var scope = serviceProvider.CreateScope();
         var tenantService = scope.ServiceProvider.GetRequiredService<ITenantService>();
         
@@ -84,6 +62,7 @@ public class RevitalizeBasicTests
     /// Test service request creation and management using DI-injected service
     /// </summary>
     [Fact]
+    [Trait("TestType", "Integration")]
     public async Task Should_Persist_Request_Using_ServiceRequestService()
     {
         using var serviceProvider = CreateTestServiceProvider();
@@ -125,6 +104,7 @@ public class RevitalizeBasicTests
     /// Test configuration service using DI-injected service
     /// </summary>
     [Fact]
+    [Trait("TestType", "Unit")]
     public void Should_Access_RevitalizeConfigService_Via_DI()
     {
         using var serviceProvider = CreateTestServiceProvider();
@@ -144,6 +124,7 @@ public class RevitalizeBasicTests
     /// Test that all Revitalize services are properly registered in DI container
     /// </summary>
     [Fact]
+    [Trait("TestType", "Unit")]
     public void Should_Resolve_All_Revitalize_Services_From_DI()
     {
         using var serviceProvider = CreateTestServiceProvider();

@@ -68,6 +68,8 @@ namespace Data
         public DbSet<TechTrackingLog> TechTrackingLogs { get; set; } = null!; // Sprint 30E - Secure Technician GPS API
         // Sprint 32.2 - Security + Audit Harden
         public DbSet<AuditLogEntry> AuditLogEntries { get; set; } = null!;
+        // Sprint 121 - Empathy prompts for Lyra cognition testing
+        public DbSet<EmpathyPrompt> EmpathyPrompts { get; set; } = null!;
         // Sprint 34.2 - SLA Escalation Log Model
         public DbSet<EscalationLogEntry> EscalationLogs { get; set; } = null!;
         // Sprint 35 - Technician Reward Scoring System
