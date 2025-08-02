@@ -1,0 +1,71 @@
+{
+  "version": "1.0.0",
+  "description": "Cognitive seeds for Revitalize empathy testing scenarios",
+  "scenarios": [
+    {
+      "persona": "AnxiousCustomer",
+      "context": "service_failure",
+      "expectedResponse": "reassurance and clear timeline for resolution"
+    },
+    {
+      "persona": "AnxiousCustomer", 
+      "context": "billing_issue",
+      "expectedResponse": "patient explanation and immediate escalation offer"
+    },
+    {
+      "persona": "AnxiousCustomer",
+      "context": "scheduling_conflict", 
+      "expectedResponse": "flexible rescheduling options and priority consideration"
+    },
+    {
+      "persona": "FrustratedCustomer",
+      "context": "service_failure",
+      "expectedResponse": "acknowledgment of frustration and immediate action plan"
+    },
+    {
+      "persona": "FrustratedCustomer",
+      "context": "billing_issue", 
+      "expectedResponse": "direct resolution and compensation consideration"
+    },
+    {
+      "persona": "FrustratedCustomer",
+      "context": "scheduling_conflict",
+      "expectedResponse": "priority rescheduling and service guarantee"
+    },
+    {
+      "persona": "TechnicallySavvy",
+      "context": "service_failure",
+      "expectedResponse": "detailed technical explanation and root cause analysis"
+    },
+    {
+      "persona": "TechnicallySavvy",
+      "context": "billing_issue",
+      "expectedResponse": "detailed breakdown of charges and billing process"
+    },
+    {
+      "persona": "TechnicallySavvy", 
+      "context": "scheduling_conflict",
+      "expectedResponse": "technical resource availability and system constraints explanation"
+    },
+    {
+      "persona": "AnxiousCustomer",
+      "context": "urgent_request",
+      "expectedResponse": "immediate acknowledgment and clear emergency protocol"
+    },
+    {
+      "persona": "FrustratedCustomer",
+      "context": "general_complaint",
+      "expectedResponse": "validation of concerns and concrete improvement steps"
+    },
+    {
+      "persona": "TechnicallySavvy",
+      "context": "general_complaint", 
+      "expectedResponse": "technical analysis of issues and systematic improvement plan"
+    }
+  ],
+  "metadata": {
+    "created": "2024-08-02",
+    "purpose": "Sprint121+122 unified empathy testing scenarios",
+    "usage": "Inject into RevitalizeReplayCLI for persona-based empathy testing"
+  }
+}

@@ -1,0 +1,170 @@
+@page "/revitalize/servicerequests"
+@model Pages.Revitalize.ServiceRequests.IndexModel
+@{
+    ViewData["Title"] = "Service Requests";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3">
+                    <i class="fas fa-clipboard-list"></i>
+                    Service Requests
+                </h1>
+                <a href="/revitalize/servicerequests/create" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> New Request
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <form method="get" class="row">
+                        <div class="col-md-3">
+                            <select name="status" class="form-control">
+                                <option value="">All Statuses</option>
+                                <option value="Pending" selected="@(Model.StatusFilter == "Pending")">Pending</option>
+                                <option value="Assigned" selected="@(Model.StatusFilter == "Assigned")">Assigned</option>
+                                <option value="InProgress" selected="@(Model.StatusFilter == "InProgress")">In Progress</option>
+                                <option value="Completed" selected="@(Model.StatusFilter == "Completed")">Completed</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <select name="serviceType" class="form-control">
+                                <option value="">All Types</option>
+                                <option value="Plumbing" selected="@(Model.ServiceTypeFilter == "Plumbing")">Plumbing</option>
+                                <option value="HVAC" selected="@(Model.ServiceTypeFilter == "HVAC")">HVAC</option>
+                                <option value="WaterFiltration" selected="@(Model.ServiceTypeFilter == "WaterFiltration")">Water Filtration</option>
+                                <option value="Emergency" selected="@(Model.ServiceTypeFilter == "Emergency")">Emergency</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <select name="priority" class="form-control">
+                                <option value="">All Priorities</option>
+                                <option value="Emergency" selected="@(Model.PriorityFilter == "Emergency")">Emergency</option>
+                                <option value="High" selected="@(Model.PriorityFilter == "High")">High</option>
+                                <option value="Medium" selected="@(Model.PriorityFilter == "Medium")">Medium</option>
+                                <option value="Low" selected="@(Model.PriorityFilter == "Low")">Low</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <button type="submit" class="btn btn-outline-primary">
+                                <i class="fas fa-filter"></i> Filter
+                            </button>
+                            <a href="/revitalize/servicerequests" class="btn btn-outline-secondary">
+                                <i class="fas fa-times"></i> Clear
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Service Requests List -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    @if (Model.ServiceRequests.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Title</th>
+                                        <th>Customer</th>
+                                        <th>Type</th>
+                                        <th>Priority</th>
+                                        <th>Status</th>
+                                        <th>Created</th>
+                                        <th>Scheduled</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var request in Model.ServiceRequests)
+                                    {
+                                        <tr>
+                                            <td><strong>#@request.ServiceRequestId</strong></td>
+                                            <td>
+                                                <a href="/revitalize/servicerequests/@request.ServiceRequestId">
+                                                    @request.Title
+                                                </a>
+                                            </td>
+                                            <td>
+                                                @request.CustomerName
+                                                @if (!string.IsNullOrEmpty(request.CustomerPhone))
+                                                {
+                                                    <br><small class="text-muted">@request.CustomerPhone</small>
+                                                }
+                                            </td>
+                                            <td>
+                                                <span class="badge badge-secondary">@request.ServiceType</span>
+                                            </td>
+                                            <td>
+                                                <span class="badge badge-@(request.Priority == Revitalize.Models.RevitalizePriority.Emergency ? "danger" : 
+                                                                         request.Priority == Revitalize.Models.RevitalizePriority.High ? "warning" : 
+                                                                         request.Priority == Revitalize.Models.RevitalizePriority.Medium ? "info" : "light")">
+                                                    @request.Priority
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <span class="badge badge-@(request.Status == Revitalize.Models.RevitalizeServiceRequestStatus.Completed ? "success" : 
+                                                                         request.Status == Revitalize.Models.RevitalizeServiceRequestStatus.InProgress ? "primary" : 
+                                                                         request.Status == Revitalize.Models.RevitalizeServiceRequestStatus.Assigned ? "info" : "secondary")">
+                                                    @request.Status
+                                                </span>
+                                            </td>
+                                            <td>@request.CreatedAt.ToString("MM/dd/yyyy")</td>
+                                            <td>
+                                                @if (request.ScheduledDate.HasValue)
+                                                {
+                                                    @request.ScheduledDate.Value.ToString("MM/dd/yyyy HH:mm")
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">Not scheduled</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                <div class="btn-group" role="group">
+                                                    <a href="/revitalize/servicerequests/@request.ServiceRequestId" 
+                                                       class="btn btn-sm btn-outline-primary" title="View Details">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
+                                                    <a href="/revitalize/servicerequests/@request.ServiceRequestId/edit" 
+                                                       class="btn btn-sm btn-outline-secondary" title="Edit">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-5">
+                            <i class="fas fa-clipboard-list fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">No service requests found</h5>
+                            <p class="text-muted">Create your first service request to get started.</p>
+                            <a href="/revitalize/servicerequests/create" class="btn btn-primary">
+                                <i class="fas fa-plus"></i> Create Service Request
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

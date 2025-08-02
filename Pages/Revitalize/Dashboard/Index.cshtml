@@ -1,0 +1,180 @@
+@page "/revitalize"
+@model Pages.Revitalize.Dashboard.IndexModel
+@{
+    ViewData["Title"] = "Revitalize Dashboard";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="h3 mb-4">
+                <i class="fas fa-tachometer-alt"></i>
+                Revitalize SaaS Dashboard
+            </h1>
+        </div>
+    </div>
+
+    <!-- Key Metrics Row -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4 class="card-title">@Model.TotalServiceRequests</h4>
+                            <p class="card-text">Total Requests</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-clipboard-list fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4 class="card-title">@Model.ActiveTechnicians</h4>
+                            <p class="card-text">Active Technicians</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-users fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4 class="card-title">@Model.PendingRequests</h4>
+                            <p class="card-text">Pending Requests</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-clock fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4 class="card-title">@Model.TotalTenants</h4>
+                            <p class="card-text">Active Tenants</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-building fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions Row -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-2">
+                            <a href="/revitalize/servicerequests/create" class="btn btn-primary btn-block">
+                                <i class="fas fa-plus"></i> New Service Request
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <a href="/revitalize/tenants" class="btn btn-outline-primary btn-block">
+                                <i class="fas fa-building"></i> Manage Tenants
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <a href="/revitalize/servicerequests" class="btn btn-outline-success btn-block">
+                                <i class="fas fa-list"></i> View All Requests
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <a href="/admin" class="btn btn-outline-secondary btn-block">
+                                <i class="fas fa-cogs"></i> Admin Panel
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Recent Service Requests</h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.RecentRequests.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Title</th>
+                                        <th>Type</th>
+                                        <th>Priority</th>
+                                        <th>Status</th>
+                                        <th>Created</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var request in Model.RecentRequests)
+                                    {
+                                        <tr>
+                                            <td>@request.ServiceRequestId</td>
+                                            <td>@request.Title</td>
+                                            <td>
+                                                <span class="badge badge-secondary">@request.ServiceType</span>
+                                            </td>
+                                            <td>
+                                                <span class="badge badge-@(request.Priority == Revitalize.Models.RevitalizePriority.Emergency ? "danger" : 
+                                                                         request.Priority == Revitalize.Models.RevitalizePriority.High ? "warning" : "info")">
+                                                    @request.Priority
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <span class="badge badge-@(request.Status == Revitalize.Models.RevitalizeServiceRequestStatus.Completed ? "success" : 
+                                                                         request.Status == Revitalize.Models.RevitalizeServiceRequestStatus.InProgress ? "primary" : "secondary")">
+                                                    @request.Status
+                                                </span>
+                                            </td>
+                                            <td>@request.CreatedAt.ToString("MM/dd/yyyy HH:mm")</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-3">
+                            <p class="text-muted">No recent service requests found.</p>
+                            <a href="/revitalize/servicerequests/create" class="btn btn-primary">
+                                <i class="fas fa-plus"></i> Create Your First Request
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
