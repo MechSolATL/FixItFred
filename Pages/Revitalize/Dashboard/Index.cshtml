@@ -89,9 +89,9 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-3 mb-2">
-                            <a href="/revitalize/servicerequests/create" class="btn btn-primary btn-block">
+                            <button type="button" class="btn btn-primary btn-block" onclick="openServiceRequestModal()">
                                 <i class="fas fa-plus"></i> New Service Request
-                            </a>
+                            </button>
                         </div>
                         <div class="col-md-3 mb-2">
                             <a href="/revitalize/tenants" class="btn btn-outline-primary btn-block">
@@ -168,13 +168,27 @@
                     {
                         <div class="text-center py-3">
                             <p class="text-muted">No recent service requests found.</p>
-                            <a href="/revitalize/servicerequests/create" class="btn btn-primary">
+                            <button type="button" class="btn btn-primary" onclick="openServiceRequestModal()">
                                 <i class="fas fa-plus"></i> Create Your First Request
-                            </a>
+                            </button>
                         </div>
                     }
                 </div>
             </div>
         </div>
+    </div>
+</div>
+
+@* [Sprint124_FixItFred_EmpathyExpansion] Include empathy modal overlays *@
+@await Html.PartialAsync("_LyraEmpathyModal")
+@await Html.PartialAsync("~/Pages/Revitalize/Modals/_ServiceRequestModal.cshtml")
+
+@* [Sprint124_FixItFred_EmpathyExpansion] Demo empathy trigger button *@
+<div class="fixed-bottom p-3" style="z-index: 1000;">
+    <div class="float-end">
+        <button type="button" class="btn btn-sm btn-info" onclick="openLyraEmpathyModal('AnxiousCustomer')" 
+                title="Test Empathy Modal">
+            <i class="fas fa-heart"></i> Test Empathy
+        </button>
     </div>
 </div>

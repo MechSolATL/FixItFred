@@ -13,9 +13,9 @@
                     <i class="fas fa-clipboard-list"></i>
                     Service Requests
                 </h1>
-                <a href="/revitalize/servicerequests/create" class="btn btn-primary">
+                <button type="button" class="btn btn-primary" onclick="openServiceRequestModal()">
                     <i class="fas fa-plus"></i> New Request
-                </a>
+                </button>
             </div>
         </div>
     </div>
@@ -158,9 +158,9 @@
                             <i class="fas fa-clipboard-list fa-3x text-muted mb-3"></i>
                             <h5 class="text-muted">No service requests found</h5>
                             <p class="text-muted">Create your first service request to get started.</p>
-                            <a href="/revitalize/servicerequests/create" class="btn btn-primary">
+                            <button type="button" class="btn btn-primary" onclick="openServiceRequestModal()">
                                 <i class="fas fa-plus"></i> Create Service Request
-                            </a>
+                            </button>
                         </div>
                     }
                 </div>
@@ -168,3 +168,7 @@
         </div>
     </div>
 </div>
+
+@* [Sprint124_FixItFred_EmpathyExpansion] Include empathy modal overlays *@
+@await Html.PartialAsync("_LyraEmpathyModal")
+@await Html.PartialAsync("~/Pages/Revitalize/Modals/_ServiceRequestModal.cshtml")

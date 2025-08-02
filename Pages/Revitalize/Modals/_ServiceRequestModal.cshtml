@@ -1,0 +1,463 @@
+@*
+    [Sprint124_FixItFred_EmpathyExpansion] Enhanced Service Request Modal with Empathy Integration
+    Mobile-responsive modal for creating and managing service requests with real-time empathy support
+    CLI Trigger: RevitalizeCLI service-request-modal commands
+    UI Trigger: Dashboard quick actions, service request creation workflows
+*@
+
+@model dynamic
+
+<div id="service-request-modal" class="service-request-overlay" 
+     style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; 
+            background: rgba(0, 0, 0, 0.6); z-index: 8888; 
+            display: none; align-items: center; justify-content: center; 
+            backdrop-filter: blur(4px); padding: 1rem;"
+     role="dialog" aria-labelledby="service-modal-title" aria-modal="true">
+    
+    <!-- [Sprint124_FixItFred_EmpathyExpansion] Mobile-responsive modal container -->
+    <div class="service-request-modal-content" 
+         style="background: white; border-radius: 1rem; box-shadow: 0 8px 32px rgba(0,0,0,0.25); 
+                max-width: 95vw; max-height: 90vh; overflow-y: auto; width: 100%;">
+        
+        <!-- Modal header with empathy integration indicator -->
+        <div class="modal-header" style="padding: 1.5rem; border-bottom: 1px solid #dee2e6; background: #f8f9fa;">
+            <div class="d-flex align-items-center justify-content-between w-100">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-clipboard-list text-primary me-3" style="font-size: 1.5rem;"></i>
+                    <div>
+                        <h4 id="service-modal-title" class="mb-0" style="color: #495057;">
+                            <span class="d-none d-md-inline">[Sprint124_FixItFred_EmpathyExpansion]</span>
+                            Service Request
+                        </h4>
+                        <small class="text-muted d-block">
+                            <i class="fas fa-heart text-danger me-1"></i>
+                            Empathy-Enhanced Service Management
+                        </small>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-link text-muted p-2" 
+                        onclick="closeServiceRequestModal()" aria-label="Close">
+                    <i class="fas fa-times" style="font-size: 1.25rem;"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- [Sprint124_FixItFred_EmpathyExpansion] Form content area -->
+        <div class="modal-body" style="padding: 2rem 1.5rem;">
+            
+            <!-- Customer Information Section -->
+            <div class="customer-section mb-4">
+                <h5 class="section-title mb-3" style="color: #6c757d; font-weight: 600;">
+                    <i class="fas fa-user me-2"></i>Customer Information
+                </h5>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="customerName" class="form-label">Customer Name *</label>
+                        <input type="text" class="form-control" id="customerName" 
+                               onchange="detectCustomerPersona()" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="customerPhone" class="form-label">Phone Number</label>
+                        <input type="tel" class="form-control" id="customerPhone">
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="customerEmail" class="form-label">Email Address</label>
+                        <input type="email" class="form-control" id="customerEmail">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="customerAddress" class="form-label">Service Address</label>
+                        <input type="text" class="form-control" id="customerAddress" required>
+                    </div>
+                </div>
+                
+                <!-- [Sprint124_FixItFred_EmpathyExpansion] Customer persona detection display -->
+                <div id="persona-detection" class="persona-indicator mt-3" style="display: none;">
+                    <div class="alert alert-info border-left-info" style="border-left: 4px solid #36b9cc;">
+                        <i class="fas fa-user-circle me-2"></i>
+                        <strong>Detected Customer Persona:</strong> 
+                        <span id="detected-customer-persona">AnxiousCustomer</span>
+                        <button type="button" class="btn btn-sm btn-outline-info ms-2" 
+                                onclick="openLyraEmpathyModal(document.getElementById('detected-customer-persona').textContent)">
+                            <i class="fas fa-heart me-1"></i>View Empathy Guidance
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Service Request Details Section -->
+            <div class="service-details-section mb-4">
+                <h5 class="section-title mb-3" style="color: #6c757d; font-weight: 600;">
+                    <i class="fas fa-tools me-2"></i>Service Details
+                </h5>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="serviceTitle" class="form-label">Service Title *</label>
+                        <input type="text" class="form-control" id="serviceTitle" 
+                               placeholder="Brief description of the issue" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="serviceType" class="form-label">Service Type *</label>
+                        <select class="form-control" id="serviceType" onchange="updateEmpathyContext()" required>
+                            <option value="">Select Service Type</option>
+                            <option value="Plumbing">Plumbing</option>
+                            <option value="HVAC">HVAC</option>
+                            <option value="WaterFiltration">Water Filtration</option>
+                            <option value="Emergency">Emergency Service</option>
+                            <option value="Maintenance">Routine Maintenance</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="priority" class="form-label">Priority Level *</label>
+                        <select class="form-control" id="priority" onchange="updateEmpathyContext()" required>
+                            <option value="">Select Priority</option>
+                            <option value="Emergency">Emergency</option>
+                            <option value="High">High</option>
+                            <option value="Medium">Medium</option>
+                            <option value="Low">Low</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="preferredDate" class="form-label">Preferred Date</label>
+                        <input type="datetime-local" class="form-control" id="preferredDate">
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="description" class="form-label">Detailed Description *</label>
+                    <textarea class="form-control" id="description" rows="4" 
+                              placeholder="Please provide detailed information about the issue..." 
+                              onchange="analyzeDescriptionForEmpathy()" required></textarea>
+                    
+                    <!-- [Sprint124_FixItFred_EmpathyExpansion] Empathy analysis results -->
+                    <div id="empathy-analysis" class="empathy-feedback mt-2" style="display: none;">
+                        <div class="alert alert-warning border-left-warning" style="border-left: 4px solid #f6c23e;">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            <strong>Empathy Alert:</strong> 
+                            <span id="empathy-analysis-text">Customer language suggests frustration or urgency</span>
+                            <button type="button" class="btn btn-sm btn-outline-warning ms-2" 
+                                    onclick="handleEmpathyAlert()">
+                                <i class="fas fa-heart me-1"></i>Address Immediately
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- [Sprint124_FixItFred_EmpathyExpansion] Real-time empathy guidance panel -->
+            <div id="empathy-guidance-panel" class="empathy-panel mb-4" style="display: none;">
+                <div class="card border-info">
+                    <div class="card-header bg-info text-white">
+                        <h6 class="mb-0">
+                            <i class="fas fa-heart me-2"></i>Real-time Empathy Guidance
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div id="empathy-suggestions-container">
+                            <!-- Dynamic empathy suggestions will be populated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- [Sprint124_FixItFred_EmpathyExpansion] Modal footer with actions -->
+        <div class="modal-footer" style="padding: 1rem 1.5rem; border-top: 1px solid #dee2e6; background: #f8f9fa;">
+            <div class="d-flex justify-content-between align-items-center w-100 flex-column flex-md-row gap-2">
+                <div class="empathy-status" style="font-size: 0.9rem; color: #6c757d;">
+                    <i class="fas fa-heart text-danger me-1"></i>
+                    Empathy Mode: <strong id="empathy-mode-status">Active</strong>
+                </div>
+                <div class="action-buttons d-flex gap-2 flex-column flex-md-row">
+                    <button type="button" class="btn btn-outline-secondary" onclick="closeServiceRequestModal()">
+                        <i class="fas fa-times me-2"></i>Cancel
+                    </button>
+                    <button type="button" class="btn btn-info" onclick="saveAsDraft()">
+                        <i class="fas fa-save me-2"></i>Save Draft
+                    </button>
+                    <button type="button" class="btn btn-primary" onclick="submitServiceRequest()">
+                        <i class="fas fa-paper-plane me-2"></i>Submit Request
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- [Sprint124_FixItFred_EmpathyExpansion] Mobile-responsive CSS -->
+<style>
+    .service-request-overlay {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    .service-request-modal-content {
+        animation: serviceModalSlideIn 0.3s ease-out;
+    }
+    
+    @keyframes serviceModalSlideIn {
+        from {
+            opacity: 0;
+            transform: scale(0.95) translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+        }
+    }
+    
+    .border-left-info {
+        border-left: 4px solid #36b9cc !important;
+    }
+    
+    .border-left-warning {
+        border-left: 4px solid #f6c23e !important;
+    }
+    
+    .section-title {
+        border-bottom: 2px solid #e9ecef;
+        padding-bottom: 0.5rem;
+    }
+    
+    /* Mobile-specific optimizations */
+    @media (max-width: 768px) {
+        .service-request-modal-content {
+            margin: 0.5rem;
+            max-height: 95vh;
+        }
+        
+        .modal-body {
+            padding: 1.5rem 1rem !important;
+        }
+        
+        .modal-header, .modal-footer {
+            padding: 1rem !important;
+        }
+        
+        .action-buttons .btn {
+            width: 100%;
+            margin-bottom: 0.5rem;
+        }
+        
+        .section-title {
+            font-size: 1rem;
+        }
+    }
+    
+    /* Tablet optimizations */
+    @media (min-width: 768px) and (max-width: 1024px) {
+        .service-request-modal-content {
+            max-width: 90vw;
+        }
+    }
+    
+    /* Desktop optimizations */
+    @media (min-width: 1024px) {
+        .service-request-modal-content {
+            max-width: 800px;
+            width: auto;
+        }
+    }
+</style>
+
+<!-- [Sprint124_FixItFred_EmpathyExpansion] JavaScript for modal functionality -->
+<script>
+    let empathyAnalysisTimeout = null;
+    let currentServiceContext = {};
+    
+    function openServiceRequestModal() {
+        console.log('[Sprint124_FixItFred_EmpathyExpansion] Opening service request modal');
+        document.getElementById('service-request-modal').style.display = 'flex';
+        
+        // Initialize empathy mode
+        document.getElementById('empathy-mode-status').textContent = 'Active';
+        
+        // Set up mobile viewport handling
+        if (window.innerWidth <= 768) {
+            document.body.style.overflow = 'hidden';
+        }
+    }
+    
+    function closeServiceRequestModal() {
+        console.log('[Sprint124_FixItFred_EmpathyExpansion] Closing service request modal');
+        document.getElementById('service-request-modal').style.display = 'none';
+        document.body.style.overflow = '';
+        
+        // Clear empathy analysis timeout
+        if (empathyAnalysisTimeout) {
+            clearTimeout(empathyAnalysisTimeout);
+        }
+    }
+    
+    function detectCustomerPersona() {
+        const customerName = document.getElementById('customerName').value.toLowerCase();
+        let detectedPersona = 'Default';
+        
+        // Simple persona detection logic for demo
+        if (customerName.includes('anxiety') || customerName.includes('worried')) {
+            detectedPersona = 'AnxiousCustomer';
+        } else if (customerName.includes('frustrated') || customerName.includes('angry')) {
+            detectedPersona = 'FrustratedCustomer';
+        } else if (customerName.includes('tech') || customerName.includes('engineer')) {
+            detectedPersona = 'TechnicallySavvy';
+        }
+        
+        // Update UI
+        document.getElementById('detected-customer-persona').textContent = detectedPersona;
+        document.getElementById('persona-detection').style.display = 'block';
+        
+        console.log('[Sprint124_FixItFred_EmpathyExpansion] Detected persona:', detectedPersona);
+    }
+    
+    function updateEmpathyContext() {
+        currentServiceContext = {
+            serviceType: document.getElementById('serviceType').value,
+            priority: document.getElementById('priority').value,
+            timestamp: new Date().toISOString()
+        };
+        
+        // Show empathy guidance if high priority or emergency
+        if (currentServiceContext.priority === 'Emergency' || currentServiceContext.priority === 'High') {
+            showEmpathyGuidancePanel();
+        }
+        
+        console.log('[Sprint124_FixItFred_EmpathyExpansion] Updated service context:', currentServiceContext);
+    }
+    
+    function analyzeDescriptionForEmpathy() {
+        const description = document.getElementById('description').value.toLowerCase();
+        
+        // Clear previous timeout
+        if (empathyAnalysisTimeout) {
+            clearTimeout(empathyAnalysisTimeout);
+        }
+        
+        // Analyze after user stops typing (500ms delay)
+        empathyAnalysisTimeout = setTimeout(() => {
+            const empathyTriggers = [
+                { keywords: ['urgent', 'emergency', 'immediately'], alert: 'Customer indicates urgent situation' },
+                { keywords: ['frustrated', 'angry', 'disappointed'], alert: 'Customer language suggests frustration' },
+                { keywords: ['worried', 'concerned', 'anxious'], alert: 'Customer shows signs of anxiety' },
+                { keywords: ['again', 'still', 'repeatedly'], alert: 'Customer indicates recurring issue' }
+            ];
+            
+            for (let trigger of empathyTriggers) {
+                if (trigger.keywords.some(keyword => description.includes(keyword))) {
+                    showEmpathyAlert(trigger.alert);
+                    break;
+                }
+            }
+        }, 500);
+    }
+    
+    function showEmpathyAlert(alertText) {
+        document.getElementById('empathy-analysis-text').textContent = alertText;
+        document.getElementById('empathy-analysis').style.display = 'block';
+        
+        console.log('[Sprint124_FixItFred_EmpathyExpansion] Empathy alert triggered:', alertText);
+    }
+    
+    function handleEmpathyAlert() {
+        const persona = document.getElementById('detected-customer-persona').textContent || 'AnxiousCustomer';
+        const serviceType = currentServiceContext.serviceType || 'General';
+        
+        console.log('[Sprint124_FixItFred_EmpathyExpansion] Handling empathy alert for persona:', persona);
+        
+        // Open empathy modal with context
+        openLyraEmpathyModal(persona, {
+            primaryEmotion: 'concern',
+            intensityLevel: 7,
+            triggerEvent: 'service request creation'
+        }, serviceType);
+    }
+    
+    function showEmpathyGuidancePanel() {
+        const container = document.getElementById('empathy-suggestions-container');
+        container.innerHTML = `
+            <div class="empathy-suggestion mb-2">
+                <i class="fas fa-lightbulb text-warning me-2"></i>
+                <strong>Suggestion:</strong> Prioritize immediate response and clear timeline communication
+            </div>
+            <div class="empathy-suggestion mb-2">
+                <i class="fas fa-phone text-info me-2"></i>
+                <strong>Action:</strong> Consider immediate phone contact for high-priority requests
+            </div>
+            <div class="empathy-suggestion">
+                <i class="fas fa-heart text-danger me-2"></i>
+                <strong>Empathy:</strong> Use reassuring language to address customer concerns
+            </div>
+        `;
+        
+        document.getElementById('empathy-guidance-panel').style.display = 'block';
+    }
+    
+    function saveAsDraft() {
+        console.log('[Sprint124_FixItFred_EmpathyExpansion] Saving service request as draft');
+        
+        const formData = collectFormData();
+        formData.status = 'Draft';
+        formData.empathyContext = currentServiceContext;
+        
+        // Mock save to localStorage for demo
+        localStorage.setItem('serviceRequestDraft', JSON.stringify(formData));
+        
+        alert('Service request saved as draft with empathy context!');
+        closeServiceRequestModal();
+    }
+    
+    function submitServiceRequest() {
+        console.log('[Sprint124_FixItFred_EmpathyExpansion] Submitting service request');
+        
+        if (!validateForm()) {
+            alert('Please fill in all required fields.');
+            return;
+        }
+        
+        const formData = collectFormData();
+        formData.status = 'Submitted';
+        formData.submittedAt = new Date().toISOString();
+        formData.empathyContext = currentServiceContext;
+        
+        // Mock submission
+        console.log('[Sprint124_FixItFred_EmpathyExpansion] Service request data:', formData);
+        
+        alert('Service request submitted successfully with empathy tracking!');
+        closeServiceRequestModal();
+        
+        // Refresh page to show new request
+        window.location.reload();
+    }
+    
+    function collectFormData() {
+        return {
+            customerName: document.getElementById('customerName').value,
+            customerPhone: document.getElementById('customerPhone').value,
+            customerEmail: document.getElementById('customerEmail').value,
+            customerAddress: document.getElementById('customerAddress').value,
+            serviceTitle: document.getElementById('serviceTitle').value,
+            serviceType: document.getElementById('serviceType').value,
+            priority: document.getElementById('priority').value,
+            preferredDate: document.getElementById('preferredDate').value,
+            description: document.getElementById('description').value,
+            detectedPersona: document.getElementById('detected-customer-persona').textContent
+        };
+    }
+    
+    function validateForm() {
+        const requiredFields = ['customerName', 'customerAddress', 'serviceTitle', 'serviceType', 'priority', 'description'];
+        return requiredFields.every(field => document.getElementById(field).value.trim() !== '');
+    }
+    
+    // [Sprint124_FixItFred_EmpathyExpansion] Close modal on escape key
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape' && document.getElementById('service-request-modal').style.display === 'flex') {
+            closeServiceRequestModal();
+        }
+    });
+</script>

@@ -1,0 +1,351 @@
+@*
+    [Sprint124_FixItFred_EmpathyExpansion] Lyra Empathy Modal Overlay
+    Mobile-responsive empathy prompt overlay for persona-based interactions
+    Supports: AnxiousCustomer, FrustratedCustomer, TechnicallySavvy personas
+    CLI Trigger: ServiceAtlantaCLI empathy-modal commands
+    UI Trigger: Revitalize service request interactions, empathy event detection
+*@
+
+@model dynamic
+
+<div id="lyra-empathy-modal" class="lyra-empathy-overlay" 
+     style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; 
+            background: rgba(0, 0, 0, 0.7); z-index: 9999; 
+            display: flex; align-items: center; justify-content: center; 
+            backdrop-filter: blur(6px); padding: 1rem;"
+     role="dialog" aria-labelledby="empathy-modal-title" aria-modal="true">
+    
+    <!-- [Sprint124_FixItFred_EmpathyExpansion] Mobile-responsive modal container -->
+    <div class="lyra-empathy-modal-content" 
+         style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                border-radius: 1.5rem; box-shadow: 0 10px 40px rgba(0,0,0,0.3); 
+                color: white; max-width: 95vw; max-height: 90vh; overflow-y: auto;
+                width: 100%; position: relative;">
+        
+        <!-- Mobile-optimized header -->
+        <div class="modal-header" style="padding: 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.2);">
+            <div class="d-flex align-items-center justify-content-between w-100">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-heart text-light" style="font-size: 1.5rem; margin-right: 0.75rem;"></i>
+                    <h4 id="empathy-modal-title" class="mb-0" style="font-weight: 600;">
+                        <span class="d-none d-md-inline">[Sprint124_FixItFred_EmpathyExpansion]</span>
+                        Lyra Empathy Assistant
+                    </h4>
+                </div>
+                <button type="button" class="btn btn-link text-light p-2" 
+                        onclick="closeLyraEmpathyModal()" aria-label="Close">
+                    <i class="fas fa-times" style="font-size: 1.25rem;"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- [Sprint124_FixItFred_EmpathyExpansion] Persona-specific content area -->
+        <div class="modal-body" style="padding: 2rem 1.5rem;">
+            
+            <!-- Persona Detection Display -->
+            <div class="empathy-persona-indicator mb-4" style="text-align: center;">
+                <div class="persona-badge" style="display: inline-block; background: rgba(255,255,255,0.2); 
+                                                 border-radius: 2rem; padding: 0.5rem 1.5rem; font-size: 0.9rem;">
+                    <i class="fas fa-user-circle me-2"></i>
+                    Detected Persona: <strong id="detected-persona">AnxiousCustomer</strong>
+                </div>
+            </div>
+
+            <!-- Empathy Narrative Display -->
+            <div class="empathy-narrative" style="background: rgba(255,255,255,0.1); 
+                                                 border-radius: 1rem; padding: 1.5rem; margin-bottom: 1.5rem;">
+                <h5 style="color: #FFE4B5; margin-bottom: 1rem;">
+                    <i class="fas fa-comment-dots me-2"></i>Empathy Response
+                </h5>
+                <div id="empathy-text" style="font-size: 1.1rem; line-height: 1.6; min-height: 3rem;">
+                    I understand this situation may be concerning for you. Let me help you find the best solution while keeping you informed every step of the way.
+                </div>
+            </div>
+
+            <!-- Real-time Empathy Suggestions -->
+            <div class="empathy-suggestions" style="margin-bottom: 1.5rem;">
+                <h6 style="color: #F0E68C; margin-bottom: 1rem;">
+                    <i class="fas fa-lightbulb me-2"></i>Live Empathy Suggestions
+                </h6>
+                <div id="empathy-suggestions-list" class="suggestions-container">
+                    <!-- Dynamic suggestions will be populated here -->
+                </div>
+            </div>
+
+            <!-- Mobile-optimized action buttons -->
+            <div class="empathy-actions d-flex flex-column flex-md-row gap-2">
+                <button type="button" class="btn btn-light flex-fill" 
+                        onclick="applyEmpathyResponse()" style="font-weight: 500;">
+                    <i class="fas fa-check me-2"></i>Apply This Response
+                </button>
+                <button type="button" class="btn btn-outline-light flex-fill" 
+                        onclick="generateNewEmpathyResponse()" style="font-weight: 500;">
+                    <i class="fas fa-sync me-2"></i>Generate New Response
+                </button>
+                <button type="button" class="btn btn-outline-light flex-fill" 
+                        onclick="viewEmpathyAnalytics()" style="font-weight: 500;">
+                    <i class="fas fa-chart-line me-2"></i>
+                    <span class="d-none d-md-inline">View Analytics</span>
+                    <span class="d-md-none">Analytics</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- [Sprint124_FixItFred_EmpathyExpansion] Footer with persona metrics -->
+        <div class="modal-footer" style="padding: 1rem 1.5rem; border-top: 1px solid rgba(255,255,255,0.2); 
+                                         background: rgba(0,0,0,0.1);">
+            <div class="d-flex justify-content-between align-items-center w-100 flex-column flex-md-row gap-2">
+                <div class="empathy-metrics" style="font-size: 0.9rem; color: #E6E6FA;">
+                    <span>Empathy Score: <strong id="empathy-score">0.85</strong></span>
+                    <span class="ms-3">Effectiveness: <strong id="effectiveness-rating">92%</strong></span>
+                </div>
+                <div class="empathy-feedback">
+                    <button type="button" class="btn btn-sm btn-outline-light" 
+                            onclick="provideFeedback()" style="font-size: 0.8rem;">
+                        <i class="fas fa-thumbs-up me-1"></i>Provide Feedback
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- [Sprint124_FixItFred_EmpathyExpansion] Mobile-responsive CSS -->
+<style>
+    .lyra-empathy-overlay {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    .lyra-empathy-modal-content {
+        animation: empathyModalSlideIn 0.3s ease-out;
+    }
+    
+    @keyframes empathyModalSlideIn {
+        from {
+            opacity: 0;
+            transform: scale(0.9) translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+        }
+    }
+    
+    .suggestions-container {
+        max-height: 150px;
+        overflow-y: auto;
+    }
+    
+    .suggestion-item {
+        background: rgba(255,255,255,0.1);
+        border-radius: 0.5rem;
+        padding: 0.75rem;
+        margin-bottom: 0.5rem;
+        border-left: 3px solid #FFE4B5;
+        font-size: 0.9rem;
+        line-height: 1.4;
+    }
+    
+    /* Mobile-specific optimizations */
+    @media (max-width: 768px) {
+        .lyra-empathy-modal-content {
+            margin: 0.5rem;
+            max-height: 95vh;
+        }
+        
+        .modal-body {
+            padding: 1.5rem 1rem !important;
+        }
+        
+        .modal-header {
+            padding: 1rem !important;
+        }
+        
+        .modal-footer {
+            padding: 0.75rem 1rem !important;
+        }
+        
+        .empathy-actions .btn {
+            padding: 0.75rem 1rem;
+            font-size: 0.9rem;
+        }
+    }
+    
+    /* Tablet optimizations */
+    @media (min-width: 768px) and (max-width: 1024px) {
+        .lyra-empathy-modal-content {
+            max-width: 80vw;
+        }
+    }
+    
+    /* Desktop optimizations */
+    @media (min-width: 1024px) {
+        .lyra-empathy-modal-content {
+            max-width: 600px;
+            width: auto;
+        }
+    }
+</style>
+
+<!-- [Sprint124_FixItFred_EmpathyExpansion] JavaScript for modal functionality -->
+<script>
+    // [Sprint124_FixItFred_EmpathyExpansion] Global modal management
+    let currentEmpathySession = null;
+    let empathySuggestionsStream = null;
+    
+    function openLyraEmpathyModal(persona = 'AnxiousCustomer', emotionalContext = null, serviceContext = null) {
+        console.log('[Sprint124_FixItFred_EmpathyExpansion] Opening Lyra empathy modal for persona:', persona);
+        
+        // Update persona display
+        document.getElementById('detected-persona').textContent = persona;
+        
+        // Show modal
+        document.getElementById('lyra-empathy-modal').style.display = 'flex';
+        
+        // Generate initial empathy response
+        generateEmpathyResponse(persona, emotionalContext, serviceContext);
+        
+        // Start real-time suggestions stream
+        startEmpathySuggestionsStream();
+        
+        // Set up mobile viewport handling
+        if (window.innerWidth <= 768) {
+            document.body.style.overflow = 'hidden';
+        }
+    }
+    
+    function closeLyraEmpathyModal() {
+        console.log('[Sprint124_FixItFred_EmpathyExpansion] Closing Lyra empathy modal');
+        
+        document.getElementById('lyra-empathy-modal').style.display = 'none';
+        document.body.style.overflow = '';
+        
+        // Stop suggestions stream
+        if (empathySuggestionsStream) {
+            clearInterval(empathySuggestionsStream);
+            empathySuggestionsStream = null;
+        }
+    }
+    
+    async function generateEmpathyResponse(persona, emotionalContext, serviceContext) {
+        try {
+            console.log('[Sprint124_FixItFred_EmpathyExpansion] Generating empathy response for:', persona);
+            
+            // Mock API call - in production would call LyraEmpathyNarrator service
+            const response = await mockGenerateEmpathyNarrative(persona, emotionalContext, serviceContext);
+            
+            // Update UI with response
+            document.getElementById('empathy-text').textContent = response.narrative;
+            document.getElementById('empathy-score').textContent = response.empathyScore.toFixed(2);
+            document.getElementById('effectiveness-rating').textContent = Math.round(response.empathyScore * 100) + '%';
+            
+        } catch (error) {
+            console.error('[Sprint124_FixItFred_EmpathyExpansion] Error generating empathy response:', error);
+            document.getElementById('empathy-text').textContent = 'I understand your situation and I\'m here to help you find the best solution.';
+        }
+    }
+    
+    function generateNewEmpathyResponse() {
+        const persona = document.getElementById('detected-persona').textContent;
+        generateEmpathyResponse(persona, null, 'user requested new response');
+    }
+    
+    function startEmpathySuggestionsStream() {
+        let suggestionIndex = 0;
+        const suggestions = [
+            { type: 'ToneAdjustment', text: 'Consider using a more reassuring tone', confidence: 0.85 },
+            { type: 'ActiveListening', text: 'Acknowledge the customer\'s specific concern', confidence: 0.92 },
+            { type: 'EscalationPrevention', text: 'Offer proactive status update', confidence: 0.78 }
+        ];
+        
+        empathySuggestionsStream = setInterval(() => {
+            if (suggestionIndex < suggestions.length) {
+                addSuggestionToUI(suggestions[suggestionIndex]);
+                suggestionIndex++;
+            } else {
+                clearInterval(empathySuggestionsStream);
+            }
+        }, 8000); // Add suggestion every 8 seconds
+    }
+    
+    function addSuggestionToUI(suggestion) {
+        const container = document.getElementById('empathy-suggestions-list');
+        const suggestionDiv = document.createElement('div');
+        suggestionDiv.className = 'suggestion-item';
+        suggestionDiv.innerHTML = `
+            <strong>${suggestion.type}:</strong> ${suggestion.text}
+            <span class="float-end text-warning">${Math.round(suggestion.confidence * 100)}%</span>
+        `;
+        container.appendChild(suggestionDiv);
+        
+        // Auto-scroll to bottom on mobile
+        if (window.innerWidth <= 768) {
+            container.scrollTop = container.scrollHeight;
+        }
+    }
+    
+    function applyEmpathyResponse() {
+        const empathyText = document.getElementById('empathy-text').textContent;
+        console.log('[Sprint124_FixItFred_EmpathyExpansion] Applying empathy response:', empathyText);
+        
+        // In production, would apply to actual service interaction
+        alert('Empathy response applied to current interaction!');
+        closeLyraEmpathyModal();
+    }
+    
+    function viewEmpathyAnalytics() {
+        console.log('[Sprint124_FixItFred_EmpathyExpansion] Opening empathy analytics view');
+        // In production, would navigate to analytics dashboard
+        window.open('/revitalize/analytics/empathy', '_blank');
+    }
+    
+    function provideFeedback() {
+        const rating = prompt('[Sprint124_FixItFred_EmpathyExpansion] Rate empathy effectiveness (1-5):');
+        if (rating) {
+            console.log('[Sprint124_FixItFred_EmpathyExpansion] Empathy feedback provided:', rating);
+            alert('Thank you for your feedback! This helps improve our empathy system.');
+        }
+    }
+    
+    // [Sprint124_FixItFred_EmpathyExpansion] Mock empathy generation for testing
+    async function mockGenerateEmpathyNarrative(persona, emotionalContext, serviceContext) {
+        const responses = {
+            'AnxiousCustomer': {
+                narrative: 'I want to reassure you that we understand your concerns and will keep you updated every step of the way. Your peace of mind is important to us.',
+                empathyScore: 0.87
+            },
+            'FrustratedCustomer': {
+                narrative: 'I completely understand your frustration, and I sincerely apologize for any inconvenience. Let me personally ensure we resolve this quickly.',
+                empathyScore: 0.91
+            },
+            'TechnicallySavvy': {
+                narrative: 'From a technical perspective, I can provide you with detailed information about the issue and our step-by-step resolution process.',
+                empathyScore: 0.82
+            },
+            'Default': {
+                narrative: 'I understand your situation and I\'m committed to helping you find the best solution. Thank you for your patience.',
+                empathyScore: 0.75
+            }
+        };
+        
+        return responses[persona] || responses['Default'];
+    }
+    
+    // [Sprint124_FixItFred_EmpathyExpansion] Close modal on escape key
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            closeLyraEmpathyModal();
+        }
+    });
+    
+    // [Sprint124_FixItFred_EmpathyExpansion] Handle mobile viewport changes
+    window.addEventListener('resize', function() {
+        if (document.getElementById('lyra-empathy-modal').style.display === 'flex') {
+            if (window.innerWidth <= 768) {
+                document.body.style.overflow = 'hidden';
+            } else {
+                document.body.style.overflow = '';
+            }
+        }
+    });
+</script>
