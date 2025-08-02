@@ -56,7 +56,8 @@ namespace Pages.Admin
         /// <summary>
         /// The list of technicians available for filtering.
         /// </summary>
-        public List<Technician> Technicians { get; set; } = new();
+        // [Sprint1002_FixItFred] Explicitly qualified to resolve namespace conflict
+        public List<Data.Models.Technician> Technicians { get; set; } = new();
 
         /// <summary>
         /// Handles GET requests to the Technician Audit page.

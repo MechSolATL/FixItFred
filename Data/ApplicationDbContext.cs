@@ -121,7 +121,8 @@ namespace Data
         public DbSet<TechnicianForecastLog> TechnicianForecastLogs { get; set; } = null!;
         public DbSet<TechnicianSkillMatrix> TechnicianSkillMatrices { get; set; } = null!;
         public DbSet<TechnicianWarningLog> TechnicianWarningLogs { get; set; } = null!;
-        public DbSet<TechnicianBehaviorLog> TechnicianBehaviorLogs { get; set; } = null!; // Sprint 71.0: Behavior analyzer log
+        // [Sprint1002_FixItFred] Explicitly qualified to resolve ambiguous reference  
+        public DbSet<Data.Models.TechnicianBehaviorLog> TechnicianBehaviorLogs { get; set; } = null!; // Sprint 71.0: Behavior analyzer log
         public DbSet<TechnicianResponseLog> TechnicianResponseLogs { get; set; } = null!;
         public DbSet<TechnicianTrustLog> TechnicianTrustLogs { get; set; } = null!;
         public DbSet<TechnicianEscalationLog> TechnicianEscalationLogs { get; set; } = null!;

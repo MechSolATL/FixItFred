@@ -55,7 +55,8 @@ namespace Services
         /// Retrieves all technicians.
         /// </summary>
         /// <returns>A list of all technicians.</returns>
-        public List<Technician> GetAllTechnicians()
+        // [Sprint1002_FixItFred] Explicitly qualified to resolve namespace conflict
+        public List<Data.Models.Technician> GetAllTechnicians()
         {
             return _db.Technicians.ToList();
         }

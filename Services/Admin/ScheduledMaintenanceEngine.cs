@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using System.IO;
@@ -22,7 +23,7 @@ namespace Services.Admin
             _serviceProvider = serviceProvider;
         }
 
-        protected override async Task ExecuteAsync(System.Threading.CancellationToken stoppingToken)
+        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             while (!stoppingToken.IsCancellationRequested)
             {

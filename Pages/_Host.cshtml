@@ -1,7 +1,7 @@
 ﻿@page "/_Host"
-@namespace MVP_Core.Pages
+@* [Sprint1002_FixItFred] Fixed namespace references to match actual project structure *@
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
-@inject MVP_Core.Services.ISeoService SeoService
+@inject Services.ISeoService SeoService
 @{
     Layout = null;
     ViewData["Title"] ??= "Service Atlanta Dev Portal";
