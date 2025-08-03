@@ -1,0 +1,450 @@
+@*
+    User Settings Component for Sprint122_CertumDNSBypass
+    Provides user privacy controls and activity management
+*@
+
+<div class="user-settings-container" data-sprint="Sprint122_CertumDNSBypass">
+    <div class="settings-header">
+        <h3>🔧 User Settings - Privacy & Activity</h3>
+        <p class="settings-description">
+            Manage your privacy preferences and activity data for Sprint122_CertumDNSBypass
+        </p>
+    </div>
+    
+    <div class="settings-sections">
+        <!-- Privacy Settings -->
+        <div class="settings-section">
+            <h4>🛡️ Privacy Settings</h4>
+            
+            <div class="setting-item">
+                <label for="telemetryEnabled">
+                    <input type="checkbox" id="telemetryEnabled" checked />
+                    Enable Telemetry Collection
+                </label>
+                <p class="setting-description">
+                    Allow collection of diagnostic and performance data to improve system functionality.
+                </p>
+            </div>
+            
+            <div class="setting-item">
+                <label for="privacyMode">
+                    <input type="checkbox" id="privacyMode" />
+                    Privacy Mode (Minimal Data Collection)
+                </label>
+                <p class="setting-description">
+                    Collect only essential data required for system operation. Reduces diagnostic capabilities.
+                </p>
+            </div>
+            
+            <div class="setting-item">
+                <label for="empathyLogging">
+                    <input type="checkbox" id="empathyLogging" checked />
+                    Enable Empathy Logging
+                </label>
+                <p class="setting-description">
+                    Track emotional context to provide better user support and experience.
+                </p>
+            </div>
+        </div>
+        
+        <!-- Activity Management -->
+        <div class="settings-section">
+            <h4>📊 Activity Management</h4>
+            
+            <div class="setting-item">
+                <label>Activity Data Retention:</label>
+                <select id="retentionPeriod" class="retention-select">
+                    <option value="7">7 days</option>
+                    <option value="30" selected>30 days</option>
+                    <option value="90">90 days</option>
+                    <option value="365">1 year</option>
+                </select>
+                <p class="setting-description">
+                    How long to keep your activity data and logs.
+                </p>
+            </div>
+            
+            <div class="setting-item">
+                <button type="button" id="clearActivityBtn" class="clear-activity-btn">
+                    🗑️ Clear Activity Data
+                </button>
+                <p class="setting-description">
+                    Remove all stored activity data, empathy logs, and telemetry information.
+                    <strong>This action cannot be undone.</strong>
+                </p>
+            </div>
+            
+            <div class="setting-item">
+                <button type="button" id="exportDataBtn" class="export-data-btn">
+                    📄 Export My Data
+                </button>
+                <p class="setting-description">
+                    Download a copy of your stored data in JSON format.
+                </p>
+            </div>
+        </div>
+        
+        <!-- License Settings -->
+        <div class="settings-section">
+            <h4>📜 License Settings</h4>
+            
+            <div class="setting-item">
+                <label for="licenseFreeMode">
+                    <input type="checkbox" id="licenseFreeMode" />
+                    Enable License-Free Mode
+                </label>
+                <p class="setting-description">
+                    Operate with ethical constraints in license-free mode with reduced functionality.
+                </p>
+            </div>
+            
+            <div class="license-status">
+                <strong>Current License:</strong> <span id="licenseStatus">Basic</span>
+                <br>
+                <strong>Trust Level:</strong> <span id="trustLevel">Verified</span>
+            </div>
+        </div>
+        
+        <!-- Advanced Settings -->
+        <div class="settings-section">
+            <h4>⚙️ Advanced Settings</h4>
+            
+            <div class="setting-item">
+                <label for="debugMode">
+                    <input type="checkbox" id="debugMode" />
+                    Enable Debug Mode
+                </label>
+                <p class="setting-description">
+                    Show detailed diagnostic information and verbose logging.
+                </p>
+            </div>
+            
+            <div class="setting-item">
+                <label for="fieldFirstCircle">
+                    <input type="checkbox" id="fieldFirstCircle" checked />
+                    Participate in Field First Circle
+                </label>
+                <p class="setting-description">
+                    Allow invitations to tech ID circles for collaborative development.
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Action Buttons -->
+    <div class="settings-actions">
+        <button type="button" id="saveSettingsBtn" class="save-settings-btn">
+            💾 Save Settings
+        </button>
+        <button type="button" id="resetSettingsBtn" class="reset-settings-btn">
+            🔄 Reset to Defaults
+        </button>
+    </div>
+    
+    <!-- Status Messages -->
+    <div id="settingsStatus" class="settings-status" style="display: none;">
+        <span id="statusMessage"></span>
+    </div>
+</div>
+
+<style>
+    .user-settings-container {
+        max-width: 800px;
+        margin: 20px auto;
+        padding: 20px;
+        background: #ffffff;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    
+    .settings-header {
+        text-align: center;
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 2px solid #e9ecef;
+    }
+    
+    .settings-header h3 {
+        color: #495057;
+        margin-bottom: 10px;
+        font-size: 1.5em;
+    }
+    
+    .settings-description {
+        color: #6c757d;
+        font-size: 0.95em;
+        margin: 0;
+    }
+    
+    .settings-sections {
+        display: grid;
+        gap: 25px;
+    }
+    
+    .settings-section {
+        padding: 20px;
+        background: #f8f9fa;
+        border-radius: 6px;
+        border-left: 4px solid #007bff;
+    }
+    
+    .settings-section h4 {
+        color: #495057;
+        margin-bottom: 15px;
+        font-size: 1.2em;
+    }
+    
+    .setting-item {
+        margin-bottom: 15px;
+        padding: 10px 0;
+    }
+    
+    .setting-item label {
+        display: flex;
+        align-items: center;
+        font-weight: 500;
+        color: #495057;
+        cursor: pointer;
+        margin-bottom: 5px;
+    }
+    
+    .setting-item input[type="checkbox"] {
+        margin-right: 10px;
+        transform: scale(1.2);
+    }
+    
+    .setting-description {
+        font-size: 0.9em;
+        color: #6c757d;
+        margin: 0;
+        padding-left: 0;
+    }
+    
+    .retention-select {
+        padding: 8px 12px;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        font-size: 1em;
+        margin-left: 10px;
+    }
+    
+    .clear-activity-btn, .export-data-btn {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        font-size: 1em;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+    
+    .clear-activity-btn {
+        background-color: #dc3545;
+        color: white;
+    }
+    
+    .clear-activity-btn:hover {
+        background-color: #c82333;
+    }
+    
+    .export-data-btn {
+        background-color: #17a2b8;
+        color: white;
+    }
+    
+    .export-data-btn:hover {
+        background-color: #138496;
+    }
+    
+    .license-status {
+        padding: 10px;
+        background: #e7f3ff;
+        border-radius: 4px;
+        border-left: 3px solid #007bff;
+        font-size: 0.9em;
+    }
+    
+    .settings-actions {
+        text-align: center;
+        margin-top: 30px;
+        padding-top: 20px;
+        border-top: 1px solid #e9ecef;
+    }
+    
+    .save-settings-btn, .reset-settings-btn {
+        padding: 12px 24px;
+        margin: 0 10px;
+        border: none;
+        border-radius: 4px;
+        font-size: 1em;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+    
+    .save-settings-btn {
+        background-color: #28a745;
+        color: white;
+    }
+    
+    .save-settings-btn:hover {
+        background-color: #218838;
+    }
+    
+    .reset-settings-btn {
+        background-color: #6c757d;
+        color: white;
+    }
+    
+    .reset-settings-btn:hover {
+        background-color: #545b62;
+    }
+    
+    .settings-status {
+        margin-top: 15px;
+        padding: 10px;
+        border-radius: 4px;
+        text-align: center;
+        font-weight: 500;
+    }
+    
+    .settings-status.success {
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+    }
+    
+    .settings-status.error {
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize settings
+        loadUserSettings();
+        
+        // Event listeners
+        document.getElementById('clearActivityBtn').addEventListener('click', clearActivityData);
+        document.getElementById('exportDataBtn').addEventListener('click', exportUserData);
+        document.getElementById('saveSettingsBtn').addEventListener('click', saveUserSettings);
+        document.getElementById('resetSettingsBtn').addEventListener('click', resetUserSettings);
+        
+        // Privacy mode toggle
+        document.getElementById('privacyMode').addEventListener('change', function() {
+            if (this.checked) {
+                document.getElementById('telemetryEnabled').checked = true;
+                document.getElementById('telemetryEnabled').disabled = true;
+            } else {
+                document.getElementById('telemetryEnabled').disabled = false;
+            }
+        });
+    });
+    
+    function loadUserSettings() {
+        // Load settings from localStorage or defaults
+        const settings = JSON.parse(localStorage.getItem('userSettings') || '{}');
+        
+        document.getElementById('telemetryEnabled').checked = settings.telemetryEnabled !== false;
+        document.getElementById('privacyMode').checked = settings.privacyMode === true;
+        document.getElementById('empathyLogging').checked = settings.empathyLogging !== false;
+        document.getElementById('licenseFreeMode').checked = settings.licenseFreeMode === true;
+        document.getElementById('debugMode').checked = settings.debugMode === true;
+        document.getElementById('fieldFirstCircle').checked = settings.fieldFirstCircle !== false;
+        document.getElementById('retentionPeriod').value = settings.retentionPeriod || '30';
+    }
+    
+    function saveUserSettings() {
+        const settings = {
+            telemetryEnabled: document.getElementById('telemetryEnabled').checked,
+            privacyMode: document.getElementById('privacyMode').checked,
+            empathyLogging: document.getElementById('empathyLogging').checked,
+            licenseFreeMode: document.getElementById('licenseFreeMode').checked,
+            debugMode: document.getElementById('debugMode').checked,
+            fieldFirstCircle: document.getElementById('fieldFirstCircle').checked,
+            retentionPeriod: document.getElementById('retentionPeriod').value,
+            lastUpdated: new Date().toISOString()
+        };
+        
+        localStorage.setItem('userSettings', JSON.stringify(settings));
+        showStatusMessage('Settings saved successfully!', 'success');
+        
+        // Apply settings immediately
+        applySettings(settings);
+    }
+    
+    function resetUserSettings() {
+        if (confirm('Are you sure you want to reset all settings to defaults?')) {
+            localStorage.removeItem('userSettings');
+            loadUserSettings();
+            showStatusMessage('Settings reset to defaults.', 'success');
+        }
+    }
+    
+    function clearActivityData() {
+        if (confirm('Are you sure you want to clear ALL activity data? This action cannot be undone.')) {
+            // Clear various data stores
+            localStorage.removeItem('activityData');
+            localStorage.removeItem('empathyLogs');
+            localStorage.removeItem('telemetryData');
+            
+            showStatusMessage('Activity data cleared successfully.', 'success');
+            
+            // Log the action
+            console.log(`[${new Date().toISOString()}] USER_ACTION: Activity data cleared by user request`);
+        }
+    }
+    
+    function exportUserData() {
+        const userData = {
+            settings: JSON.parse(localStorage.getItem('userSettings') || '{}'),
+            activityData: JSON.parse(localStorage.getItem('activityData') || '[]'),
+            empathyLogs: JSON.parse(localStorage.getItem('empathyLogs') || '[]'),
+            exportTimestamp: new Date().toISOString(),
+            sprint: 'Sprint122_CertumDNSBypass'
+        };
+        
+        const dataStr = JSON.stringify(userData, null, 2);
+        const dataBlob = new Blob([dataStr], { type: 'application/json' });
+        
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(dataBlob);
+        link.download = `user-data-${new Date().toISOString().split('T')[0]}.json`;
+        link.click();
+        
+        showStatusMessage('User data exported successfully.', 'success');
+    }
+    
+    function applySettings(settings) {
+        // Apply telemetry settings
+        if (window.fixItFredTelemetry) {
+            if (settings.telemetryEnabled) {
+                window.fixItFredTelemetry.enable();
+                if (settings.privacyMode) {
+                    window.fixItFredTelemetry.enablePrivacyMode();
+                } else {
+                    window.fixItFredTelemetry.disablePrivacyMode();
+                }
+            } else {
+                window.fixItFredTelemetry.disable();
+            }
+        }
+        
+        // Apply other settings as needed
+        console.log(`[${new Date().toISOString()}] SETTINGS_APPLIED:`, settings);
+    }
+    
+    function showStatusMessage(message, type) {
+        const statusDiv = document.getElementById('settingsStatus');
+        const messageSpan = document.getElementById('statusMessage');
+        
+        messageSpan.textContent = message;
+        statusDiv.className = `settings-status ${type}`;
+        statusDiv.style.display = 'block';
+        
+        setTimeout(() => {
+            statusDiv.style.display = 'none';
+        }, 3000);
+    }
+</script>
