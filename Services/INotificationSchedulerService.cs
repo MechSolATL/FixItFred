@@ -2,7 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Data.Models;
 
-namespace Services
+namespace MVP_Core.Services
 {
     /// <summary>
     /// Interface for notification scheduling service.

@@ -7,7 +7,7 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace Services
+namespace MVP_Core.Services
 {
     public class EstimateService
     {

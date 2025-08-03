@@ -1,13 +1,39 @@
 {
-  "sprint": "Sprint92",
+  "sprint": "Sprint91_27_OperationFusion",
   "tasks": [
-    "RazorModelBindingFix",
-    "AutoServiceWiring",
-    "SmartReplayStrategyInjection"
+    "OperationSystemFusion",
+    "NamespaceEnforcement", 
+    "LyraIntegration",
+    "FieldAssessmentReports",
+    "SEOHeadEnhancement",
+    "CalendarSyncStubs",
+    "FixItFredDiagnostics",
+    "GitHubCopilotCompliance",
+    "TechViewPatchOverlay"
   ],
   "defaultBehavior": {
     "enableDiagnostics": true,
     "autoStageMetadata": true,
-    "prioritizeFailingBuildTargets": true
+    "prioritizeFailingBuildTargets": true,
+    "enforceMvpCoreNamespaces": true,
+    "enableLyraEmpathyHooks": true,
+    "enableTechnicianGuidance": true,
+    "clientVisibilityRestricted": true
+  },
+  "integrations": {
+    "lyra": {
+      "empathyCorpusPath": "Logs/EmpathyCorpus/",
+      "autoExportNarration": true
+    },
+    "fixItFred": {
+      "diagnosticsPath": "Logs/FixItFred/",
+      "autoScanServices": true,
+      "ciWarningsCollection": true
+    },
+    "assessmentFlow": {
+      "reportPath": "Logs/FieldReports/",
+      "pdfExport": true,
+      "workflowSteps": ["Assessment", "Estimate", "Invoice"]
+    }
   }
 }

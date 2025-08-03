@@ -7,7 +7,7 @@ using Services.Dispatch;
 using Data;
 using Data.Models;
 
-namespace Services
+namespace MVP_Core.Services
 {
     /// <summary>
     /// Service for scheduling and processing notifications.

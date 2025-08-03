@@ -1,6 +1,6 @@
 using Data.Models.Seo;
 
-namespace Services
+namespace MVP_Core.Services
 {
     public interface ISeoService
     {

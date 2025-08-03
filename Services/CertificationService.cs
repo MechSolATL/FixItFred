@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Data;
 using Data.Models;
 
-namespace Services
+namespace MVP_Core.Services
 {
     public class CertificationService
     {

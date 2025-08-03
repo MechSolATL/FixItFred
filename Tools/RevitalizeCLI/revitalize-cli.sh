@@ -251,6 +251,9 @@ process_cognitive_seeds() {
 EOF
     
     log_success "Cognitive seeds processed. Results logged to: $log_file"
+    
+    # Sprint91_27 - Export to Lyra empathy corpus
+    export_to_lyra_corpus "process_cognitive_seeds" "processed $scenario_count scenarios" "{\"file\": \"$json_file\", \"scenario_count\": $scenario_count}"
 }
 
 # [Sprint123_FixItFred_OmegaSweep] Empathy replay function
@@ -280,6 +283,50 @@ replay_empathy_scenario() {
     esac
     
     log_success "Empathy replay completed for $persona"
+    
+    # Sprint91_27 - Export to Lyra empathy corpus
+    export_to_lyra_corpus "empathy_replay" "$persona scenario completed" "{\"persona\": \"$persona\", \"scenario_type\": \"empathy_replay\"}"
+}
+
+# [Sprint91_27] Lyra integration for CLI narration export
+export_to_lyra_corpus() {
+    local operation="$1"
+    local result="$2"
+    local metadata="$3"
+    
+    log_info "Exporting CLI operation to Lyra empathy corpus..."
+    
+    # Create empathy corpus directory if it doesn't exist
+    local corpus_dir="$PROJECT_ROOT/Logs/EmpathyCorpus"
+    mkdir -p "$corpus_dir"
+    
+    # Generate timestamp for unique filename
+    local timestamp=$(date -u +"%Y%m%d_%H%M%S")
+    local export_file="$corpus_dir/CLI_Export_${timestamp}_$(uuidgen | cut -d'-' f1).json"
+    
+    # Create narration content
+    local narration="CLI operation '$operation' completed by RevitalizeCLI"
+    if [ -n "$result" ]; then
+        narration="$narration. Result: $result"
+    fi
+    
+    # Export to JSON format
+    cat > "$export_file" << EOF
+{
+  "ToolName": "RevitalizeCLI",
+  "Narration": "$narration", 
+  "ExportedAt": "$(date -u -Iseconds)",
+  "Metadata": {
+    "Operation": "$operation",
+    "Result": "$result",
+    "ToolVersion": "Sprint91_27",
+    "CLIMetadata": $metadata
+  },
+  "Source": "CLI"
+}
+EOF
+    
+    log_info "Lyra empathy data exported to: $export_file"
 }
 
 # [Sprint123_FixItFred_OmegaSweep] Seed sample data with empathy context
@@ -337,6 +384,9 @@ seed_data() {
 EOF
     
     log_success "Enhanced sample data with empathy context created: revitalize-sample-data.json"
+    
+    # Sprint91_27 - Export operation to Lyra empathy corpus
+    export_to_lyra_corpus "seed_data" "success" '{"scenarios_created": "multiple", "empathy_context": "enabled"}'
 }
 
 # [Sprint123_FixItFred_OmegaSweep] Main command dispatcher

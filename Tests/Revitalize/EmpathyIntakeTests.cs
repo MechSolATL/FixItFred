@@ -2,6 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Interfaces;
 using Data;
 using Data.Models;
+using Tests.TestSeeds;
 using Xunit;
 
 namespace Tests.Revitalize;
@@ -41,12 +42,17 @@ public class EmpathyIntakeTests : RevitalizeTestBase
     public void Should_Seed_Empathy_Prompts_In_Database()
     {
         using var serviceProvider = CreateTestServiceProvider();
-        SeedTestData(serviceProvider);
         using var scope = serviceProvider.CreateScope();
         
         var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
         
-        // Verify empathy prompts were seeded
+        // Ensure database is created and schema is applied
+        context.Database.EnsureCreated();
+        
+        // Seed comprehensive empathy test data directly in the same context
+        TestDataSeeder.SeedTestData(context);
+        
+        // Verify empathy prompts were seeded in the same context
         var prompts = context.EmpathyPrompts.ToList();
         Assert.NotEmpty(prompts);
         Assert.True(prompts.Count >= 4); // We seed 4 prompts
@@ -67,10 +73,15 @@ public class EmpathyIntakeTests : RevitalizeTestBase
     public void Should_Retrieve_Empathy_Prompts_By_Category()
     {
         using var serviceProvider = CreateTestServiceProvider();
-        SeedTestData(serviceProvider);
         using var scope = serviceProvider.CreateScope();
         
         var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        
+        // Ensure database is created and schema is applied
+        context.Database.EnsureCreated();
+        
+        // Seed comprehensive empathy test data directly in the same context
+        TestDataSeeder.SeedTestData(context);
         
         // Test retrieval by category
         var apologyPrompts = context.EmpathyPrompts

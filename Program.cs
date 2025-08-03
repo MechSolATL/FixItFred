@@ -26,7 +26,18 @@ builder.Services.AddHttpContextAccessor();
 // ✅ FixItFred & Revitalize services
 builder.Services.AddScoped<Interfaces.IUserContext, Services.DefaultUserContext>(); // 🔐 ClaimsPrincipal DI context
 // builder.Services.AddScoped<Services.ReplayEngineService>();                          // 🔄 [OmegaSweep_Auto] Replay engine for snapshots - Missing class
-builder.Services.AddScoped<Services.ISeoService, Services.SEOService>();                                  // 📎 SEO binding per Razor Page
+
+// Register MVP_Core services first
+builder.Services.AddScoped<MVP_Core.Services.ISeoService, MVP_Core.Services.SEOService>();                                  // 📎 SEO binding per Razor Page
+builder.Services.AddScoped<MVP_Core.Services.CertificationService>();                                  // 📎 Certification service
+builder.Services.AddScoped<MVP_Core.Services.SkillsTrackerService>();                                  // 📎 Skills tracker service
+builder.Services.AddScoped<MVP_Core.Services.IContentService, MVP_Core.Services.ContentService>();                                  // 📎 Content service
+
+// Register backward compatibility services  
+builder.Services.AddScoped<Services.ISeoService, Services.SEOService>();                                  // 📎 SEO binding per Razor Page (backward compatibility)
+builder.Services.AddScoped<Services.CertificationService>();                                  // 📎 Certification service (backward compatibility)
+builder.Services.AddScoped<Services.SkillsTrackerService>();                                  // 📎 Skills tracker service (backward compatibility)
+builder.Services.AddScoped<Services.IContentService, Services.ContentService>();                                  // 📎 Content service (backward compatibility)
 builder.Services.AddScoped<Services.System.SystemDiagnosticsService>();
 // builder.Services.AddScoped<Services.Admin.IRootCauseCorrelationEngine, Services.Admin.RootCauseCorrelationEngine>(); // Missing interface
 // builder.Services.AddScoped<Services.Admin.IReplayEngineService, Services.Admin.ReplayEngineService>(); // Missing interface
@@ -34,7 +45,7 @@ builder.Services.AddScoped<Services.System.SystemDiagnosticsService>();
 
 // ✅ AutoRepair and Diagnostics
 builder.Services.AddScoped<Services.Admin.AutoRepairEngine>();
-builder.Services.AddScoped<Services.INotificationSchedulerService, Services.NotificationSchedulerService>();
+builder.Services.AddScoped<MVP_Core.Services.INotificationSchedulerService, MVP_Core.Services.NotificationSchedulerService>();
 builder.Services.AddScoped<Services.ICustomerTicketAnalyticsService, Services.CustomerTicketAnalyticsService>();
 builder.Services.AddScoped<Services.ISkillLeaderboardService, Services.SkillLeaderboardService>();
 builder.Services.AddScoped<Services.Admin.ComplianceReportService>();
@@ -52,6 +63,16 @@ builder.Services.AddScoped<Services.Admin.ValidationSimulatorService>(); // ⚠�
 // ✅ FixItFred OMEGASWEEP FAILSAFE v3.2 Services
 builder.Services.AddScoped<MVP_Core.Services.FixItFred.IFixItFredService, MVP_Core.Services.FixItFred.FixItFredService>();
 builder.Services.AddScoped<MVP_Core.Hubs.OmegaSweepHubClient>();
+
+// ✅ Sprint91_27 - Operation System Fusion Services
+builder.Services.AddScoped<MVP_Core.Services.ICalendarSyncService, MVP_Core.Services.Integrations.GoogleCalendarSyncService>();
+builder.Services.AddScoped<MVP_Core.Services.Integrations.GoogleCalendarSyncService>();
+builder.Services.AddScoped<MVP_Core.Services.Integrations.OutlookCalendarSyncService>();
+builder.Services.AddScoped<MVP_Core.Services.FieldAssessmentReportService>();
+builder.Services.AddScoped<MVP_Core.Services.TechViewPatchOverlayService>();
+builder.Services.AddScoped<MVP_Core.Services.Diagnostics.IServiceModuleScanner, MVP_Core.Services.Diagnostics.ServiceModuleScanner>();
+builder.Services.AddScoped<MVP_Core.Services.Diagnostics.DiagnosticsRunner>();
+builder.Services.AddScoped<MVP_Core.FixItFred.CI.FixItFredApp>();
 
 // ✅ SignalR for real-time OmegaSweep updates
 builder.Services.AddSignalR();

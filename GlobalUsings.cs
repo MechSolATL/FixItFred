@@ -16,6 +16,7 @@ global using Microsoft.EntityFrameworkCore;
 // =====================================
 // Project-Specific Namespaces
 // [Sprint1002_FixItFred] Fixed namespace references to match actual project structure
+// [Sprint91_27] Support both legacy Services and new MVP_Core.Services
 // =====================================
 global using Data;
 global using Data.Models;
@@ -23,3 +24,4 @@ global using Data.Models.Seo;
 global using Models;
 global using Helpers;
 global using Services;
+global using MVP_Core.ViewModels;

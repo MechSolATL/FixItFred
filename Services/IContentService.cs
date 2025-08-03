@@ -1,4 +1,4 @@
-namespace Services
+namespace MVP_Core.Services
 {
     public interface IContentService
     {

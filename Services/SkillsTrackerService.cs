@@ -4,7 +4,7 @@ using System;
 using Data;
 using Data.Models;
 
-namespace Services
+namespace MVP_Core.Services
 {
     /// <summary>
     /// Service for managing skill tracks and progress for technicians.

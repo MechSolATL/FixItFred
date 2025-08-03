@@ -1,14 +1,21 @@
 @using Microsoft.AspNetCore.Http.Extensions
+@using System.Diagnostics
+@using MVP_Core.ViewModels
+@model SeoMetaViewModel
 @* _SEOHead.cshtml: Injects SEO metadata into the <head> section. *@
 @* [FixItFredComment:Sprint1003 - SEO Meta Injection] Enhanced with canonical links and OpenGraph tags *@
+@* [Sprint91_27] Added fallback meta handling and trace ID comments *@
 @{
-    var title = ViewData["Title"] as string ?? "Service Atlanta";
-    var metaDescription = ViewData["MetaDescription"] as string ?? "Your trusted pros for Plumbing, HVAC, and Water Filtration.";
-    var keywords = ViewData["Keywords"] as string ?? "plumbing, HVAC, heating, air conditioning, water filtration";
-    var robots = ViewData["Robots"] as string ?? "index, follow";
-    var canonicalUrl = Context.Request.GetDisplayUrl(); // FixItFred: Added using directive for GetDisplayUrl
-    var ogImage = ViewData["OgImage"] as string ?? "/images/service-atlanta-og.jpg";
+    var title = Model.Title ?? "Service Atlanta";
+    var metaDescription = Model.MetaDescription ?? "Your trusted pros for Plumbing, HVAC, and Water Filtration.";
+    var keywords = Model.Keywords ?? "plumbing, HVAC, heating, air conditioning, water filtration";
+    var robots = Model.Robots ?? "index, follow";
+    var canonicalUrl = Model.CanonicalUrl ?? Context.Request.GetDisplayUrl();
+    var ogImage = Model.OgImage ?? "/images/service-atlanta-og.jpg";
+    var traceId = Model.TraceId ?? Activity.Current?.Id ?? Context.TraceIdentifier;
+    var pagePath = Model.PagePath ?? Context.Request.Path.Value ?? "/";
 }
+<!-- SEO Trace: @pagePath @traceId -->
 <title>@title</title>
 <meta name="description" content="@metaDescription" />
 <meta name="keywords" content="@keywords" />
