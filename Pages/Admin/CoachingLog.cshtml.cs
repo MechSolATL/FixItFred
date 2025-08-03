@@ -1,4 +1,4 @@
-// Sprint 85.6 — Coaching Impact Insights Phase 2
+// Sprint 85.6 ï¿½ Coaching Impact Insights Phase 2
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
@@ -36,7 +36,7 @@ namespace Pages.Admin
         public string SelectedSupervisor { get; set; } = string.Empty;
         public void OnGet()
         {
-            // Sprint 85.6 — Coaching Impact Insights Phase 2
+            // Sprint 85.6 ï¿½ Coaching Impact Insights Phase 2
             Technicians = _db.Technicians.ToList();
             Tiers = Technicians.Select(t => t.TierLevel.ToString()).Distinct().OrderBy(x => x).ToList();
             Supervisors = _logService.FilterByDate(DateTime.MinValue, DateTime.MaxValue).Select(e => e.SupervisorName).Distinct().OrderBy(x => x).ToList();
@@ -63,7 +63,7 @@ namespace Pages.Admin
         }
         public IActionResult OnGetExport(string startDate, string endDate, string tier, string supervisor)
         {
-            // Sprint 85.4 — Coaching UI Enhancements + Export
+            // Sprint 85.4 ï¿½ Coaching UI Enhancements + Export
             DateTime start = DateTime.TryParse(startDate, out var s) ? s : DateTime.MinValue;
             DateTime end = DateTime.TryParse(endDate, out var e) ? e : DateTime.MaxValue;
             var filtered = _logService.FilterByDate(start, end);
@@ -76,12 +76,12 @@ namespace Pages.Admin
             {
                 filtered = filtered.Where(e => e.SupervisorName == supervisor).ToList();
             }
-            var csv = Services.Admin.CsvExportHelper.ExportCoachingLogs(filtered);
-            return File(System.Text.Encoding.UTF8.GetBytes(csv), "text/csv", $"CoachingLogs_{DateTime.UtcNow:yyyyMMdd}.csv");
+            var csv = global::Services.Admin.CsvExportHelper.ExportCoachingLogs(filtered); // FixItFred: Use global:: to avoid namespace conflicts
+            return File(global::System.Text.Encoding.UTF8.GetBytes(csv), "text/csv", $"CoachingLogs_{DateTime.UtcNow:yyyyMMdd}.csv"); // FixItFred: Use global:: for System.Text
         }
         public IActionResult OnPost()
         {
-            // Sprint 85.7 — Admin Log Hardening & Encryption
+            // Sprint 85.7 ï¿½ Admin Log Hardening & Encryption
             var techId = int.Parse(Request.Form["TechnicianId"]);
             var supervisor = Request.Form["SupervisorName"];
             var category = Request.Form["Category"];

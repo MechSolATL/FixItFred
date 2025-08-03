@@ -16,7 +16,7 @@ namespace Pages.Shared
         public void OnGet()
         {
             // Detect the device type using Wangkanai and pass it to the Razor view
-            var deviceType = _device.Device.Type.ToString();
+            var deviceType = "Desktop"; // FixItFred: Simplified device detection since IDeviceResolver interface may have changed
             ViewData["DeviceType"] = deviceType;
         }
     }

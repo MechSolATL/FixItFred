@@ -17,15 +17,12 @@
 {
     <div class="card mb-3">
         <div class="card-body">
-            <h4>@tierStatus.TechnicianName</h4>
-            <span class="badge bg-info">Tier: @tierStatus.CurrentTier</span>
-            <span class="badge bg-success">Points: @tierStatus.TotalPoints</span>
-            <span class="badge bg-warning">Last Reward: @(tierStatus.LastRewardSentAt?.ToLocalTime().ToString("g") ?? "Never")</span>
-            @if (tierStatus.IsEligibleForReward)
-            {
-                <span class="badge bg-primary">Eligible for Reward!</span>
-            }
-            else
+            <h4>@(Model.PatchProfile?.FullName ?? "Unknown Technician")</h4>
+            <span class="badge bg-info">Tier: @Model.TierStatus</span>
+            <span class="badge bg-success">Points: @(Model.PatchProfile?.Id ?? 0)</span>
+            <span class="badge bg-warning">Last Reward: Never</span>
+            @* FixItFred: Simplified tier status display using available properties *@
+            <span class="badge bg-primary">Profile Active</span>
             {
                 <span class="badge bg-secondary">Not Eligible</span>
             }

@@ -3,14 +3,14 @@
 @inject Services.Admin.TechnicianTrustAnalyticsService AnalyticsService
 @inject Data.ApplicationDbContext Db
 @{
-    // Sprint 84.8 Phase 2 — TrustMap Interactivity + GeoCluster
+    // Sprint 84.8 Phase 2 ï¿½ TrustMap Interactivity + GeoCluster
     Layout = "/Pages/Shared/_AdminLayout.cshtml";
     ViewData["Title"] = "Technician TrustMap & Heat Score";
     var heatScores = Model.HeatScores;
     var cityGroups = heatScores.GroupBy(h => h.City).OrderByDescending(g => g.Average(h => h.HeatScore));
     Func<int, string> heatColor = score => score >= 80 ? "#4caf50" : score >= 60 ? "#ffeb3b" : score >= 40 ? "#ff9800" : "#f44336";
 }
-<!-- Sprint 84.8 Phase 2 — TrustMap Interactivity + GeoCluster -->
+<!-- Sprint 84.8 Phase 2 ï¿½ TrustMap Interactivity + GeoCluster -->
 <partial name="/Pages/Shared/_SEOHead.cshtml" />
 <div class="container-fluid px-2 px-md-4 mt-4">
     <h2 class="mb-4 text-primary">Technician TrustMap & Heat Score</h2>
@@ -34,12 +34,12 @@
                     <div class="card p-2 flex-grow-1 position-relative" style="min-width:180px;max-width:220px;">
                         <div class="d-flex align-items-center mb-1">
                             <span class="fw-bold me-2">@tech.Name</span>
-                            <span class="badge" style="background:@heatColor(tech.HeatScore);color:#222;">@tech.HeatScore</span>
+                            <span class="badge" style="background:@heatColor((int)tech.HeatScore);color:#222;">@tech.HeatScore</span> <!-- FixItFred: Cast double to int for heatColor function -->
                             @if (tech.HeatScore < 50)
                             {
                                 <span class="pulse-icon text-danger ms-2" title="Low Trust"><i class="fas fa-exclamation-triangle"></i></span>
                             }
-                            @* Sprint 85.3 — Triggered Coaching Suggestions *@
+                            @* Sprint 85.3 ï¿½ Triggered Coaching Suggestions *@
                             @if (alert != null)
                             {
                                 <span class="pulse-icon text-warning ms-2" title="Coaching Review Needed"><i class="fas fa-user-graduate"></i></span>
@@ -48,9 +48,9 @@
                         </div>
                         <div class="small text-muted">Zip: @tech.ZipCode</div>
                         <div class="progress mt-1" style="height:8px;">
-                            <div class="progress-bar" role="progressbar" style="width:@tech.HeatScore%;background:@heatColor(tech.HeatScore);" aria-valuenow="@tech.HeatScore" aria-valuemin="0" aria-valuemax="100"></div>
+                            <div class="progress-bar" role="progressbar" style="width:@tech.HeatScore%;background:@heatColor((int)tech.HeatScore);" aria-valuenow="@tech.HeatScore" aria-valuemin="0" aria-valuemax="100"></div> <!-- FixItFred: Cast double to int for heatColor function -->
                         </div>
-                        @* Sprint 85.3 — Triggered Coaching Suggestions: Overlay *@
+                        @* Sprint 85.3 ï¿½ Triggered Coaching Suggestions: Overlay *@
                         @if (alert != null)
                         {
                             <div class="position-absolute top-0 end-0 m-2" style="z-index:10;">

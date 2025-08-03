@@ -7,13 +7,13 @@
 @inject ContentService ContentService
 @inject ISeoService SeoService
 @{ 
-    var seo = await SeoService.GetSeoForPageAsync("Leaderboard");
+    var seo = await SeoService.GetSeoMetaAsync("Leaderboard"); // FixItFred: Use GetSeoMetaAsync to get SeoMeta object with properties
     ViewData["Title"] = seo.Title;
-    ViewData["Description"] = seo.Description;
+    ViewData["Description"] = seo.MetaDescription;
 }
 
 <div class="leaderboard">
-    <h1>@Model.Title</h1>
+    <h1>@ViewData["Title"]</h1> <!-- FixItFred: Use ViewData instead of Model.Title -->
     <div class="technicians">
         @foreach (var tech in Model.TopTechnicians)
         {

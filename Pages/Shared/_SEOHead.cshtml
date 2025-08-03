@@ -1,3 +1,4 @@
+@using Microsoft.AspNetCore.Http.Extensions
 @* _SEOHead.cshtml: Injects SEO metadata into the <head> section. *@
 @* [FixItFredComment:Sprint1003 - SEO Meta Injection] Enhanced with canonical links and OpenGraph tags *@
 @{
@@ -5,7 +6,7 @@
     var metaDescription = ViewData["MetaDescription"] as string ?? "Your trusted pros for Plumbing, HVAC, and Water Filtration.";
     var keywords = ViewData["Keywords"] as string ?? "plumbing, HVAC, heating, air conditioning, water filtration";
     var robots = ViewData["Robots"] as string ?? "index, follow";
-    var canonicalUrl = Context.Request.GetDisplayUrl();
+    var canonicalUrl = Context.Request.GetDisplayUrl(); // FixItFred: Added using directive for GetDisplayUrl
     var ogImage = ViewData["OgImage"] as string ?? "/images/service-atlanta-og.jpg";
 }
 <title>@title</title>

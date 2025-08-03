@@ -32,5 +32,11 @@ namespace Models
 
         [MaxLength(500)]
         public string? Notes { get; set; }
+
+        // FixItFred: Add missing properties referenced in TechnicianReportService
+        public List<Guid> TechnicianIds { get; set; } = new List<Guid>();
+        public DateTime FromDate { get; set; }
+        public DateTime ToDate { get; set; }
+        public Dictionary<Guid, string> ComparisonData { get; set; } = new Dictionary<Guid, string>();
     }
 }

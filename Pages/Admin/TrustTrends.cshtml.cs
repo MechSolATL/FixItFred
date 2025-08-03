@@ -10,7 +10,7 @@ using Data;
 
 namespace Pages.Admin
 {
-    // Sprint 85.0 — Trust Trends Chart Logic + Filters
+    // Sprint 85.0 ï¿½ Trust Trends Chart Logic + Filters
     public class TrustTrendsModel : PageModel
     {
         private readonly TechnicianTrustAnalyticsService _analyticsService;
@@ -25,7 +25,7 @@ namespace Pages.Admin
         public List<Data.Models.Technician> Technicians { get; set; } = new();
         public DateTime StartDate => DateTime.UtcNow.Date.AddDays(-DateRangeIndex);
         public DateTime EndDate => DateTime.UtcNow.Date;
-        public List<TechnicianTrendPoint> TrendData { get; set; } = new();
+        public List<MVP_Core.Pages.Admin.TechnicianTrendPoint> TrendData { get; set; } = new(); // FixItFred: Use fully qualified namespace to match service return type
 
         public async Task OnGetAsync()
         {
@@ -55,7 +55,7 @@ namespace Pages.Admin
         }
     }
 
-    // Sprint 85.0 — Trust Trends Chart Logic + Filters
+    // Sprint 85.0 ï¿½ Trust Trends Chart Logic + Filters
     public class TechnicianTrendPoint
     {
         public int TechnicianId { get; set; }
@@ -64,4 +64,4 @@ namespace Pages.Admin
         public int HeatScore { get; set; }
     }
 }
-// Sprint 85.0 — Trust Trends Chart Logic + Filters
+// Sprint 85.0 ï¿½ Trust Trends Chart Logic + Filters

@@ -4,6 +4,7 @@ using Helpers;
 using Services.Admin;
 using Services.Dispatch;
 using System.Linq;
+using Models.Admin; // FixItFred: Add missing namespace for TechnicianStatusDto
 
 namespace Data.Seeders
 {
@@ -101,7 +102,7 @@ namespace Data.Seeders
                     TimesUsed = 0
                 });
                 var brutalRoasts = Enumerable.Range(1, 10).Select(i => new RoastTemplate {
-                    Message = $"[Brutal-{i}] You're proof that AI can't fix attitude—and we've tried.",
+                    Message = $"[Brutal-{i}] You're proof that AI can't fix attitudeï¿½and we've tried.",
                     Tier = RoastTier.Brutal,
                     Category = categories[i % categories.Length],
                     UseLimit = 20,
@@ -148,12 +149,12 @@ namespace Data.Seeders
 
 #if DEBUG
         /// <summary>
-        /// Seeds 3–5 dummy ServiceRequest records with mock addresses, technician matches, and Zone tags.
+        /// Seeds 3ï¿½5 dummy ServiceRequest records with mock addresses, technician matches, and Zone tags.
         /// Triggers ETA prediction and ScheduleQueue insertion for each test record.
         /// </summary>
         public static void SeedTestServiceRequests(ApplicationDbContext db, DispatcherService dispatcherService, NotificationDispatchEngine dispatchEngine)
         {
-            // FixItFred: Sprint 30D.3 — QA Seed Injection Prep 2024-07-25
+            // FixItFred: Sprint 30D.3 ï¿½ QA Seed Injection Prep 2024-07-25
             if (db.ServiceRequests.Any(r => r.CustomerName.StartsWith("TestSeed"))) return; // Avoid duplicates
 
             var testRequests = new[]
@@ -188,7 +189,7 @@ namespace Data.Seeders
                 var tech = dispatcherService.FindAvailableTechnicianForZone(req.Zone);
                 if (tech != null)
                 {
-                    var techStatus = new Models.Admin.TechnicianStatusDto {
+                    var techStatus = new TechnicianStatusDto { // FixItFred: Remove Models.Admin prefix since we added using directive
                         TechnicianId = tech.Id,
                         Name = tech.FullName,
                         Status = tech.Specialty,
@@ -566,7 +567,7 @@ namespace Data.Seeders
                     new RoastTemplate { Message = "Your onboarding answers are so diplomatic, even Switzerland is jealous.", Tier = RoastTier.Soft, Category = "Onboarding", UseLimit = 10, TimesUsed = 0 },
                     new RoastTemplate { Message = "You dodged more questions than a politician at a debate.", Tier = RoastTier.Medium, Category = "Onboarding", UseLimit = 10, TimesUsed = 0 },
                     new RoastTemplate { Message = "Your confidence bias is so strong, the mirrors ask you for advice.", Tier = RoastTier.Savage, Category = "Onboarding", UseLimit = 10, TimesUsed = 0 },
-                    new RoastTemplate { Message = "If self-awareness was a sport, you'd be the referee and the player—at the same time.", Tier = RoastTier.Brutal, Category = "Onboarding", UseLimit = 10, TimesUsed = 0 }
+                    new RoastTemplate { Message = "If self-awareness was a sport, you'd be the referee and the playerï¿½at the same time.", Tier = RoastTier.Brutal, Category = "Onboarding", UseLimit = 10, TimesUsed = 0 }
                 };
                 db.RoastTemplates.AddRange(onboardingRoasts);
                 db.SaveChanges();

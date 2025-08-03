@@ -35,7 +35,7 @@ namespace Services
             var tech = _db.Technicians.FirstOrDefault(t => t.Id == technicianId);
             if (tech != null)
             {
-                tech.PatchReputationScore = (tech.PatchReputationScore.HasValue ? tech.PatchReputationScore.Value : 0) + points;
+                tech.PatchReputationScore = tech.PatchReputationScore + points; // FixItFred: Remove nullable operators since PatchReputationScore is not nullable
                 _db.SaveChanges();
             }
         }
@@ -90,10 +90,11 @@ namespace Services
         public List<(int TechnicianId, int Score)> GetTopTechs(int topN = 5)
         {
             return _db.Technicians
-                .Where(t => t.PatchReputationScore != null)
+                .Where(t => t.PatchReputationScore > 0) // FixItFred: Change from null check since PatchReputationScore is not nullable
                 .OrderByDescending(t => t.PatchReputationScore)
                 .Take(topN)
-                .Select(t => (t.Id, t.PatchReputationScore ?? 0))
+                .ToList() // FixItFred: Execute query first, then select to avoid expression tree issues
+                .Select(t => (t.Id, (int)t.PatchReputationScore))
                 .ToList();
         }
 

@@ -7,6 +7,7 @@ namespace Data.Models
     {
         public int Id { get; set; }
         public string FullName { get; set; } = string.Empty;
+        public string Name => FullName; // FixItFred: Add Name property for compatibility
         public string? Email { get; set; }
         public string? Phone { get; set; }
         public string? Specialty { get; set; }
@@ -16,7 +17,7 @@ namespace Data.Models
         public string? PhotoUrl { get; set; }
         public string? Badges { get; set; } // JSON array
 
-        // FixItFred: Sprint 30E – Live Tracking: Add GPS fields
+        // FixItFred: Sprint 30E ï¿½ Live Tracking: Add GPS fields
         public double? Latitude { get; set; }
         public double? Longitude { get; set; }
 

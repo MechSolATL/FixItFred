@@ -46,7 +46,12 @@ namespace Services.Scheduled
                         if (!alreadyAssigned)
                         {
                             await badgeService.AssignWeeklyBadgesAsync();
-                            db.Add(new PatchSystemLog { Timestamp = DateTime.UtcNow, Message = "PatchBadgeHostedService: Badges assigned." });
+                            db.Add(new PatchSystemLog { 
+                                Timestamp = DateTime.UtcNow, 
+                                Action = "PatchBadgeHostedService: Badges assigned.", // FixItFred: Use Action property instead of Message
+                                PerformedBy = "System",
+                                Notes = "Weekly badge assignment completed"
+                            });
                             await db.SaveChangesAsync();
                             _logger.LogInformation("PatchBadgeHostedService: Badges assigned.");
                         }

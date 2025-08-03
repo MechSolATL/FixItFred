@@ -1,4 +1,4 @@
-// Sprint 84.8 — TrustMap UI Scaffold
+// Sprint 84.8 ï¿½ TrustMap UI Scaffold
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Data.Models;
 using System.Collections.Generic;
@@ -9,7 +9,7 @@ using Services.Admin;
 
 namespace Pages.Admin
 {
-    // Sprint 84.8 — Technician Heat Score + Map Overlay
+    // Sprint 84.8 ï¿½ Technician Heat Score + Map Overlay
     public class TrustMapModel : PageModel
     {
         private readonly TechnicianTrustAnalyticsService _analyticsService;
@@ -18,14 +18,14 @@ namespace Pages.Admin
             _analyticsService = analyticsService;
         }
 
-        public List<TechnicianHeatScoreDto> HeatScores { get; set; } = new();
+        public List<MVP_Core.Pages.Admin.TechnicianHeatScoreDto> HeatScores { get; set; } = new(); // FixItFred: Use fully qualified namespace to match service return type
 
         public async Task OnGetAsync()
         {
             HeatScores = await _analyticsService.GetHeatScoreMapData();
         }
 
-        // Sprint 84.8 Phase 2 — TrustMap Interactivity + GeoCluster
+        // Sprint 84.8 Phase 2 ï¿½ TrustMap Interactivity + GeoCluster
         public async Task<IActionResult> OnGetTrustMapDataAsync()
         {
             var data = await _analyticsService.GetHeatScoreMapData();
@@ -42,7 +42,7 @@ namespace Pages.Admin
         }
     }
 
-    // Sprint 84.8 — Technician Heat Score + Map Overlay
+    // Sprint 84.8 ï¿½ Technician Heat Score + Map Overlay
     public class TechnicianHeatScoreDto
     {
         public int TechnicianId { get; set; }

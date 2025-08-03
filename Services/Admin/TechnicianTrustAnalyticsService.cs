@@ -1,4 +1,4 @@
-// Sprint 84.8 — Technician Heat Score + Map Overlay
+// Sprint 84.8 ï¿½ Technician Heat Score + Map Overlay
 using Data.Models;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +9,7 @@ using Pages.Admin;
 
 namespace Services.Admin
 {
-    // Sprint 84.8 — Technician Heat Score + Map Overlay
+    // Sprint 84.8 ï¿½ Technician Heat Score + Map Overlay
     public class TechnicianTrustAnalyticsService
     {
         private readonly ApplicationDbContext _db;
@@ -18,7 +18,7 @@ namespace Services.Admin
             _db = db;
         }
 
-        public async Task<List<TechnicianHeatScoreDto>> GetHeatScoreMapData()
+        public async Task<List<MVP_Core.Pages.Admin.TechnicianHeatScoreDto>> GetHeatScoreMapData() // FixItFred: Use fully qualified namespace
         {
             // Join Technicians with latest TrustLog, fallback to TrustScore
             var techs = _db.Technicians.ToList();
@@ -42,8 +42,8 @@ namespace Services.Admin
             return await Task.FromResult(result);
         }
 
-        // Sprint 85.0 — Trust Trends Chart Logic + Filters
-        public async Task<List<TechnicianTrendPoint>> GetTechnicianTrustTrends(DateTime start, DateTime end, int? technicianId = null)
+        // Sprint 85.0 ï¿½ Trust Trends Chart Logic + Filters
+        public async Task<List<MVP_Core.Pages.Admin.TechnicianTrendPoint>> GetTechnicianTrustTrends(DateTime start, DateTime end, int? technicianId = null) // FixItFred: Use fully qualified namespace
         {
             var logs = _db.TechnicianTrustLogs
                 .Where(l => l.RecordedAt >= start && l.RecordedAt <= end)
@@ -66,4 +66,4 @@ namespace Services.Admin
         }
     }
 }
-// Sprint 85.0 — Trust Trends Chart Logic + Filters
+// Sprint 85.0 ï¿½ Trust Trends Chart Logic + Filters

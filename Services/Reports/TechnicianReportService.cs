@@ -94,7 +94,7 @@ namespace Services.Reports
         {
             // TODO: Replace with actual PDF generation logic
             var reportText = $"Technician Report for {technician.Name}\nNotes: {notes ?? "None"}\nChart included: {chartImg.Length > 0}";
-            return System.Text.Encoding.UTF8.GetBytes(reportText);
+            return global::System.Text.Encoding.UTF8.GetBytes(reportText); // FixItFred: Use global:: to avoid namespace conflict with Services.System
         }
 
         // ✅ Overloaded method for controller compatibility
@@ -102,7 +102,7 @@ namespace Services.Reports
         {
             // TODO: Replace with actual PDF generation logic
             var reportText = $"Comparison Report for {technicians.Count} technicians\nNotes: {notes ?? "None"}\nCharts included: {chartImgs.Count}";
-            return System.Text.Encoding.UTF8.GetBytes(reportText);
+            return global::System.Text.Encoding.UTF8.GetBytes(reportText); // FixItFred: Use global:: to avoid namespace conflict with Services.System
         }
     }
 }

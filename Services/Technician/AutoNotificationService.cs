@@ -2,10 +2,11 @@ using System;
 using System.Threading.Tasks;
 using Data;
 using Models;
+using Models.Admin; // FixItFred: Add missing namespace for TechnicianAlertLog
 
 namespace Services.Technician
 {
-    // Sprint 86.7 — Auto Notification Service for Technician AI Companion
+    // Sprint 86.7 ï¿½ Auto Notification Service for Technician AI Companion
     public class AutoNotificationService
     {
         private readonly ApplicationDbContext _db;
