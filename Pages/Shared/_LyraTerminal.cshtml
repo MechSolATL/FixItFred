@@ -1,0 +1,592 @@
+@*
+    [Sprint126_OneScan_41-50] Retro Terminal UI (Lyra) Component
+    IBM Plex Mono font, C:\> prefix, typewriter scroll animations
+    Cursor animations (▌), glitch-in/slide-out effects
+    Used across overlays, CLI, and LMS
+*@
+
+@model dynamic
+
+<div id="lyra-terminal" class="lyra-terminal" 
+     style="position: fixed; top: 50px; right: 50px; z-index: 9997; 
+            width: 500px; height: 350px; display: none;"
+     role="terminal" aria-label="Lyra Terminal">
+    
+    <!-- [Sprint126_OneScan_41-50] Terminal window container -->
+    <div class="terminal-window" 
+         style="background: #000000; border: 2px solid #00ff00; border-radius: 0.5rem; 
+                font-family: 'IBM Plex Mono', 'Courier New', monospace; 
+                font-size: 14px; line-height: 1.4; color: #00ff00; 
+                box-shadow: 0 0 20px rgba(0, 255, 0, 0.3), inset 0 0 20px rgba(0, 255, 0, 0.1); 
+                overflow: hidden; position: relative;
+                animation: terminalGlitchIn 0.8s ease-out;">
+        
+        <!-- [Sprint126_OneScan_41-50] Terminal title bar -->
+        <div class="terminal-title-bar" 
+             style="background: #1a1a1a; padding: 0.5rem 1rem; border-bottom: 1px solid #00ff00; 
+                    display: flex; align-items: center; justify-content: between;">
+            <div class="terminal-title" style="font-weight: bold; font-size: 12px;">
+                LYRA TERMINAL v2.6.4 [MVP-Core]
+            </div>
+            <div class="terminal-controls" style="display: flex; gap: 0.5rem;">
+                <button type="button" class="terminal-minimize" onclick="minimizeTerminal()" 
+                        style="background: #ffaa00; width: 12px; height: 12px; border: none; 
+                               border-radius: 50%; cursor: pointer;" title="Minimize">
+                </button>
+                <button type="button" class="terminal-maximize" onclick="maximizeTerminal()" 
+                        style="background: #00ff00; width: 12px; height: 12px; border: none; 
+                               border-radius: 50%; cursor: pointer;" title="Maximize">
+                </button>
+                <button type="button" class="terminal-close" onclick="closeTerminal()" 
+                        style="background: #ff0000; width: 12px; height: 12px; border: none; 
+                               border-radius: 50%; cursor: pointer;" title="Close">
+                </button>
+            </div>
+        </div>
+
+        <!-- [Sprint126_OneScan_41-50] Terminal output area with scrolling -->
+        <div class="terminal-output" id="terminal-output" 
+             style="height: 250px; padding: 1rem; overflow-y: auto; 
+                    scrollbar-width: thin; scrollbar-color: #00ff00 #000000;">
+            
+            <!-- Welcome message -->
+            <div class="terminal-line">
+                <span class="terminal-timestamp">[13:37:42]</span>
+                <span class="terminal-system">SYSTEM:</span> 
+                Lyra Terminal initialized
+            </div>
+            <div class="terminal-line">
+                <span class="terminal-timestamp">[13:37:42]</span>
+                <span class="terminal-info">INFO:</span> 
+                Type 'help' for available commands
+            </div>
+            <div class="terminal-line">
+                <span class="terminal-timestamp">[13:37:43]</span>
+                <span class="terminal-ready">READY:</span> 
+                Terminal ready for input
+            </div>
+        </div>
+
+        <!-- [Sprint126_OneScan_41-50] Terminal input line with C:\> prefix -->
+        <div class="terminal-input-line" 
+             style="padding: 0.5rem 1rem; border-top: 1px solid #00ff00; 
+                    display: flex; align-items: center; background: #0a0a0a;">
+            <span class="terminal-prompt" style="color: #00ff00; margin-right: 0.5rem;">C:\></span>
+            <input type="text" id="terminal-input" class="terminal-input" 
+                   onkeypress="handleTerminalInput(event)" 
+                   style="background: transparent; border: none; color: #00ff00; 
+                          font-family: 'IBM Plex Mono', 'Courier New', monospace; 
+                          font-size: 14px; flex: 1; outline: none;"
+                   placeholder="Enter command..." autocomplete="off">
+            <span class="terminal-cursor" id="terminal-cursor" 
+                  style="background: #00ff00; width: 2px; height: 18px; 
+                         animation: terminalCursorBlink 1s infinite;">▌</span>
+        </div>
+
+        <!-- [Sprint126_OneScan_41-50] Terminal overlay effects -->
+        <div class="terminal-scanlines" 
+             style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; 
+                    background: repeating-linear-gradient(
+                        0deg,
+                        transparent,
+                        transparent 2px,
+                        rgba(0, 255, 0, 0.03) 2px,
+                        rgba(0, 255, 0, 0.03) 4px
+                    ); pointer-events: none;">
+        </div>
+    </div>
+</div>
+
+<!-- [Sprint126_OneScan_41-50] Terminal trigger button -->
+<div id="terminal-trigger" class="terminal-trigger" 
+     style="position: fixed; top: 20px; right: 20px; z-index: 9996; 
+            background: #000000; border: 2px solid #00ff00; border-radius: 0.25rem; 
+            padding: 0.5rem; cursor: pointer; font-family: 'IBM Plex Mono', monospace; 
+            color: #00ff00; font-size: 12px; animation: terminalTriggerPulse 2s infinite;"
+     onclick="toggleLyraTerminal()" title="Open Lyra Terminal">
+    <span>C:\> _</span>
+</div>
+
+<!-- [Sprint126_OneScan_41-50] CSS Animations and Styling -->
+<style>
+    /* Import IBM Plex Mono font */
+    @@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+    
+    @@keyframes terminalGlitchIn {
+        0% { 
+            transform: scale(0.8) rotate(0.5deg); 
+            opacity: 0; 
+            filter: hue-rotate(180deg) contrast(2);
+        }
+        25% { 
+            transform: scale(1.1) rotate(-0.3deg); 
+            opacity: 0.7; 
+            filter: hue-rotate(90deg) contrast(1.5);
+        }
+        50% { 
+            transform: scale(0.95) rotate(0.2deg); 
+            opacity: 0.9; 
+            filter: hue-rotate(45deg) contrast(1.2);
+        }
+        100% { 
+            transform: scale(1) rotate(0deg); 
+            opacity: 1; 
+            filter: none;
+        }
+    }
+    
+    @@keyframes terminalSlideOut {
+        0% { 
+            transform: translateX(0) scale(1); 
+            opacity: 1; 
+        }
+        100% { 
+            transform: translateX(100%) scale(0.8); 
+            opacity: 0; 
+        }
+    }
+    
+    @@keyframes terminalCursorBlink {
+        0%, 50% { opacity: 1; }
+        51%, 100% { opacity: 0; }
+    }
+    
+    @@keyframes terminalTriggerPulse {
+        0%, 100% { 
+            box-shadow: 0 0 5px rgba(0, 255, 0, 0.5); 
+            border-color: #00ff00;
+        }
+        50% { 
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.8); 
+            border-color: #88ff88;
+        }
+    }
+    
+    @@keyframes typewriterEffect {
+        from { width: 0; }
+        to { width: 100%; }
+    }
+    
+    .typewriter-line {
+        overflow: hidden;
+        white-space: nowrap;
+        border-right: 2px solid #00ff00;
+        animation: typewriterEffect 1.5s steps(50) forwards;
+    }
+    
+    /* Terminal text styling */
+    .terminal-line {
+        margin-bottom: 0.25rem;
+        word-wrap: break-word;
+    }
+    
+    .terminal-timestamp {
+        color: #666666;
+        font-weight: 500;
+    }
+    
+    .terminal-system {
+        color: #ff6600;
+        font-weight: bold;
+    }
+    
+    .terminal-info {
+        color: #00aaff;
+        font-weight: bold;
+    }
+    
+    .terminal-ready {
+        color: #00ff00;
+        font-weight: bold;
+    }
+    
+    .terminal-error {
+        color: #ff4444;
+        font-weight: bold;
+    }
+    
+    .terminal-warning {
+        color: #ffaa00;
+        font-weight: bold;
+    }
+    
+    /* Scrollbar styling for webkit browsers */
+    .terminal-output::-webkit-scrollbar {
+        width: 8px;
+    }
+    
+    .terminal-output::-webkit-scrollbar-track {
+        background: #000000;
+    }
+    
+    .terminal-output::-webkit-scrollbar-thumb {
+        background: #00ff00;
+        border-radius: 4px;
+    }
+    
+    .terminal-output::-webkit-scrollbar-thumb:hover {
+        background: #88ff88;
+    }
+    
+    /* Terminal window states */
+    .terminal-minimized {
+        height: 40px !important;
+    }
+    
+    .terminal-minimized .terminal-output {
+        display: none !important;
+    }
+    
+    .terminal-minimized .terminal-input-line {
+        display: none !important;
+    }
+    
+    .terminal-maximized {
+        width: 80vw !important;
+        height: 70vh !important;
+        top: 10vh !important;
+        right: 10vw !important;
+    }
+    
+    /* Mobile responsiveness */
+    @@media (max-width: 768px) {
+        #lyra-terminal {
+            position: fixed !important;
+            top: 10px !important;
+            left: 10px !important;
+            right: 10px !important;
+            width: auto !important;
+            height: 300px !important;
+        }
+        
+        .terminal-window {
+            font-size: 12px !important;
+        }
+        
+        .terminal-output {
+            height: 200px !important;
+        }
+        
+        #terminal-trigger {
+            top: 10px !important;
+            right: 10px !important;
+        }
+    }
+</style>
+
+<!-- [Sprint126_OneScan_41-50] JavaScript functionality -->
+<script>
+    // [Sprint126_OneScan_41-50] Global terminal state
+    let terminalVisible = false;
+    let terminalMinimized = false;
+    let terminalMaximized = false;
+    let commandHistory = [];
+    let historyIndex = -1;
+    let currentDirectory = 'C:\\MVP-Core\\Lyra';
+    
+    // [Sprint126_OneScan_41-50] Available terminal commands
+    const terminalCommands = {
+        help: () => displayHelp(),
+        clear: () => clearTerminal(),
+        dir: () => listDirectory(),
+        cd: (path) => changeDirectory(path),
+        echo: (text) => echoText(text),
+        status: () => showSystemStatus(),
+        roast: () => triggerRoastMode(),
+        voice: (personality) => activateVoiceNarrator(personality),
+        lyra: (query) => queryLyra(query),
+        cls: () => clearTerminal(),
+        exit: () => closeTerminal(),
+        about: () => showAbout(),
+        time: () => showTime(),
+        whoami: () => showUser()
+    };
+    
+    /**
+     * [Sprint126_OneScan_41-50] Toggles Lyra terminal visibility
+     */
+    function toggleLyraTerminal() {
+        console.log('[Sprint126_OneScan_41-50] Toggling Lyra terminal');
+        
+        const terminal = document.getElementById('lyra-terminal');
+        const trigger = document.getElementById('terminal-trigger');
+        
+        if (terminalVisible) {
+            terminal.style.animation = 'terminalSlideOut 0.5s ease-in forwards';
+            setTimeout(() => {
+                terminal.style.display = 'none';
+                trigger.style.display = 'block';
+                terminalVisible = false;
+            }, 500);
+        } else {
+            terminal.style.display = 'block';
+            terminal.style.animation = 'terminalGlitchIn 0.8s ease-out';
+            trigger.style.display = 'none';
+            terminalVisible = true;
+            
+            // Focus input
+            setTimeout(() => {
+                document.getElementById('terminal-input').focus();
+            }, 100);
+        }
+    }
+    
+    /**
+     * [Sprint126_OneScan_41-50] Minimizes terminal window
+     */
+    function minimizeTerminal() {
+        const terminal = document.querySelector('.terminal-window');
+        terminalMinimized = !terminalMinimized;
+        
+        if (terminalMinimized) {
+            terminal.classList.add('terminal-minimized');
+            addTerminalLine('SYSTEM: Terminal minimized', 'system');
+        } else {
+            terminal.classList.remove('terminal-minimized');
+            addTerminalLine('SYSTEM: Terminal restored', 'system');
+        }
+    }
+    
+    /**
+     * [Sprint126_OneScan_41-50] Maximizes terminal window
+     */
+    function maximizeTerminal() {
+        const terminal = document.querySelector('.terminal-window');
+        terminalMaximized = !terminalMaximized;
+        
+        if (terminalMaximized) {
+            terminal.classList.add('terminal-maximized');
+            addTerminalLine('SYSTEM: Terminal maximized', 'system');
+        } else {
+            terminal.classList.remove('terminal-maximized');
+            addTerminalLine('SYSTEM: Terminal restored', 'system');
+        }
+    }
+    
+    /**
+     * [Sprint126_OneScan_41-50] Closes terminal window
+     */
+    function closeTerminal() {
+        addTerminalLine('SYSTEM: Terminal shutting down...', 'system');
+        setTimeout(() => {
+            toggleLyraTerminal();
+        }, 1000);
+    }
+    
+    /**
+     * [Sprint126_OneScan_41-50] Handles terminal input
+     */
+    function handleTerminalInput(event) {
+        if (event.key === 'Enter') {
+            const input = event.target;
+            const command = input.value.trim();
+            
+            if (command) {
+                // Add to history
+                commandHistory.push(command);
+                historyIndex = commandHistory.length;
+                
+                // Display command
+                addTerminalLine(`${currentDirectory}> ${command}`, 'input');
+                
+                // Execute command
+                executeCommand(command);
+            }
+            
+            // Clear input
+            input.value = '';
+        } else if (event.key === 'ArrowUp') {
+            // Command history up
+            if (historyIndex > 0) {
+                historyIndex--;
+                event.target.value = commandHistory[historyIndex];
+            }
+            event.preventDefault();
+        } else if (event.key === 'ArrowDown') {
+            // Command history down
+            if (historyIndex < commandHistory.length - 1) {
+                historyIndex++;
+                event.target.value = commandHistory[historyIndex];
+            } else {
+                historyIndex = commandHistory.length;
+                event.target.value = '';
+            }
+            event.preventDefault();
+        }
+    }
+    
+    /**
+     * [Sprint126_OneScan_41-50] Executes terminal command
+     */
+    function executeCommand(commandLine) {
+        const parts = commandLine.split(' ');
+        const command = parts[0].toLowerCase();
+        const args = parts.slice(1).join(' ');
+        
+        console.log('[Sprint126_OneScan_41-50] Executing command:', command, args);
+        
+        if (terminalCommands[command]) {
+            terminalCommands[command](args);
+        } else {
+            addTerminalLine(`ERROR: '${command}' is not recognized as an internal or external command.`, 'error');
+        }
+    }
+    
+    /**
+     * [Sprint126_OneScan_41-50] Adds line to terminal output with typewriter effect
+     */
+    function addTerminalLine(text, type = 'info', useTypewriter = false) {
+        const output = document.getElementById('terminal-output');
+        const line = document.createElement('div');
+        line.className = 'terminal-line';
+        
+        if (useTypewriter) {
+            line.classList.add('typewriter-line');
+        }
+        
+        const timestamp = new Date().toLocaleTimeString('en-US', { hour12: false });
+        const typeClass = `terminal-${type}`;
+        
+        line.innerHTML = `<span class="terminal-timestamp">[${timestamp}]</span> <span class="${typeClass}">${text}</span>`;
+        
+        output.appendChild(line);
+        output.scrollTop = output.scrollHeight;
+    }
+    
+    // [Sprint126_OneScan_41-50] Terminal command implementations
+    
+    function displayHelp() {
+        addTerminalLine('Available commands:', 'info');
+        addTerminalLine('  help      - Show this help', 'info');
+        addTerminalLine('  clear/cls - Clear terminal', 'info');
+        addTerminalLine('  dir       - List directory contents', 'info');
+        addTerminalLine('  cd <path> - Change directory', 'info');
+        addTerminalLine('  echo <text> - Echo text', 'info');
+        addTerminalLine('  status    - Show system status', 'info');
+        addTerminalLine('  roast     - Trigger roast mode', 'info');
+        addTerminalLine('  voice <personality> - Activate voice narrator', 'info');
+        addTerminalLine('  lyra <query> - Query Lyra system', 'info');
+        addTerminalLine('  about     - About this terminal', 'info');
+        addTerminalLine('  time      - Show current time', 'info');
+        addTerminalLine('  whoami    - Show current user', 'info');
+        addTerminalLine('  exit      - Close terminal', 'info');
+    }
+    
+    function clearTerminal() {
+        document.getElementById('terminal-output').innerHTML = '';
+        addTerminalLine('Terminal cleared', 'system');
+    }
+    
+    function listDirectory() {
+        addTerminalLine('Directory of ' + currentDirectory, 'info');
+        addTerminalLine('', 'info');
+        addTerminalLine('  <DIR>     bin', 'info');
+        addTerminalLine('  <DIR>     config', 'info');
+        addTerminalLine('  <DIR>     logs', 'info');
+        addTerminalLine('  <DIR>     modules', 'info');
+        addTerminalLine('           README.txt', 'info');
+        addTerminalLine('           lyra.exe', 'info');
+        addTerminalLine('           patch.dll', 'info');
+        addTerminalLine('', 'info');
+        addTerminalLine('7 items found', 'info');
+    }
+    
+    function changeDirectory(path) {
+        if (!path) {
+            addTerminalLine('Current directory: ' + currentDirectory, 'info');
+        } else {
+            currentDirectory = `C:\\MVP-Core\\Lyra\\${path}`;
+            addTerminalLine(`Changed to: ${currentDirectory}`, 'info');
+        }
+    }
+    
+    function echoText(text) {
+        addTerminalLine(text || 'ECHO is on.', 'info', true);
+    }
+    
+    function showSystemStatus() {
+        addTerminalLine('MVP-Core System Status:', 'info');
+        addTerminalLine('  Lyra Engine: ONLINE', 'ready');
+        addTerminalLine('  Patch Module: ACTIVE', 'ready');
+        addTerminalLine('  Voice Narrator: READY', 'ready');
+        addTerminalLine('  Roast Engine: LOADED', 'warning');
+        addTerminalLine('  Memory Usage: 342MB / 8GB', 'info');
+        addTerminalLine('  Uptime: 47h 23m 15s', 'info');
+    }
+    
+    function triggerRoastMode() {
+        addTerminalLine('Initializing Roast Engine...', 'warning');
+        setTimeout(() => {
+            addTerminalLine('ROAST: Terminal, you think you\'re so smart with your blinking cursor!', 'error');
+            // Trigger actual roast overlay if available
+            if (window.triggerPatchLyraRoast) {
+                window.triggerPatchLyraRoast('UserRequest', 'terminal-user', 'CLI command');
+            }
+        }, 1000);
+    }
+    
+    function activateVoiceNarrator(personality) {
+        if (!personality) {
+            addTerminalLine('Usage: voice <personality>', 'info');
+            addTerminalLine('Available: buckwheat, forrestgump, rodney, dice, austin, danny', 'info');
+        } else {
+            addTerminalLine(`Activating voice narrator: ${personality}`, 'info');
+            // Trigger voice narrator if available
+            if (window.triggerVoiceNarration) {
+                window.triggerVoiceNarration(`Terminal activated voice narrator: ${personality}`, personality);
+            }
+        }
+    }
+    
+    function queryLyra(query) {
+        if (!query) {
+            addTerminalLine('Usage: lyra <query>', 'info');
+            addTerminalLine('Example: lyra search technician reports', 'info');
+        } else {
+            addTerminalLine(`Querying Lyra: "${query}"`, 'info');
+            setTimeout(() => {
+                addTerminalLine('LYRA: Processing your request...', 'ready', true);
+                setTimeout(() => {
+                    addTerminalLine(`LYRA: Found 23 results for "${query}"`, 'ready');
+                }, 1500);
+            }, 500);
+        }
+    }
+    
+    function showAbout() {
+        addTerminalLine('Lyra Terminal v2.6.4', 'info');
+        addTerminalLine('Part of MVP-Core System', 'info');
+        addTerminalLine('Sprint 126 OneScan Implementation', 'info');
+        addTerminalLine('Service-Atlanta Technologies', 'info');
+    }
+    
+    function showTime() {
+        const now = new Date();
+        addTerminalLine(`Current time: ${now.toLocaleString()}`, 'info');
+    }
+    
+    function showUser() {
+        addTerminalLine('Current user: ServiceAtlanta\\LyraOperator', 'info');
+        addTerminalLine('Privileges: Administrator', 'info');
+    }
+    
+    // [Sprint126_OneScan_41-50] Auto-initialize terminal
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('[Sprint126_OneScan_41-50] Lyra Terminal initialized');
+    });
+    
+    // [Sprint126_OneScan_41-50] Global function for external triggers
+    window.openLyraTerminal = function(command) {
+        if (!terminalVisible) {
+            toggleLyraTerminal();
+        }
+        
+        if (command) {
+            setTimeout(() => {
+                const input = document.getElementById('terminal-input');
+                input.value = command;
+                input.focus();
+            }, 900);
+        }
+    };
+</script>

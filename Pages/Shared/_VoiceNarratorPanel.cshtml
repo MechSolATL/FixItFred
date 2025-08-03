@@ -1,0 +1,481 @@
+@*
+    [Sprint126_OneScan_21-40] Voice Narrator Mode Pack Component
+    Displays random voice personality narration with rotation and fallback
+    Personalities: Buckwheat, Forrest Gump, Rodney Dangerfield, Dice Clay, Austin Powers, Danny DeVito
+    Includes share-to-IG functionality with Service-Atlanta watermark
+*@
+
+@model dynamic
+
+<div id="voice-narrator-panel" class="voice-narrator-panel" 
+     style="position: fixed; bottom: 20px; left: 20px; z-index: 9999; 
+            max-width: 350px; display: none;"
+     role="complementary" aria-label="Voice Narrator">
+    
+    <!-- [Sprint126_OneScan_21-40] Voice narrator container -->
+    <div class="narrator-container" 
+         style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                border-radius: 1rem; box-shadow: 0 8px 32px rgba(0,0,0,0.3); 
+                color: white; overflow: hidden; position: relative;
+                border: 2px solid #9b59b6; animation: narratorSlideIn 0.5s ease-out;">
+        
+        <!-- [Sprint126_OneScan_21-40] Header with voice selector -->
+        <div class="narrator-header" style="background: rgba(155, 89, 182, 0.9); padding: 0.75rem 1rem; 
+                                           display: flex; align-items: center; justify-content: between;">
+            <div class="voice-avatar" style="display: flex; align-items: center; gap: 0.5rem;">
+                <div id="voice-avatar-circle" class="avatar-circle" 
+                     style="width: 36px; height: 36px; background: #f39c12; 
+                            border-radius: 50%; display: flex; align-items: center; 
+                            justify-content: center; font-weight: bold; font-size: 0.9rem;">
+                    🎭
+                </div>
+                <div class="voice-info">
+                    <div class="voice-name" id="current-voice-name" 
+                         style="font-weight: bold; font-size: 0.9rem;">Random Voice</div>
+                    <div class="voice-status" style="font-size: 0.7rem; opacity: 0.8;">Ready to narrate</div>
+                </div>
+            </div>
+            
+            <div class="narrator-controls" style="display: flex; gap: 0.5rem; align-items: center;">
+                <button type="button" class="btn btn-sm btn-outline-light" onclick="randomizeVoice()" 
+                        title="Get Random Voice" style="padding: 0.25rem 0.5rem; font-size: 0.7rem;">
+                    🎲
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-light" onclick="toggleVoiceNarrator()" 
+                        title="Close" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;">
+                    ×
+                </button>
+            </div>
+        </div>
+
+        <!-- [Sprint126_OneScan_21-40] Narration content area -->
+        <div class="narrator-content" style="padding: 1rem;">
+            
+            <!-- Current narration display -->
+            <div class="current-narration" style="margin-bottom: 1rem;">
+                <div class="narration-text" id="narration-text" 
+                     style="background: rgba(255,255,255,0.1); padding: 0.75rem; 
+                            border-radius: 0.5rem; min-height: 3rem; line-height: 1.4; 
+                            font-size: 0.9rem; font-style: italic;">
+                    *Ready to provide voice narration...*
+                </div>
+            </div>
+
+            <!-- Voice selector dropdown -->
+            <div class="voice-selector" style="margin-bottom: 1rem;">
+                <label for="voice-select" style="font-size: 0.8rem; margin-bottom: 0.5rem; display: block;">
+                    Choose Voice:
+                </label>
+                <select id="voice-select" class="form-select form-select-sm" 
+                        onchange="changeVoice(this.value)" 
+                        style="background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); 
+                               color: white; border-radius: 0.25rem;">
+                    <option value="random">🎲 Random Voice</option>
+                    <option value="buckwheat">🧸 Buckwheat</option>
+                    <option value="forrestgump">🍫 Forrest Gump</option>
+                    <option value="rodneyDangerfield">😅 Rodney Dangerfield</option>
+                    <option value="diceclay">💪 Dice Clay</option>
+                    <option value="austinpowers">🕺 Austin Powers</option>
+                    <option value="dannydevito">🎬 Danny DeVito</option>
+                </select>
+            </div>
+
+            <!-- Action buttons -->
+            <div class="narrator-actions" style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                <button type="button" class="btn btn-sm btn-primary" onclick="narrateCurrentPage()" 
+                        style="flex: 1; font-size: 0.8rem;">
+                    🎤 Narrate Page
+                </button>
+                <button type="button" class="btn btn-sm btn-success" onclick="narrateSelection()" 
+                        style="flex: 1; font-size: 0.8rem;">
+                    📖 Narrate Selection
+                </button>
+            </div>
+
+            <!-- Share functionality -->
+            <div class="narrator-share" style="margin-top: 1rem; padding-top: 1rem; 
+                                              border-top: 1px solid rgba(255,255,255,0.2);">
+                <button type="button" class="btn btn-sm btn-warning w-100" onclick="shareNarration()" 
+                        style="font-size: 0.8rem;">
+                    📤 Share to Instagram
+                </button>
+            </div>
+        </div>
+
+        <!-- [Sprint126_OneScan_21-40] Footer with Service-Atlanta branding -->
+        <div class="narrator-footer" style="background: rgba(0,0,0,0.2); padding: 0.5rem 1rem; 
+                                           font-size: 0.7rem; text-align: center; color: #bdc3c7;">
+            Powered by Service-Atlanta Voice AI
+        </div>
+    </div>
+</div>
+
+<!-- [Sprint126_OneScan_21-40] Quick trigger button -->
+<div id="voice-narrator-trigger" class="narrator-trigger" 
+     style="position: fixed; bottom: 20px; left: 20px; z-index: 9998; 
+            width: 60px; height: 60px; background: linear-gradient(135deg, #9b59b6, #667eea); 
+            border-radius: 50%; display: flex; align-items: center; justify-content: center; 
+            cursor: pointer; box-shadow: 0 4px 16px rgba(155, 89, 182, 0.4); 
+            animation: voicePulse 2s infinite ease-in-out;"
+     onclick="toggleVoiceNarrator()" title="Voice Narrator">
+    <span style="font-size: 1.5rem; color: white;">🎭</span>
+</div>
+
+<!-- [Sprint126_OneScan_21-40] CSS Animations -->
+<style>
+    @@keyframes narratorSlideIn {
+        0% { transform: translateX(-100px) scale(0.8); opacity: 0; }
+        100% { transform: translateX(0) scale(1); opacity: 1; }
+    }
+    
+    @@keyframes voicePulse {
+        0%, 100% { transform: scale(1); box-shadow: 0 4px 16px rgba(155, 89, 182, 0.4); }
+        50% { transform: scale(1.1); box-shadow: 0 6px 24px rgba(155, 89, 182, 0.6); }
+    }
+    
+    @@keyframes textTypewriter {
+        from { width: 0; }
+        to { width: 100%; }
+    }
+    
+    .typewriter-text {
+        overflow: hidden;
+        white-space: nowrap;
+        border-right: 2px solid white;
+        animation: textTypewriter 1.5s steps(50) forwards;
+    }
+    
+    /* Voice-specific styling */
+    .voice-buckwheat { background: linear-gradient(135deg, #FFD700, #FFA500); }
+    .voice-forrestgump { background: linear-gradient(135deg, #228B22, #32CD32); }
+    .voice-rodney { background: linear-gradient(135deg, #DC143C, #FF6347); }
+    .voice-dice { background: linear-gradient(135deg, #000000, #333333); }
+    .voice-austin { background: linear-gradient(135deg, #4169E1, #6495ED); }
+    .voice-danny { background: linear-gradient(135deg, #8B4513, #D2691E); }
+    
+    /* Mobile responsiveness */
+    @@media (max-width: 768px) {
+        #voice-narrator-panel {
+            position: fixed !important;
+            bottom: 10px !important;
+            left: 10px !important;
+            right: 10px !important;
+            max-width: none !important;
+        }
+        
+        .narrator-actions {
+            flex-direction: column !important;
+        }
+        
+        #voice-narrator-trigger {
+            bottom: 10px !important;
+            left: 10px !important;
+            width: 50px !important;
+            height: 50px !important;
+        }
+        
+        #voice-narrator-trigger span {
+            font-size: 1.2rem !important;
+        }
+    }
+</style>
+
+<!-- [Sprint126_OneScan_21-40] JavaScript functionality -->
+<script>
+    // [Sprint126_OneScan_21-40] Global voice narrator management
+    let currentVoicePersonality = 'random';
+    let narratorVisible = false;
+    let currentNarration = null;
+    let voiceRotationHistory = [];
+    
+    // [Sprint126_OneScan_21-40] Voice personality configurations
+    const voicePersonalities = {
+        buckwheat: {
+            name: 'Buckwheat',
+            avatar: '🧸',
+            color: '#FFD700',
+            samplePhrase: 'Otay! Dis is gonna be gweaat!'
+        },
+        forrestgump: {
+            name: 'Forrest Gump',
+            avatar: '🍫',
+            color: '#228B22',
+            samplePhrase: 'Mama always said, life is like a box of chocolates'
+        },
+        rodneyDangerfield: {
+            name: 'Rodney Dangerfield',
+            avatar: '😅',
+            color: '#DC143C',
+            samplePhrase: 'I tell ya, I get no respect at all!'
+        },
+        diceclay: {
+            name: 'Dice Clay',
+            avatar: '💪',
+            color: '#000000',
+            samplePhrase: 'Ohhhhhhh! Unbelievable!'
+        },
+        austinpowers: {
+            name: 'Austin Powers',
+            avatar: '🕺',
+            color: '#4169E1',
+            samplePhrase: 'Yeah baby! Groovy!'
+        },
+        dannydevito: {
+            name: 'Danny DeVito',
+            avatar: '🎬',
+            color: '#8B4513',
+            samplePhrase: 'Listen here, capisce?'
+        }
+    };
+    
+    /**
+     * [Sprint126_OneScan_21-40] Toggles voice narrator panel visibility
+     */
+    function toggleVoiceNarrator() {
+        console.log('[Sprint126_OneScan_21-40] Toggling voice narrator');
+        
+        const panel = document.getElementById('voice-narrator-panel');
+        const trigger = document.getElementById('voice-narrator-trigger');
+        
+        if (narratorVisible) {
+            panel.style.display = 'none';
+            trigger.style.display = 'flex';
+            narratorVisible = false;
+        } else {
+            panel.style.display = 'block';
+            trigger.style.display = 'none';
+            narratorVisible = true;
+            
+            // Auto-select random voice if none selected
+            if (currentVoicePersonality === 'random') {
+                randomizeVoice();
+            }
+        }
+    }
+    
+    /**
+     * [Sprint126_OneScan_21-40] Randomizes voice personality with rotation protection
+     */
+    function randomizeVoice() {
+        const availableVoices = Object.keys(voicePersonalities);
+        
+        // Filter out recently used voices for better variety
+        const filteredVoices = availableVoices.filter(voice => 
+            !voiceRotationHistory.slice(-2).includes(voice)
+        );
+        
+        const voicesToChooseFrom = filteredVoices.length > 0 ? filteredVoices : availableVoices;
+        const selectedVoice = voicesToChooseFrom[Math.floor(Math.random() * voicesToChooseFrom.length)];
+        
+        changeVoice(selectedVoice);
+        
+        // Update rotation history
+        voiceRotationHistory.push(selectedVoice);
+        if (voiceRotationHistory.length > 4) {
+            voiceRotationHistory.shift();
+        }
+    }
+    
+    /**
+     * [Sprint126_OneScan_21-40] Changes active voice personality
+     */
+    function changeVoice(voiceKey) {
+        if (voiceKey === 'random') {
+            randomizeVoice();
+            return;
+        }
+        
+        console.log('[Sprint126_OneScan_21-40] Changing voice to:', voiceKey);
+        
+        currentVoicePersonality = voiceKey;
+        const voiceConfig = voicePersonalities[voiceKey];
+        
+        if (voiceConfig) {
+            // Update UI
+            document.getElementById('current-voice-name').textContent = voiceConfig.name;
+            document.getElementById('voice-avatar-circle').textContent = voiceConfig.avatar;
+            document.getElementById('voice-avatar-circle').style.background = voiceConfig.color;
+            document.getElementById('voice-select').value = voiceKey;
+            
+            // Update container styling
+            const container = document.querySelector('.narrator-container');
+            container.className = 'narrator-container voice-' + voiceKey.toLowerCase();
+            
+            // Show sample phrase
+            showNarration(voiceConfig.samplePhrase);
+        }
+    }
+    
+    /**
+     * [Sprint126_OneScan_21-40] Displays narration text with typewriter effect
+     */
+    function showNarration(text) {
+        const narrationElement = document.getElementById('narration-text');
+        narrationElement.classList.remove('typewriter-text');
+        narrationElement.textContent = '';
+        
+        // Typewriter effect
+        setTimeout(() => {
+            narrationElement.textContent = text;
+            narrationElement.classList.add('typewriter-text');
+        }, 100);
+    }
+    
+    /**
+     * [Sprint126_OneScan_21-40] Narrates current page content
+     */
+    async function narrateCurrentPage() {
+        console.log('[Sprint126_OneScan_21-40] Narrating current page');
+        
+        try {
+            // Get page title and main content
+            const pageTitle = document.title;
+            const mainContent = document.querySelector('main, .container, body')?.textContent || '';
+            const contentSample = mainContent.substring(0, 200).trim();
+            
+            const textToNarrate = `Page: ${pageTitle}. ${contentSample}...`;
+            
+            // Generate voice narration
+            const narration = await generateVoiceNarration(textToNarrate, currentVoicePersonality);
+            showNarration(narration.narratedText);
+            currentNarration = narration;
+            
+        } catch (error) {
+            console.error('[Sprint126_OneScan_21-40] Error narrating page:', error);
+            showNarration('Sorry, I had trouble reading this page.');
+        }
+    }
+    
+    /**
+     * [Sprint126_OneScan_21-40] Narrates selected text
+     */
+    async function narrateSelection() {
+        console.log('[Sprint126_OneScan_21-40] Narrating selection');
+        
+        try {
+            const selectedText = window.getSelection().toString().trim();
+            
+            if (!selectedText) {
+                showNarration('Please select some text first, then try again.');
+                return;
+            }
+            
+            // Generate voice narration
+            const narration = await generateVoiceNarration(selectedText, currentVoicePersonality);
+            showNarration(narration.narratedText);
+            currentNarration = narration;
+            
+        } catch (error) {
+            console.error('[Sprint126_OneScan_21-40] Error narrating selection:', error);
+            showNarration('Sorry, I had trouble reading the selected text.');
+        }
+    }
+    
+    /**
+     * [Sprint126_OneScan_21-40] Generates voice narration (mock API call)
+     */
+    async function generateVoiceNarration(text, personality) {
+        // Mock API call - in production would call VoiceNarratorService
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        const adaptedText = adaptTextToVoice(text, personality);
+        
+        return {
+            id: crypto.randomUUID(),
+            originalText: text,
+            narratedText: adaptedText,
+            voicePersonality: personality,
+            voiceName: voicePersonalities[personality]?.name || 'Unknown',
+            timestamp: new Date().toISOString(),
+            audioUrl: `/api/audio/narration/${crypto.randomUUID()}.mp3`,
+            shareImageUrl: `/api/images/share/${crypto.randomUUID()}.jpg`
+        };
+    }
+    
+    /**
+     * [Sprint126_OneScan_21-40] Adapts text to voice personality (client-side mock)
+     */
+    function adaptTextToVoice(text, personality) {
+        switch (personality) {
+            case 'buckwheat':
+                return `*in Buckwheat voice* ${text.replace(/r/g, 'w').replace(/R/g, 'W')}!`;
+            case 'forrestgump':
+                return `Mama always said... ${text}. That's all I got to say about that.`;
+            case 'rodneyDangerfield':
+                return `I tell ya... ${text}. *tugs at collar* No respect, I tell ya!`;
+            case 'diceclay':
+                return `Ohhhhhhh! ${text}! You know what I'm sayin'? Unbelievable!`;
+            case 'austinpowers':
+                return `Right then... ${text}. Yeah baby!`;
+            case 'dannydevito':
+                return `*gruff voice* Listen here, ${text}. Capisce?`;
+            default:
+                return text;
+        }
+    }
+    
+    /**
+     * [Sprint126_OneScan_21-40] Shares narration to Instagram with Service-Atlanta watermark
+     */
+    async function shareNarration() {
+        if (!currentNarration) {
+            showNarration('Please generate a narration first before sharing.');
+            return;
+        }
+        
+        console.log('[Sprint126_OneScan_21-40] Sharing narration to Instagram');
+        
+        try {
+            // Generate share text with Service-Atlanta branding
+            const shareText = `🎭 Voice Narration by ${currentNarration.voiceName}\n\n` +
+                             `"${currentNarration.narratedText}"\n\n` +
+                             `#ServiceAtlanta #VoiceAI #${currentNarration.voicePersonality} #TechSupport`;
+            
+            if (navigator.share) {
+                await navigator.share({
+                    title: 'Service-Atlanta Voice Narration',
+                    text: shareText,
+                    url: currentNarration.shareImageUrl
+                });
+            } else {
+                // Fallback: copy to clipboard
+                await navigator.clipboard.writeText(shareText);
+                showNarration('Narration copied to clipboard! Paste it on Instagram.');
+            }
+            
+        } catch (error) {
+            console.error('[Sprint126_OneScan_21-40] Error sharing narration:', error);
+            showNarration('Sorry, sharing failed. Please try again.');
+        }
+    }
+    
+    // [Sprint126_OneScan_21-40] Auto-initialize on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('[Sprint126_OneScan_21-40] Voice narrator initialized');
+        
+        // Initialize with random voice after delay
+        setTimeout(() => {
+            if (currentVoicePersonality === 'random') {
+                randomizeVoice();
+            }
+        }, 1000);
+    });
+    
+    // [Sprint126_OneScan_21-40] Global function for external triggers
+    window.triggerVoiceNarration = function(text, personality) {
+        if (!narratorVisible) {
+            toggleVoiceNarrator();
+        }
+        
+        if (personality && voicePersonalities[personality]) {
+            changeVoice(personality);
+        }
+        
+        setTimeout(() => {
+            generateVoiceNarration(text, currentVoicePersonality).then(narration => {
+                showNarration(narration.narratedText);
+                currentNarration = narration;
+            });
+        }, 500);
+    };
+</script>

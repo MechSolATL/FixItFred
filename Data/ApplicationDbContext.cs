@@ -216,6 +216,9 @@ namespace Data
         public DbSet<Revitalize.Models.RevitalizeTenant> RevitalizeTenants { get; set; } = null!;
         public DbSet<Revitalize.Models.RevitalizeServiceRequest> RevitalizeServiceRequests { get; set; } = null!;
         public DbSet<Revitalize.Models.RevitalizeTechnicianProfile> RevitalizeTechnicianProfiles { get; set; } = null!;
+        
+        // Sprint126 - OneScan Implementation: Patch & Lyra Banter Engine
+        public DbSet<BanterReplayEvent> BanterReplayEvents { get; set; } = null!;
         #endregion
 
         #region Fluent Table Mappings

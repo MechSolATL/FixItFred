@@ -1,0 +1,369 @@
+@*
+    [Sprint126_OneScan_01-20] Patch & Lyra Roast Overlay Component
+    Displays escalating duo banter with "Dino, look away..." functionality
+    Triggered by job fails, long diagnostics, checklist gaps, and user events
+    Features NYC-style clapbacks and Yo Mama pack responses
+*@
+
+@model dynamic
+
+<div id="patch-lyra-roast-overlay" class="roast-overlay" 
+     style="position: fixed; top: 20px; right: 20px; z-index: 10000; 
+            max-width: 400px; min-width: 300px; display: none;"
+     role="alert" aria-live="polite">
+    
+    <!-- [Sprint126_OneScan_01-20] Main roast container with escalation styling -->
+    <div class="roast-container" id="roast-container" 
+         style="background: linear-gradient(145deg, #2c3e50, #3498db); 
+                border-radius: 1rem; box-shadow: 0 8px 32px rgba(0,0,0,0.3); 
+                color: white; overflow: hidden; position: relative;
+                border: 2px solid #e74c3c; animation: roastPulse 0.5s ease-in-out;">
+        
+        <!-- [Sprint126_OneScan_01-20] Header with escalation indicator -->
+        <div class="roast-header" style="background: rgba(231, 76, 60, 0.9); padding: 0.75rem 1rem; 
+                                        display: flex; align-items: center; justify-content: between;">
+            <div class="roast-avatars" style="display: flex; align-items: center; gap: 0.5rem;">
+                <div class="patch-avatar" style="width: 32px; height: 32px; background: #f39c12; 
+                                                 border-radius: 50%; display: flex; align-items: center; 
+                                                 justify-content: center; font-weight: bold; font-size: 0.8rem;">
+                    P
+                </div>
+                <div class="lyra-avatar" style="width: 32px; height: 32px; background: #9b59b6; 
+                                                border-radius: 50%; display: flex; align-items: center; 
+                                                justify-content: center; font-weight: bold; font-size: 0.8rem;">
+                    L
+                </div>
+            </div>
+            
+            <div class="escalation-indicator" id="escalation-indicator" 
+                 style="background: #e74c3c; color: white; padding: 0.25rem 0.5rem; 
+                        border-radius: 1rem; font-size: 0.7rem; font-weight: bold;">
+                GENTLE
+            </div>
+            
+            <button type="button" class="close-roast" onclick="closeRoastOverlay()" 
+                    style="background: none; border: none; color: white; font-size: 1.2rem; 
+                           cursor: pointer; padding: 0.25rem;" aria-label="Close roast">
+                ×
+            </button>
+        </div>
+
+        <!-- [Sprint126_OneScan_01-20] Dino warning for spicy content -->
+        <div id="dino-warning" class="dino-warning" style="display: none; background: #f39c12; 
+                                                           color: white; padding: 0.5rem 1rem; 
+                                                           text-align: center; font-weight: bold; 
+                                                           animation: flashWarning 1s ease-in-out;">
+            🦕 DINO, LOOK AWAY! This is about to get spicy! 🌶️
+        </div>
+
+        <!-- [Sprint126_OneScan_01-20] Banter content area -->
+        <div class="roast-content" style="padding: 1rem;">
+            
+            <!-- Patch's line -->
+            <div class="patch-line" style="margin-bottom: 1rem;">
+                <div class="speaker-label" style="font-size: 0.8rem; color: #f39c12; 
+                                                 font-weight: bold; margin-bottom: 0.25rem;">
+                    PATCH:
+                </div>
+                <div id="patch-text" class="roast-text" 
+                     style="background: rgba(243, 156, 18, 0.2); padding: 0.75rem; 
+                            border-radius: 0.5rem; border-left: 3px solid #f39c12; 
+                            line-height: 1.4; font-size: 0.9rem; min-height: 2rem;">
+                    Loading roast...
+                </div>
+            </div>
+
+            <!-- Lyra's line -->
+            <div class="lyra-line">
+                <div class="speaker-label" style="font-size: 0.8rem; color: #9b59b6; 
+                                                 font-weight: bold; margin-bottom: 0.25rem;">
+                    LYRA:
+                </div>
+                <div id="lyra-text" class="roast-text" 
+                     style="background: rgba(155, 89, 182, 0.2); padding: 0.75rem; 
+                            border-radius: 0.5rem; border-left: 3px solid #9b59b6; 
+                            line-height: 1.4; font-size: 0.9rem; min-height: 2rem;">
+                    Loading response...
+                </div>
+            </div>
+        </div>
+
+        <!-- [Sprint126_OneScan_01-20] Action buttons -->
+        <div class="roast-actions" style="padding: 1rem; border-top: 1px solid rgba(255,255,255,0.2); 
+                                          display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            <button type="button" class="btn btn-sm btn-warning" onclick="escalateRoast()" 
+                    style="flex: 1; min-width: 80px; font-size: 0.8rem;">
+                🔥 Escalate
+            </button>
+            <button type="button" class="btn btn-sm btn-info" onclick="saveRoast()" 
+                    style="flex: 1; min-width: 80px; font-size: 0.8rem;">
+                💾 Save
+            </button>
+            <button type="button" class="btn btn-sm btn-success" onclick="shareRoast()" 
+                    style="flex: 1; min-width: 80px; font-size: 0.8rem;">
+                📤 Share
+            </button>
+        </div>
+
+        <!-- [Sprint126_OneScan_01-20] Trigger info footer -->
+        <div class="roast-trigger-info" style="background: rgba(0,0,0,0.3); padding: 0.5rem 1rem; 
+                                              font-size: 0.7rem; color: #bdc3c7;">
+            Trigger: <span id="trigger-type">Unknown</span> | 
+            Time: <span id="trigger-time">--:--</span> | 
+            Level: <span id="trigger-level">1</span>
+        </div>
+    </div>
+</div>
+
+<!-- [Sprint126_OneScan_01-20] CSS Animations -->
+<style>
+    @@keyframes roastPulse {
+        0% { transform: scale(0.8) translateX(100px); opacity: 0; }
+        50% { transform: scale(1.05) translateX(0); opacity: 0.8; }
+        100% { transform: scale(1) translateX(0); opacity: 1; }
+    }
+    
+    @@keyframes flashWarning {
+        0%, 100% { background: #f39c12; }
+        50% { background: #e74c3c; }
+    }
+    
+    @@keyframes escalationGlow {
+        0%, 100% { box-shadow: 0 0 5px rgba(231, 76, 60, 0.5); }
+        50% { box-shadow: 0 0 20px rgba(231, 76, 60, 0.8); }
+    }
+    
+    .roast-overlay.escalation-spicy .roast-container {
+        border-color: #e67e22;
+        animation: escalationGlow 2s infinite;
+    }
+    
+    .roast-overlay.escalation-savage .roast-container {
+        border-color: #e74c3c;
+        animation: escalationGlow 1s infinite;
+    }
+    
+    .roast-overlay.escalation-nuclear .roast-container {
+        border-color: #c0392b;
+        animation: escalationGlow 0.5s infinite;
+        background: linear-gradient(145deg, #8b0000, #dc143c) !important;
+    }
+    
+    /* Mobile responsiveness */
+    @@media (max-width: 768px) {
+        #patch-lyra-roast-overlay {
+            position: fixed !important;
+            top: 10px !important;
+            left: 10px !important;
+            right: 10px !important;
+            max-width: none !important;
+            min-width: auto !important;
+        }
+        
+        .roast-actions {
+            flex-direction: column !important;
+        }
+        
+        .roast-content {
+            padding: 0.75rem !important;
+        }
+    }
+</style>
+
+<!-- [Sprint126_OneScan_01-20] JavaScript functionality -->
+<script>
+    // [Sprint126_OneScan_01-20] Global roast overlay management
+    let currentRoastSession = null;
+    let roastEscalationLevel = 1;
+    let roastHistory = [];
+    
+    /**
+     * [Sprint126_OneScan_01-20] Displays roast overlay with banter content
+     * banterResponse - Response from PatchLyraBanterEngine
+     */
+    function showRoastOverlay(banterResponse) {
+        console.log('[Sprint126_OneScan_01-20] Showing roast overlay:', banterResponse);
+        
+        const overlay = document.getElementById('patch-lyra-roast-overlay');
+        const container = document.getElementById('roast-container');
+        
+        // Update content
+        document.getElementById('patch-text').textContent = banterResponse.patchLine || 'Patch: Well, that\'s interesting...';
+        document.getElementById('lyra-text').textContent = banterResponse.lyraLine || 'Lyra: Indeed, quite the development.';
+        
+        // Update escalation indicator
+        const escalationText = banterResponse.escalationLevel || 'GENTLE';
+        document.getElementById('escalation-indicator').textContent = escalationText.toUpperCase();
+        
+        // Update trigger info
+        document.getElementById('trigger-type').textContent = banterResponse.trigger || 'Unknown';
+        document.getElementById('trigger-time').textContent = new Date().toLocaleTimeString();
+        document.getElementById('trigger-level').textContent = banterResponse.escalationLevelNum || '1';
+        
+        // Show/hide Dino warning for spicy content
+        const dinoWarning = document.getElementById('dino-warning');
+        if (banterResponse.shouldDinoLookAway) {
+            dinoWarning.style.display = 'block';
+            setTimeout(() => {
+                dinoWarning.style.display = 'none';
+            }, 3000);
+        } else {
+            dinoWarning.style.display = 'none';
+        }
+        
+        // Apply escalation styling
+        overlay.className = 'roast-overlay escalation-' + (escalationText.toLowerCase());
+        
+        // Show overlay with animation
+        overlay.style.display = 'block';
+        container.style.animation = 'roastPulse 0.5s ease-in-out';
+        
+        // Store current session
+        currentRoastSession = banterResponse;
+        roastEscalationLevel = banterResponse.escalationLevelNum || 1;
+        roastHistory.push(banterResponse);
+        
+        // Auto-hide after 10 seconds unless escalation is high
+        if (roastEscalationLevel <= 2) {
+            setTimeout(() => {
+                if (overlay.style.display !== 'none') {
+                    closeRoastOverlay();
+                }
+            }, 10000);
+        }
+    }
+    
+    /**
+     * [Sprint126_OneScan_01-20] Closes the roast overlay
+     */
+    function closeRoastOverlay() {
+        console.log('[Sprint126_OneScan_01-20] Closing roast overlay');
+        
+        const overlay = document.getElementById('patch-lyra-roast-overlay');
+        overlay.style.display = 'none';
+        currentRoastSession = null;
+    }
+    
+    /**
+     * [Sprint126_OneScan_01-20] Escalates the current roast to next level
+     */
+    async function escalateRoast() {
+        if (!currentRoastSession) return;
+        
+        console.log('[Sprint126_OneScan_01-20] Escalating roast from level', roastEscalationLevel);
+        
+        try {
+            // Call backend to trigger escalated banter
+            const response = await fetch('/api/roast/escalate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    employeeId: currentRoastSession.employeeId || 'unknown',
+                    currentLevel: roastEscalationLevel,
+                    trigger: 'UserEscalation'
+                })
+            });
+            
+            if (response.ok) {
+                const escalatedBanter = await response.json();
+                showRoastOverlay(escalatedBanter);
+            }
+        } catch (error) {
+            console.error('[Sprint126_OneScan_01-20] Error escalating roast:', error);
+            
+            // Fallback escalation
+            const escalatedBanter = {
+                patchLine: "Patch: Oh, you want MORE? Buckle up buttercup!",
+                lyraLine: "Lyra: *cracks digital knuckles* Let's turn up the heat!",
+                escalationLevel: "SPICY",
+                escalationLevelNum: Math.min(roastEscalationLevel + 1, 5),
+                trigger: "UserEscalation",
+                shouldDinoLookAway: true
+            };
+            showRoastOverlay(escalatedBanter);
+        }
+    }
+    
+    /**
+     * [Sprint126_OneScan_01-20] Saves current roast to favorites
+     */
+    function saveRoast() {
+        if (!currentRoastSession) return;
+        
+        console.log('[Sprint126_OneScan_01-20] Saving roast to favorites');
+        
+        // Store in localStorage for now (would be database in production)
+        const savedRoasts = JSON.parse(localStorage.getItem('savedRoasts') || '[]');
+        savedRoasts.push({
+            ...currentRoastSession,
+            savedAt: new Date().toISOString()
+        });
+        localStorage.setItem('savedRoasts', JSON.stringify(savedRoasts));
+        
+        // Show confirmation
+        const saveBtn = event.target;
+        const originalText = saveBtn.textContent;
+        saveBtn.textContent = '✅ Saved!';
+        saveBtn.disabled = true;
+        
+        setTimeout(() => {
+            saveBtn.textContent = originalText;
+            saveBtn.disabled = false;
+        }, 2000);
+    }
+    
+    /**
+     * [Sprint126_OneScan_01-20] Shares roast (opens share dialog)
+     */
+    function shareRoast() {
+        if (!currentRoastSession) return;
+        
+        console.log('[Sprint126_OneScan_01-20] Sharing roast');
+        
+        const shareText = `🔥 Patch & Lyra Roast Session 🔥\n\n` +
+                         `Patch: ${currentRoastSession.patchLine}\n\n` +
+                         `Lyra: ${currentRoastSession.lyraLine}\n\n` +
+                         `Escalation Level: ${currentRoastSession.escalationLevel}\n` +
+                         `#ServiceAtlanta #PatchAndLyra #RoastSession`;
+        
+        if (navigator.share) {
+            navigator.share({
+                title: 'Patch & Lyra Roast Session',
+                text: shareText
+            });
+        } else {
+            // Fallback: copy to clipboard
+            navigator.clipboard.writeText(shareText).then(() => {
+                alert('Roast copied to clipboard! Share it wherever you want!');
+            });
+        }
+    }
+    
+    /**
+     * [Sprint126_OneScan_01-20] API function to trigger roast from external sources
+     */
+    window.triggerPatchLyraRoast = function(trigger, employeeId, context) {
+        console.log('[Sprint126_OneScan_01-20] External roast trigger:', trigger, employeeId);
+        
+        // Mock banter for immediate response (production would call backend)
+        const mockBanter = {
+            patchLine: "Patch: Well, well, well... what do we have here?",
+            lyraLine: "Lyra: Analyzing... yep, it's exactly what I thought.",
+            escalationLevel: "PLAYFUL",
+            escalationLevelNum: 2,
+            trigger: trigger,
+            employeeId: employeeId,
+            shouldDinoLookAway: false
+        };
+        
+        showRoastOverlay(mockBanter);
+    };
+    
+    // [Sprint126_OneScan_01-20] Auto-trigger roast on page load for demo
+    document.addEventListener('DOMContentLoaded', function() {
+        // Uncomment for demo mode
+        // setTimeout(() => {
+        //     window.triggerPatchLyraRoast('PageLoad', 'demo-user', 'Demo context');
+        // }, 2000);
+    });
+</script>

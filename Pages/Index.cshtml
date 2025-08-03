@@ -36,9 +36,388 @@
     </div>
 </div>
 
+<!-- [Sprint126_OneScan_81-90] Lyra Search Integration for Homepage -->
+<div class="lyra-homepage-search" style="position: fixed; bottom: 30px; right: 30px; z-index: 1000;">
+    <!-- Lyra Logo with Pulse Animation -->
+    <div id="lyra-homepage-logo" class="lyra-logo-trigger" 
+         onclick="openHomepageLyraSearch()" 
+         style="width: 48px; height: 48px; background: linear-gradient(135deg, #00d4aa, #00ffc3); 
+                border-radius: 50%; display: flex; align-items: center; justify-content: center; 
+                cursor: pointer; box-shadow: 0 4px 16px rgba(0, 212, 170, 0.4); 
+                animation: lyraHeartbeat 2s infinite ease-in-out; margin-bottom: 1rem;"
+         title="Ask Lyra...">
+        <span style="font-size: 1.5rem; color: white;">🔍</span>
+    </div>
+    
+    <!-- Voice-Enabled Search Bar (Initially Hidden) -->
+    <div id="homepage-search-bar" class="homepage-search-bar" 
+         style="background: rgba(255, 255, 255, 0.95); border-radius: 2rem; 
+                padding: 1rem 1.5rem; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); 
+                backdrop-filter: blur(10px); border: 2px solid #00d4aa; 
+                min-width: 300px; display: none; margin-bottom: 1rem;
+                animation: searchBarSlideUp 0.3s ease-out;">
+        
+        <div class="search-input-container" style="position: relative;">
+            <input type="text" id="homepage-search-input" 
+                   placeholder="Ask Lyra about our services..." 
+                   onkeypress="handleHomepageSearch(event)"
+                   style="width: 100%; padding: 0.75rem 3rem 0.75rem 1rem; 
+                          border: none; background: transparent; font-size: 1rem; 
+                          color: #333; outline: none; font-family: 'Segoe UI', sans-serif;">
+            
+            <div class="search-actions" style="position: absolute; right: 0.5rem; top: 50%; 
+                                              transform: translateY(-50%); display: flex; gap: 0.25rem;">
+                <button type="button" id="voice-search-homepage" onclick="toggleHomepageVoiceSearch()" 
+                        style="background: none; border: none; color: #00d4aa; cursor: pointer; 
+                               padding: 0.25rem; border-radius: 0.25rem; font-size: 1.1rem;"
+                        title="Voice Search">
+                    🎤
+                </button>
+                <button type="button" onclick="executeHomepageSearch()" 
+                        style="background: none; border: none; color: #00d4aa; cursor: pointer; 
+                               padding: 0.25rem; border-radius: 0.25rem; font-size: 1.1rem;"
+                        title="Search">
+                    🔍
+                </button>
+            </div>
+        </div>
+        
+        <!-- Quick Service Suggestions -->
+        <div class="service-suggestions" style="margin-top: 0.75rem; display: flex; 
+                                                gap: 0.5rem; flex-wrap: wrap;">
+            <button type="button" class="service-suggestion-btn" onclick="searchService('plumbing')" 
+                    style="background: rgba(0, 212, 170, 0.1); border: 1px solid #00d4aa; 
+                           color: #00d4aa; padding: 0.25rem 0.75rem; border-radius: 1rem; 
+                           cursor: pointer; font-size: 0.8rem; transition: all 0.3s ease;">
+                🔧 Plumbing
+            </button>
+            <button type="button" class="service-suggestion-btn" onclick="searchService('hvac')" 
+                    style="background: rgba(0, 212, 170, 0.1); border: 1px solid #00d4aa; 
+                           color: #00d4aa; padding: 0.25rem 0.75rem; border-radius: 1rem; 
+                           cursor: pointer; font-size: 0.8rem; transition: all 0.3s ease;">
+                🌡️ HVAC
+            </button>
+            <button type="button" class="service-suggestion-btn" onclick="searchService('filtration')" 
+                    style="background: rgba(0, 212, 170, 0.1); border: 1px solid #00d4aa; 
+                           color: #00d4aa; padding: 0.25rem 0.75rem; border-radius: 1rem; 
+                           cursor: pointer; font-size: 0.8rem; transition: all 0.3s ease;">
+                💧 Water Filtration
+            </button>
+            <button type="button" class="service-suggestion-btn" onclick="searchService('emergency')" 
+                    style="background: rgba(255, 107, 107, 0.1); border: 1px solid #ff6b6b; 
+                           color: #ff6b6b; padding: 0.25rem 0.75rem; border-radius: 1rem; 
+                           cursor: pointer; font-size: 0.8rem; transition: all 0.3s ease;">
+                🚨 Emergency
+            </button>
+        </div>
+        
+        <!-- Close search bar -->
+        <button type="button" onclick="closeHomepageSearchBar()" 
+                style="position: absolute; top: -8px; right: -8px; width: 20px; height: 20px; 
+                       border-radius: 50%; background: #ff6b6b; border: none; color: white; 
+                       cursor: pointer; font-size: 0.7rem; display: flex; 
+                       align-items: center; justify-content: center;">
+            ×
+        </button>
+    </div>
+</div>
+
 <!-- Modal Loads Here -->
 <div id="modalHost"></div>
 
 @section Scripts {
     <script src="/js/modal.js"></script>
+    
+    <!-- [Sprint126_OneScan_81-90] Homepage Lyra Search Scripts -->
+    <script>
+        // [Sprint126_OneScan_81-90] Homepage search state
+        let homepageSearchVisible = false;
+        let homepageVoiceActive = false;
+        let homepageRecognition = null;
+        
+        /**
+         * [Sprint126_OneScan_81-90] Opens homepage Lyra search bar
+         */
+        function openHomepageLyraSearch() {
+            console.log('[Sprint126_OneScan_81-90] Opening homepage Lyra search');
+            
+            const searchBar = document.getElementById('homepage-search-bar');
+            const logo = document.getElementById('lyra-homepage-logo');
+            
+            if (!homepageSearchVisible) {
+                searchBar.style.display = 'block';
+                searchBar.style.animation = 'searchBarSlideUp 0.3s ease-out';
+                homepageSearchVisible = true;
+                
+                // Focus search input
+                setTimeout(() => {
+                    document.getElementById('homepage-search-input').focus();
+                }, 300);
+                
+                // Log search open
+                console.log('[Sprint126_OneScan_81-90] Homepage search opened');
+            } else {
+                // If already open, focus input
+                document.getElementById('homepage-search-input').focus();
+            }
+        }
+        
+        /**
+         * [Sprint126_OneScan_81-90] Closes homepage search bar
+         */
+        function closeHomepageSearchBar() {
+            console.log('[Sprint126_OneScan_81-90] Closing homepage search bar');
+            
+            const searchBar = document.getElementById('homepage-search-bar');
+            searchBar.style.animation = 'searchBarSlideDown 0.3s ease-in';
+            
+            setTimeout(() => {
+                searchBar.style.display = 'none';
+                homepageSearchVisible = false;
+            }, 300);
+            
+            // Stop voice search if active
+            if (homepageVoiceActive) {
+                stopHomepageVoiceSearch();
+            }
+        }
+        
+        /**
+         * [Sprint126_OneScan_81-90] Handles search input on homepage
+         */
+        function handleHomepageSearch(event) {
+            if (event.key === 'Enter') {
+                executeHomepageSearch();
+            }
+        }
+        
+        /**
+         * [Sprint126_OneScan_81-90] Executes homepage search
+         */
+        function executeHomepageSearch() {
+            const searchInput = document.getElementById('homepage-search-input');
+            const query = searchInput.value.trim();
+            
+            if (!query) {
+                return;
+            }
+            
+            console.log('[Sprint126_OneScan_81-90] Executing homepage search:', query);
+            
+            // Open full Lyra search console with query
+            if (window.openLyraSearchConsole) {
+                window.openLyraSearchConsole('public', query);
+            } else {
+                // Fallback: show results in modal or navigate
+                alert(`Searching for: "${query}"\nThis would open the full Lyra search console.`);
+            }
+            
+            // Close homepage search bar
+            closeHomepageSearchBar();
+        }
+        
+        /**
+         * [Sprint126_OneScan_81-90] Toggles voice search on homepage
+         */
+        function toggleHomepageVoiceSearch() {
+            if (homepageVoiceActive) {
+                stopHomepageVoiceSearch();
+            } else {
+                startHomepageVoiceSearch();
+            }
+        }
+        
+        /**
+         * [Sprint126_OneScan_81-90] Starts voice search on homepage
+         */
+        function startHomepageVoiceSearch() {
+            if (!('webkitSpeechRecognition' in window)) {
+                alert('Voice search is not supported in this browser.');
+                return;
+            }
+            
+            const voiceBtn = document.getElementById('voice-search-homepage');
+            voiceBtn.style.color = '#ff6b6b';
+            voiceBtn.style.animation = 'voicePulse 1s infinite ease-in-out';
+            homepageVoiceActive = true;
+            
+            homepageRecognition = new webkitSpeechRecognition();
+            homepageRecognition.continuous = false;
+            homepageRecognition.interimResults = false;
+            homepageRecognition.lang = 'en-US';
+            
+            homepageRecognition.onresult = function(event) {
+                const transcript = event.results[0][0].transcript;
+                document.getElementById('homepage-search-input').value = transcript;
+                executeHomepageSearch();
+                stopHomepageVoiceSearch();
+            };
+            
+            homepageRecognition.onerror = function(event) {
+                console.error('[Sprint126_OneScan_81-90] Homepage voice recognition error:', event.error);
+                stopHomepageVoiceSearch();
+            };
+            
+            homepageRecognition.onend = function() {
+                stopHomepageVoiceSearch();
+            };
+            
+            homepageRecognition.start();
+            
+            // Auto-stop after 10 seconds
+            setTimeout(() => {
+                if (homepageVoiceActive) {
+                    stopHomepageVoiceSearch();
+                }
+            }, 10000);
+        }
+        
+        /**
+         * [Sprint126_OneScan_81-90] Stops voice search on homepage
+         */
+        function stopHomepageVoiceSearch() {
+            if (homepageRecognition) {
+                homepageRecognition.stop();
+                homepageRecognition = null;
+            }
+            
+            const voiceBtn = document.getElementById('voice-search-homepage');
+            voiceBtn.style.color = '#00d4aa';
+            voiceBtn.style.animation = '';
+            homepageVoiceActive = false;
+        }
+        
+        /**
+         * [Sprint126_OneScan_81-90] Searches for specific service
+         */
+        function searchService(serviceType) {
+            const serviceQueries = {
+                'plumbing': 'plumbing services near me',
+                'hvac': 'HVAC repair and maintenance',
+                'filtration': 'water filtration system installation',
+                'emergency': 'emergency service request'
+            };
+            
+            const query = serviceQueries[serviceType] || serviceType;
+            document.getElementById('homepage-search-input').value = query;
+            executeHomepageSearch();
+        }
+        
+        // [Sprint126_OneScan_81-90] Auto-close search bar on click outside
+        document.addEventListener('click', function(event) {
+            const searchBar = document.getElementById('homepage-search-bar');
+            const logo = document.getElementById('lyra-homepage-logo');
+            
+            if (homepageSearchVisible && 
+                !searchBar.contains(event.target) && 
+                !logo.contains(event.target)) {
+                closeHomepageSearchBar();
+            }
+        });
+        
+        // [Sprint126_OneScan_81-90] Service suggestion hover effects
+        document.addEventListener('DOMContentLoaded', function() {
+            const suggestionBtns = document.querySelectorAll('.service-suggestion-btn');
+            
+            suggestionBtns.forEach(btn => {
+                btn.addEventListener('mouseenter', function() {
+                    this.style.transform = 'scale(1.05)';
+                    this.style.boxShadow = '0 2px 8px rgba(0, 212, 170, 0.3)';
+                });
+                
+                btn.addEventListener('mouseleave', function() {
+                    this.style.transform = 'scale(1)';
+                    this.style.boxShadow = 'none';
+                });
+            });
+        });
+    </script>
+    
+    <!-- [Sprint126_OneScan_81-90] Homepage Search CSS Animations -->
+    <style>
+        @@keyframes lyraHeartbeat {
+            0%, 100% { 
+                transform: scale(1); 
+                box-shadow: 0 4px 16px rgba(0, 212, 170, 0.4); 
+            }
+            50% { 
+                transform: scale(1.1); 
+                box-shadow: 0 6px 24px rgba(0, 212, 170, 0.6); 
+            }
+        }
+        
+        @@keyframes searchBarSlideUp {
+            from { 
+                opacity: 0; 
+                transform: translateY(20px) scale(0.9); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0) scale(1); 
+            }
+        }
+        
+        @@keyframes searchBarSlideDown {
+            from { 
+                opacity: 1; 
+                transform: translateY(0) scale(1); 
+            }
+            to { 
+                opacity: 0; 
+                transform: translateY(20px) scale(0.9); 
+            }
+        }
+        
+        @@keyframes voicePulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+        
+        /* Logo hover effect */
+        .lyra-logo-trigger:hover {
+            transform: scale(1.1) !important;
+            box-shadow: 0 6px 24px rgba(0, 212, 170, 0.6) !important;
+        }
+        
+        /* Search bar responsive design */
+        @@media (max-width: 768px) {
+            .lyra-homepage-search {
+                position: fixed !important;
+                bottom: 20px !important;
+                right: 20px !important;
+                left: 20px !important;
+            }
+            
+            .homepage-search-bar {
+                min-width: auto !important;
+                width: 100% !important;
+            }
+            
+            .service-suggestions {
+                flex-direction: column !important;
+                gap: 0.25rem !important;
+            }
+            
+            .service-suggestion-btn {
+                text-align: left !important;
+                justify-content: flex-start !important;
+            }
+        }
+        
+        /* Focus states */
+        #homepage-search-input:focus {
+            box-shadow: 0 0 0 2px rgba(0, 212, 170, 0.3);
+        }
+        
+        /* Service suggestion animations */
+        .service-suggestion-btn {
+            transition: all 0.3s ease !important;
+        }
+        
+        .service-suggestion-btn:hover {
+            background: rgba(0, 212, 170, 0.2) !important;
+            border-color: #00ffc3 !important;
+            color: #00ffc3 !important;
+        }
+    </style>
 }

@@ -1,0 +1,836 @@
+@*
+    [Sprint126_OneScan_71-80] Universal Lyra Search Console Component
+    Logo-triggered drawer (click to open, idle close)
+    Dual mode: Public (larger UI) vs Internal (compact)
+    Logs to Logs/LyraSearchTrace.json for tracking and analytics
+*@
+
+@model dynamic
+
+<div id="lyra-search-console" class="lyra-search-console" 
+     style="position: fixed; top: 0; left: -400px; z-index: 10001; 
+            width: 400px; height: 100vh; transition: left 0.3s ease-in-out;"
+     role="search" aria-label="Lyra Search Console">
+    
+    <!-- [Sprint126_OneScan_71-80] Search console container -->
+    <div class="search-console-container" 
+         style="background: linear-gradient(180deg, #1a1a2e 0%, #16213e 50%, #0f0f23 100%); 
+                height: 100%; border-right: 3px solid #00d4aa; 
+                box-shadow: 5px 0 20px rgba(0, 212, 170, 0.3); 
+                color: white; overflow-y: auto; position: relative;">
+        
+        <!-- [Sprint126_OneScan_71-80] Search console header -->
+        <div class="search-header" style="padding: 1.5rem 1rem; border-bottom: 1px solid #00d4aa;">
+            <div class="search-header-content" style="display: flex; align-items: center; justify-content: between;">
+                <div class="lyra-branding" style="display: flex; align-items: center; gap: 0.75rem;">
+                    <div class="lyra-logo" style="width: 48px; height: 48px; background: #00d4aa; 
+                                              border-radius: 50%; display: flex; align-items: center; 
+                                              justify-content: center; font-weight: bold; 
+                                              animation: logoHeartbeat 2s infinite ease-in-out;">
+                        🔍
+                    </div>
+                    <div class="lyra-info">
+                        <h3 class="search-title" style="margin: 0; font-size: 1.2rem; color: #00d4aa;">
+                            Lyra Search
+                        </h3>
+                        <div class="search-mode" id="search-mode-indicator" 
+                             style="font-size: 0.8rem; color: #a0a0a0;">
+                            Internal Mode
+                        </div>
+                    </div>
+                </div>
+                
+                <button type="button" class="close-search" onclick="closeLyraSearch()" 
+                        style="background: none; border: 1px solid #00d4aa; color: #00d4aa; 
+                               padding: 0.5rem; border-radius: 0.25rem; cursor: pointer;">
+                    ✕
+                </button>
+            </div>
+        </div>
+
+        <!-- [Sprint126_OneScan_71-80] Smart search input area -->
+        <div class="search-input-area" style="padding: 1.5rem 1rem;">
+            
+            <!-- Voice search toggle -->
+            <div class="voice-search-toggle" style="margin-bottom: 1rem; text-align: center;">
+                <button type="button" id="voice-search-btn" onclick="toggleVoiceSearch()" 
+                        style="background: rgba(0, 212, 170, 0.2); border: 1px solid #00d4aa; 
+                               color: #00d4aa; padding: 0.5rem 1rem; border-radius: 1.5rem; 
+                               cursor: pointer; font-size: 0.9rem; transition: all 0.3s ease;">
+                    🎤 Voice Search
+                </button>
+            </div>
+
+            <!-- Main search input -->
+            <div class="search-input-container" style="position: relative; margin-bottom: 1rem;">
+                <input type="text" id="lyra-search-input" class="lyra-search-input" 
+                       placeholder="Ask Lyra..." onkeypress="handleSearchInput(event)" 
+                       oninput="handleSearchInputChange(event)"
+                       style="width: 100%; padding: 1rem 3rem 1rem 1rem; 
+                              background: rgba(255, 255, 255, 0.1); border: 1px solid #00d4aa; 
+                              border-radius: 0.5rem; color: white; font-size: 1rem; 
+                              font-family: 'Segoe UI', sans-serif; outline: none; 
+                              transition: all 0.3s ease;">
+                <button type="button" class="search-submit" onclick="executeSearch()" 
+                        style="position: absolute; right: 0.5rem; top: 50%; transform: translateY(-50%); 
+                               background: #00d4aa; border: none; color: white; padding: 0.5rem; 
+                               border-radius: 0.25rem; cursor: pointer;">
+                    🔍
+                </button>
+            </div>
+
+            <!-- Smart suggestions -->
+            <div class="smart-suggestions" id="smart-suggestions" 
+                 style="margin-bottom: 1rem; display: none;">
+                <div class="suggestions-header" style="font-size: 0.8rem; color: #a0a0a0; margin-bottom: 0.5rem;">
+                    Smart Suggestions:
+                </div>
+                <div class="suggestions-list" id="suggestions-list">
+                    <!-- Dynamic suggestions will be populated here -->
+                </div>
+            </div>
+
+            <!-- Quick filters -->
+            <div class="quick-filters" style="margin-bottom: 1rem;">
+                <div class="filters-header" style="font-size: 0.8rem; color: #a0a0a0; margin-bottom: 0.5rem;">
+                    Quick Filters:
+                </div>
+                <div class="filter-buttons" style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                    <button type="button" class="filter-btn" onclick="applyFilter('technicians')" 
+                            style="background: rgba(0, 212, 170, 0.2); border: 1px solid #00d4aa; 
+                                   color: #00d4aa; padding: 0.25rem 0.5rem; border-radius: 1rem; 
+                                   cursor: pointer; font-size: 0.8rem;">
+                        👷 Technicians
+                    </button>
+                    <button type="button" class="filter-btn" onclick="applyFilter('customers')" 
+                            style="background: rgba(0, 212, 170, 0.2); border: 1px solid #00d4aa; 
+                                   color: #00d4aa; padding: 0.25rem 0.5rem; border-radius: 1rem; 
+                                   cursor: pointer; font-size: 0.8rem;">
+                        👥 Customers
+                    </button>
+                    <button type="button" class="filter-btn" onclick="applyFilter('jobs')" 
+                            style="background: rgba(0, 212, 170, 0.2); border: 1px solid #00d4aa; 
+                                   color: #00d4aa; padding: 0.25rem 0.5rem; border-radius: 1rem; 
+                                   cursor: pointer; font-size: 0.8rem;">
+                        🔧 Jobs
+                    </button>
+                    <button type="button" class="filter-btn" onclick="applyFilter('reports')" 
+                            style="background: rgba(0, 212, 170, 0.2); border: 1px solid #00d4aa; 
+                                   color: #00d4aa; padding: 0.25rem 0.5rem; border-radius: 1rem; 
+                                   cursor: pointer; font-size: 0.8rem;">
+                        📊 Reports
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- [Sprint126_OneScan_71-80] Search results area -->
+        <div class="search-results" id="search-results" 
+             style="padding: 0 1rem 1rem 1rem; flex: 1;">
+            
+            <div class="results-header" style="margin-bottom: 1rem; display: none;" id="results-header">
+                <div class="results-count" id="results-count" 
+                     style="font-size: 0.9rem; color: #00d4aa;">
+                    <!-- Results count will be populated here -->
+                </div>
+            </div>
+
+            <div class="results-list" id="results-list">
+                <!-- Search results will be populated here -->
+            </div>
+
+            <!-- No results state -->
+            <div class="no-results" id="no-results" style="text-align: center; padding: 2rem; display: none;">
+                <div style="font-size: 2rem; margin-bottom: 1rem; opacity: 0.5;">🤖</div>
+                <div style="color: #a0a0a0; margin-bottom: 0.5rem;">No results found</div>
+                <div style="color: #666; font-size: 0.8rem;">Try adjusting your search terms or filters</div>
+            </div>
+        </div>
+
+        <!-- [Sprint126_OneScan_71-80] Search console footer -->
+        <div class="search-footer" style="padding: 1rem; border-top: 1px solid rgba(0, 212, 170, 0.3); 
+                                          background: rgba(0, 0, 0, 0.3);">
+            <div class="search-stats" style="display: flex; justify-content: between; align-items: center;">
+                <div class="last-search" id="last-search-time" style="font-size: 0.7rem; color: #666;">
+                    Ready to search
+                </div>
+                <div class="search-count" id="search-count" style="font-size: 0.7rem; color: #666;">
+                    0 searches today
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- [Sprint126_OneScan_71-80] Search console trigger (logo) -->
+<div id="lyra-search-trigger" class="lyra-search-trigger" 
+     style="position: fixed; top: 20px; left: 20px; z-index: 10000; 
+            width: 48px; height: 48px; background: #00d4aa; border-radius: 50%; 
+            display: flex; align-items: center; justify-content: center; 
+            cursor: pointer; box-shadow: 0 4px 16px rgba(0, 212, 170, 0.4); 
+            animation: logoHeartbeat 2s infinite ease-in-out; transition: all 0.3s ease;"
+     onclick="openLyraSearch()" title="Ask Lyra...">
+    <span style="font-size: 1.5rem; color: white;">🔍</span>
+</div>
+
+<!-- [Sprint126_OneScan_71-80] CSS Animations and Styling -->
+<style>
+    @@keyframes logoHeartbeat {
+        0%, 100% { 
+            transform: scale(1); 
+            box-shadow: 0 4px 16px rgba(0, 212, 170, 0.4); 
+        }
+        50% { 
+            transform: scale(1.1); 
+            box-shadow: 0 6px 24px rgba(0, 212, 170, 0.6); 
+        }
+    }
+    
+    @@keyframes searchSlideIn {
+        from { left: -400px; }
+        to { left: 0; }
+    }
+    
+    @@keyframes searchSlideOut {
+        from { left: 0; }
+        to { left: -400px; }
+    }
+    
+    @@keyframes resultFadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    /* Search input focus effects */
+    .lyra-search-input:focus {
+        border-color: #00ffc3 !important;
+        box-shadow: 0 0 10px rgba(0, 212, 170, 0.5) !important;
+    }
+    
+    /* Filter button hover effects */
+    .filter-btn:hover {
+        background: rgba(0, 212, 170, 0.4) !important;
+        transform: scale(1.05);
+    }
+    
+    /* Search result styling */
+    .search-result-item {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(0, 212, 170, 0.3);
+        border-radius: 0.5rem;
+        padding: 1rem;
+        margin-bottom: 0.75rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        animation: resultFadeIn 0.3s ease-out;
+    }
+    
+    .search-result-item:hover {
+        background: rgba(0, 212, 170, 0.1);
+        border-color: #00d4aa;
+        transform: translateX(5px);
+    }
+    
+    .search-result-title {
+        color: #00ffc3;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+    }
+    
+    .search-result-description {
+        color: #cccccc;
+        font-size: 0.9rem;
+        line-height: 1.4;
+    }
+    
+    .search-result-meta {
+        color: #666;
+        font-size: 0.8rem;
+        margin-top: 0.5rem;
+        display: flex;
+        justify-content: between;
+    }
+    
+    /* Voice search active state */
+    .voice-search-active {
+        background: rgba(255, 0, 0, 0.2) !important;
+        color: #ff6b6b !important;
+        border-color: #ff6b6b !important;
+        animation: voicePulse 1s infinite ease-in-out;
+    }
+    
+    @@keyframes voicePulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+    }
+    
+    /* Public mode styling */
+    .search-console-public {
+        width: 500px !important;
+    }
+    
+    .search-console-public .search-header {
+        padding: 2rem 1.5rem !important;
+    }
+    
+    .search-console-public .lyra-logo {
+        width: 64px !important;
+        height: 64px !important;
+    }
+    
+    .search-console-public .search-title {
+        font-size: 1.5rem !important;
+    }
+    
+    /* Responsive design */
+    @@media (max-width: 768px) {
+        #lyra-search-console {
+            width: 100vw !important;
+            left: -100vw !important;
+        }
+        
+        #lyra-search-console.open {
+            left: 0 !important;
+        }
+        
+        #lyra-search-trigger {
+            top: 10px !important;
+            left: 10px !important;
+            width: 40px !important;
+            height: 40px !important;
+        }
+        
+        #lyra-search-trigger span {
+            font-size: 1.2rem !important;
+        }
+    }
+</style>
+
+<!-- [Sprint126_OneScan_71-80] JavaScript functionality -->
+<script>
+    // [Sprint126_OneScan_71-80] Global search console state
+    let searchConsoleOpen = false;
+    let voiceSearchActive = false;
+    let currentSearchMode = 'internal'; // 'internal' or 'public'
+    let searchHistory = [];
+    let searchCount = 0;
+    let idleTimer = null;
+    let recognition = null;
+    
+    /**
+     * [Sprint126_OneScan_71-80] Opens Lyra search console
+     */
+    function openLyraSearch(mode = null) {
+        console.log('[Sprint126_OneScan_71-80] Opening Lyra search console');
+        
+        if (mode) {
+            setSearchMode(mode);
+        }
+        
+        const console = document.getElementById('lyra-search-console');
+        const trigger = document.getElementById('lyra-search-trigger');
+        
+        console.style.left = '0';
+        console.classList.add('open');
+        trigger.style.display = 'none';
+        searchConsoleOpen = true;
+        
+        // Focus search input
+        setTimeout(() => {
+            document.getElementById('lyra-search-input').focus();
+        }, 300);
+        
+        // Start idle timer
+        startIdleTimer();
+        
+        // Log search console open
+        logSearchActivity('console_opened', { mode: currentSearchMode });
+    }
+    
+    /**
+     * [Sprint126_OneScan_71-80] Closes Lyra search console
+     */
+    function closeLyraSearch() {
+        console.log('[Sprint126_OneScan_71-80] Closing Lyra search console');
+        
+        const console = document.getElementById('lyra-search-console');
+        const trigger = document.getElementById('lyra-search-trigger');
+        
+        console.style.left = '-400px';
+        console.classList.remove('open');
+        trigger.style.display = 'flex';
+        searchConsoleOpen = false;
+        
+        // Stop voice search if active
+        if (voiceSearchActive) {
+            stopVoiceSearch();
+        }
+        
+        // Clear idle timer
+        clearIdleTimer();
+        
+        // Log search console close
+        logSearchActivity('console_closed', { duration: Date.now() - searchConsoleOpenTime });
+    }
+    
+    /**
+     * [Sprint126_OneScan_71-80] Sets search mode (public vs internal)
+     */
+    function setSearchMode(mode) {
+        currentSearchMode = mode;
+        const console = document.getElementById('lyra-search-console');
+        const modeIndicator = document.getElementById('search-mode-indicator');
+        
+        if (mode === 'public') {
+            console.querySelector('.search-console-container').classList.add('search-console-public');
+            modeIndicator.textContent = 'Public Mode';
+            document.getElementById('lyra-search-input').placeholder = 'Ask Lyra about our services...';
+        } else {
+            console.querySelector('.search-console-container').classList.remove('search-console-public');
+            modeIndicator.textContent = 'Internal Mode';
+            document.getElementById('lyra-search-input').placeholder = 'Ask Lyra...';
+        }
+        
+        console.log('[Sprint126_OneScan_71-80] Search mode set to:', mode);
+    }
+    
+    /**
+     * [Sprint126_OneScan_71-80] Handles search input
+     */
+    function handleSearchInput(event) {
+        if (event.key === 'Enter') {
+            executeSearch();
+        }
+    }
+    
+    /**
+     * [Sprint126_OneScan_71-80] Handles search input changes for smart suggestions
+     */
+    function handleSearchInputChange(event) {
+        const query = event.target.value.trim();
+        
+        if (query.length > 2) {
+            showSmartSuggestions(query);
+        } else {
+            hideSmartSuggestions();
+        }
+        
+        // Reset idle timer
+        resetIdleTimer();
+    }
+    
+    /**
+     * [Sprint126_OneScan_71-80] Executes search query
+     */
+    async function executeSearch() {
+        const searchInput = document.getElementById('lyra-search-input');
+        const query = searchInput.value.trim();
+        
+        if (!query) {
+            return;
+        }
+        
+        console.log('[Sprint126_OneScan_71-80] Executing search:', query);
+        
+        // Show loading state
+        showSearchLoading();
+        
+        try {
+            // Log search query
+            logSearchActivity('search_executed', { 
+                query: query, 
+                mode: currentSearchMode,
+                timestamp: new Date().toISOString()
+            });
+            
+            // Add to search history
+            searchHistory.unshift(query);
+            if (searchHistory.length > 10) {
+                searchHistory.pop();
+            }
+            
+            // Increment search count
+            searchCount++;
+            updateSearchStats();
+            
+            // Execute search (mock implementation)
+            const results = await performSearch(query);
+            
+            // Display results
+            displaySearchResults(results);
+            
+        } catch (error) {
+            console.error('[Sprint126_OneScan_71-80] Search error:', error);
+            showSearchError();
+        }
+    }
+    
+    /**
+     * [Sprint126_OneScan_71-80] Performs the actual search (mock implementation)
+     */
+    async function performSearch(query) {
+        // Simulate API delay
+        await new Promise(resolve => setTimeout(resolve, 800));
+        
+        // Mock search results based on query
+        const mockResults = generateMockResults(query);
+        
+        return mockResults;
+    }
+    
+    /**
+     * [Sprint126_OneScan_71-80] Generates mock search results
+     */
+    function generateMockResults(query) {
+        const queryLower = query.toLowerCase();
+        
+        const allResults = [
+            {
+                id: 1,
+                title: 'Technician John Smith',
+                description: 'HVAC specialist with 5 years experience. Currently assigned to Zone 3.',
+                type: 'technician',
+                relevance: queryLower.includes('technician') || queryLower.includes('john') ? 0.9 : 0.3
+            },
+            {
+                id: 2,
+                title: 'Service Request #SR-2024-1001',
+                description: 'AC unit not cooling - Customer: Jane Doe, Address: 123 Main St',
+                type: 'service_request',
+                relevance: queryLower.includes('service') || queryLower.includes('job') ? 0.8 : 0.2
+            },
+            {
+                id: 3,
+                title: 'Customer Jane Doe',
+                description: 'Regular customer since 2020. Last service: AC maintenance on 01/15/2024',
+                type: 'customer',
+                relevance: queryLower.includes('customer') || queryLower.includes('jane') ? 0.9 : 0.1
+            },
+            {
+                id: 4,
+                title: 'Weekly Performance Report',
+                description: 'Technician performance metrics for week ending 01/20/2024',
+                type: 'report',
+                relevance: queryLower.includes('report') || queryLower.includes('performance') ? 0.8 : 0.1
+            },
+            {
+                id: 5,
+                title: 'Jenkins Build #1234',
+                description: 'MVP-Core deployment build completed successfully',
+                type: 'system',
+                relevance: queryLower.includes('jenkins') || queryLower.includes('build') ? 0.9 : 0.05
+            }
+        ];
+        
+        // Filter results based on current mode
+        let filteredResults = allResults;
+        if (currentSearchMode === 'public') {
+            filteredResults = allResults.filter(r => r.type !== 'system' && r.type !== 'report');
+        }
+        
+        // Sort by relevance and filter
+        return filteredResults
+            .filter(result => result.relevance > 0.3)
+            .sort((a, b) => b.relevance - a.relevance)
+            .slice(0, 5);
+    }
+    
+    /**
+     * [Sprint126_OneScan_71-80] Displays search results
+     */
+    function displaySearchResults(results) {
+        const resultsContainer = document.getElementById('results-list');
+        const resultsHeader = document.getElementById('results-header');
+        const resultsCount = document.getElementById('results-count');
+        const noResults = document.getElementById('no-results');
+        
+        if (results.length === 0) {
+            resultsContainer.innerHTML = '';
+            resultsHeader.style.display = 'none';
+            noResults.style.display = 'block';
+            return;
+        }
+        
+        // Show results header
+        resultsHeader.style.display = 'block';
+        noResults.style.display = 'none';
+        resultsCount.textContent = `${results.length} result${results.length !== 1 ? 's' : ''} found`;
+        
+        // Generate results HTML
+        resultsContainer.innerHTML = results.map(result => `
+            <div class="search-result-item" onclick="selectSearchResult(${result.id}, '${result.type}')">
+                <div class="search-result-title">${result.title}</div>
+                <div class="search-result-description">${result.description}</div>
+                <div class="search-result-meta">
+                    <span>Type: ${result.type.replace('_', ' ')}</span>
+                    <span>Relevance: ${Math.round(result.relevance * 100)}%</span>
+                </div>
+            </div>
+        `).join('');
+    }
+    
+    /**
+     * [Sprint126_OneScan_71-80] Shows smart suggestions
+     */
+    function showSmartSuggestions(query) {
+        const suggestionsContainer = document.getElementById('smart-suggestions');
+        const suggestionsList = document.getElementById('suggestions-list');
+        
+        // Generate suggestions based on query
+        const suggestions = generateSuggestions(query);
+        
+        if (suggestions.length > 0) {
+            suggestionsList.innerHTML = suggestions.map(suggestion => `
+                <div class="suggestion-item" onclick="applySuggestion('${suggestion}')" 
+                     style="background: rgba(0, 212, 170, 0.1); padding: 0.5rem; 
+                            border-radius: 0.25rem; margin-bottom: 0.25rem; 
+                            cursor: pointer; font-size: 0.9rem;">
+                    ${suggestion}
+                </div>
+            `).join('');
+            
+            suggestionsContainer.style.display = 'block';
+        }
+    }
+    
+    /**
+     * [Sprint126_OneScan_71-80] Hides smart suggestions
+     */
+    function hideSmartSuggestions() {
+        document.getElementById('smart-suggestions').style.display = 'none';
+    }
+    
+    /**
+     * [Sprint126_OneScan_71-80] Generates smart suggestions
+     */
+    function generateSuggestions(query) {
+        const queryLower = query.toLowerCase();
+        
+        const allSuggestions = [
+            'Show all technicians',
+            'Find service requests from today',
+            'List pending jobs',
+            'Customer service reports',
+            'Jenkins build status',
+            'Performance metrics',
+            'Recent updates'
+        ];
+        
+        return allSuggestions
+            .filter(suggestion => 
+                suggestion.toLowerCase().includes(queryLower) || 
+                queryLower.split(' ').some(word => suggestion.toLowerCase().includes(word))
+            )
+            .slice(0, 3);
+    }
+    
+    /**
+     * [Sprint126_OneScan_71-80] Applies suggestion to search input
+     */
+    function applySuggestion(suggestion) {
+        document.getElementById('lyra-search-input').value = suggestion;
+        hideSmartSuggestions();
+        executeSearch();
+    }
+    
+    /**
+     * [Sprint126_OneScan_71-80] Applies quick filter
+     */
+    function applyFilter(filterType) {
+        const filterQueries = {
+            'technicians': 'show all technicians',
+            'customers': 'list customers',
+            'jobs': 'find service requests',
+            'reports': 'performance reports'
+        };
+        
+        document.getElementById('lyra-search-input').value = filterQueries[filterType] || '';
+        executeSearch();
+    }
+    
+    /**
+     * [Sprint126_OneScan_71-80] Toggles voice search
+     */
+    function toggleVoiceSearch() {
+        if (voiceSearchActive) {
+            stopVoiceSearch();
+        } else {
+            startVoiceSearch();
+        }
+    }
+    
+    /**
+     * [Sprint126_OneScan_71-80] Starts voice search
+     */
+    function startVoiceSearch() {
+        if (!('webkitSpeechRecognition' in window)) {
+            alert('Voice search is not supported in this browser.');
+            return;
+        }
+        
+        const voiceBtn = document.getElementById('voice-search-btn');
+        voiceBtn.classList.add('voice-search-active');
+        voiceBtn.textContent = '🎤 Listening...';
+        voiceSearchActive = true;
+        
+        recognition = new webkitSpeechRecognition();
+        recognition.continuous = false;
+        recognition.interimResults = false;
+        recognition.lang = 'en-US';
+        
+        recognition.onresult = function(event) {
+            const transcript = event.results[0][0].transcript;
+            document.getElementById('lyra-search-input').value = transcript;
+            executeSearch();
+            stopVoiceSearch();
+        };
+        
+        recognition.onerror = function(event) {
+            console.error('[Sprint126_OneScan_71-80] Voice recognition error:', event.error);
+            stopVoiceSearch();
+        };
+        
+        recognition.onend = function() {
+            stopVoiceSearch();
+        };
+        
+        recognition.start();
+        
+        // Auto-stop after 10 seconds
+        setTimeout(() => {
+            if (voiceSearchActive) {
+                stopVoiceSearch();
+            }
+        }, 10000);
+    }
+    
+    /**
+     * [Sprint126_OneScan_71-80] Stops voice search
+     */
+    function stopVoiceSearch() {
+        if (recognition) {
+            recognition.stop();
+            recognition = null;
+        }
+        
+        const voiceBtn = document.getElementById('voice-search-btn');
+        voiceBtn.classList.remove('voice-search-active');
+        voiceBtn.textContent = '🎤 Voice Search';
+        voiceSearchActive = false;
+    }
+    
+    /**
+     * [Sprint126_OneScan_71-80] Logs search activity to LyraSearchTrace.json
+     */
+    function logSearchActivity(action, data) {
+        const logEntry = {
+            timestamp: new Date().toISOString(),
+            action: action,
+            data: data,
+            sessionId: generateSessionId(),
+            userAgent: navigator.userAgent,
+            mode: currentSearchMode
+        };
+        
+        // In production, this would make an API call to log to Logs/LyraSearchTrace.json
+        console.log('[Sprint126_OneScan_71-80] Logging search activity:', logEntry);
+        
+        // Store in localStorage for demo purposes
+        const existingLogs = JSON.parse(localStorage.getItem('lyraSearchTrace') || '[]');
+        existingLogs.push(logEntry);
+        
+        // Keep only last 100 entries
+        if (existingLogs.length > 100) {
+            existingLogs.splice(0, existingLogs.length - 100);
+        }
+        
+        localStorage.setItem('lyraSearchTrace', JSON.stringify(existingLogs));
+    }
+    
+    // [Sprint126_OneScan_71-80] Helper functions
+    
+    function showSearchLoading() {
+        document.getElementById('results-list').innerHTML = `
+            <div style="text-align: center; padding: 2rem; color: #00d4aa;">
+                <div style="font-size: 2rem; margin-bottom: 1rem;">🔍</div>
+                <div>Searching...</div>
+            </div>
+        `;
+    }
+    
+    function showSearchError() {
+        document.getElementById('results-list').innerHTML = `
+            <div style="text-align: center; padding: 2rem; color: #ff6b6b;">
+                <div style="font-size: 2rem; margin-bottom: 1rem;">⚠️</div>
+                <div>Search error occurred</div>
+            </div>
+        `;
+    }
+    
+    function selectSearchResult(id, type) {
+        console.log('[Sprint126_OneScan_71-80] Selected result:', id, type);
+        logSearchActivity('result_selected', { resultId: id, resultType: type });
+        
+        // In production, would navigate to the appropriate page
+        alert(`Selected ${type} with ID ${id}`);
+    }
+    
+    function updateSearchStats() {
+        document.getElementById('search-count').textContent = `${searchCount} search${searchCount !== 1 ? 'es' : ''} today`;
+        document.getElementById('last-search-time').textContent = `Last search: ${new Date().toLocaleTimeString()}`;
+    }
+    
+    function generateSessionId() {
+        return 'lyra_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    }
+    
+    // [Sprint126_OneScan_71-80] Idle timer management
+    
+    let searchConsoleOpenTime = 0;
+    
+    function startIdleTimer() {
+        searchConsoleOpenTime = Date.now();
+        idleTimer = setTimeout(() => {
+            if (searchConsoleOpen) {
+                logSearchActivity('idle_close', { idleDuration: 30000 });
+                closeLyraSearch();
+            }
+        }, 30000); // 30 seconds idle timeout
+    }
+    
+    function resetIdleTimer() {
+        clearIdleTimer();
+        startIdleTimer();
+    }
+    
+    function clearIdleTimer() {
+        if (idleTimer) {
+            clearTimeout(idleTimer);
+            idleTimer = null;
+        }
+    }
+    
+    // [Sprint126_OneScan_71-80] Initialize search console
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('[Sprint126_OneScan_71-80] Lyra Search Console initialized');
+        
+        // Auto-detect mode based on URL
+        if (window.location.pathname.includes('/public') || window.location.pathname === '/') {
+            setSearchMode('public');
+        } else {
+            setSearchMode('internal');
+        }
+    });
+    
+    // [Sprint126_OneScan_71-80] Global functions for external triggers
+    window.openLyraSearchConsole = function(mode, query) {
+        openLyraSearch(mode);
+        
+        if (query) {
+            setTimeout(() => {
+                document.getElementById('lyra-search-input').value = query;
+                executeSearch();
+            }, 400);
+        }
+    };
+</script>
