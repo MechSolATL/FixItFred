@@ -1,0 +1,319 @@
+@page
+@model Pages.Admin.ReplaySummaryDashboardModel
+@{
+    ViewData["Title"] = "Replay Summary Dashboard - Omega Sweep";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="display-6 text-primary">
+                    🔄 Replay Summary Dashboard
+                    <small class="text-muted fs-6">[OmegaSweep_Auto]</small>
+                </h1>
+                <div class="badge bg-success">
+                    Last Updated: @DateTime.UtcNow.ToString("MMM dd, yyyy HH:mm")
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter Controls -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <form method="get" class="row g-3 align-items-end">
+                        <div class="col-md-3">
+                            <label for="DateRange" class="form-label">Date Range (Days)</label>
+                            <select class="form-select" asp-for="DateRange" id="DateRange">
+                                <option value="7">Last 7 Days</option>
+                                <option value="30">Last 30 Days</option>
+                                <option value="90">Last 90 Days</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="PersonaFilter" class="form-label">Persona Type</label>
+                            <select class="form-select" asp-for="PersonaFilter" id="PersonaFilter">
+                                <option value="All">All Personas</option>
+                                <option value="Customer Service">Customer Service</option>
+                                <option value="Technical Support">Technical Support</option>
+                                <option value="Emergency Response">Emergency Response</option>
+                                <option value="Sales Support">Sales Support</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-filter"></i> Apply Filters
+                            </button>
+                        </div>
+                        <div class="col-md-3">
+                            <form method="post" style="display: inline;">
+                                <button type="submit" asp-page-handler="Export" class="btn btn-success">
+                                    <i class="fas fa-download"></i> Export CSV
+                                </button>
+                            </form>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (!string.IsNullOrEmpty(Model.ExportMessage))
+    {
+        <div class="row mb-3">
+            <div class="col-12">
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="fas fa-check-circle"></i> @Model.ExportMessage
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Persona Analytics Summary -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-line"></i> Persona Empathy Analytics
+                    </h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.PersonaAnalytics.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Persona Type</th>
+                                        <th>Current Score</th>
+                                        <th>Previous Score</th>
+                                        <th>Change</th>
+                                        <th>Test Count</th>
+                                        <th>Pass Rate</th>
+                                        <th>Last Updated</th>
+                                        <th>Trend</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var analytic in Model.PersonaAnalytics)
+                                    {
+                                        var scoreClass = analytic.ScoreDifference > 0 ? "text-success" : 
+                                                        analytic.ScoreDifference < 0 ? "text-danger" : "text-muted";
+                                        var badgeClass = analytic.CurrentScore >= 85 ? "bg-success" : 
+                                                        analytic.CurrentScore >= 75 ? "bg-warning" : "bg-danger";
+                                        
+                                        <tr>
+                                            <td>
+                                                <strong>@analytic.PersonaType</strong>
+                                            </td>
+                                            <td>
+                                                <span class="badge @badgeClass">
+                                                    @analytic.CurrentScore.ToString("F1")
+                                                </span>
+                                            </td>
+                                            <td>@analytic.PreviousScore.ToString("F1")</td>
+                                            <td class="@scoreClass">
+                                                <strong>@analytic.ScoreDifference.ToString("+0.0;-0.0;0.0")</strong>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-info">@analytic.TestCount</span>
+                                            </td>
+                                            <td>@analytic.PassRate.ToString("F1")%</td>
+                                            <td class="text-muted">
+                                                @analytic.LastUpdated.ToString("MMM dd, HH:mm")
+                                            </td>
+                                            <td style="font-size: 1.2em;">
+                                                @analytic.TrendIndicator
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-4">
+                            <div class="text-muted">
+                                <i class="fas fa-chart-line fa-3x mb-3"></i>
+                                <p>No persona analytics data available for the selected filters.</p>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Trend Chart -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-area"></i> 7-Day Empathy Score Trends
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="empathyTrendChart" height="100"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Summary Stats -->
+    <div class="row">
+        @{
+            var avgScore = Model.PersonaAnalytics.Any() ? Model.PersonaAnalytics.Average(p => p.CurrentScore) : 0;
+            var totalTests = Model.PersonaAnalytics.Sum(p => p.TestCount);
+            var avgPassRate = Model.PersonaAnalytics.Any() ? Model.PersonaAnalytics.Average(p => p.PassRate) : 0;
+            var improvingCount = Model.PersonaAnalytics.Count(p => p.ScoreDifference > 0);
+        }
+        
+        <div class="col-md-3 mb-3">
+            <div class="card text-center bg-primary text-white">
+                <div class="card-body">
+                    <h3 class="display-6">@avgScore.ToString("F1")</h3>
+                    <p class="mb-0">Average Empathy Score</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="card text-center bg-success text-white">
+                <div class="card-body">
+                    <h3 class="display-6">@totalTests</h3>
+                    <p class="mb-0">Total Tests Run</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="card text-center bg-info text-white">
+                <div class="card-body">
+                    <h3 class="display-6">@avgPassRate.ToString("F1")%</h3>
+                    <p class="mb-0">Average Pass Rate</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="card text-center bg-warning text-white">
+                <div class="card-body">
+                    <h3 class="display-6">@improvingCount/@Model.PersonaAnalytics.Count</h3>
+                    <p class="mb-0">Improving Personas</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// [OmegaSweep_Auto] Empathy trend chart visualization
+document.addEventListener('DOMContentLoaded', function() {
+    const ctx = document.getElementById('empathyTrendChart').getContext('2d');
+    
+    const trendData = @Html.Raw(Json.Serialize(Model.TrendData));
+    const labels = trendData.map(d => new Date(d.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+    
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Customer Service',
+                    data: trendData.map(d => d.customerService),
+                    borderColor: 'rgb(75, 192, 192)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.1)',
+                    tension: 0.3
+                },
+                {
+                    label: 'Technical Support',
+                    data: trendData.map(d => d.technicalSupport),
+                    borderColor: 'rgb(255, 99, 132)',
+                    backgroundColor: 'rgba(255, 99, 132, 0.1)',
+                    tension: 0.3
+                },
+                {
+                    label: 'Emergency Response',
+                    data: trendData.map(d => d.emergencyResponse),
+                    borderColor: 'rgb(54, 162, 235)',
+                    backgroundColor: 'rgba(54, 162, 235, 0.1)',
+                    tension: 0.3
+                },
+                {
+                    label: 'Sales Support',
+                    data: trendData.map(d => d.salesSupport),
+                    borderColor: 'rgb(255, 206, 86)',
+                    backgroundColor: 'rgba(255, 206, 86, 0.1)',
+                    tension: 0.3
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Empathy Score Trends (Last 7 Days)'
+                },
+                legend: {
+                    position: 'top'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: false,
+                    min: 70,
+                    max: 100,
+                    title: {
+                        display: true,
+                        text: 'Empathy Score'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Date'
+                    }
+                }
+            }
+        }
+    });
+});
+</script>
+}
+
+<style>
+.card {
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    border: 1px solid rgba(0, 0, 0, 0.125);
+}
+
+.table td, .table th {
+    vertical-align: middle;
+}
+
+.badge {
+    font-size: 0.8em;
+}
+
+.display-6 small {
+    font-size: 0.5em;
+    vertical-align: super;
+}
+
+#empathyTrendChart {
+    max-height: 400px;
+}
+</style>

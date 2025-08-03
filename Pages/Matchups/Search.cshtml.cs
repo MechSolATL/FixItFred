@@ -34,7 +34,7 @@ namespace Pages.Matchups
             ViewData["Title"] = "Search Heat Pump Matchups";
             ViewData["Layout"] = "/Pages/Shared/_Layout.cshtml";
 
-            var seo = await _seoService.GetSeoByPageNameAsync("MatchupsSearch");
+            var seo = await _seoService.GetSeoMetaAsync("MatchupsSearch");
             if (seo != null)
             {
                 ViewData["MetaDescription"] = seo.MetaDescription;

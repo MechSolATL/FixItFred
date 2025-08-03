@@ -54,7 +54,7 @@ namespace Pages.Services
             }
 
             // SEO
-            var seo = await _seoService.GetSeoByPageNameAsync("Services/AirConditioning");
+            var seo = await _seoService.GetSeoMetaAsync("Services/AirConditioning");
             ViewData["Title"] = seo?.Title ?? "Air Conditioning Service Request";
             ViewData["MetaDescription"] = seo?.MetaDescription ?? "";
             ViewData["Keywords"] = seo?.Keywords ?? "";

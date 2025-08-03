@@ -22,7 +22,7 @@ namespace Pages.Tools
 
         public async Task OnGetAsync()
         {
-            var seo = await _seoService.GetSeoByPageNameAsync("Tools/HashPassword");
+            var seo = await _seoService.GetSeoMetaAsync("Tools/HashPassword");
             ViewData["Title"] = seo?.Title ?? "Hash Password";
             ViewData["MetaDescription"] = seo?.MetaDescription;
             ViewData["Keywords"] = seo?.Keywords;

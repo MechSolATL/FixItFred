@@ -40,7 +40,7 @@ namespace Pages
 
         public async Task OnGetAsync()
         {
-            var seo = await _seoService.GetSeoByPageNameAsync("Submit");
+            var seo = await _seoService.GetSeoMetaAsync("Submit");
             ViewData["Title"] = seo?.Title ?? "Submit Service Request";
             ViewData["MetaDescription"] = seo?.MetaDescription;
             ViewData["Keywords"] = seo?.Keywords;

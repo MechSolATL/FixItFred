@@ -22,7 +22,7 @@ namespace Pages
 
         public async Task OnGetAsync()
         {
-            var seo = await _seoService.GetSeoByPageNameAsync("AccessDenied");
+            var seo = await _seoService.GetSeoMetaAsync("AccessDenied");
             if (seo != null)
             {
                 ViewData["Title"] = seo.Title;

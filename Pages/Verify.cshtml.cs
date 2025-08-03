@@ -47,7 +47,7 @@ namespace Pages
 
         public async Task<IActionResult> OnGetAsync()
         {
-            var seo = await _seoService.GetSeoByPageNameAsync("Verify");
+            var seo = await _seoService.GetSeoMetaAsync("Verify");
             if (seo != null)
             {
                 ViewData["Title"] = seo.Title;

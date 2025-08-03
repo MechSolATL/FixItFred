@@ -13,7 +13,7 @@ namespace Pages.Shared
 
         public async Task OnGetAsync()
         {
-            var seo = await _seoService.GetSeoByPageNameAsync("ThankYou");
+            var seo = await _seoService.GetSeoMetaAsync("ThankYou");
             if (seo != null)
             {
                 ViewData["Title"] = seo.Title;

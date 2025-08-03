@@ -88,5 +88,21 @@ namespace Services.Reports
                 ComparisonData = new Dictionary<Guid, string>() // placeholder
             });
         }
+
+        // ✅ Overloaded method for controller compatibility
+        public async Task<byte[]> GenerateSingleReport(TechnicianProfileDto technician, byte[] chartImg, string? notes)
+        {
+            // TODO: Replace with actual PDF generation logic
+            var reportText = $"Technician Report for {technician.Name}\nNotes: {notes ?? "None"}\nChart included: {chartImg.Length > 0}";
+            return System.Text.Encoding.UTF8.GetBytes(reportText);
+        }
+
+        // ✅ Overloaded method for controller compatibility
+        public async Task<byte[]> GenerateComparisonReport(List<TechnicianProfileDto> technicians, List<byte[]> chartImgs, string? notes)
+        {
+            // TODO: Replace with actual PDF generation logic
+            var reportText = $"Comparison Report for {technicians.Count} technicians\nNotes: {notes ?? "None"}\nCharts included: {chartImgs.Count}";
+            return System.Text.Encoding.UTF8.GetBytes(reportText);
+        }
     }
 }

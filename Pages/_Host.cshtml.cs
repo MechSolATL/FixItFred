@@ -14,9 +14,9 @@ namespace Pages
 
         public async Task OnGetAsync()
         {
-            SeoMeta? SeoMeta = await _seoService.GetSeoByPageNameAsync("_Host");
+            SeoMeta? SeoMeta = await _seoService.GetSeoMetaAsync("_Host");
 
-            ViewData["Title"] = SeoMeta?.Title ?? "MechSol ATL – Developer Hub";
+            ViewData["Title"] = SeoMeta?.Title ?? "MechSol ATL ï¿½ Developer Hub";
             ViewData["MetaDescription"] = SeoMeta?.MetaDescription ?? "Developer hub for managing and testing service workflows.";
             ViewData["Keywords"] = SeoMeta?.Keywords ?? "Service Atlanta, Dev Tools, Workflow Testing";
             ViewData["Robots"] = SeoMeta?.Robots ?? "noindex, nofollow";

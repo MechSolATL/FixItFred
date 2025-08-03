@@ -60,7 +60,7 @@ namespace Pages.Services
             string details = string.Join("\n", SessionData.Answers.Select(static a =>
                 $"QID {a.Key}: {a.Value.Answer?.Trim()} (Answered at {a.Value.AnsweredAt:yyyy-MM-dd HH:mm:ss})"));
 
-            ServiceRequest serviceRequest = new()
+            Data.Models.ServiceRequest serviceRequest = new()
             {
                 CustomerName = SessionData.CustomerName,
                 Phone = SessionData.PhoneNumber,

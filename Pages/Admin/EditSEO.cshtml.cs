@@ -32,7 +32,7 @@ namespace Pages.Admin
         public async Task<IActionResult> OnGetAsync(int id)
         {
             ViewData["Title"] = "Edit SEO";
-            var meta = await _seoService.GetSeoByPageNameAsync("EditSEO");
+            var meta = await _seoService.GetSeoMetaAsync("EditSEO");
             ViewData["MetaDescription"] = meta?.MetaDescription;
             ViewData["Keywords"] = meta?.Keywords;
             ViewData["Robots"] = meta?.Robots;

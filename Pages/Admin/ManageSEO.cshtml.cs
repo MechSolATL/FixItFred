@@ -22,7 +22,7 @@ namespace MVP_Core.Pages.Admin
 
         public async Task OnGetAsync()
         {
-            var seo = await _seoService.GetSeoByPageNameAsync("Admin/ManageSEO");
+            var seo = await _seoService.GetSeoMetaAsync("Admin/ManageSEO");
             ViewData["Title"] = seo?.Title ?? "Manage SEO Metadata";
             ViewData["MetaDescription"] = seo?.MetaDescription ?? "Admin panel for managing SEO metadata.";
             ViewData["Keywords"] = seo?.Keywords;

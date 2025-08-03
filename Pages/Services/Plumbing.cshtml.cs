@@ -53,7 +53,7 @@ namespace Pages.Services
             }
 
             // SEO
-            var seo = await _seoService.GetSeoByPageNameAsync("Services/Plumbing");
+            var seo = await _seoService.GetSeoMetaAsync("Services/Plumbing");
             ViewData["Title"] = seo?.Title ?? "Plumbing Service Request";
             ViewData["MetaDescription"] = seo?.MetaDescription ?? "";
             ViewData["Keywords"] = seo?.Keywords ?? "";

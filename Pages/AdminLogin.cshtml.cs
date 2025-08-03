@@ -50,10 +50,10 @@ namespace Pages
         {
             // 🎯 Set Razor compliance ViewData + Layout
             ViewData["Title"] = "Admin Login";
-            Layout = "/Pages/Shared/_Layout.cshtml";
+            ViewData["Layout"] = "/Pages/Shared/_Layout.cshtml";
 
             // 🧠 Inject SEO metadata dynamically
-            Seo = await _seoService.GetSeoByPageNameAsync("AdminLogin");
+            Seo = await _seoService.GetSeoMetaAsync("AdminLogin");
             if (Seo != null)
             {
                 ViewData["Title"] = Seo.Title;

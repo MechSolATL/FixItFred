@@ -28,7 +28,7 @@ namespace Pages.Profile
 
         public async Task<IActionResult> OnGetAsync()
         {
-            var seo = await _seoService.GetSeoByPageNameAsync("Profile/ProfileReview");
+            var seo = await _seoService.GetSeoMetaAsync("Profile/ProfileReview");
             ViewData["Title"] = seo?.Title ?? "Profile Review";
             ViewData["MetaDescription"] = seo?.MetaDescription;
             ViewData["Keywords"] = seo?.Keywords;

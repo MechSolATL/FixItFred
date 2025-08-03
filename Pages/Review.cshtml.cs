@@ -23,7 +23,7 @@ namespace Pages
 
         public async Task OnGetAsync()
         {
-            var seo = await _seoService.GetSeoByPageNameAsync("Review");
+            var seo = await _seoService.GetSeoMetaAsync("Review");
             ViewData["Title"] = seo?.Title ?? "Review Your Answers";
             ViewData["MetaDescription"] = seo?.MetaDescription;
             ViewData["Keywords"] = seo?.Keywords;

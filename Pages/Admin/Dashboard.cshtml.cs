@@ -94,13 +94,14 @@ namespace Pages.Admin
                 AvgRebuildSuggestionsPerTech = _adminAnalyticsService.GetAvgRebuildSuggestionsPerTech()
             };
             // Sprint 91.22.5 - Patch Badge Visuals: Get current week's badge holders
-            var weekAgo = DateTime.UtcNow.AddDays(-7);
-            CurrentBadgeHolders = _context.TechnicianBadges
-                .Where(b => b.EarnedOn >= weekAgo)
-                .Join(_context.Technicians, b => b.TechnicianId, t => t.Id, (b, t) => new { t.FullName, Badge = b })
-                .OrderByDescending(x => x.Badge.EarnedOn)
-                .Select(x => (x.FullName, x.Badge))
-                .ToList();
+            // var weekAgo = DateTime.UtcNow.AddDays(-7);
+            // CurrentBadgeHolders = _context.TechnicianBadges
+            //     .Where(b => b.EarnedOn >= weekAgo)
+            //     .Join(_context.Technicians, b => b.TechnicianId, t => t.Id, (b, t) => new { t.FullName, Badge = b })
+            //     .OrderByDescending(x => x.Badge.EarnedOn)
+            //     .Select(x => (x.FullName, x.Badge))
+            //     .ToList();
+            CurrentBadgeHolders = new List<(string, TechnicianBadge)>(); // Placeholder until TechnicianBadges is implemented
         }
 
         public async Task<IActionResult> OnPostAcknowledgeAlertAsync(int alertId, string actionTaken)

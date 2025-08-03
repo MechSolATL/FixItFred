@@ -53,8 +53,8 @@ namespace Services.Admin
                     Outcome = item.Outcome,
                     Count = item.Count,
                     LastRecorded = item.LastRecorded,
-                    ErrorObject = item.ErrorObject,
-                    ServiceRequest = item.ServiceRequest
+                    ErrorObject = item.ErrorObject?.ToString() ?? "",
+                    ServiceRequest = item.ServiceRequest?.ToString() ?? ""
                 };
                 learningLogs.Add(log);
             }

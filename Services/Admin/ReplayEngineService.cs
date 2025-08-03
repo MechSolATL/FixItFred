@@ -25,7 +25,7 @@ namespace Services.Admin
         {
             _db = db;
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _userContext = userContext ?? new DefaultUserContext();
+            _userContext = userContext ?? throw new ArgumentNullException(nameof(userContext));
         }
 
         /// <summary>

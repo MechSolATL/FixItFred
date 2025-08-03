@@ -2,7 +2,7 @@ using Data.Models.Seo;
 
 namespace Services
 {
-    public class SeoService : ISeoService
+    public class SEOService : ISeoService
     {
         public Task<SeoMeta> GetSeoMetaAsync(string pageName)
         {

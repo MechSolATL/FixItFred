@@ -54,7 +54,7 @@ namespace Pages.Services
             }
 
             // SEO
-            var seo = await _seoService.GetSeoByPageNameAsync("Services/WaterFiltration");
+            var seo = await _seoService.GetSeoMetaAsync("Services/WaterFiltration");
             ViewData["Title"] = seo?.Title ?? "Water Filtration Service Request";
             ViewData["MetaDescription"] = seo?.MetaDescription ?? "";
             ViewData["Keywords"] = seo?.Keywords ?? "";

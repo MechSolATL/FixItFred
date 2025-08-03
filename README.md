@@ -211,6 +211,85 @@ Test project uses EF Core InMemory + xUnit. See /MVP_Core.Tests/README.md for us
 
 ---
 
+## **Omega Sweep Automation** 🔄
+
+### **Overview**
+Omega Sweep is an integrated automation system that validates empathy metrics, build integrity, and deployment readiness across the MVP-Core platform. It ensures that all changes maintain high empathy scores and technical quality standards.
+
+### **Features**
+- **Automated CI/CD Integration**: Triggers on pushes to `master`, `release/*` branches, or changes to `Revitalize/`, `CLI/`, `Tests/` directories
+- **Empathy Score Validation**: Tests empathy metrics with configurable thresholds
+- **Build Integrity Checks**: Validates compilation and dependency injection
+- **CLI Signal Testing**: Ensures CLI-to-Overlay communication
+- **Merge Protection**: Blocks merges on failed validations
+
+### **Usage**
+
+#### **Local Development CLI**
+```bash
+# Run full Omega Sweep validation
+./Tools/OmegaSweep/omega-sweep.sh run
+
+# Run empathy tests with custom threshold
+./Tools/OmegaSweep/omega-sweep.sh empathy --empathy-score-threshold=80.0
+
+# Generate empathy score report
+./Tools/OmegaSweep/omega-sweep.sh score-report
+
+# Test CLI signal (debugging)
+./Tools/OmegaSweep/omega-sweep.sh signal-test
+
+# Show all available options
+./Tools/OmegaSweep/omega-sweep.sh help
+```
+
+#### **Available CLI Options**
+- `--empathy-score-threshold=N`: Set minimum empathy score (default: 75.0)
+- `--verbose`: Enable detailed output
+- `--dry-run`: Show what would be executed without running
+- `--test-signal`: Test mode for CI signal validation
+
+#### **Git Hook Integration**
+The pre-commit hook automatically validates changes affecting Omega Sweep relevant files:
+```bash
+# Hook location
+.idea/hooks/pre-commit
+
+# Validates before each commit:
+# - Build compilation
+# - Empathy test results
+# - DI conflict detection
+```
+
+#### **GitHub Actions Workflow**
+The CI workflow (`.github/workflows/omega_sweep.yml`) automatically:
+1. Builds the project with error detection
+2. Runs empathy-categorized tests
+3. Checks for dependency injection conflicts
+4. Tests CLI-to-Overlay signal connectivity
+5. Generates empathy score differential reports
+6. Blocks merge if any validation fails
+
+### **Logging and Monitoring**
+- **Main Log**: `Logs/Revitalize_OmegaSweep_Log.md` - Detailed execution logs
+- **Run History**: `Logs/OmegaSweep_RunHistory.md` - Historical run tracking
+- **Empathy Reports**: Auto-generated score reports with trend analysis
+
+### **Merge Blocking Conditions**
+Omega Sweep will block merges if:
+- ❌ Any empathy test fails
+- ❌ Razor build errors detected  
+- ❌ Dependency injection conflicts found
+- ❌ CLI-to-Overlay signal test fails
+
+### **Admin Dashboard Integration**
+Access empathy analytics through the admin dashboard:
+- **Persona Analytics**: View empathy scores by persona type
+- **Trend Monitoring**: Track empathy improvements over time
+- **Compliance Reports**: Export data for compliance review
+
+---
+
 ## Legal Notice
 
 All code, designs, workflows, service structures, and business methods associated with Service-Atlanta.com and Mechanical Solutions Atlanta are protected under a Proprietary License.  

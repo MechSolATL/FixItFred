@@ -17,6 +17,10 @@ wwwroot/temp/
 !.copilot/
 !.copilot/project.json
 
+# [OmegaSweep_Auto] Include git hooks for local validation
+!.idea/hooks/
+!.idea/hooks/pre-commit
+
 # NuGet, Build, and Release folders
 artifacts/
 packages/
@@ -36,6 +40,17 @@ x64/
 x86/
 [Bb]uild/
 [Ll]ogs/
+
+# [OmegaSweep_Auto] Exclude Omega Sweep logs but keep structure
+Logs/*
+!Logs/.gitkeep
+!Logs/Revitalize_OmegaSweep_Log.md
+!Logs/OmegaSweep_RunHistory.md
+
+# [OmegaSweep_Auto] Exclude temporary CLI files
+Tools/OmegaSweep/temp/
+Tools/OmegaSweep/*.tmp
+Tools/OmegaSweep/logs/
 
 # Visual Studio
 .vs/
@@ -94,7 +109,7 @@ PublishScripts/
 tools/
 !tools/packages.config
 
-# Include any local data queries — optional
+# Include any local data queries ï¿½ optional
 /Data/SQLQuery1.sql
 /Data/SQLQuery2.sql
 /Data/SQLQuery3.sql

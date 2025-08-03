@@ -92,7 +92,7 @@ namespace Pages.Services
             {
                 string sessionId = HttpContext.Session.Id;
 
-                ServiceRequest newRequest = new()
+                Data.Models.ServiceRequest newRequest = new()
                 {
                     CustomerName = session.CustomerName,
                     Phone = session.PhoneNumber,

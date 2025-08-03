@@ -18,10 +18,10 @@ public interface IRevitalizeSeoService
 /// </summary>
 public class RevitalizeSeoService : IRevitalizeSeoService
 {
-    private readonly SeoService _baseSeoService;
+    private readonly SEOService _baseSeoService;
     private readonly IRevitalizeConfigService _configService;
 
-    public RevitalizeSeoService(SeoService baseSeoService, IRevitalizeConfigService configService)
+    public RevitalizeSeoService(SEOService baseSeoService, IRevitalizeConfigService configService)
     {
         _baseSeoService = baseSeoService;
         _configService = configService;

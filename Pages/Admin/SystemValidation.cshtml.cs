@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Data;
 using Data.Models;
 using AdminReplayEngineService = Services.Admin.ReplayEngineService;
+using AdminValidationSimulatorService = Services.Admin.ValidationSimulatorService;
 
 #pragma warning disable CS0618
 // [Sprint91_27] Nova hard patch — Timestamp — Warning suppression
@@ -16,9 +17,9 @@ namespace Pages.Admin
     public class SystemValidationModel : PageModel
     {
         private readonly ApplicationDbContext _db;
-        private readonly ValidationSimulatorService _simService;
+        private readonly AdminValidationSimulatorService _simService;
         private readonly AdminReplayEngineService _replayService;
-        public SystemValidationModel(ApplicationDbContext db, ValidationSimulatorService simService)
+        public SystemValidationModel(ApplicationDbContext db, AdminValidationSimulatorService simService)
         {
             _db = db;
             _simService = simService;

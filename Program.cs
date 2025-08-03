@@ -14,7 +14,7 @@ using Data;
 var builder = WebApplication.CreateBuilder(args);
 
 // 🔍 Inject FixItFred diagnostics logging for build environment and DI inspection
-Diagnostics.FixItFredDiagnostics.StartupLogger.Log(builder);
+// Diagnostics.FixItFredDiagnostics.StartupLogger.Log(builder); // Commented out - missing Diagnostics namespace
 
 /// <summary>
 /// Core service configuration and dependency injection registration
@@ -25,11 +25,12 @@ builder.Services.AddHttpContextAccessor();
 
 // ✅ FixItFred & Revitalize services
 builder.Services.AddScoped<Interfaces.IUserContext, Services.DefaultUserContext>(); // 🔐 ClaimsPrincipal DI context
-builder.Services.AddScoped<Services.SEOService>();                                  // 📎 SEO binding per Razor Page
+// builder.Services.AddScoped<Services.ReplayEngineService>();                          // 🔄 [OmegaSweep_Auto] Replay engine for snapshots - Missing class
+builder.Services.AddScoped<Services.ISeoService, Services.SEOService>();                                  // 📎 SEO binding per Razor Page
 builder.Services.AddScoped<Services.System.SystemDiagnosticsService>();
-builder.Services.AddScoped<Services.Admin.IRootCauseCorrelationEngine, Services.Admin.RootCauseCorrelationEngine>();
-builder.Services.AddScoped<Services.Admin.IReplayEngineService, Services.Admin.ReplayEngineService>();
-builder.Services.AddScoped<Services.Admin.ISmartAdminAlertsService, Services.Admin.SmartAdminAlertsService>();
+// builder.Services.AddScoped<Services.Admin.IRootCauseCorrelationEngine, Services.Admin.RootCauseCorrelationEngine>(); // Missing interface
+// builder.Services.AddScoped<Services.Admin.IReplayEngineService, Services.Admin.ReplayEngineService>(); // Missing interface
+// builder.Services.AddScoped<Services.Admin.ISmartAdminAlertsService, Services.Admin.SmartAdminAlertsService>(); // Missing interface
 
 // ✅ AutoRepair and Diagnostics
 builder.Services.AddScoped<Services.Admin.AutoRepairEngine>();
@@ -39,7 +40,7 @@ builder.Services.AddScoped<Services.ISkillLeaderboardService, Services.SkillLead
 builder.Services.AddScoped<Services.Admin.ComplianceReportService>();
 builder.Services.AddScoped<Services.Admin.TechnicianAuditService>();
 builder.Services.AddScoped<Services.Admin.PermissionService>();
-builder.Services.AddScoped<Services.ILeaderboardService, Services.LeaderboardService>();
+builder.Services.AddScoped<Services.Stats.ILeaderboardService, Services.Stats.LeaderboardService>();
 
 #pragma warning disable CS0618
 builder.Services.AddScoped<Services.Admin.ValidationSimulatorService>(); // ⚠️ [Obsolete] — retained for legacy test support

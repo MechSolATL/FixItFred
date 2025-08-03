@@ -1,5 +1,5 @@
 using Interfaces;
-using System.Security.Principal;
+using System.Security.Claims;
 
 namespace Services
 {
@@ -9,10 +9,17 @@ namespace Services
     /// </summary>
     public class DefaultUserContext : IUserContext
     {
+        private readonly IHttpContextAccessor _httpContextAccessor;
+
+        public DefaultUserContext(IHttpContextAccessor httpContextAccessor)
+        {
+            _httpContextAccessor = httpContextAccessor;
+        }
+
         /// <summary>
-        /// [Sprint123_FixItFred_OmegaSweep] Mock user principal for default context
+        /// [Sprint123_FixItFred_OmegaSweep] Gets current ClaimsPrincipal representing the authenticated user
         /// </summary>
-        public IPrincipal? User { get; } = new GenericPrincipal(new GenericIdentity("system"), new[] { "Admin" });
+        public ClaimsPrincipal? User => _httpContextAccessor.HttpContext?.User;
 
         /// <summary>
         /// [Sprint123_FixItFred_OmegaSweep] Gets current user identifier

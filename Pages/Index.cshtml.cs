@@ -24,8 +24,8 @@ namespace Pages
 
         public async Task OnGetAsync()
         {
-            SeoMeta? seoMeta = await _seoService.GetSeoByPageNameAsync("Home");
-            ViewData["Title"] = seoMeta?.Title ?? "Service Atlanta – Home";
+            SeoMeta? seoMeta = await _seoService.GetSeoMetaAsync("Home");
+            ViewData["Title"] = seoMeta?.Title ?? "Service Atlanta ï¿½ Home";
             ViewData["MetaDescription"] = seoMeta?.MetaDescription ?? "Your trusted pros for Plumbing, HVAC, and Water Filtration.";
             ViewData["Keywords"] = seoMeta?.Keywords ?? "plumbing, heating, air conditioning, tankless water heater, HVAC, Duluth";
             ViewData["Robots"] = seoMeta?.Robots ?? "index, follow";

@@ -24,7 +24,7 @@ namespace Pages.Admin.BlazorAdmin.Pages
 
         public async Task OnGetAsync()
         {
-            var seo = await _seoService.GetSeoByPageNameAsync("AuditLog");
+            var seo = await _seoService.GetSeoMetaAsync("AuditLog");
             ViewData["Title"] = seo?.Title ?? "Audit Log";
             ViewData["MetaDescription"] = seo?.MetaDescription;
             ViewData["Keywords"] = seo?.Keywords;
