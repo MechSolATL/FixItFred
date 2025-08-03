@@ -1,0 +1,209 @@
+@model Models.MentorModeToggleModel
+@inject Services.UserPerformanceLevelEngine PerformanceEngine
+
+@{
+    var mentorModeUnlocked = await PerformanceEngine.IsMentorModeUnlockedAsync(Model.UserId);
+    var userProfile = await PerformanceEngine.GetUserPerformanceProfileAsync(Model.UserId);
+}
+
+<div class="mentor-mode-toggle-container" data-user-id="@Model.UserId">
+    @if (mentorModeUnlocked)
+    {
+        <div class="card border-warning">
+            <div class="card-header bg-warning text-dark">
+                <h6 class="card-title mb-0">
+                    <i class="fas fa-user-graduate"></i>
+                    Mentor Mode
+                    <span class="badge badge-light ms-2">Expert Level</span>
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="mb-1">
+                            <strong>Guide team members and share expertise</strong>
+                        </p>
+                        <small class="text-muted">
+                            Available to Expert-level users for mentoring and training support
+                        </small>
+                    </div>
+                    <div class="form-check form-switch">
+                        <input 
+                            class="form-check-input mentor-mode-switch" 
+                            type="checkbox" 
+                            id="mentorModeSwitch" 
+                            @(userProfile.MentorModeEnabled ? "checked" : "")
+                            data-user-id="@Model.UserId">
+                        <label class="form-check-label" for="mentorModeSwitch">
+                            @(userProfile.MentorModeEnabled ? "Enabled" : "Disabled")
+                        </label>
+                    </div>
+                </div>
+                
+                @if (userProfile.MentorModeEnabled)
+                {
+                    <div class="mentor-features mt-3 pt-3 border-top">
+                        <h6 class="text-warning">
+                            <i class="fas fa-star"></i>
+                            Mentor Features Active
+                        </h6>
+                        <ul class="list-unstyled mb-0">
+                            <li class="mb-1">
+                                <i class="fas fa-check text-success"></i>
+                                Enhanced guidance overlays
+                            </li>
+                            <li class="mb-1">
+                                <i class="fas fa-check text-success"></i>
+                                Team performance insights
+                            </li>
+                            <li class="mb-1">
+                                <i class="fas fa-check text-success"></i>
+                                Advanced workflow shortcuts
+                            </li>
+                            <li class="mb-1">
+                                <i class="fas fa-check text-success"></i>
+                                Training assistance tools
+                            </li>
+                        </ul>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="card border-light">
+            <div class="card-body text-center">
+                <div class="text-muted">
+                    <i class="fas fa-lock fa-2x mb-3"></i>
+                    <h6>Mentor Mode</h6>
+                    <p class="mb-0">
+                        Reach Expert level to unlock mentoring capabilities
+                    </p>
+                    <small>
+                        Current level: <span class="badge badge-secondary">@(await PerformanceEngine.GetUserPerformanceLevelAsync(Model.UserId))</span>
+                    </small>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<style>
+    .mentor-mode-toggle-container {
+        max-width: 400px;
+    }
+
+    .form-check-input:checked {
+        background-color: #ffc107;
+        border-color: #ffc107;
+    }
+
+    .form-check-input:focus {
+        border-color: #ffcd39;
+        outline: 0;
+        box-shadow: 0 0 0 0.25rem rgba(255, 193, 7, 0.25);
+    }
+
+    .mentor-features {
+        background-color: rgba(255, 193, 7, 0.1);
+        border-radius: 0.375rem;
+        padding: 15px;
+        margin: 0 -15px;
+    }
+
+    .mentor-features ul li {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .card.border-warning {
+        box-shadow: 0 0.125rem 0.25rem rgba(255, 193, 7, 0.2);
+    }
+
+    @@media (max-width: 768px) {
+        .mentor-mode-toggle-container {
+            max-width: 100%;
+        }
+        
+        .d-flex.justify-content-between {
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .form-check.form-switch {
+            align-self: flex-start;
+        }
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const mentorModeSwitch = document.querySelector('.mentor-mode-switch');
+    
+    if (mentorModeSwitch) {
+        mentorModeSwitch.addEventListener('change', async function() {
+            const userId = this.dataset.userId;
+            const enabled = this.checked;
+            
+            try {
+                const response = await fetch('/api/mentor-mode/toggle', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+                    },
+                    body: JSON.stringify({
+                        userId: parseInt(userId),
+                        enabled: enabled
+                    })
+                });
+
+                if (response.ok) {
+                    // Update the label
+                    const label = this.nextElementSibling;
+                    label.textContent = enabled ? 'Enabled' : 'Disabled';
+                    
+                    // Show/hide mentor features
+                    const mentorFeatures = document.querySelector('.mentor-features');
+                    if (mentorFeatures) {
+                        mentorFeatures.style.display = enabled ? 'block' : 'none';
+                    }
+                    
+                    // Show success notification
+                    showNotification('Mentor Mode ' + (enabled ? 'enabled' : 'disabled') + ' successfully', 'success');
+                } else {
+                    // Revert the switch if the request failed
+                    this.checked = !enabled;
+                    showNotification('Failed to update Mentor Mode. Please try again.', 'error');
+                }
+            } catch (error) {
+                console.error('Error toggling mentor mode:', error);
+                this.checked = !enabled;
+                showNotification('An error occurred. Please try again.', 'error');
+            }
+        });
+    }
+    
+    function showNotification(message, type) {
+        // Create a simple notification (you can integrate with your existing notification system)
+        const notification = document.createElement('div');
+        notification.className = `alert alert-${type === 'success' ? 'success' : 'danger'} alert-dismissible fade show position-fixed`;
+        notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; max-width: 300px;';
+        notification.innerHTML = `
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        
+        document.body.appendChild(notification);
+        
+        // Auto-remove after 3 seconds
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.parentNode.removeChild(notification);
+            }
+        }, 3000);
+    }
+});
+</script>

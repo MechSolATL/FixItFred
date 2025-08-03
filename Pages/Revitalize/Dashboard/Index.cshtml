@@ -108,9 +108,66 @@
                                 <i class="fas fa-cogs"></i> Admin Panel
                             </a>
                         </div>
+                        <div class="col-md-3 mb-2">
+                            <a href="/revitalize/docs/manager-handbook" class="btn btn-outline-warning btn-block">
+                                <i class="fas fa-book"></i> Manager Handbook
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Lyra Adaptive Learning Features -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <div class="card border-primary">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-brain"></i>
+                        Lyra Adaptive Learning System
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted mb-3">
+                        Intelligent system that learns from user behavior patterns and adapts the interface to optimize workflow efficiency.
+                    </p>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6><i class="fas fa-chart-line text-primary"></i> Performance Tracking</h6>
+                            <ul class="list-unstyled mb-3">
+                                <li><i class="fas fa-check-circle text-success"></i> User skill level assessment</li>
+                                <li><i class="fas fa-check-circle text-success"></i> Workflow pattern analysis</li>
+                                <li><i class="fas fa-check-circle text-success"></i> Adaptive tip suppression</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6><i class="fas fa-lightbulb text-warning"></i> Smart Guidance</h6>
+                            <ul class="list-unstyled mb-3">
+                                <li><i class="fas fa-check-circle text-success"></i> Context-aware overlays</li>
+                                <li><i class="fas fa-check-circle text-success"></i> Personalized shortcuts</li>
+                                <li><i class="fas fa-check-circle text-success"></i> Muscle memory detection</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <a href="/revitalize/docs/manager-handbook" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-book"></i> View Documentation
+                        </a>
+                        <button class="btn btn-outline-secondary btn-sm" onclick="showLyraDemo()">
+                            <i class="fas fa-play"></i> Demo
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <!-- Mentor Mode Toggle Component -->
+            @{
+                var mentorToggleModel = new Models.MentorModeToggleModel { UserId = Model.CurrentUserId };
+            }
+            @await Html.PartialAsync("~/Pages/Shared/Components/MentorModeToggle.cshtml", mentorToggleModel)
         </div>
     </div>
 
@@ -178,6 +235,223 @@
         </div>
     </div>
 </div>
+
+<!-- Lyra Demo Modal -->
+<div class="modal fade" id="lyraDemo" tabindex="-1" aria-labelledby="lyraDemoLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="lyraDemoLabel">
+                    <i class="fas fa-brain"></i>
+                    Lyra Adaptive Learning Demo
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="text-center mb-4">
+                    <div class="demo-stage" id="demoStage">
+                        <div class="demo-screen active" id="stage1">
+                            <h4><i class="fas fa-user-plus text-primary"></i> New User Experience</h4>
+                            <p>When a new user starts using the system:</p>
+                            <div class="demo-tips">
+                                <div class="tip-example beginner">
+                                    <i class="fas fa-lightbulb"></i>
+                                    "Click here to create a new service request"
+                                </div>
+                                <div class="tip-example beginner">
+                                    <i class="fas fa-info-circle"></i>
+                                    "This button will save your progress"
+                                </div>
+                            </div>
+                            <small class="text-muted">System shows comprehensive guidance and tips</small>
+                        </div>
+                        
+                        <div class="demo-screen" id="stage2">
+                            <h4><i class="fas fa-chart-line text-info"></i> Learning in Progress</h4>
+                            <p>As the user becomes more familiar:</p>
+                            <div class="demo-tips">
+                                <div class="tip-example intermediate">
+                                    <i class="fas fa-keyboard"></i>
+                                    "Press Ctrl+N for quick access"
+                                </div>
+                            </div>
+                            <small class="text-muted">Tips become less frequent, shortcuts are introduced</small>
+                        </div>
+                        
+                        <div class="demo-screen" id="stage3">
+                            <h4><i class="fas fa-star text-warning"></i> Expert Level Reached</h4>
+                            <p>Expert users enjoy streamlined experience:</p>
+                            <div class="demo-tips">
+                                <div class="tip-example expert">
+                                    <i class="fas fa-user-graduate"></i>
+                                    "Mentor Mode Available"
+                                </div>
+                            </div>
+                            <small class="text-muted">Minimal interface, advanced features unlocked</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="demo-controls text-center">
+                    <button class="btn btn-sm btn-outline-primary" onclick="previousStage()" id="prevBtn" disabled>
+                        <i class="fas fa-arrow-left"></i> Previous
+                    </button>
+                    <span class="mx-3">
+                        <span id="currentStage">1</span> of 3
+                    </span>
+                    <button class="btn btn-sm btn-outline-primary" onclick="nextStage()" id="nextBtn">
+                        Next <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+                
+                <div class="mt-4 pt-3 border-top">
+                    <h6><i class="fas fa-cogs"></i> Key Features Demonstrated:</h6>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-check text-success"></i> Progressive tip reduction</li>
+                                <li><i class="fas fa-check text-success"></i> Skill level detection</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-check text-success"></i> Workflow adaptation</li>
+                                <li><i class="fas fa-check text-success"></i> Mentor mode unlocking</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <a href="/revitalize/docs/manager-handbook" class="btn btn-primary">
+                    <i class="fas fa-book"></i> Learn More
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .demo-stage {
+        min-height: 200px;
+        position: relative;
+    }
+    
+    .demo-screen {
+        display: none;
+        animation: fadeIn 0.5s ease-in-out;
+    }
+    
+    .demo-screen.active {
+        display: block;
+    }
+    
+    @@keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .tip-example {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 12px;
+        margin: 10px 0;
+        position: relative;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .tip-example.beginner {
+        border-left: 4px solid #007bff;
+        background: rgba(0, 123, 255, 0.05);
+    }
+    
+    .tip-example.intermediate {
+        border-left: 4px solid #17a2b8;
+        background: rgba(23, 162, 184, 0.05);
+    }
+    
+    .tip-example.expert {
+        border-left: 4px solid #ffc107;
+        background: rgba(255, 193, 7, 0.05);
+    }
+    
+    .demo-controls {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 8px;
+    }
+</style>
+
+<script>
+let currentDemoStage = 1;
+const totalStages = 3;
+
+function showLyraDemo() {
+    $('#lyraDemo').modal('show');
+    currentDemoStage = 1;
+    updateDemoDisplay();
+}
+
+function nextStage() {
+    if (currentDemoStage < totalStages) {
+        currentDemoStage++;
+        updateDemoDisplay();
+    }
+}
+
+function previousStage() {
+    if (currentDemoStage > 1) {
+        currentDemoStage--;
+        updateDemoDisplay();
+    }
+}
+
+function updateDemoDisplay() {
+    // Hide all stages
+    $('.demo-screen').removeClass('active');
+    
+    // Show current stage
+    $(`#stage${currentDemoStage}`).addClass('active');
+    
+    // Update counter
+    $('#currentStage').text(currentDemoStage);
+    
+    // Update button states
+    $('#prevBtn').prop('disabled', currentDemoStage === 1);
+    $('#nextBtn').prop('disabled', currentDemoStage === totalStages);
+    
+    if (currentDemoStage === totalStages) {
+        $('#nextBtn').html('<i class="fas fa-redo"></i> Restart').attr('onclick', 'restartDemo()');
+    } else {
+        $('#nextBtn').html('Next <i class="fas fa-arrow-right"></i>').attr('onclick', 'nextStage()');
+    }
+}
+
+function restartDemo() {
+    currentDemoStage = 1;
+    updateDemoDisplay();
+}
+
+// Auto-advance demo every 5 seconds when modal is open
+let demoInterval;
+$('#lyraDemo').on('shown.bs.modal', function () {
+    demoInterval = setInterval(function() {
+        if (currentDemoStage < totalStages) {
+            nextStage();
+        } else {
+            restartDemo();
+        }
+    }, 5000);
+});
+
+$('#lyraDemo').on('hidden.bs.modal', function () {
+    if (demoInterval) {
+        clearInterval(demoInterval);
+    }
+});
+</script>
 
 @* [Sprint124_FixItFred_EmpathyExpansion] Include empathy modal overlays *@
 @await Html.PartialAsync("_LyraEmpathyModal")

@@ -15,6 +15,11 @@ namespace Data.Models
         /// <summary>
         /// Represents a viewer role.
         /// </summary>
-        Viewer
+        Viewer,
+
+        /// <summary>
+        /// Represents a manager role.
+        /// </summary>
+        Manager
     }
 }

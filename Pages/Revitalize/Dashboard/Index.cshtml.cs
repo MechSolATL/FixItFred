@@ -73,6 +73,14 @@ public class IndexModel : PageModel
     public List<RevitalizeServiceRequest> RecentRequests { get; set; } = new();
 
     /// <summary>
+    /// Current user ID for personalized features like Mentor Mode
+    /// UX Trigger: Used by Lyra adaptive learning components
+    /// Model Connection: Retrieved from authenticated user context
+    /// Expected Outcome: Enables user-specific adaptive features
+    /// </summary>
+    public int CurrentUserId { get; set; }
+
+    /// <summary>
     /// Handles GET request for dashboard page load
     /// Aggregates metrics and recent data for display
     /// UX Trigger: Page load or dashboard refresh action
@@ -81,6 +89,9 @@ public class IndexModel : PageModel
     /// </summary>
     public async Task OnGetAsync()
     {
+        // Get current user ID (mock for demo purposes)
+        CurrentUserId = 1; // In production, this would come from User.Identity or claims
+        
         // Get dashboard metrics
         // In a real implementation, these would be filtered by current tenant
         var allRequests = await _serviceRequestService.GetServiceRequestsByTenantAsync(1); // Default tenant for demo

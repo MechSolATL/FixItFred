@@ -1,0 +1,170 @@
+@page "/revitalize/docs/manager-handbook"
+@model Pages.Revitalize.Docs.ManagerHandbookModel
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize(Roles="Manager")]
+@{
+    ViewData["Title"] = "Manager Handbook";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3">
+                    <i class="fas fa-book"></i>
+                    Manager Handbook
+                </h1>
+                <a href="/revitalize" class="btn btn-outline-primary">
+                    <i class="fas fa-arrow-left"></i>
+                    Back to Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-graduation-cap"></i>
+                        Lyra Adaptive Learning System Guide
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <!-- Markdown content will be rendered here -->
+                    <div id="markdown-content" class="markdown-content">
+                        @Html.Raw(Model.MarkdownContent)
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Performance Overview Card -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-chart-line"></i>
+                        Team Performance Overview
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <h4 class="text-primary">@Model.PerformanceStats.BeginnerCount</h4>
+                                <p class="text-muted">Beginner Users</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <h4 class="text-info">@Model.PerformanceStats.IntermediateCount</h4>
+                                <p class="text-muted">Intermediate Users</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <h4 class="text-success">@Model.PerformanceStats.ExpertCount</h4>
+                                <p class="text-muted">Expert Users</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <h4 class="text-warning">@Model.PerformanceStats.ActiveMentorCount</h4>
+                                <p class="text-muted">Active Mentors</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .markdown-content {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+        line-height: 1.6;
+        color: #333;
+    }
+
+    .markdown-content h1 {
+        border-bottom: 2px solid #eee;
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+    }
+
+    .markdown-content h2 {
+        margin-top: 30px;
+        margin-bottom: 15px;
+        color: #2c3e50;
+    }
+
+    .markdown-content h3 {
+        margin-top: 25px;
+        margin-bottom: 10px;
+        color: #34495e;
+    }
+
+    .markdown-content h4 {
+        margin-top: 20px;
+        margin-bottom: 8px;
+        color: #7f8c8d;
+    }
+
+    .markdown-content ul, .markdown-content ol {
+        margin-bottom: 15px;
+        padding-left: 20px;
+    }
+
+    .markdown-content li {
+        margin-bottom: 5px;
+    }
+
+    .markdown-content p {
+        margin-bottom: 15px;
+    }
+
+    .markdown-content code {
+        background-color: #f8f9fa;
+        padding: 2px 4px;
+        border-radius: 3px;
+        font-family: 'Courier New', monospace;
+    }
+
+    .markdown-content blockquote {
+        border-left: 4px solid #007bff;
+        padding-left: 15px;
+        margin: 20px 0;
+        font-style: italic;
+        color: #555;
+    }
+
+    .markdown-content table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 20px 0;
+    }
+
+    .markdown-content th,
+    .markdown-content td {
+        border: 1px solid #ddd;
+        padding: 8px 12px;
+        text-align: left;
+    }
+
+    .markdown-content th {
+        background-color: #f8f9fa;
+        font-weight: 600;
+    }
+
+    .markdown-content hr {
+        border: none;
+        border-top: 1px solid #eee;
+        margin: 30px 0;
+    }
+</style>
