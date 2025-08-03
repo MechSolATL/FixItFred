@@ -1,0 +1,600 @@
+@page
+@model Pages.Admin.ImpactFXManagerModel
+@{
+    ViewData["Title"] = "HeroFX Studio - Impact FX Manager";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+}
+
+@section Styles {
+    <link href="~/css/HeroFXAnimations.css" rel="stylesheet" />
+    <style>
+        .fx-preview-area {
+            border: 2px dashed #ccc;
+            border-radius: 10px;
+            padding: 50px;
+            text-align: center;
+            background: linear-gradient(45deg, #f8f9fa, #e9ecef);
+            min-height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .fx-control-panel {
+            background: #fff;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            padding: 25px;
+            margin: 20px 0;
+        }
+        
+        .effect-card {
+            border: 1px solid #dee2e6;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+            transition: all 0.3s ease;
+            background: #fff;
+        }
+        
+        .effect-card:hover {
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+        
+        .effect-card.premium {
+            border-left: 4px solid #ffd700;
+            background: linear-gradient(45deg, #fff, #fffaf0);
+        }
+        
+        .analytics-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 10px 0;
+        }
+        
+        .btn-fx {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .btn-fx:hover {
+            background: linear-gradient(45deg, #ee5a24, #ff6b6b);
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+        }
+        
+        .btn-fx-secondary {
+            background: linear-gradient(45deg, #74b9ff, #0984e3);
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-fx-secondary:hover {
+            background: linear-gradient(45deg, #0984e3, #74b9ff);
+            transform: scale(1.05);
+        }
+        
+        .kapow-meter {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+        
+        .progress-kapow {
+            height: 8px;
+            border-radius: 4px;
+            background: linear-gradient(90deg, #ff6b6b, #feca57, #48dbfb);
+        }
+        
+        .voice-fx-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            background: #00d084;
+            border-radius: 50%;
+            margin-left: 5px;
+            animation: pulse 1s infinite;
+        }
+        
+        @@keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .persona-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            margin: 2px;
+            background: #e9ecef;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .persona-badge.tech { background: #ff9ff3; }
+        .persona-badge.admin { background: #54a0ff; }
+        .persona-badge.csr { background: #5f27cd; color: white; }
+    </style>
+}
+
+<div class="container-fluid mt-4">
+    <!-- Page Header -->
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="display-4">🎨 HeroFX Studio</h1>
+                    <p class="lead text-muted">Take Control & Express Yourself - Create KAPOW moments!</p>
+                </div>
+                <div>
+                    @if (!Model.IsEffectsSeeded)
+                    {
+                        <form method="post" asp-page-handler="SeedDefaultEffects" class="d-inline">
+                            <button type="submit" class="btn btn-fx">🚀 Seed Default Effects</button>
+                        </form>
+                    }
+                    <button type="button" class="btn btn-fx-secondary" data-bs-toggle="modal" data-bs-target="#createEffectModal">
+                        ⚡ Create New Effect
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alert Messages -->
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <strong>Success!</strong> @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong>Error!</strong> @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="row">
+        <!-- Creative Panel UX -->
+        <div class="col-lg-8">
+            <div class="fx-control-panel">
+                <h3>🎭 Creative Panel UX</h3>
+                <p>Live preview of every effect - Build, test, deploy "KAPOW" moments</p>
+                
+                <!-- Preview Area -->
+                <div class="fx-preview-area" id="fx-preview">
+                    <div class="text-center">
+                        <h4>👆 Preview Area</h4>
+                        <p>Select an effect below to see it in action!</p>
+                        <div class="btn-group mb-3" role="group">
+                            <button type="button" class="btn btn-fx" onclick="previewRandomEffect()">🎲 Random Effect</button>
+                            <button type="button" class="btn btn-fx-secondary" onclick="toggleSound()">🔊 Sound</button>
+                            <button type="button" class="btn btn-fx-secondary" onclick="toggleVoice()">🎤 Voice</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Effect Controls -->
+                <div class="row mt-4">
+                    @foreach (var effect in Model.Effects.Where(e => e.IsActive))
+                    {
+                        <div class="col-md-6 col-lg-4 mb-3">
+                            <div class="effect-card @(effect.IsPremium ? "premium" : "")" data-effect="@effect.Name">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <h6 class="mb-0">@effect.DisplayName</h6>
+                                    @if (effect.IsPremium)
+                                    {
+                                        <span class="badge bg-warning">⭐ Premium</span>
+                                    }
+                                </div>
+                                
+                                <div class="mb-2">
+                                    <small class="text-muted">Duration: @effect.DurationMs ms</small>
+                                    @if (!string.IsNullOrEmpty(effect.VoiceType))
+                                    {
+                                        <span class="voice-fx-indicator" title="VoiceFX: @effect.VoiceType"></span>
+                                    }
+                                </div>
+                                
+                                <!-- Persona/Role Badges -->
+                                @if (!string.IsNullOrEmpty(effect.RoleAssignments))
+                                {
+                                    <div class="mb-2">
+                                        @foreach (var role in effect.RoleAssignments.Split(','))
+                                        {
+                                            <span class="persona-badge @role.ToLower().Trim()">@role.Trim()</span>
+                                        }
+                                    </div>
+                                }
+                                
+                                <div class="d-grid gap-2">
+                                    <button type="button" class="btn btn-sm btn-fx-secondary" onclick="previewEffect('@effect.Name')">
+                                        🎬 Preview
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="editEffect(@effect.Id)">
+                                        ⚙️ Edit
+                                    </button>
+                                </div>
+                                
+                                <!-- Usage Stats -->
+                                <div class="kapow-meter mt-2">
+                                    <small>KAPOW Ratio: @effect.KapowToClickRatio.ToString("F1")%</small>
+                                    <div class="progress mt-1" style="height: 4px;">
+                                        <div class="progress-bar progress-kapow" style="width: @Math.Min(effect.KapowToClickRatio, 100)%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Analytics & Control -->
+        <div class="col-lg-4">
+            <!-- Analytics Dashboard -->
+            @if (Model.AnalyticsData != null)
+            {
+                <div class="analytics-card">
+                    <h4>📊 KAPOW Analytics</h4>
+                    <div class="row text-center">
+                        <div class="col-6">
+                            <h3 class="mb-0">@(((dynamic)Model.AnalyticsData).Summary.TotalTriggers)</h3>
+                            <small>Total Triggers</small>
+                        </div>
+                        <div class="col-6">
+                            <h3 class="mb-0">@(((dynamic)Model.AnalyticsData).Summary.KapowToClickRatio.ToString("F1"))%</h3>
+                            <small>KAPOW-to-CLICKS</small>
+                        </div>
+                    </div>
+                    <hr style="border-color: rgba(255,255,255,0.3);">
+                    <div class="row text-center">
+                        <div class="col-6">
+                            <h5 class="mb-0">@(((dynamic)Model.AnalyticsData).Summary.SuccessRate.ToString("F1"))%</h5>
+                            <small>Success Rate</small>
+                        </div>
+                        <div class="col-6">
+                            <h5 class="mb-0">@(((dynamic)Model.AnalyticsData).Summary.ReactionsCount)</h5>
+                            <small>Reactions</small>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <!-- Dynamic Control Tools -->
+            <div class="fx-control-panel">
+                <h5>🎮 Dynamic Controls</h5>
+                
+                <div class="form-check form-switch mb-3">
+                    <input class="form-check-input" type="checkbox" id="randomizerToggle" @(Model.RandomizerEnabled ? "checked" : "")>
+                    <label class="form-check-label" for="randomizerToggle">🎲 Randomizer Mode</label>
+                </div>
+                
+                <div class="form-check form-switch mb-3">
+                    <input class="form-check-input" type="checkbox" id="soundToggle" @(Model.SoundEnabled ? "checked" : "")>
+                    <label class="form-check-label" for="soundToggle">🔊 Sound Effects</label>
+                </div>
+                
+                <div class="form-check form-switch mb-3">
+                    <input class="form-check-input" type="checkbox" id="voiceToggle" @(Model.VoiceEnabled ? "checked" : "")>
+                    <label class="form-check-label" for="voiceToggle">🎤 VoiceFX</label>
+                </div>
+                
+                <hr>
+                
+                <div class="d-grid gap-2">
+                    <button type="button" class="btn btn-fx" onclick="triggerDispatchEffect()">🚀 Trigger Dispatch</button>
+                    <button type="button" class="btn btn-fx-secondary" onclick="triggerPraiseEffect()">👏 Trigger Praise</button>
+                    <button type="button" class="btn btn-outline-warning" onclick="triggerGlitchEffect()">⚡ Trigger Glitch</button>
+                </div>
+            </div>
+
+            <!-- FX Pack Upsell -->
+            <div class="fx-control-panel" style="background: linear-gradient(45deg, #ffd700, #ffb347); color: #333;">
+                <h5>🎁 FX Pack Store</h5>
+                <p class="mb-2">Unlock premium effects!</p>
+                <ul class="list-unstyled">
+                    <li>🔥 Hype Pack - $9.99</li>
+                    <li>🎙️ Narrator Pack - $7.99</li>
+                    <li>🌟 Motion Pro - $14.99</li>
+                </ul>
+                <button class="btn btn-dark btn-sm">💎 Browse Packs</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create/Edit Effect Modal -->
+<div class="modal fade" id="createEffectModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form method="post" asp-page-handler="SaveEffect">
+                <div class="modal-header">
+                    <h5 class="modal-title">⚡ Create/Edit Effect</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" asp-for="Effect.Id" />
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="Effect.Name" class="form-label">Effect Name</label>
+                                <input asp-for="Effect.Name" class="form-control" placeholder="e.g., slam, pop, yeet" />
+                                <span asp-validation-for="Effect.Name" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="Effect.DisplayName" class="form-label">Display Name</label>
+                                <input asp-for="Effect.DisplayName" class="form-control" placeholder="e.g., SLAM!" />
+                                <span asp-validation-for="Effect.DisplayName" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="Effect.CssClass" class="form-label">CSS Class</label>
+                                <input asp-for="Effect.CssClass" class="form-control" placeholder="hero-fx-slam" />
+                                <span asp-validation-for="Effect.CssClass" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="Effect.DurationMs" class="form-label">Duration (ms)</label>
+                                <input asp-for="Effect.DurationMs" type="number" class="form-control" min="100" max="5000" />
+                                <span asp-validation-for="Effect.DurationMs" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label asp-for="Effect.TriggerEvents" class="form-label">Trigger Events (comma-separated)</label>
+                        <input asp-for="Effect.TriggerEvents" class="form-control" placeholder="dispatch, praise, success" />
+                        <small class="form-text text-muted">Events: dispatch, login, praise, success, error, warning, close, update</small>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="Effect.RoleAssignments" class="form-label">Role Assignments</label>
+                                <input asp-for="Effect.RoleAssignments" class="form-control" placeholder="Tech, CSR, Admin" />
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="Effect.BehaviorMoods" class="form-label">Behavior Moods</label>
+                                <input asp-for="Effect.BehaviorMoods" class="form-control" placeholder="calm, celebration, frustration" />
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="Effect.VoiceType" class="form-label">Voice Type</label>
+                                <select asp-for="Effect.VoiceType" class="form-select">
+                                    <option value="">None</option>
+                                    <option value="calm">Calm</option>
+                                    <option value="chaos">Chaos</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="Effect.FxPackCategory" class="form-label">FX Pack Category</label>
+                                <select asp-for="Effect.FxPackCategory" class="form-select">
+                                    <option value="">Standard</option>
+                                    <option value="hype">Hype Pack</option>
+                                    <option value="narrator">Narrator Pack</option>
+                                    <option value="motion pro">Motion Pro</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-check">
+                                <input asp-for="Effect.IsActive" class="form-check-input" />
+                                <label asp-for="Effect.IsActive" class="form-check-label">Active</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-check">
+                                <input asp-for="Effect.IsPremium" class="form-check-input" />
+                                <label asp-for="Effect.IsPremium" class="form-check-label">Premium</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-check">
+                                <input asp-for="Effect.IsMobileCompatible" class="form-check-input" />
+                                <label asp-for="Effect.IsMobileCompatible" class="form-check-label">Mobile Compatible</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-fx">💾 Save Effect</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/HeroFXEngine.js"></script>
+    <script>
+        // Global configuration
+        let soundEnabled = @Model.SoundEnabled.ToString().ToLower();
+        let voiceEnabled = @Model.VoiceEnabled.ToString().ToLower();
+        let randomizerEnabled = @Model.RandomizerEnabled.ToString().ToLower();
+        
+        // Preview functions
+        function previewEffect(effectName) {
+            const previewArea = document.getElementById('fx-preview');
+            HeroFXStudio.previewEffect(effectName, previewArea);
+            logReaction(effectName);
+        }
+        
+        function previewRandomEffect() {
+            fetch('/Admin/ImpactFXManager?handler=TriggerRandomEffect', {
+                method: 'POST',
+                headers: {
+                    'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value,
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    previewEffect(data.effectName);
+                    showToast(`Random effect: ${data.displayName}!`, 'success');
+                }
+            });
+        }
+        
+        // Context-specific triggers
+        function triggerDispatchEffect() {
+            previewEffect('slam');
+            if (voiceEnabled) {
+                HeroFXStudio.playVoice('KAPOW! Dispatch successful!', 'chaos');
+            }
+        }
+        
+        function triggerPraiseEffect() {
+            previewEffect('pop');
+            if (voiceEnabled) {
+                HeroFXStudio.playVoice('Great job!', 'calm');
+            }
+        }
+        
+        function triggerGlitchEffect() {
+            previewEffect('glitch');
+            if (voiceEnabled) {
+                HeroFXStudio.playVoice('System error detected!', 'calm');
+            }
+        }
+        
+        // Configuration toggles
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            HeroFXStudio.enableSound(soundEnabled);
+            document.getElementById('soundToggle').checked = soundEnabled;
+            showToast(`Sound ${soundEnabled ? 'enabled' : 'disabled'}`, 'info');
+        }
+        
+        function toggleVoice() {
+            voiceEnabled = !voiceEnabled;
+            HeroFXStudio.enableVoice(voiceEnabled);
+            document.getElementById('voiceToggle').checked = voiceEnabled;
+            showToast(`Voice ${voiceEnabled ? 'enabled' : 'disabled'}`, 'info');
+        }
+        
+        // Edit effect
+        function editEffect(effectId) {
+            fetch(`/Admin/ImpactFXManager?handler=Effect&id=${effectId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        populateEffectForm(data.effect);
+                        const modal = new bootstrap.Modal(document.getElementById('createEffectModal'));
+                        modal.show();
+                    }
+                });
+        }
+        
+        function populateEffectForm(effect) {
+            document.querySelector('input[name="Effect.Id"]').value = effect.id;
+            document.querySelector('input[name="Effect.Name"]').value = effect.name;
+            document.querySelector('input[name="Effect.DisplayName"]').value = effect.displayName;
+            document.querySelector('input[name="Effect.CssClass"]').value = effect.cssClass;
+            document.querySelector('input[name="Effect.DurationMs"]').value = effect.durationMs;
+            document.querySelector('input[name="Effect.TriggerEvents"]').value = effect.triggerEvents || '';
+            document.querySelector('input[name="Effect.RoleAssignments"]').value = effect.roleAssignments || '';
+            document.querySelector('input[name="Effect.BehaviorMoods"]').value = effect.behaviorMoods || '';
+            document.querySelector('select[name="Effect.VoiceType"]').value = effect.voiceType || '';
+            document.querySelector('select[name="Effect.FxPackCategory"]').value = effect.fxPackCategory || '';
+            document.querySelector('input[name="Effect.IsActive"]').checked = effect.isActive;
+            document.querySelector('input[name="Effect.IsPremium"]').checked = effect.isPremium;
+            document.querySelector('input[name="Effect.IsMobileCompatible"]').checked = effect.isMobileCompatible;
+        }
+        
+        // Log reaction for analytics
+        function logReaction(effectName) {
+            fetch('/Admin/ImpactFXManager?handler=LogReaction', {
+                method: 'POST',
+                headers: {
+                    'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ effectName })
+            });
+        }
+        
+        // Toast notifications
+        function showToast(message, type = 'info') {
+            // Simple toast implementation
+            const toast = document.createElement('div');
+            toast.className = `alert alert-${type} position-fixed`;
+            toast.style.top = '20px';
+            toast.style.right = '20px';
+            toast.style.zIndex = '9999';
+            toast.style.minWidth = '300px';
+            toast.innerHTML = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    toast.parentNode.removeChild(toast);
+                }
+            }, 3000);
+        }
+        
+        // Initialize settings
+        document.addEventListener('DOMContentLoaded', function() {
+            HeroFXStudio.enableSound(soundEnabled);
+            HeroFXStudio.enableVoice(voiceEnabled);
+            HeroFXStudio.setDebugMode(true);
+            
+            // Setup toggle event listeners
+            document.getElementById('soundToggle').addEventListener('change', function() {
+                soundEnabled = this.checked;
+                HeroFXStudio.enableSound(soundEnabled);
+            });
+            
+            document.getElementById('voiceToggle').addEventListener('change', function() {
+                voiceEnabled = this.checked;
+                HeroFXStudio.enableVoice(voiceEnabled);
+            });
+            
+            document.getElementById('randomizerToggle').addEventListener('change', function() {
+                randomizerEnabled = this.checked;
+                showToast(`Randomizer ${randomizerEnabled ? 'enabled' : 'disabled'}`, 'info');
+            });
+        });
+    </script>
+}

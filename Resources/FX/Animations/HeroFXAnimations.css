@@ -1,0 +1,339 @@
+/* HeroFX Studio Animations - Sprint127_HeroFX_StudioDivision
+   Empowers admins to control visual energy with KAPOW moments */
+
+/* Base animation classes */
+.hero-fx-trigger {
+    transition: all 0.3s ease;
+    will-change: transform, opacity, filter;
+    position: relative;
+    overflow: hidden;
+}
+
+/* SLAM Effect - Powerful impact animation */
+.hero-fx-slam {
+    animation: heroSlamSequence 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    transform-origin: center center;
+}
+
+@keyframes heroSlamSequence {
+    0% { 
+        transform: scale(1) rotate(0deg);
+        filter: brightness(1);
+    }
+    15% { 
+        transform: scale(1.15) rotate(-2deg);
+        filter: brightness(1.2) contrast(1.1);
+        box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+    }
+    30% { 
+        transform: scale(0.95) rotate(1deg);
+        filter: brightness(1.1);
+    }
+    50% { 
+        transform: scale(1.08) rotate(-1deg);
+        filter: brightness(1.15);
+        box-shadow: 0 0 30px rgba(255, 215, 0, 0.8);
+    }
+    75% { 
+        transform: scale(1.02) rotate(0.5deg);
+        filter: brightness(1.05);
+    }
+    100% { 
+        transform: scale(1) rotate(0deg);
+        filter: brightness(1);
+        box-shadow: none;
+    }
+}
+
+/* POP Effect - Quick bubble-like animation */
+.hero-fx-pop {
+    animation: heroPopSequence 0.6s ease-out;
+    transform-origin: center center;
+}
+
+@keyframes heroPopSequence {
+    0% { 
+        transform: scale(1);
+        opacity: 1;
+    }
+    20% { 
+        transform: scale(1.25);
+        opacity: 0.9;
+        filter: brightness(1.1);
+    }
+    40% { 
+        transform: scale(0.9);
+        opacity: 1;
+    }
+    60% { 
+        transform: scale(1.1);
+        filter: brightness(1.05);
+    }
+    80% { 
+        transform: scale(0.98);
+        opacity: 1;
+    }
+    100% { 
+        transform: scale(1);
+        opacity: 1;
+        filter: brightness(1);
+    }
+}
+
+/* YEET Effect - Explosive dismissal animation */
+.hero-fx-yeet {
+    animation: heroYeetSequence 1.2s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    transform-origin: center center;
+}
+
+@keyframes heroYeetSequence {
+    0% { 
+        transform: scale(1) translateX(0) rotate(0deg);
+        opacity: 1;
+    }
+    25% { 
+        transform: scale(1.1) translateX(-5px) rotate(-5deg);
+        opacity: 0.9;
+        filter: hue-rotate(15deg);
+    }
+    50% { 
+        transform: scale(0.8) translateX(10px) rotate(10deg);
+        opacity: 0.7;
+        filter: hue-rotate(30deg);
+    }
+    75% { 
+        transform: scale(1.3) translateX(-20px) rotate(-15deg);
+        opacity: 0.4;
+        filter: hue-rotate(45deg) blur(1px);
+    }
+    100% { 
+        transform: scale(0.1) translateX(100px) rotate(45deg);
+        opacity: 0;
+        filter: hue-rotate(60deg) blur(3px);
+    }
+}
+
+/* GLITCH Effect - Digital distortion animation */
+.hero-fx-glitch {
+    animation: heroGlitchSequence 1.0s steps(10, end);
+    transform-origin: center center;
+}
+
+@keyframes heroGlitchSequence {
+    0% { 
+        transform: translate(0, 0) scale(1);
+        filter: hue-rotate(0deg);
+        clip-path: inset(0 0 0 0);
+    }
+    10% { 
+        transform: translate(-2px, 1px) scale(1.02);
+        filter: hue-rotate(90deg) saturate(1.5);
+        clip-path: inset(10% 0 85% 0);
+    }
+    20% { 
+        transform: translate(3px, -1px) scale(0.98);
+        filter: hue-rotate(180deg) saturate(2);
+        clip-path: inset(20% 0 70% 0);
+    }
+    30% { 
+        transform: translate(-1px, 2px) scale(1.01);
+        filter: hue-rotate(270deg) saturate(1.8);
+        clip-path: inset(30% 0 60% 0);
+    }
+    40% { 
+        transform: translate(2px, -2px) scale(0.99);
+        filter: hue-rotate(45deg) contrast(1.5);
+        clip-path: inset(40% 0 50% 0);
+    }
+    50% { 
+        transform: translate(-3px, 0px) scale(1.03);
+        filter: hue-rotate(135deg) contrast(2);
+        clip-path: inset(50% 0 40% 0);
+    }
+    60% { 
+        transform: translate(1px, 3px) scale(0.97);
+        filter: hue-rotate(225deg) contrast(1.2);
+        clip-path: inset(60% 0 30% 0);
+    }
+    70% { 
+        transform: translate(-2px, -1px) scale(1.02);
+        filter: hue-rotate(315deg) contrast(1.8);
+        clip-path: inset(70% 0 20% 0);
+    }
+    80% { 
+        transform: translate(3px, 1px) scale(0.98);
+        filter: hue-rotate(0deg) contrast(1.1);
+        clip-path: inset(80% 0 10% 0);
+    }
+    90% { 
+        transform: translate(-1px, -2px) scale(1.01);
+        filter: hue-rotate(90deg) contrast(1.3);
+        clip-path: inset(90% 0 5% 0);
+    }
+    100% { 
+        transform: translate(0, 0) scale(1);
+        filter: hue-rotate(0deg) contrast(1);
+        clip-path: inset(0 0 0 0);
+    }
+}
+
+/* STRETCH Effect - Elastic deformation animation */
+.hero-fx-stretch {
+    animation: heroStretchSequence 0.8s ease-in-out;
+    transform-origin: center center;
+}
+
+@keyframes heroStretchSequence {
+    0% { 
+        transform: scaleX(1) scaleY(1);
+        filter: brightness(1);
+    }
+    25% { 
+        transform: scaleX(1.3) scaleY(0.7);
+        filter: brightness(1.1);
+    }
+    50% { 
+        transform: scaleX(0.8) scaleY(1.4);
+        filter: brightness(1.05);
+    }
+    75% { 
+        transform: scaleX(1.1) scaleY(0.9);
+        filter: brightness(1.02);
+    }
+    100% { 
+        transform: scaleX(1) scaleY(1);
+        filter: brightness(1);
+    }
+}
+
+/* Additional effect variations for different contexts */
+
+/* Celebration mode - Enhanced sparkle effect */
+.hero-fx-celebration {
+    position: relative;
+}
+
+.hero-fx-celebration::before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: -10px;
+    right: -10px;
+    bottom: -10px;
+    background: radial-gradient(circle, rgba(255,215,0,0.3) 0%, transparent 70%);
+    animation: celebrationSparkle 2s infinite;
+    pointer-events: none;
+    z-index: -1;
+}
+
+@keyframes celebrationSparkle {
+    0%, 100% { opacity: 0; transform: rotate(0deg); }
+    50% { opacity: 1; transform: rotate(180deg); }
+}
+
+/* Frustration mode - Red glow effect */
+.hero-fx-frustration {
+    position: relative;
+}
+
+.hero-fx-frustration::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 0, 0, 0.1);
+    animation: frustrationPulse 1.5s infinite;
+    pointer-events: none;
+}
+
+@keyframes frustrationPulse {
+    0%, 100% { background: rgba(255, 0, 0, 0); }
+    50% { background: rgba(255, 0, 0, 0.2); }
+}
+
+/* Mobile optimizations - Reduced intensity for performance */
+@media (max-width: 768px) {
+    .hero-fx-slam,
+    .hero-fx-pop,
+    .hero-fx-yeet,
+    .hero-fx-glitch,
+    .hero-fx-stretch {
+        animation-duration: 0.5s; /* Faster on mobile */
+    }
+    
+    /* Disable complex filters on mobile for performance */
+    @keyframes heroGlitchSequence {
+        0%, 100% { 
+            transform: translate(0, 0) scale(1);
+            filter: none;
+        }
+        50% { 
+            transform: translate(-2px, 2px) scale(1.02);
+            filter: none;
+        }
+    }
+}
+
+/* VoiceFX integration classes */
+.hero-fx-with-voice {
+    position: relative;
+}
+
+.hero-fx-voice-indicator {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    width: 12px;
+    height: 12px;
+    background: #00ff00;
+    border-radius: 50%;
+    animation: voiceIndicator 0.5s ease-in-out;
+}
+
+@keyframes voiceIndicator {
+    0% { opacity: 0; transform: scale(0); }
+    50% { opacity: 1; transform: scale(1.2); }
+    100% { opacity: 0.7; transform: scale(1); }
+}
+
+/* Accessibility - Respect reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+    .hero-fx-slam,
+    .hero-fx-pop,
+    .hero-fx-yeet,
+    .hero-fx-glitch,
+    .hero-fx-stretch {
+        animation: none;
+        transition: opacity 0.2s ease;
+    }
+    
+    .hero-fx-slam:hover,
+    .hero-fx-pop:hover,
+    .hero-fx-yeet:hover,
+    .hero-fx-glitch:hover,
+    .hero-fx-stretch:hover {
+        opacity: 0.8;
+    }
+}
+
+/* Premium FX Pack indicators */
+.hero-fx-premium {
+    position: relative;
+}
+
+.hero-fx-premium::before {
+    content: '⭐';
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    font-size: 12px;
+    z-index: 10;
+    animation: premiumBadge 2s infinite;
+}
+
+@keyframes premiumBadge {
+    0%, 100% { transform: rotate(0deg) scale(1); }
+    50% { transform: rotate(15deg) scale(1.1); }
+}

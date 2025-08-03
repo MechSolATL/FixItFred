@@ -219,6 +219,10 @@ namespace Data
         
         // Sprint126 - OneScan Implementation: Patch & Lyra Banter Engine
         public DbSet<BanterReplayEvent> BanterReplayEvents { get; set; } = null!;
+        
+        // Sprint127_HeroFX_StudioDivision - HeroFX Studio effects and analytics
+        public DbSet<HeroImpactEffect> HeroImpactEffects { get; set; } = null!;
+        public DbSet<HeroFxAnalyticsLog> HeroFxAnalyticsLogs { get; set; } = null!;
         #endregion
 
         #region Fluent Table Mappings

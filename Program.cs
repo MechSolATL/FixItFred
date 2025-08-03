@@ -89,6 +89,9 @@ builder.Services.AddScoped<MVP_Core.Services.Diagnostics.IServiceModuleScanner, 
 builder.Services.AddScoped<MVP_Core.Services.Diagnostics.DiagnosticsRunner>();
 builder.Services.AddScoped<MVP_Core.FixItFred.CI.FixItFredApp>();
 
+// ✅ Sprint127_HeroFX_StudioDivision - HeroFX Studio for visual effects
+builder.Services.AddScoped<Services.HeroFXEngine>();
+
 // ✅ SignalR for real-time OmegaSweep updates
 builder.Services.AddSignalR();
 

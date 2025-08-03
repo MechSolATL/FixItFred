@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎨 HeroFX Studio Demo - Sprint127_HeroFX_StudioDivision</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/HeroFXAnimations.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            min-height: 100vh;
+        }
+        .demo-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            margin: 20px auto;
+            max-width: 1200px;
+            padding: 30px;
+        }
+        .fx-preview-area {
+            border: 3px dashed #007bff;
+            border-radius: 15px;
+            padding: 60px 20px;
+            text-align: center;
+            background: linear-gradient(45deg, #f8f9fa, #e9ecef);
+            min-height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+        .effect-btn {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            border: none;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 25px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            margin: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+        }
+        .effect-btn:hover {
+            transform: scale(1.05) translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.5);
+            color: white;
+        }
+        .effect-btn.premium {
+            background: linear-gradient(45deg, #ffd700, #ffb347);
+            color: #333;
+            position: relative;
+        }
+        .effect-btn.premium::before {
+            content: '⭐';
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            font-size: 12px;
+        }
+        .analytics-panel {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .control-panel {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .logo {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 3rem;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+        }
+        .demo-section {
+            margin: 30px 0;
+        }
+        .voice-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            background: #00d084;
+            border-radius: 50%;
+            margin-left: 5px;
+            animation: pulse 1s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="demo-container">
+            <!-- Header -->
+            <div class="row">
+                <div class="col-12">
+                    <h1 class="logo">🎨 HeroFX Studio</h1>
+                    <p class="subtitle">Take Control & Express Yourself - Create KAPOW moments!</p>
+                    <p class="text-center text-muted">Sprint127_HeroFX_StudioDivision Demonstration</p>
+                </div>
+            </div>
+
+            <!-- Live Preview Area -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="demo-section">
+                        <h3>🎬 Live Effect Preview</h3>
+                        <div class="fx-preview-area" id="fx-preview">
+                            <div class="text-center">
+                                <h4>👆 Click effects below to see them in action!</h4>
+                                <p class="text-muted">This area will animate with your selected effects</p>
+                                <div id="demo-target" class="p-4 border rounded" style="background: white; display: inline-block;">
+                                    <h5>DEMO TARGET</h5>
+                                    <p>Effects will be applied here</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Effect Controls -->
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="demo-section">
+                        <h3>⚡ Effect Arsenal</h3>
+                        <p>Experience the full range of HeroFX animations and voice integration</p>
+                        
+                        <div class="row">
+                            <div class="col-md-6 col-lg-4 mb-3">
+                                <button class="btn effect-btn w-100" onclick="triggerDemo('slam')">
+                                    💥 SLAM!
+                                    <small class="d-block">Powerful Impact</small>
+                                </button>
+                            </div>
+                            <div class="col-md-6 col-lg-4 mb-3">
+                                <button class="btn effect-btn w-100" onclick="triggerDemo('pop')">
+                                    🎈 POP!
+                                    <small class="d-block">Quick Bubble</small>
+                                </button>
+                            </div>
+                            <div class="col-md-6 col-lg-4 mb-3">
+                                <button class="btn effect-btn premium w-100" onclick="triggerDemo('yeet')">
+                                    🚀 YEET!
+                                    <small class="d-block">Explosive Exit</small>
+                                </button>
+                            </div>
+                            <div class="col-md-6 col-lg-4 mb-3">
+                                <button class="btn effect-btn premium w-100" onclick="triggerDemo('glitch')">
+                                    ⚡ GLITCH
+                                    <small class="d-block">Digital Distortion</small>
+                                </button>
+                            </div>
+                            <div class="col-md-6 col-lg-4 mb-3">
+                                <button class="btn effect-btn w-100" onclick="triggerDemo('stretch')">
+                                    🔄 STRETCH
+                                    <small class="d-block">Elastic Motion</small>
+                                </button>
+                            </div>
+                            <div class="col-md-6 col-lg-4 mb-3">
+                                <button class="btn effect-btn w-100" onclick="triggerRandom()">
+                                    🎲 RANDOM
+                                    <small class="d-block">Surprise Me!</small>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Context Triggers -->
+                        <h4 class="mt-4">🎮 Context-Aware Triggers</h4>
+                        <div class="row">
+                            <div class="col-md-4 mb-2">
+                                <button class="btn btn-success w-100" onclick="triggerContext('dispatch')">
+                                    🚀 Trigger Dispatch Success
+                                </button>
+                            </div>
+                            <div class="col-md-4 mb-2">
+                                <button class="btn btn-primary w-100" onclick="triggerContext('login')">
+                                    👋 Trigger Login Welcome
+                                </button>
+                            </div>
+                            <div class="col-md-4 mb-2">
+                                <button class="btn btn-warning w-100" onclick="triggerContext('error')">
+                                    ⚠️ Trigger Error Alert
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Control Panel -->
+                <div class="col-lg-4">
+                    <div class="control-panel">
+                        <h4>🎛️ Control Panel</h4>
+                        
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" id="soundToggle" checked>
+                            <label class="form-check-label" for="soundToggle">
+                                🔊 Sound Effects
+                            </label>
+                        </div>
+                        
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" id="voiceToggle" checked>
+                            <label class="form-check-label" for="voiceToggle">
+                                🎤 VoiceFX <span class="voice-indicator"></span>
+                            </label>
+                        </div>
+                        
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" id="debugToggle">
+                            <label class="form-check-label" for="debugToggle">
+                                🐛 Debug Mode
+                            </label>
+                        </div>
+
+                        <hr>
+
+                        <h5>👥 Role Simulation</h5>
+                        <select class="form-select mb-3" id="roleSelect">
+                            <option value="">Any Role</option>
+                            <option value="Tech">Tech (Explosions)</option>
+                            <option value="CSR">CSR (Clean Effects)</option>
+                            <option value="Admin">Admin (All Effects)</option>
+                        </select>
+
+                        <h5>😊 Mood Simulation</h5>
+                        <select class="form-select mb-3" id="moodSelect">
+                            <option value="">Any Mood</option>
+                            <option value="calm">Calm</option>
+                            <option value="celebration">Celebration</option>
+                            <option value="frustration">Frustration</option>
+                        </select>
+                    </div>
+
+                    <!-- Analytics Panel -->
+                    <div class="analytics-panel">
+                        <h4>📊 Live Analytics</h4>
+                        <div class="row text-center">
+                            <div class="col-6">
+                                <h3 id="triggerCount">0</h3>
+                                <small>Effects Triggered</small>
+                            </div>
+                            <div class="col-6">
+                                <h3 id="reactionCount">0</h3>
+                                <small>User Reactions</small>
+                            </div>
+                        </div>
+                        <hr style="border-color: rgba(255,255,255,0.3);">
+                        <div class="text-center">
+                            <h5 id="kapowRatio">0%</h5>
+                            <small>KAPOW-to-CLICKS Ratio</small>
+                        </div>
+                        <div class="mt-3">
+                            <button class="btn btn-light btn-sm w-100" onclick="logReaction()">
+                                👍 Log Positive Reaction
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Features Overview -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="demo-section">
+                        <h3>✨ HeroFX Studio Features</h3>
+                        <div class="row">
+                            <div class="col-md-6 col-lg-3 mb-3">
+                                <div class="card h-100">
+                                    <div class="card-body text-center">
+                                        <h5>🎭 Live Preview</h5>
+                                        <p class="card-text">Test effects in real-time before deployment</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-lg-3 mb-3">
+                                <div class="card h-100">
+                                    <div class="card-body text-center">
+                                        <h5>🎤 VoiceFX</h5>
+                                        <p class="card-text">Narrator integration with calm vs chaos modes</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-lg-3 mb-3">
+                                <div class="card h-100">
+                                    <div class="card-body text-center">
+                                        <h5>👥 Persona-Aware</h5>
+                                        <p class="card-text">Role-based effect assignments</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-lg-3 mb-3">
+                                <div class="card h-100">
+                                    <div class="card-body text-center">
+                                        <h5>📊 Analytics</h5>
+                                        <p class="card-text">KAPOW-to-CLICKS ratio tracking</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="row mt-4">
+                <div class="col-12 text-center">
+                    <hr>
+                    <p class="text-muted">
+                        <strong>Sprint127_HeroFX_StudioDivision</strong> - Empowering admins to create KAPOW moments!<br>
+                        <small>🎨 Built with passion by the MVP-Core team</small>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/HeroFXEngine.js"></script>
+    <script>
+        // Demo-specific analytics
+        let triggerCount = 0;
+        let reactionCount = 0;
+
+        // Initialize HeroFX Studio
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🎨 HeroFX Studio Demo Loading...');
+            
+            // Initialize with debug mode for demo
+            HeroFXStudio.setDebugMode(true);
+            
+            // Setup control listeners
+            document.getElementById('soundToggle').addEventListener('change', function() {
+                HeroFXStudio.enableSound(this.checked);
+                showToast(`Sound ${this.checked ? 'enabled' : 'disabled'}`, 'info');
+            });
+            
+            document.getElementById('voiceToggle').addEventListener('change', function() {
+                HeroFXStudio.enableVoice(this.checked);
+                showToast(`Voice ${this.checked ? 'enabled' : 'disabled'}`, 'info');
+            });
+            
+            document.getElementById('debugToggle').addEventListener('change', function() {
+                HeroFXStudio.setDebugMode(this.checked);
+                showToast(`Debug ${this.checked ? 'enabled' : 'disabled'}`, 'info');
+            });
+
+            // Welcome message
+            setTimeout(() => {
+                triggerDemo('pop');
+                if (document.getElementById('voiceToggle').checked) {
+                    HeroFXStudio.playVoice('Welcome to HeroFX Studio!', 'calm');
+                }
+            }, 1000);
+        });
+
+        // Demo trigger function
+        function triggerDemo(effectName) {
+            const targetElement = document.getElementById('demo-target');
+            const role = document.getElementById('roleSelect').value || null;
+            const mood = document.getElementById('moodSelect').value || null;
+            
+            const voiceTexts = {
+                slam: { text: 'KAPOW!', type: 'chaos' },
+                pop: { text: 'Pop!', type: 'calm' },
+                yeet: { text: 'YEET!', type: 'chaos' },
+                glitch: { text: 'System glitch!', type: 'calm' },
+                stretch: { text: 'Stretching!', type: 'calm' }
+            };
+            
+            const voice = voiceTexts[effectName];
+            
+            HeroFXStudio.triggerEffect(effectName, targetElement, {
+                voiceText: voice ? voice.text : null,
+                voiceType: voice ? voice.type : 'calm',
+                triggerEvent: 'demo',
+                userRole: role,
+                deviceType: 'desktop'
+            });
+            
+            updateAnalytics();
+            showToast(`${effectName.toUpperCase()} effect triggered!`, 'success');
+        }
+
+        // Random effect
+        function triggerRandom() {
+            const effects = ['slam', 'pop', 'yeet', 'glitch', 'stretch'];
+            const randomEffect = effects[Math.floor(Math.random() * effects.length)];
+            triggerDemo(randomEffect);
+        }
+
+        // Context triggers
+        function triggerContext(context) {
+            const targetElement = document.getElementById('demo-target');
+            const contextMap = {
+                dispatch: { effect: 'slam', voice: 'Dispatch successful! KAPOW!', type: 'chaos' },
+                login: { effect: 'pop', voice: 'Welcome back!', type: 'calm' },
+                error: { effect: 'glitch', voice: 'Error detected!', type: 'calm' }
+            };
+            
+            const config = contextMap[context];
+            if (config) {
+                HeroFXStudio.triggerEffect(config.effect, targetElement, {
+                    voiceText: config.voice,
+                    voiceType: config.type,
+                    triggerEvent: context
+                });
+                
+                updateAnalytics();
+                showToast(`${context} context triggered!`, 'primary');
+            }
+        }
+
+        // Log reaction
+        function logReaction() {
+            reactionCount++;
+            updateAnalytics();
+            showToast('Positive reaction logged!', 'success');
+        }
+
+        // Update analytics display
+        function updateAnalytics() {
+            triggerCount++;
+            document.getElementById('triggerCount').textContent = triggerCount;
+            document.getElementById('reactionCount').textContent = reactionCount;
+            
+            const ratio = triggerCount > 0 ? (reactionCount / triggerCount * 100).toFixed(1) : 0;
+            document.getElementById('kapowRatio').textContent = ratio + '%';
+        }
+
+        // Toast notifications
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `alert alert-${type} position-fixed`;
+            toast.style.top = '20px';
+            toast.style.right = '20px';
+            toast.style.zIndex = '9999';
+            toast.style.minWidth = '300px';
+            toast.innerHTML = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    toast.parentNode.removeChild(toast);
+                }
+            }, 3000);
+        }
+
+        // Auto-demo mode (optional)
+        function startAutoDemo() {
+            setInterval(() => {
+                if (Math.random() > 0.7) { // 30% chance every 5 seconds
+                    triggerRandom();
+                }
+            }, 5000);
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey) {
+                switch(e.key) {
+                    case '1': triggerDemo('slam'); e.preventDefault(); break;
+                    case '2': triggerDemo('pop'); e.preventDefault(); break;
+                    case '3': triggerDemo('yeet'); e.preventDefault(); break;
+                    case '4': triggerDemo('glitch'); e.preventDefault(); break;
+                    case '5': triggerDemo('stretch'); e.preventDefault(); break;
+                    case 'r': triggerRandom(); e.preventDefault(); break;
+                }
+            }
+        });
+
+        console.log('🎨 HeroFX Studio Demo Ready!');
+        console.log('💡 Use Ctrl+1-5 for quick effect triggers, Ctrl+R for random effect');
+    </script>
+</body>
+</html>
