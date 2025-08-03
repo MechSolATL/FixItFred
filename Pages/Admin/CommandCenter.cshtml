@@ -1,0 +1,262 @@
+@page
+@model MVP_Core.Pages.Admin.CommandCenterModel
+@{
+    ViewData["Title"] = "FixItFred CommandCenter";
+    Layout = "_AdminLayout";
+}
+
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <h1 class="h3 mb-0">
+                    <i class="fas fa-robot text-primary"></i>
+                    FixItFred OMEGASWEEP FAILSAFE v3.2
+                </h1>
+                <div class="text-muted">
+                    <small>CommandCenter — Post-Merge Verification Mode</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (Model.CurrentStatus == null)
+    {
+        <!-- Initiate New Sweep -->
+        <div class="row">
+            <div class="col-md-8 mx-auto">
+                <div class="card border-primary">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">🔁 Initiate OMEGASWEEP FAILSAFE</h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="post" asp-page-handler="StartSweep">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label asp-for="TriggerSource" class="form-label">🧠 Trigger Source</label>
+                                        <select asp-for="TriggerSource" class="form-select">
+                                            <option value="ManualForce">ManualForce (Nova)</option>
+                                            <option value="Automated">Automated</option>
+                                            <option value="Emergency">Emergency</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label asp-for="SweepTag" class="form-label">🧾 Sweep Tag</label>
+                                        <input asp-for="SweepTag" class="form-control" placeholder="vOmegaFinal_PR22" />
+                                        <span asp-validation-for="SweepTag" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label asp-for="RelatedPr" class="form-label">🧱 Related PR (Optional)</label>
+                                <input asp-for="RelatedPr" class="form-control" placeholder="PR #22" />
+                            </div>
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    🚀 Start Triple Omega Sweep Execution
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <!-- Active Sweep Status -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card border-info">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0">🔄 Active OMEGASWEEP — Sweep ID: @Model.CurrentStatus.SweepId</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-4">
+                            <div class="col-md-3">
+                                <div class="text-center">
+                                    <div class="h4">
+                                        @switch (Model.CurrentStatus.OverallState)
+                                        {
+                                            case MVP_Core.Models.FixItFred.SweepState.Queued:
+                                                <span class="badge bg-secondary fs-6">⏳ Queued</span>
+                                                break;
+                                            case MVP_Core.Models.FixItFred.SweepState.Running:
+                                                <span class="badge bg-warning fs-6">🔄 Running</span>
+                                                break;
+                                            case MVP_Core.Models.FixItFred.SweepState.Completed:
+                                                <span class="badge bg-success fs-6">✅ Completed</span>
+                                                break;
+                                            case MVP_Core.Models.FixItFred.SweepState.Failed:
+                                                <span class="badge bg-danger fs-6">❌ Failed</span>
+                                                break;
+                                            case MVP_Core.Models.FixItFred.SweepState.RolledBack:
+                                                <span class="badge bg-danger fs-6">🔄 Rolled Back</span>
+                                                break;
+                                        }
+                                    </div>
+                                    <small class="text-muted">Overall Status</small>
+                                </div>
+                            </div>
+                            <div class="col-md-9">
+                                <dl class="row">
+                                    <dt class="col-sm-3">Trigger Source:</dt>
+                                    <dd class="col-sm-9">@Model.CurrentStatus.TriggerSource</dd>
+                                    <dt class="col-sm-3">Sweep Tag:</dt>
+                                    <dd class="col-sm-9">@Model.CurrentStatus.SweepTag</dd>
+                                    <dt class="col-sm-3">Related PR:</dt>
+                                    <dd class="col-sm-9">@Model.CurrentStatus.RelatedPr</dd>
+                                    <dt class="col-sm-3">Started:</dt>
+                                    <dd class="col-sm-9">@Model.CurrentStatus.StartTime.ToString("yyyy-MM-dd HH:mm:ss") UTC</dd>
+                                </dl>
+                            </div>
+                        </div>
+
+                        <!-- Live Status Component -->
+                        <div id="omegaSweepLiveStatus">
+                            @{
+                                var liveStatusComponent = new MVP_Core.Components.OmegaSweepLiveStatus();
+                            }
+                            <!-- Simplified live status display for now -->
+                            <div class="alert alert-info">
+                                <strong>Live Status:</strong> OmegaSweep monitoring active for sweep @Model.CurrentSweepId
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Release Gate Controls -->
+        @if (Model.CurrentStatus.OverallState == MVP_Core.Models.FixItFred.SweepState.Completed)
+        {
+            <div class="row mt-4">
+                <div class="col-md-6 mx-auto">
+                    <div class="card border-success">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="mb-0">🔐 Release Gate Control</h5>
+                        </div>
+                        <div class="card-body text-center">
+                            @if (Model.CurrentStatus.IsTagLocked)
+                            {
+                                <div class="mb-3">
+                                    <div class="alert alert-warning">
+                                        <strong>🔒 Tag Locked:</strong> @Model.CurrentStatus.TagLockReason
+                                    </div>
+                                </div>
+                                <form method="post" asp-page-handler="ApproveLockTag">
+                                    <input type="hidden" asp-for="CurrentSweepId" />
+                                    <input type="hidden" asp-for="SweepTag" />
+                                    <button type="submit" class="btn btn-success btn-lg">
+                                        ✅ Approve & Lock Tag
+                                    </button>
+                                </form>
+                            }
+                            else
+                            {
+                                <div class="alert alert-success">
+                                    <strong>🔓 Tag Unlocked:</strong> @Model.CurrentStatus.TagLockReason
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <!-- Audit Logs Section -->
+        @if (Model.CurrentStatus.AuditLogPaths.Any())
+        {
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">📄 Generated Audit Logs</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="list-group">
+                                @foreach (var logPath in Model.CurrentStatus.AuditLogPaths)
+                                {
+                                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                                        <span>@System.IO.Path.GetFileName(logPath)</span>
+                                        <small class="text-muted">@logPath</small>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+</div>
+
+@section Scripts {
+    <script src="~/lib/microsoft-signalr/signalr.min.js"></script>
+    <script>
+        // SignalR connection for real-time updates
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/omegaSweepHub")
+            .build();
+
+        connection.start().then(function () {
+            console.log("OmegaSweep SignalR connected");
+            
+            @if (!string.IsNullOrEmpty(Model.CurrentSweepId))
+            {
+                <text>
+                connection.invoke("JoinSweepGroup", "@Model.CurrentSweepId");
+                </text>
+            }
+        }).catch(function (err) {
+            console.error("SignalR connection error:", err);
+        });
+
+        // Listen for progress updates
+        connection.on("ProgressUpdate", function (status, message) {
+            // Update the live status component
+            updateLiveStatus(status, message);
+        });
+
+        function updateLiveStatus(status, message) {
+            // This would typically update the Blazor component
+            // For now, we'll show a simple notification
+            if (message) {
+                const alertDiv = document.createElement('div');
+                alertDiv.className = 'alert alert-info alert-dismissible fade show';
+                alertDiv.innerHTML = `
+                    <strong>Live Update:</strong> ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                `;
+                document.querySelector('#omegaSweepLiveStatus').prepend(alertDiv);
+                
+                // Auto-dismiss after 5 seconds
+                setTimeout(() => {
+                    alertDiv.classList.remove('show');
+                    setTimeout(() => alertDiv.remove(), 150);
+                }, 5000);
+            }
+        }
+
+        // Auto-refresh status every 10 seconds if sweep is active
+        @if (Model.CurrentStatus?.OverallState == MVP_Core.Models.FixItFred.SweepState.Running)
+        {
+            <text>
+            setInterval(function() {
+                fetch('/Admin/CommandCenter?handler=StatusApi&sweepId=@Model.CurrentSweepId')
+                    .then(response => response.json())
+                    .then(status => {
+                        if (status.overallState !== 'Running') {
+                            // Refresh the entire page when status changes from Running
+                            location.reload();
+                        }
+                    })
+                    .catch(err => console.error('Status refresh error:', err));
+            }, 10000);
+            </text>
+        }
+    </script>
+}

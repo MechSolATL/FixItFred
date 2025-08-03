@@ -1,0 +1,211 @@
+@using MVP_Core.Models.FixItFred
+
+<div class="omega-sweep-live-status">
+    <div class="row">
+        @for (int i = 0; i < 3; i++)
+        {
+            var run = Status?.Runs.ElementAtOrDefault(i);
+            var runNumber = i + 1;
+            
+            <div class="col-md-4">
+                <div class="card @GetRunCardClass(run?.State ?? SweepState.Queued)">
+                    <div class="card-header">
+                        <h6 class="mb-0">
+                            @GetRunStatusIcon(run?.State ?? SweepState.Queued) Run #@runNumber
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        @if (run != null)
+                        {
+                            <div class="mb-2">
+                                <strong>Status:</strong> 
+                                <span class="badge @GetStatusBadgeClass(run.State)">
+                                    @run.State
+                                </span>
+                            </div>
+                            
+                            @if (run.State == SweepState.Running && run.CurrentPhase.HasValue)
+                            {
+                                <div class="mb-2">
+                                    <strong>Current Phase:</strong>
+                                    <br />
+                                    <small class="text-muted">@run.CurrentPhase</small>
+                                </div>
+                                
+                                @if (run.EstimatedTimeRemaining.HasValue)
+                                {
+                                    <div class="mb-2">
+                                        <strong>ETA:</strong>
+                                        <br />
+                                        <span class="countdown" data-eta="@DateTime.UtcNow.Add(run.EstimatedTimeRemaining.Value).ToString("o")">
+                                            @run.EstimatedTimeRemaining.Value.ToString(@"mm\:ss")
+                                        </span>
+                                    </div>
+                                }
+                                
+                                <div class="progress mb-2">
+                                    <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                                         role="progressbar" 
+                                         style="width: @GetPhaseProgress(run.CurrentPhase)%">
+                                    </div>
+                                </div>
+                            }
+                            
+                            @if (run.StartTime != default)
+                            {
+                                <div class="mb-2">
+                                    <small class="text-muted">
+                                        Started: @run.StartTime.ToString("HH:mm:ss")
+                                        @if (run.EndTime.HasValue)
+                                        {
+                                            var duration = run.EndTime.Value - run.StartTime;
+                                            <br />
+                                            <text>Duration: @duration.ToString("mm\\:ss")</text>
+                                        }
+                                    </small>
+                                </div>
+                            }
+                            
+                            @if (run.PhaseResults.Any())
+                            {
+                                <div class="phase-results">
+                                    <strong>Phase Results:</strong>
+                                    <ul class="list-unstyled mt-1">
+                                        @foreach (var result in run.PhaseResults)
+                                        {
+                                            <li class="small">@result</li>
+                                        }
+                                    </ul>
+                                </div>
+                            }
+                            
+                            @if (!string.IsNullOrEmpty(run.ErrorMessage))
+                            {
+                                <div class="alert alert-danger alert-sm">
+                                    @run.ErrorMessage
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="text-center text-muted">
+                                <i class="fas fa-clock"></i>
+                                <br />
+                                Queued
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+    
+    @if (Status != null)
+    {
+        <div class="row mt-3">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong>Overall Progress:</strong>
+                        @{
+                            var completedRuns = Status.Runs.Count(r => r.State == SweepState.Completed);
+                            var totalRuns = Status.Runs.Count;
+                            var overallProgress = totalRuns > 0 ? (completedRuns * 100 / totalRuns) : 0;
+                        }
+                        <span class="badge bg-info">@completedRuns/@totalRuns runs completed</span>
+                    </div>
+                    <div>
+                        @if (Status.OverallState == SweepState.Running)
+                        {
+                            <div class="spinner-border spinner-border-sm text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        }
+                        <span class="text-muted">
+                            Last update: <span id="lastUpdateTime">@DateTime.UtcNow.ToString("HH:mm:ss")</span>
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="progress mt-2">
+                    <div class="progress-bar" role="progressbar" style="width: @overallProgress%">
+                        @overallProgress%
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<style>
+    .omega-sweep-live-status .card {
+        border-left: 4px solid;
+        margin-bottom: 1rem;
+    }
+    
+    .card-queued { border-left-color: #6c757d; }
+    .card-running { border-left-color: #ffc107; }
+    .card-completed { border-left-color: #198754; }
+    .card-failed { border-left-color: #dc3545; }
+    
+    .phase-results {
+        max-height: 120px;
+        overflow-y: auto;
+    }
+    
+    .countdown {
+        font-family: 'Courier New', monospace;
+        font-weight: bold;
+        color: #007bff;
+    }
+    
+    .alert-sm {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
+    }
+</style>
+
+@code {
+    [Parameter] public string? SweepId { get; set; }
+    [Parameter] public OmegaSweepStatus? Status { get; set; }
+
+    private string GetRunCardClass(SweepState state) => state switch
+    {
+        SweepState.Queued => "card-queued",
+        SweepState.Running => "card-running",
+        SweepState.Completed => "card-completed",
+        SweepState.Failed => "card-failed",
+        SweepState.RolledBack => "card-failed",
+        _ => "card-queued"
+    };
+
+    private string GetRunStatusIcon(SweepState state) => state switch
+    {
+        SweepState.Queued => "⏳",
+        SweepState.Running => "🔄",
+        SweepState.Completed => "✅",
+        SweepState.Failed => "❌",
+        SweepState.RolledBack => "🔄",
+        _ => "⏳"
+    };
+
+    private string GetStatusBadgeClass(SweepState state) => state switch
+    {
+        SweepState.Queued => "bg-secondary",
+        SweepState.Running => "bg-warning",
+        SweepState.Completed => "bg-success",
+        SweepState.Failed => "bg-danger",
+        SweepState.RolledBack => "bg-danger",
+        _ => "bg-secondary"
+    };
+
+    private int GetPhaseProgress(RunPhase? phase) => phase switch
+    {
+        RunPhase.Clean => 20,
+        RunPhase.Build => 40,
+        RunPhase.EmpathyTests => 60,
+        RunPhase.IntegrationTests => 80,
+        RunPhase.RevitalizeValidation => 95,
+        _ => 0
+    };
+}

@@ -46,8 +46,15 @@ builder.Services.AddScoped<Services.Stats.ILeaderboardService, Services.Stats.Le
 builder.Services.AddScoped<Services.Admin.ValidationSimulatorService>(); // ⚠️ [Obsolete] — retained for legacy test support
 #pragma warning restore CS0618
 
-// ✅ Revitalize Registration
-builder.Services.AddRevitalizeServices(); // ⛓ Register full Revitalize module (Sprint123)
+// ✅ Revitalize Registration - temporarily disabled due to missing dependencies
+// builder.Services.AddRevitalizeServices(); // ⛓ Register full Revitalize module (Sprint123)
+
+// ✅ FixItFred OMEGASWEEP FAILSAFE v3.2 Services
+builder.Services.AddScoped<MVP_Core.Services.FixItFred.IFixItFredService, MVP_Core.Services.FixItFred.FixItFredService>();
+builder.Services.AddScoped<MVP_Core.Hubs.OmegaSweepHubClient>();
+
+// ✅ SignalR for real-time OmegaSweep updates
+builder.Services.AddSignalR();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -66,6 +73,10 @@ app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthorization();
 app.MapRazorPages();
+
+// ✅ Map SignalR Hub for OmegaSweep real-time updates
+app.MapHub<MVP_Core.Hubs.OmegaSweepHub>("/omegaSweepHub");
+
 app.Run();
 
 // Stub classes for build compatibility — full implementations elsewhere
