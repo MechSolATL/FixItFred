@@ -1,0 +1,389 @@
+@page
+@model Pages.Services.WheelOfFouModel
+@{
+    ViewData["Title"] = "Wheel of Fou - FX Marketplace";
+}
+
+<link rel="stylesheet" href="~/css/heartbeat.css" />
+<link rel="stylesheet" href="~/css/pixelDisintegrate.css" />
+
+<style>
+.wheel-container {
+    position: relative;
+    width: 400px;
+    height: 400px;
+    margin: 2rem auto;
+}
+
+.wheel {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 8px solid #ff4500;
+    background: conic-gradient(
+        from 0deg,
+        #ff4500 0deg 36deg,
+        #ff6b35 36deg 72deg,
+        #ff8c42 72deg 108deg,
+        #ffad5a 108deg 144deg,
+        #ffd700 144deg 180deg,
+        #32cd32 180deg 216deg,
+        #00bfff 216deg 252deg,
+        #9932cc 252deg 288deg,
+        #ff69b4 288deg 324deg,
+        #ff0000 324deg 360deg
+    );
+    position: relative;
+    animation: wheelGlow 3s ease-in-out infinite;
+    cursor: pointer;
+    transition: transform 0.1s ease;
+}
+
+.wheel:hover {
+    transform: scale(1.02);
+}
+
+.wheel-spinning {
+    animation: spin 3s cubic-bezier(0.17, 0.67, 0.12, 0.99) forwards,
+               wheelGlow 3s ease-in-out infinite;
+}
+
+.wheel-pointer {
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 20px solid transparent;
+    border-right: 20px solid transparent;
+    border-top: 40px solid #333;
+    z-index: 10;
+}
+
+.wheel-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80px;
+    height: 80px;
+    background: #333;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    border: 4px solid #fff;
+    z-index: 5;
+}
+
+@@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(1800deg); } /* 5 full rotations */
+}
+
+@@keyframes wheelGlow {
+    0%, 100% { box-shadow: 0 0 20px #ff4500; }
+    50% { box-shadow: 0 0 40px #ff4500, 0 0 60px #ff6b35; }
+}
+
+.prize-list {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.prize-card {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.prize-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.token-display {
+    background: linear-gradient(45deg, #ffd700, #ffed4a);
+    border-radius: 20px;
+    padding: 0.5rem 1rem;
+    color: #333;
+    font-weight: bold;
+    display: inline-block;
+}
+
+.spin-button {
+    background: linear-gradient(45deg, #ff4500, #ff6b35);
+    border: none;
+    color: white;
+    font-size: 1.2rem;
+    font-weight: bold;
+    padding: 1rem 2rem;
+    border-radius: 50px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.spin-button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 16px rgba(255, 69, 0, 0.3);
+}
+
+.spin-button:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.recent-winners {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 1rem;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.winner-item {
+    padding: 0.25rem 0;
+    border-bottom: 1px solid #dee2e6;
+    animation: fadeInUp 0.5s ease-out;
+}
+
+.marketplace-header {
+    background: linear-gradient(135deg, #1a1a1a, #2d2d2d);
+    color: white;
+    padding: 2rem 0;
+    margin-bottom: 2rem;
+}
+</style>
+
+<div class="marketplace-header text-center">
+    <div class="container">
+        <div class="spark-ignition">
+            <h1 class="logo-heartbeat">🎡 Wheel of Fou</h1>
+        </div>
+        <p class="lead">FX Marketplace • Spin to Win Legendary Effects</p>
+        <p class="text-muted">Sparks88 Evolution • Built by fire. Run by soul. Operated by legends.</p>
+    </div>
+</div>
+
+<div class="container">
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show checkmark-heartbeat" role="alert">
+            <strong>@TempData["SuccessMessage"]</strong>
+            @if (TempData["PrizeDescription"] != null)
+            {
+                <br><small>@TempData["PrizeDescription"]</small>
+            }
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header text-center">
+                    <h3>🎯 Spin the Wheel</h3>
+                    <div class="token-display connection-pulse">
+                        💰 @Model.UserTokens Tokens
+                    </div>
+                </div>
+                <div class="card-body text-center">
+                    <div class="wheel-container">
+                        <div class="wheel-pointer"></div>
+                        <div class="wheel pixel-disintegrate" id="wheel">
+                            <div class="wheel-center">
+                                <span>SPIN</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <form method="post" asp-page-handler="SpinWheel" id="spinForm">
+                        <button type="submit" class="spin-button button-heartbeat" id="spinButton" 
+                                @(Model.UserTokens < 10 ? "disabled" : "")>
+                            🔥 Spin for 10 Tokens
+                        </button>
+                    </form>
+                    
+                    <div class="mt-3">
+                        <p class="text-muted">
+                            <small>
+                                💡 Tip: Higher rarity prizes are harder to win but more valuable!<br>
+                                Cost: 10 tokens per spin
+                            </small>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h4>🏆 Recent Winners</h4>
+                </div>
+                <div class="card-body">
+                    <div class="recent-winners">
+                        @foreach (var winner in Model.RecentWinners)
+                        {
+                            <div class="winner-item">
+                                <small>🎉 @winner</small>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3>🎁 Available Prizes</h3>
+                </div>
+                <div class="card-body">
+                    <div class="prize-list">
+                        @foreach (var prize in Model.AvailablePrizes.OrderByDescending(p => p.Weight))
+                        {
+                            <div class="prize-card stability-hum">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h6 class="@prize.GetRarityClass()">@prize.Name</h6>
+                                        <p class="small mb-1">@prize.Description</p>
+                                        <small class="text-muted">@prize.Type</small>
+                                    </div>
+                                    <div class="text-end">
+                                        <span class="badge @prize.GetRarityBadge()">@prize.Rarity</span>
+                                        <div class="small text-muted mt-1">@prize.Value</div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h4>ℹ️ How It Works</h4>
+                </div>
+                <div class="card-body">
+                    <ol>
+                        <li><strong>Earn Tokens:</strong> Complete jobs, get reviews, participate in the community</li>
+                        <li><strong>Spin the Wheel:</strong> Each spin costs 10 tokens</li>
+                        <li><strong>Win Prizes:</strong> Unlock FX effects, badges, and exclusive content</li>
+                        <li><strong>Show Off:</strong> Display your winnings on your profile</li>
+                    </ol>
+                    
+                    <div class="mt-3 p-3 border rounded bg-light">
+                        <h6>🎯 Rarity Guide:</h6>
+                        <div class="row">
+                            <div class="col-6">
+                                <small class="text-secondary">● Common (High Chance)</small><br>
+                                <small class="text-success">● Uncommon (Good Chance)</small><br>
+                                <small class="text-primary">● Rare (Low Chance)</small>
+                            </div>
+                            <div class="col-6">
+                                <small class="text-warning">● Epic (Very Rare)</small><br>
+                                <small class="text-danger">● Legendary (Ultra Rare)</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-12 text-center">
+            <div class="card pixel-disintegrate">
+                <div class="card-header bg-dark text-white">
+                    <h4>⚡ Jack-in-the-Box FX Challenge</h4>
+                </div>
+                <div class="card-body">
+                    <p class="lead">
+                        Unlock the legendary Jack-in-the-Box FX and experience the ultimate surprise effect!
+                    </p>
+                    <p>
+                        This ultra-rare prize appears randomly across the platform, creating unexpected moments of delight. 
+                        Only the luckiest legends will experience its magic.
+                    </p>
+                    <div class="spark-ignition">
+                        <p class="text-warning"><em>"Built by fire. Run by soul. Operated by legends."</em></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let isSpinning = false;
+
+document.getElementById('spinForm').addEventListener('submit', function(e) {
+    if (isSpinning) {
+        e.preventDefault();
+        return;
+    }
+    
+    isSpinning = true;
+    const wheel = document.getElementById('wheel');
+    const button = document.getElementById('spinButton');
+    
+    // Disable button and add spinning effect
+    button.disabled = true;
+    button.textContent = '🌪️ Spinning...';
+    wheel.classList.add('wheel-spinning');
+    
+    // Add pixel disintegration effect
+    wheel.classList.add('pixel-disintegrate', 'active');
+    
+    // The form will submit and page will reload with results
+});
+
+// Add some interactive effects
+document.getElementById('wheel').addEventListener('click', function() {
+    if (!isSpinning && @Model.UserTokens >= 10) {
+        this.style.transform = 'scale(0.98)';
+        setTimeout(() => {
+            this.style.transform = '';
+        }, 100);
+    }
+});
+
+// Auto-refresh recent winners (simulate live updates)
+setInterval(() => {
+    const winners = document.querySelectorAll('.winner-item');
+    if (winners.length > 0) {
+        winners[0].style.animation = 'fadeInUp 0.5s ease-out';
+    }
+}, 10000);
+
+// Initialize marketplace
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('🎡 Wheel of Fou Loaded');
+    console.log('🎯 FX Marketplace Active');
+    console.log('💫 Built by fire. Run by soul. Operated by legends.');
+    
+    // Add hover effects to prize cards
+    document.querySelectorAll('.prize-card').forEach(card => {
+        card.addEventListener('mouseenter', () => {
+            card.classList.add('system-heartbeat');
+        });
+        card.addEventListener('mouseleave', () => {
+            card.classList.remove('system-heartbeat');
+        });
+    });
+});
+</script>

@@ -44,6 +44,10 @@ builder.Services.AddScoped<MVP_Core.Services.CertificationService>();           
 builder.Services.AddScoped<MVP_Core.Services.SkillsTrackerService>();                                  // 📎 Skills tracker service
 builder.Services.AddScoped<MVP_Core.Services.IContentService, MVP_Core.Services.ContentService>();                                  // 📎 Content service
 
+// ✅ Sparks88 Evolution Services
+builder.Services.AddScoped<MVP_Core.Services.IFXQuoteShuffleService, MVP_Core.Services.FXQuoteShuffleService>(); // 🎙️ Motivational Quote Engine
+builder.Services.AddScoped<MVP_Core.Services.ISparks88VoiceService, MVP_Core.Services.Sparks88VoiceService>(); // 🗣️ Voice/FX Integration
+
 // Register backward compatibility services  
 builder.Services.AddScoped<Services.ISeoService, Services.SEOService>();                                  // 📎 SEO binding per Razor Page (backward compatibility)
 builder.Services.AddScoped<Services.CertificationService>();                                  // 📎 Certification service (backward compatibility)

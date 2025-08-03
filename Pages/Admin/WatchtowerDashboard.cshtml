@@ -1,0 +1,352 @@
+@page
+@model Pages.Admin.WatchtowerDashboardModel
+@{
+    ViewData["Title"] = "Watchtower Dashboard - Nova's Command Center";
+    Layout = "_AdminLayout";
+}
+
+<link rel="stylesheet" href="~/css/heartbeat.css" />
+<link rel="stylesheet" href="~/css/pixelDisintegrate.css" />
+
+<style>
+.watchtower-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.metric-card {
+    background: linear-gradient(135deg, #1a1a1a, #2d2d2d);
+    border: 1px solid #444;
+    border-radius: 12px;
+    padding: 1.5rem;
+    color: white;
+    position: relative;
+    overflow: hidden;
+}
+
+.metric-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #ff4500, #ff6b35, #ff8c42);
+}
+
+.live-feed {
+    max-height: 400px;
+    overflow-y: auto;
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 1rem;
+}
+
+.feed-item {
+    padding: 0.5rem;
+    border-bottom: 1px solid #dee2e6;
+    animation: fadeInUp 0.5s ease-out;
+}
+
+@@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.organization-score {
+    font-size: 2rem;
+    font-weight: bold;
+}
+</style>
+
+<div class="system-heartbeat">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="text-center">
+                <h1 class="logo-heartbeat mb-2">🔭 Watchtower Dashboard</h1>
+                <h2 class="text-primary">Nova's Command Center</h2>
+                <p class="text-muted">Total System Evolution • Sparks88 Active</p>
+                <p class="small"><em>"Built by fire. Run by soul. Operated by legends."</em></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Global Statistics -->
+    <div class="watchtower-grid">
+        <div class="metric-card stability-hum">
+            <h3>👥 Total Users</h3>
+            <div class="h2 text-warning">@Model.GlobalStats.TotalUsers.ToString("N0")</div>
+            <small>Across all platforms</small>
+        </div>
+        <div class="metric-card stability-hum">
+            <h3>💫 Transactions</h3>
+            <div class="h2 text-info">@Model.GlobalStats.TotalTransactions.ToString("N0")</div>
+            <small>Total processed</small>
+        </div>
+        <div class="metric-card stability-hum">
+            <h3>⚡ Average Uptime</h3>
+            <div class="h2 text-success">@Model.GlobalStats.AverageUptime.ToString("F1")%</div>
+            <small>System reliability</small>
+        </div>
+        <div class="metric-card stability-hum">
+            <h3>🏢 Organizations</h3>
+            <div class="h2 text-primary">@Model.GlobalStats.TotalOrganizations</div>
+            <small>Active divisions</small>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Platform Metrics -->
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h4>🌐 Platform Status</h4>
+                </div>
+                <div class="card-body">
+                    @foreach (var platform in Model.AllPlatforms)
+                    {
+                        <div class="d-flex justify-content-between align-items-center mb-3 p-3 border rounded">
+                            <div>
+                                <div class="d-flex align-items-center">
+                                    <div class="@platform.GetStatusClass() me-2"></div>
+                                    <strong>@platform.Name</strong>
+                                </div>
+                                <small class="text-muted">Uptime: @platform.Uptime</small>
+                            </div>
+                            <div class="text-end">
+                                <div class="connection-pulse">
+                                    <span class="badge bg-primary">@platform.ActiveUsers users</span>
+                                </div>
+                                <div><small>@platform.TotalTransactions.ToString("N0") transactions</small></div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Module Status -->
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h4>🔧 Module Status</h4>
+                </div>
+                <div class="card-body">
+                    @foreach (var module in Model.AllModules)
+                    {
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div>
+                                <span class="fw-bold">@module.Name</span>
+                                <span class="badge bg-success ms-2">@module.Status</span>
+                            </div>
+                            <div class="text-end">
+                                <div class="@module.GetPerformanceClass()">@module.Performance</div>
+                                <small class="text-muted">@module.Usage requests</small>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Organization Health -->
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h4>🏢 Organization Health</h4>
+                </div>
+                <div class="card-body">
+                    @foreach (var org in Model.AllOrganizations)
+                    {
+                        <div class="d-flex justify-content-between align-items-center mb-3 p-2 border rounded">
+                            <div>
+                                <strong>@org.Name</strong>
+                                <div class="small text-muted">@org.ActiveProjects active projects</div>
+                            </div>
+                            <div class="text-end">
+                                <div class="organization-score @org.GetHealthClass()">@org.Score</div>
+                                <small class="@org.GetHealthClass()">@org.Health</small>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Live Feed -->
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between">
+                    <h4>📡 Live Activity Feed</h4>
+                    <div class="connection-pulse">
+                        <small class="text-success">● LIVE</small>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="live-feed">
+                        @foreach (var item in Model.LiveFeed)
+                        {
+                            <div class="feed-item">
+                                <div class="d-flex align-items-start">
+                                    <span class="me-2">@item.GetIcon()</span>
+                                    <div class="flex-grow-1">
+                                        <div class="@item.GetSeverityClass() fw-bold">@item.Event</div>
+                                        <small class="text-muted">
+                                            @item.Type • @item.Time.ToString("HH:mm:ss")
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- System Commands -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card pixel-disintegrate">
+                <div class="card-header bg-dark text-white">
+                    <h4>⚡ Watchtower Commands</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-md-3 mb-3">
+                            <button class="btn btn-warning w-100 button-heartbeat" onclick="triggerGlobalScan()">
+                                🔍 Global Scan
+                            </button>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <button class="btn btn-info w-100 button-heartbeat" onclick="refreshMetrics()">
+                                📊 Refresh Metrics
+                            </button>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="/Admin/ModControlPanel" class="btn btn-primary w-100 button-heartbeat">
+                                🎛️ MOD Control
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <button class="btn btn-danger w-100 button-heartbeat" onclick="emergencyProtocol()">
+                                🚨 Emergency
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sparks88 Branding -->
+    <div class="row mt-4">
+        <div class="col-12 text-center">
+            <div class="spark-ignition">
+                <h3 class="text-warning">🔥 Sparks88 Evolution Active</h3>
+            </div>
+            <p class="text-muted">
+                <em>"The evolution begins. Train them like you trained yourself."</em>
+            </p>
+        </div>
+    </div>
+</div>
+
+<script>
+// Auto-refresh live feed every 10 seconds
+setInterval(async () => {
+    try {
+        // Simulate new feed item
+        const feedContainer = document.querySelector('.live-feed');
+        const newItem = document.createElement('div');
+        newItem.className = 'feed-item';
+        newItem.innerHTML = `
+            <div class="d-flex align-items-start">
+                <span class="me-2">⚙️</span>
+                <div class="flex-grow-1">
+                    <div class="text-info fw-bold">Watchtower heartbeat detected</div>
+                    <small class="text-muted">System • ${new Date().toLocaleTimeString()}</small>
+                </div>
+            </div>
+        `;
+        feedContainer.prepend(newItem);
+        
+        // Remove old items if too many
+        const items = feedContainer.querySelectorAll('.feed-item');
+        if (items.length > 10) {
+            items[items.length - 1].remove();
+        }
+    } catch (error) {
+        console.log('Feed update failed:', error);
+    }
+}, 10000);
+
+function triggerGlobalScan() {
+    // Add pixel effect to all metric cards
+    document.querySelectorAll('.metric-card').forEach(card => {
+        card.classList.add('pixel-disintegrate', 'active');
+        setTimeout(() => {
+            card.classList.remove('active');
+        }, 2000);
+    });
+    
+    const btn = event.target;
+    const originalText = btn.textContent;
+    btn.textContent = '🔍 Scanning...';
+    btn.disabled = true;
+    
+    setTimeout(() => {
+        btn.textContent = originalText;
+        btn.disabled = false;
+        alert('Global scan completed. All systems operational.');
+    }, 3000);
+}
+
+function refreshMetrics() {
+    // Trigger heartbeat on all status indicators
+    document.querySelectorAll('.status-heartbeat').forEach(indicator => {
+        indicator.style.animationDuration = '0.3s';
+        setTimeout(() => {
+            indicator.style.animationDuration = '';
+        }, 1000);
+    });
+    
+    location.reload();
+}
+
+function emergencyProtocol() {
+    if (confirm('Are you sure you want to activate emergency protocol?')) {
+        // Flash all heartbeat elements red
+        document.querySelectorAll('.status-heartbeat').forEach(indicator => {
+            indicator.classList.add('critical');
+            indicator.style.animationDuration = '0.2s';
+        });
+        
+        alert('Emergency protocol activated. All systems on high alert.');
+        
+        setTimeout(() => {
+            document.querySelectorAll('.status-heartbeat').forEach(indicator => {
+                indicator.classList.remove('critical');
+                indicator.style.animationDuration = '';
+            });
+        }, 5000);
+    }
+}
+
+// Initialize watchtower
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('🔭 Watchtower Dashboard Online - Nova\'s Command Center Active');
+    console.log('🔥 Sparks88 Evolution Detected');
+    console.log('💫 Built by fire. Run by soul. Operated by legends.');
+});
+</script>

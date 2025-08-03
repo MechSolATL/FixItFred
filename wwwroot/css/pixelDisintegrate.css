@@ -1,0 +1,201 @@
+/* Sparks88 - Pixel Disintegration Effect */
+/* Built by fire. Run by soul. Operated by legends. */
+
+.pixel-disintegrate {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.pixel-disintegrate::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        radial-gradient(circle at 20% 20%, rgba(255,69,0,0.1) 2px, transparent 2px),
+        radial-gradient(circle at 40% 40%, rgba(255,140,0,0.15) 1px, transparent 1px),
+        radial-gradient(circle at 60% 60%, rgba(255,215,0,0.1) 1px, transparent 1px),
+        radial-gradient(circle at 80% 80%, rgba(255,69,0,0.2) 2px, transparent 2px);
+    background-size: 10px 10px, 8px 8px, 6px 6px, 12px 12px;
+    opacity: 0;
+    transition: opacity 0.6s ease-in-out;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.pixel-disintegrate.active::before {
+    opacity: 1;
+    animation: pixelFloat 2s linear infinite;
+}
+
+.pixel-disintegrate.active {
+    transform: scale(0.98);
+    filter: blur(0.5px) contrast(1.1);
+}
+
+.pixel-fade-out {
+    animation: pixelDisintegration 1.5s ease-out forwards;
+}
+
+@keyframes pixelDisintegration {
+    0% {
+        transform: scale(1) rotate(0deg);
+        opacity: 1;
+        filter: blur(0px);
+    }
+    25% {
+        transform: scale(0.98) rotate(0.5deg);
+        filter: blur(1px);
+    }
+    50% {
+        transform: scale(0.95) rotate(-0.5deg);
+        opacity: 0.8;
+        filter: blur(2px) brightness(1.2);
+    }
+    75% {
+        transform: scale(0.9) rotate(0.3deg);
+        opacity: 0.4;
+        filter: blur(3px) brightness(1.5);
+    }
+    100% {
+        transform: scale(0.8) rotate(0deg);
+        opacity: 0;
+        filter: blur(5px) brightness(2);
+    }
+}
+
+@keyframes pixelFloat {
+    0%, 100% {
+        background-position: 0px 0px, 0px 0px, 0px 0px, 0px 0px;
+    }
+    25% {
+        background-position: 2px -2px, -1px 1px, 1px -1px, -2px 2px;
+    }
+    50% {
+        background-position: -2px 2px, 1px -1px, -1px 1px, 2px -2px;
+    }
+    75% {
+        background-position: 1px 1px, -2px -2px, 2px 2px, -1px -1px;
+    }
+}
+
+/* Spark ignition effect */
+.spark-ignition {
+    position: relative;
+    overflow: hidden;
+}
+
+.spark-ignition::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 4px;
+    height: 4px;
+    background: #ff4500;
+    border-radius: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    animation: sparkIgnite 0.8s ease-out;
+}
+
+@keyframes sparkIgnite {
+    0% {
+        transform: translate(-50%, -50%) scale(0);
+        opacity: 0;
+    }
+    30% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+        box-shadow: 0 0 10px #ff4500, 0 0 20px #ff6b35, 0 0 30px #ff8c42;
+    }
+    60% {
+        transform: translate(-50%, -50%) scale(3);
+        opacity: 0.8;
+        box-shadow: 0 0 20px #ff4500, 0 0 40px #ff6b35, 0 0 60px #ff8c42;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(8);
+        opacity: 0;
+        box-shadow: 0 0 40px #ff4500, 0 0 80px #ff6b35, 0 0 120px #ff8c42;
+    }
+}
+
+/* Logo breathing effect */
+.logo-breathe {
+    animation: logoBreathe 3s ease-in-out infinite;
+    transform-origin: center;
+}
+
+@keyframes logoBreathe {
+    0%, 100% {
+        transform: scale(1);
+        filter: brightness(1);
+    }
+    50% {
+        transform: scale(1.05);
+        filter: brightness(1.1);
+    }
+}
+
+/* Dust particle system */
+.dust-particles {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 9999;
+}
+
+.dust-particle {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: rgba(255, 215, 0, 0.6);
+    border-radius: 50%;
+    animation: dustFloat 4s linear infinite;
+}
+
+@keyframes dustFloat {
+    0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 0;
+    }
+    10% {
+        opacity: 1;
+    }
+    90% {
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(-100vh) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .pixel-disintegrate::before {
+        background-size: 6px 6px, 4px 4px, 3px 3px, 8px 8px;
+    }
+    
+    .dust-particle {
+        width: 1px;
+        height: 1px;
+    }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .pixel-disintegrate::before {
+        background: 
+            radial-gradient(circle at 20% 20%, rgba(255,255,255,0.3) 2px, transparent 2px),
+            radial-gradient(circle at 40% 40%, rgba(255,255,255,0.4) 1px, transparent 1px),
+            radial-gradient(circle at 60% 60%, rgba(255,255,255,0.3) 1px, transparent 1px),
+            radial-gradient(circle at 80% 80%, rgba(255,255,255,0.5) 2px, transparent 2px);
+    }
+}

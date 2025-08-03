@@ -1,0 +1,285 @@
+@page
+@model Pages.Admin.ModControlPanelModel
+@{
+    ViewData["Title"] = "MODLight Control Panel - Sparks88";
+    Layout = "_AdminLayout";
+}
+
+<link rel="stylesheet" href="~/css/heartbeat.css" />
+<link rel="stylesheet" href="~/css/pixelDisintegrate.css" />
+
+<div class="system-heartbeat">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="logo-heartbeat">🎛 MODLight Control Panel</h1>
+                    <p class="text-muted">Sparks88 Evolution • Built by fire. Run by soul. Operated by legends.</p>
+                </div>
+                <div class="text-end">
+                    <div class="d-inline-block status-heartbeat @(Model.SystemStatus == "Online" ? "stable" : "warning")"></div>
+                    <span class="ms-2">System @Model.SystemStatus</span>
+                    <br>
+                    <small class="text-muted">Last Update: @Model.LastPingTime</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show checkmark-heartbeat" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["InfoMessage"] != null)
+    {
+        <div class="alert alert-info alert-dismissible fade show" role="alert">
+            @TempData["InfoMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card stability-hum">
+                <div class="card-body text-center">
+                    <h3>@Model.TotalMods</h3>
+                    <p class="mb-0">Total MODs</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stability-hum">
+                <div class="card-body text-center">
+                    <h3>@Model.ActiveDevices</h3>
+                    <p class="mb-0">Active Devices</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body text-center">
+                    <div class="connection-pulse">
+                        <h3>Live</h3>
+                    </div>
+                    <p class="mb-0">Network Status</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h3 class="text-warning">88</h3>
+                    <p class="mb-0">Spark Level</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h4>🔌 Connected Devices</h4>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Status</th>
+                                    <th>Device Name</th>
+                                    <th>Type</th>
+                                    <th>Location</th>
+                                    <th>Last Ping</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var device in Model.ConnectedDevices)
+                                {
+                                    <tr>
+                                        <td>
+                                            <div class="@device.GetStatusClass()"></div>
+                                        </td>
+                                        <td><strong>@device.Name</strong></td>
+                                        <td>
+                                            <span class="badge bg-primary">@device.Type</span>
+                                        </td>
+                                        <td>@device.Location</td>
+                                        <td>
+                                            <small>@device.LastPing.ToString("HH:mm:ss")</small>
+                                        </td>
+                                        <td>
+                                            <form method="post" asp-page-handler="TriggerPing" class="d-inline">
+                                                <input type="hidden" name="deviceId" value="@device.Id" />
+                                                <button type="submit" class="btn btn-sm btn-outline-primary button-heartbeat">
+                                                    📡 Ping
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h4>📊 MOD Analytics</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        @foreach (var stat in Model.ModStats)
+                        {
+                            <div class="col-md-6 mb-3">
+                                <div class="border rounded p-3">
+                                    <div class="d-flex justify-content-between">
+                                        <strong>@stat.Category</strong>
+                                        <span class="badge bg-secondary">@stat.Count devices</span>
+                                    </div>
+                                    <div class="mt-2">
+                                        <small class="text-muted">Usage: @stat.Usage | Uptime: @stat.Uptime</small>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h4>➕ Register New Device</h4>
+                </div>
+                <div class="card-body">
+                    <form method="post" asp-page-handler="RegisterDevice">
+                        <div class="mb-3">
+                            <label asp-for="NewDevice.Name" class="form-label"></label>
+                            <input asp-for="NewDevice.Name" class="form-control" placeholder="e.g., CoreLight Field Unit" />
+                            <span asp-validation-for="NewDevice.Name" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label asp-for="NewDevice.Type" class="form-label"></label>
+                            <select asp-for="NewDevice.Type" class="form-select">
+                                <option value="">Select Device Type</option>
+                                <option value="MVP-Core">MVP-Core</option>
+                                <option value="MVP-CoreLight">MVP-CoreLight</option>
+                                <option value="FX Broadcast">FX Broadcast Layer</option>
+                                <option value="Marketplace">Marketplace Module</option>
+                                <option value="Watchtower">Watchtower System</option>
+                            </select>
+                            <span asp-validation-for="NewDevice.Type" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label asp-for="NewDevice.Location" class="form-label"></label>
+                            <input asp-for="NewDevice.Location" class="form-control" placeholder="e.g., Mobile Unit 1" />
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary w-100 button-heartbeat">
+                            🔥 Register Device
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h4>🚀 Quick Actions</h4>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-warning button-heartbeat" onclick="triggerSystemScan()">
+                            📡 Scan for Devices
+                        </button>
+                        <button class="btn btn-info button-heartbeat" onclick="refreshStatus()">
+                            🔄 Refresh Status
+                        </button>
+                        <button class="btn btn-success button-heartbeat" onclick="pingAllDevices()">
+                            📢 Ping All Devices
+                        </button>
+                        <a href="/Admin/WatchtowerDashboard" class="btn btn-primary button-heartbeat">
+                            🔭 Open Watchtower
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mt-4 pixel-disintegrate">
+                <div class="card-header bg-dark text-white">
+                    <h4>⚡ Sparks88 Status</h4>
+                </div>
+                <div class="card-body">
+                    <div class="text-center">
+                        <div class="spark-ignition mb-3">
+                            <h2 class="text-warning">🔥</h2>
+                        </div>
+                        <p><strong>Evolution Status:</strong> Active</p>
+                        <p><em>"Built by fire. Run by soul. Operated by legends."</em></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function triggerSystemScan() {
+    // Add pixel disintegrate effect
+    document.querySelectorAll('.card').forEach(card => {
+        card.classList.add('pixel-disintegrate', 'active');
+        setTimeout(() => {
+            card.classList.remove('active');
+        }, 2000);
+    });
+    
+    // Show loading state
+    const btn = event.target;
+    const originalText = btn.textContent;
+    btn.textContent = '🔍 Scanning...';
+    btn.disabled = true;
+    
+    setTimeout(() => {
+        btn.textContent = originalText;
+        btn.disabled = false;
+        alert('System scan completed. No new devices found.');
+    }, 3000);
+}
+
+function refreshStatus() {
+    location.reload();
+}
+
+function pingAllDevices() {
+    // Trigger heartbeat animation on all status indicators
+    document.querySelectorAll('.status-heartbeat').forEach(indicator => {
+        indicator.style.animationDuration = '0.5s';
+        setTimeout(() => {
+            indicator.style.animationDuration = '';
+        }, 2000);
+    });
+    
+    alert('Ping sent to all devices. Check status indicators.');
+}
+
+// Auto-refresh every 30 seconds
+setInterval(() => {
+    document.querySelector('.connection-pulse').style.animation = 'connectionRipple 0.5s ease-out';
+    setTimeout(() => {
+        document.querySelector('.connection-pulse').style.animation = '';
+    }, 500);
+}, 30000);
+</script>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

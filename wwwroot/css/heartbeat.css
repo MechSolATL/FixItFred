@@ -1,0 +1,283 @@
+/* Sparks88 - Heartbeat System Pulse */
+/* Built by fire. Run by soul. Operated by legends. */
+
+.system-heartbeat {
+    position: relative;
+    animation: systemPulse 2s ease-in-out infinite;
+}
+
+.system-heartbeat::before {
+    content: '';
+    position: absolute;
+    top: -5px;
+    left: -5px;
+    right: -5px;
+    bottom: -5px;
+    border: 2px solid transparent;
+    border-radius: inherit;
+    background: linear-gradient(45deg, #ff4500, #ff6b35, #ff8c42, #ffad5a) border-box;
+    -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: destination-out;
+    mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    opacity: 0;
+    animation: heartbeatGlow 2s ease-in-out infinite;
+}
+
+@keyframes systemPulse {
+    0%, 100% {
+        transform: scale(1);
+        filter: brightness(1);
+    }
+    50% {
+        transform: scale(1.02);
+        filter: brightness(1.05);
+    }
+}
+
+@keyframes heartbeatGlow {
+    0%, 100% {
+        opacity: 0;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.6;
+        transform: scale(1.1);
+    }
+}
+
+/* Logo heartbeat for main branding */
+.logo-heartbeat {
+    animation: logoHeartbeat 1.5s ease-in-out infinite;
+    transform-origin: center;
+}
+
+@keyframes logoHeartbeat {
+    0%, 100% {
+        transform: scale(1);
+        filter: drop-shadow(0 0 5px rgba(255, 69, 0, 0.3));
+    }
+    25% {
+        transform: scale(1.05);
+        filter: drop-shadow(0 0 10px rgba(255, 69, 0, 0.6));
+    }
+    50% {
+        transform: scale(1.1);
+        filter: drop-shadow(0 0 15px rgba(255, 69, 0, 0.8));
+    }
+    75% {
+        transform: scale(1.05);
+        filter: drop-shadow(0 0 10px rgba(255, 69, 0, 0.6));
+    }
+}
+
+/* System status indicators */
+.status-heartbeat {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    background: #00ff00;
+    border-radius: 50%;
+    animation: statusPulse 1s ease-in-out infinite;
+    position: relative;
+}
+
+.status-heartbeat.stable {
+    background: #00ff00;
+    animation-duration: 2s;
+}
+
+.status-heartbeat.warning {
+    background: #ffaa00;
+    animation-duration: 1s;
+}
+
+.status-heartbeat.critical {
+    background: #ff0000;
+    animation-duration: 0.5s;
+}
+
+.status-heartbeat.offline {
+    background: #666666;
+    animation: none;
+}
+
+@keyframes statusPulse {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+        box-shadow: 0 0 5px currentColor;
+    }
+    50% {
+        opacity: 0.6;
+        transform: scale(1.3);
+        box-shadow: 0 0 15px currentColor;
+    }
+}
+
+/* Checkmark success animation */
+.checkmark-heartbeat {
+    display: inline-block;
+    position: relative;
+    transform-origin: center;
+}
+
+.checkmark-heartbeat::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #00ff00;
+    font-weight: bold;
+    animation: checkmarkPulse 0.6s ease-out;
+}
+
+@keyframes checkmarkPulse {
+    0% {
+        transform: translate(-50%, -50%) scale(0) rotate(-180deg);
+        opacity: 0;
+    }
+    50% {
+        transform: translate(-50%, -50%) scale(1.5) rotate(0deg);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(1) rotate(0deg);
+        opacity: 1;
+    }
+}
+
+/* System stability hum animation */
+.stability-hum {
+    position: relative;
+    background: linear-gradient(45deg, rgba(0, 255, 0, 0.1), rgba(0, 255, 100, 0.05));
+    animation: stabilityHum 3s ease-in-out infinite;
+}
+
+.stability-hum::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, transparent, rgba(0, 255, 0, 0.1), transparent);
+    animation: humWave 2s linear infinite;
+}
+
+@keyframes stabilityHum {
+    0%, 100% {
+        box-shadow: 0 0 10px rgba(0, 255, 0, 0.2);
+    }
+    50% {
+        box-shadow: 0 0 20px rgba(0, 255, 0, 0.4);
+    }
+}
+
+@keyframes humWave {
+    0% {
+        transform: translateX(-100%);
+    }
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+/* Connection pulse for network status */
+.connection-pulse {
+    position: relative;
+    display: inline-block;
+}
+
+.connection-pulse::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 8px;
+    height: 8px;
+    background: #00aaff;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    animation: connectionRipple 2s ease-out infinite;
+}
+
+@keyframes connectionRipple {
+    0% {
+        width: 8px;
+        height: 8px;
+        opacity: 1;
+    }
+    100% {
+        width: 40px;
+        height: 40px;
+        opacity: 0;
+    }
+}
+
+/* Heartbeat variants for different components */
+.nav-heartbeat {
+    animation: navPulse 4s ease-in-out infinite;
+}
+
+@keyframes navPulse {
+    0%, 100% {
+        border-color: rgba(255, 69, 0, 0.2);
+    }
+    50% {
+        border-color: rgba(255, 69, 0, 0.6);
+    }
+}
+
+.button-heartbeat {
+    transition: all 0.3s ease;
+}
+
+.button-heartbeat:hover {
+    animation: buttonPulse 0.6s ease-in-out;
+}
+
+@keyframes buttonPulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+        box-shadow: 0 0 20px rgba(255, 69, 0, 0.4);
+    }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .logo-heartbeat {
+        animation-duration: 2s; /* Slower on mobile for better performance */
+    }
+    
+    .system-heartbeat::before {
+        border-width: 1px;
+    }
+    
+    .status-heartbeat {
+        width: 8px;
+        height: 8px;
+    }
+}
+
+/* Reduced motion accessibility */
+@media (prefers-reduced-motion: reduce) {
+    .system-heartbeat,
+    .logo-heartbeat,
+    .status-heartbeat,
+    .stability-hum,
+    .nav-heartbeat {
+        animation: none;
+    }
+    
+    .system-heartbeat::before,
+    .stability-hum::before,
+    .connection-pulse::before {
+        animation: none;
+        opacity: 0.5;
+    }
+}
