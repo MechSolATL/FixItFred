@@ -1,3 +1,11 @@
+// © 1997–2025 Virtual Concepts LLC, All Rights Reserved.
+// Created & designed by Virtual Concepts LLC for Mechanical Solutions Atlanta.
+// Platform: Service-Atlanta.com (MVP-Core vOmegaFinal)
+// This software and all associated components are the exclusive intellectual property of Service Atlanta.
+// No part of this system may be copied, distributed, resold, lent, or disclosed to any unauthorized party.
+// Use is strictly limited to verified users who have completed Service Atlanta's full verification process.
+// Unauthorized use without written authorization is enforceable by law.
+
 // [Sprint123_FixItFred_OmegaSweep] Fixed all namespace references to match actual project structure
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -26,6 +34,9 @@ builder.Services.AddHttpContextAccessor();
 // ✅ FixItFred & Revitalize services
 builder.Services.AddScoped<Interfaces.IUserContext, Services.DefaultUserContext>(); // 🔐 ClaimsPrincipal DI context
 // builder.Services.AddScoped<Services.ReplayEngineService>();                          // 🔄 [OmegaSweep_Auto] Replay engine for snapshots - Missing class
+
+// Register TelemetryTraceService for Sprint123_15-30 Beyond-CTO Build Sweep
+builder.Services.AddScoped<Services.TelemetryTraceService>();
 
 // Register MVP_Core services first
 builder.Services.AddScoped<MVP_Core.Services.ISeoService, MVP_Core.Services.SEOService>();                                  // 📎 SEO binding per Razor Page

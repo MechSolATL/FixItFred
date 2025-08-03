@@ -1,0 +1,332 @@
+@page "/admin/command-center"
+@model MVP_Core.Pages.Revitalize.CommandCenterModel
+@{
+    ViewData["Title"] = "Command Center - Trace Logs";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+}
+
+<!-- © 1997–2025 Virtual Concepts LLC, All Rights Reserved. -->
+<!-- Created & designed by Virtual Concepts LLC for Mechanical Solutions Atlanta. -->
+<!-- Platform: Service-Atlanta.com (MVP-Core vOmegaFinal) -->
+
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h2">🎛️ Command Center</h1>
+                <div class="badge badge-primary">MVP-Core vOmegaFinal</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- System Status Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h5>System Status</h5>
+                            <h3>@Model.SystemStatus</h3>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-heartbeat fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h5>Active Sessions</h5>
+                            <h3>@Model.ActiveSessions</h3>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-users fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h5>Persona Threshold</h5>
+                            <h3>@Model.PersonaThreshold.ToString("P1")</h3>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-brain fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-danger text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h5>Security Alerts</h5>
+                            <h3>@Model.SecurityAlerts</h3>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-shield-alt fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Trace Logs Tabs -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <ul class="nav nav-tabs card-header-tabs" id="traceTabs" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" id="login-tab" data-toggle="tab" href="#login" role="tab">
+                                🔐 Login Traces
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="cli-tab" data-toggle="tab" href="#cli" role="tab">
+                                💻 CLI Actions
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="lyra-tab" data-toggle="tab" href="#lyra" role="tab">
+                                🎭 Lyra Overlays
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="github-tab" data-toggle="tab" href="#github" role="tab">
+                                📂 GitHub Operations
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="persona-tab" data-toggle="tab" href="#persona" role="tab">
+                                ⚠️ Persona Drift
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="card-body">
+                    <div class="tab-content" id="traceTabContent">
+                        <!-- Login Traces -->
+                        <div class="tab-pane fade show active" id="login" role="tabpanel">
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Timestamp</th>
+                                            <th>User</th>
+                                            <th>IP Address</th>
+                                            <th>Status</th>
+                                            <th>Session</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var log in Model.LoginLogs)
+                                        {
+                                            <tr>
+                                                <td>@log.Timestamp.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                                                <td>@log.UserName</td>
+                                                <td>@log.IpAddress</td>
+                                                <td>
+                                                    <span class="badge @(log.IsSuccessful ? "badge-success" : "badge-danger")">
+                                                        @(log.IsSuccessful ? "Success" : "Failed")
+                                                    </span>
+                                                </td>
+                                                <td><code>@log.SessionId</code></td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- CLI Actions -->
+                        <div class="tab-pane fade" id="cli" role="tabpanel">
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Timestamp</th>
+                                            <th>Action</th>
+                                            <th>Command</th>
+                                            <th>User</th>
+                                            <th>Parameters</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var log in Model.CliLogs)
+                                        {
+                                            <tr>
+                                                <td>@log.Timestamp.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                                                <td><span class="badge badge-info">@log.Action</span></td>
+                                                <td><code>@log.Command</code></td>
+                                                <td>@log.UserId</td>
+                                                <td>@log.Parameters</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Lyra Overlays -->
+                        <div class="tab-pane fade" id="lyra" role="tabpanel">
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Timestamp</th>
+                                            <th>Overlay Type</th>
+                                            <th>Persona</th>
+                                            <th>Empathy Score</th>
+                                            <th>Content Preview</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var log in Model.LyraLogs)
+                                        {
+                                            <tr>
+                                                <td>@log.Timestamp.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                                                <td><span class="badge badge-primary">@log.OverlayType</span></td>
+                                                <td>@log.PersonaId</td>
+                                                <td>
+                                                    <span class="badge @(log.EmpathyScore >= 0.85 ? "badge-success" : "badge-warning")">
+                                                        @log.EmpathyScore.ToString("P1")
+                                                    </span>
+                                                </td>
+                                                <td>@log.NarrationContent.Substring(0, Math.Min(50, log.NarrationContent.Length))...</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- GitHub Operations -->
+                        <div class="tab-pane fade" id="github" role="tabpanel">
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Timestamp</th>
+                                            <th>Operation</th>
+                                            <th>Repository</th>
+                                            <th>Branch</th>
+                                            <th>Commit</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var log in Model.GitHubLogs)
+                                        {
+                                            <tr>
+                                                <td>@log.Timestamp.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                                                <td><span class="badge badge-secondary">@log.Operation</span></td>
+                                                <td>@log.Repository</td>
+                                                <td><code>@log.Branch</code></td>
+                                                <td><code>@log.CommitHash.Substring(0, 8)</code></td>
+                                                <td>
+                                                    <span class="badge @(log.IsBlocked ? "badge-danger" : "badge-success")">
+                                                        @(log.IsBlocked ? "Blocked" : "Allowed")
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Persona Drift -->
+                        <div class="tab-pane fade" id="persona" role="tabpanel">
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Timestamp</th>
+                                            <th>Persona ID</th>
+                                            <th>Empathy Score</th>
+                                            <th>Alert Level</th>
+                                            <th>Session</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var log in Model.PersonaDriftLogs)
+                                        {
+                                            <tr>
+                                                <td>@log.Timestamp.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                                                <td>@log.PersonaId</td>
+                                                <td>@log.EmpathyScore.ToString("P1")</td>
+                                                <td>
+                                                    <span class="badge @(log.AlertLevel == "CRITICAL" ? "badge-danger" : "badge-warning")">
+                                                        @log.AlertLevel
+                                                    </span>
+                                                </td>
+                                                <td><code>@log.SessionId</code></td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Real-time Updates -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5>🔴 Real-time Monitoring</h5>
+                </div>
+                <div class="card-body">
+                    <div id="real-time-logs" class="bg-dark text-light p-3" style="height: 200px; overflow-y: auto; font-family: monospace;">
+                        <!-- Real-time logs will be inserted here via SignalR -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/lib/microsoft-signalr/signalr.min.js"></script>
+    <script>
+        // Initialize real-time monitoring
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/hubs/telemetry")
+            .build();
+
+        connection.start().then(function () {
+            console.log("Connected to TelemetryHub");
+        });
+
+        connection.on("NewTraceLog", function (logType, logData) {
+            const logsContainer = document.getElementById("real-time-logs");
+            const timestamp = new Date().toISOString();
+            const logEntry = `[${timestamp}] ${logType}: ${JSON.stringify(logData)}\n`;
+            
+            logsContainer.innerHTML += logEntry;
+            logsContainer.scrollTop = logsContainer.scrollHeight;
+        });
+
+        // Auto-refresh data every 30 seconds
+        setInterval(function() {
+            location.reload();
+        }, 30000);
+    </script>
+}

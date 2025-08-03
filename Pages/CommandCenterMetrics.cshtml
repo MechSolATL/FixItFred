@@ -1,0 +1,307 @@
+@page "/admin/command-center-metrics"
+@model MVP_Core.Pages.CommandCenterMetricsModel
+@{
+    ViewData["Title"] = "Command Center Metrics - DAU & ROI";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+}
+
+<!-- © 1997–2025 Virtual Concepts LLC, All Rights Reserved. -->
+<!-- Created & designed by Virtual Concepts LLC for Mechanical Solutions Atlanta. -->
+<!-- Platform: Service-Atlanta.com (MVP-Core vOmegaFinal) -->
+
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h2">📊 Command Center Metrics</h1>
+                <div class="badge badge-primary">MVP-Core vOmegaFinal</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Key Performance Indicators -->
+    <div class="row mb-4">
+        <div class="col-md-2">
+            <div class="card bg-primary text-white">
+                <div class="card-body text-center">
+                    <h3>@Model.DailyActiveUsers</h3>
+                    <p class="mb-0">Daily Active Users</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card bg-success text-white">
+                <div class="card-body text-center">
+                    <h3>@Model.LyraRoi.ToString("P1")</h3>
+                    <p class="mb-0">Lyra ROI</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card bg-info text-white">
+                <div class="card-body text-center">
+                    <h3>@Model.EmpathyScore.ToString("P1")</h3>
+                    <p class="mb-0">Avg Empathy Score</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card bg-warning text-white">
+                <div class="card-body text-center">
+                    <h3>@Model.SessionHijackAlerts</h3>
+                    <p class="mb-0">Security Alerts</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card bg-secondary text-white">
+                <div class="card-body text-center">
+                    <h3>@Model.FixItFredReplays</h3>
+                    <p class="mb-0">FixItFred Replays</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="card bg-dark text-white">
+                <div class="card-body text-center">
+                    <h3>@Model.GeoFilteredRequests</h3>
+                    <p class="mb-0">Geo Filtered</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5>📈 Daily Active Users Trend</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="dauChart" width="400" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5>🎭 Lyra Empathy Score Distribution</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="empathyChart" width="400" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Geographic Activity -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5>🌍 Geographic Activity & Filtering</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Location</th>
+                                    <th>Active Users</th>
+                                    <th>Sessions</th>
+                                    <th>Filtered</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var location in Model.GeographicData)
+                                {
+                                    <tr>
+                                        <td>
+                                            <i class="fas fa-map-marker-alt"></i>
+                                            @location.Location
+                                        </td>
+                                        <td>@location.ActiveUsers</td>
+                                        <td>@location.Sessions</td>
+                                        <td>@location.FilteredRequests</td>
+                                        <td>
+                                            <span class="badge @(location.IsAllowed ? "badge-success" : "badge-danger")">
+                                                @(location.IsAllowed ? "Allowed" : "Blocked")
+                                            </span>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5>🔒 Session Hijack Alerts</h5>
+                </div>
+                <div class="card-body">
+                    @foreach (var alert in Model.SecurityAlerts)
+                    {
+                        <div class="alert alert-@(alert.Severity.ToLower()) alert-dismissible fade show">
+                            <strong>@alert.Timestamp.ToString("HH:mm")</strong><br>
+                            @alert.Message<br>
+                            <small class="text-muted">IP: @alert.IpAddress</small>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FixItFred Replay Analysis -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5>🔧 FixItFred Replay Analysis</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <canvas id="replayChart" width="400" height="200"></canvas>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="table-responsive">
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Replay Type</th>
+                                            <th>Count</th>
+                                            <th>Success Rate</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var replay in Model.ReplayAnalysis)
+                                        {
+                                            <tr>
+                                                <td>@replay.Type</td>
+                                                <td>@replay.Count</td>
+                                                <td>@replay.SuccessRate.ToString("P1")</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Real-time Metrics Update -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5>⚡ Real-time Metrics Feed</h5>
+                    <small class="text-muted">Updates every 10 seconds</small>
+                </div>
+                <div class="card-body">
+                    <div id="real-time-metrics" class="bg-dark text-light p-3" style="height: 150px; overflow-y: auto; font-family: monospace;">
+                        <!-- Real-time metrics will be updated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="~/lib/microsoft-signalr/signalr.min.js"></script>
+    <script>
+        // DAU Chart
+        const dauCtx = document.getElementById('dauChart').getContext('2d');
+        const dauChart = new Chart(dauCtx, {
+            type: 'line',
+            data: {
+                labels: @Html.Raw(Model.DauChartLabels),
+                datasets: [{
+                    label: 'Daily Active Users',
+                    data: @Html.Raw(Model.DauChartData),
+                    borderColor: 'rgb(75, 192, 192)',
+                    tension: 0.1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // Empathy Score Chart
+        const empathyCtx = document.getElementById('empathyChart').getContext('2d');
+        const empathyChart = new Chart(empathyCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Excellent (≥0.9)', 'Good (0.8-0.89)', 'Warning (<0.8)'],
+                datasets: [{
+                    data: @Html.Raw(Model.EmpathyDistribution),
+                    backgroundColor: ['#28a745', '#ffc107', '#dc3545']
+                }]
+            },
+            options: {
+                responsive: true
+            }
+        });
+
+        // Replay Analysis Chart
+        const replayCtx = document.getElementById('replayChart').getContext('2d');
+        const replayChart = new Chart(replayCtx, {
+            type: 'bar',
+            data: {
+                labels: @Html.Raw(Model.ReplayChartLabels),
+                datasets: [{
+                    label: 'Replay Count',
+                    data: @Html.Raw(Model.ReplayChartData),
+                    backgroundColor: 'rgba(54, 162, 235, 0.5)'
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // Real-time updates
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/hubs/metrics")
+            .build();
+
+        connection.start().then(function () {
+            console.log("Connected to MetricsHub");
+        });
+
+        connection.on("MetricsUpdate", function (metrics) {
+            const metricsContainer = document.getElementById("real-time-metrics");
+            const timestamp = new Date().toISOString();
+            const entry = `[${timestamp}] DAU: ${metrics.dau}, Empathy: ${metrics.empathy}, Alerts: ${metrics.alerts}\n`;
+            
+            metricsContainer.innerHTML += entry;
+            metricsContainer.scrollTop = metricsContainer.scrollHeight;
+        });
+
+        // Auto-refresh every 30 seconds
+        setInterval(function() {
+            location.reload();
+        }, 30000);
+    </script>
+}
