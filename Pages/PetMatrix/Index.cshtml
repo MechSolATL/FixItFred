@@ -1,0 +1,692 @@
+@page
+@model Pages.PetMatrix.PetMatrixModel
+@{
+    ViewData["Title"] = "PetMatrix Protocol - Nova's Digital Companions";
+    Layout = "_Layout";
+}
+
+<link rel="stylesheet" href="~/css/heartbeat.css" />
+<link rel="stylesheet" href="~/css/pixelDisintegrate.css" />
+
+<style>
+.petmatrix-container {
+    background: linear-gradient(135deg, #0a0a0a, #1a1a2e, #16213e);
+    min-height: 100vh;
+    color: white;
+    font-family: 'Courier New', monospace;
+}
+
+.matrix-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin: 2rem 0;
+}
+
+.pet-card {
+    background: linear-gradient(145deg, #1e1e1e, #2a2a2a);
+    border: 2px solid #333;
+    border-radius: 15px;
+    padding: 1.5rem;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.pet-card:hover {
+    border-color: #ff4500;
+    box-shadow: 0 0 20px rgba(255, 69, 0, 0.3);
+}
+
+.pet-card.matrix-mode {
+    animation: matrixGlitch 2s infinite;
+    border-color: #00ff00;
+}
+
+.pet-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(45deg, #ff4500, #ff6b35);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    margin: 0 auto 1rem;
+}
+
+.trust-bar {
+    width: 100%;
+    height: 8px;
+    background: #333;
+    border-radius: 4px;
+    overflow: hidden;
+    margin: 0.5rem 0;
+}
+
+.trust-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #ff4500, #ffa500, #ffff00);
+    transition: width 0.5s ease;
+}
+
+.trust-fill.fully-trusted {
+    background: linear-gradient(90deg, #ffd700, #ffffe0);
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+.snack-shop {
+    background: linear-gradient(145deg, #2a1810, #3a2520);
+    border: 2px solid #8B4513;
+    border-radius: 15px;
+    padding: 2rem;
+    margin: 2rem 0;
+}
+
+.snack-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    margin: 0.5rem 0;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.snack-item:hover {
+    background: rgba(255, 69, 0, 0.1);
+    transform: translateX(5px);
+}
+
+.snack-item.risky {
+    border-left: 4px solid #ff0000;
+    animation: dangerPulse 2s infinite;
+}
+
+.horn-controls {
+    display: flex;
+    gap: 1rem;
+    margin: 2rem 0;
+    justify-content: center;
+}
+
+.horn-button {
+    padding: 1rem 2rem;
+    border: none;
+    border-radius: 10px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 150px;
+}
+
+.horn-a {
+    background: linear-gradient(45deg, #ff69b4, #ff1493);
+    color: white;
+}
+
+.horn-b {
+    background: linear-gradient(45deg, #32cd32, #228b22);
+    color: white;
+}
+
+.horn-c {
+    background: linear-gradient(45deg, #9370db, #4b0082);
+    color: white;
+}
+
+.horn-button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+}
+
+.aura-display {
+    background: linear-gradient(145deg, #1a1a2e, #16213e);
+    border: 2px solid #ff4500;
+    border-radius: 15px;
+    padding: 1.5rem;
+    text-align: center;
+    margin: 1rem 0;
+}
+
+.aura-points {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #ffd700;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+.mod-badge {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: bold;
+    margin: 0.5rem 0;
+}
+
+.mod-badge.moderator {
+    background: linear-gradient(45deg, #c0c0c0, #e6e6e6);
+    color: #333;
+}
+
+.mod-badge.manager {
+    background: linear-gradient(45deg, #ffd700, #ffffe0);
+    color: #333;
+    animation: goldGlow 2s infinite;
+}
+
+.watchtower-proximity {
+    background: rgba(0, 255, 255, 0.1);
+    border: 2px solid #00ffff;
+    border-radius: 10px;
+    padding: 1rem;
+    margin: 1rem 0;
+    text-align: center;
+}
+
+.oracle-hover {
+    background: linear-gradient(45deg, #800080, #4b0082);
+    border: 2px solid #9370db;
+    color: white;
+    animation: oracleGlow 3s infinite;
+}
+
+@@keyframes matrixGlitch {
+    0%, 100% { filter: hue-rotate(0deg); }
+    25% { filter: hue-rotate(90deg) saturate(2); }
+    50% { filter: hue-rotate(180deg) contrast(1.5); }
+    75% { filter: hue-rotate(270deg) brightness(1.2); }
+}
+
+@@keyframes dangerPulse {
+    0%, 100% { box-shadow: 0 0 5px rgba(255, 0, 0, 0.3); }
+    50% { box-shadow: 0 0 20px rgba(255, 0, 0, 0.8); }
+}
+
+@@keyframes goldGlow {
+    0%, 100% { box-shadow: 0 0 10px rgba(255, 215, 0, 0.3); }
+    50% { box-shadow: 0 0 30px rgba(255, 215, 0, 0.8); }
+}
+
+@@keyframes oracleGlow {
+    0%, 100% { box-shadow: 0 0 15px rgba(147, 112, 219, 0.5); }
+    50% { box-shadow: 0 0 40px rgba(147, 112, 219, 1); }
+}
+
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    color: white;
+    font-weight: bold;
+    z-index: 1000;
+    animation: slideIn 0.3s ease;
+}
+
+.notification.success {
+    background: linear-gradient(45deg, #28a745, #20c997);
+}
+
+.notification.warning {
+    background: linear-gradient(45deg, #ffc107, #fd7e14);
+}
+
+.notification.error {
+    background: linear-gradient(45deg, #dc3545, #e83e8c);
+}
+
+@@keyframes slideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+</style>
+
+<div class="petmatrix-container">
+    <div class="container-fluid">
+        <!-- Header -->
+        <div class="row mb-4">
+            <div class="col-12 text-center">
+                <h1 class="logo-heartbeat mb-2">🐾 PetMatrix Protocol</h1>
+                <h2 class="text-primary">Nova's Digital Companions</h2>
+                <p class="text-muted">Trust through snacks • Build your legacy • Touch the Tower</p>
+                <p class="small"><em>"In the Matrix, trust is earned by snacks. Feed your beast, build your legacy."</em></p>
+            </div>
+        </div>
+
+        <!-- User Aura Status -->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="aura-display">
+                    <h3>💫 Your Aura Status</h3>
+                    <div class="aura-points" id="aura-points">0</div>
+                    <p>Aura Points</p>
+                    <div class="mod-badge" id="mod-badge">User</div>
+                    <div id="watchtower-status"></div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="snack-shop">
+                    <h3>🛒 Chase Snack Shop</h3>
+                    <p class="small">$1 = 1 Aura Point • 1000 Points = Watchtower Access</p>
+                    <div id="snack-list"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Horn Controls -->
+        <div class="row">
+            <div class="col-12">
+                <h3 class="text-center mb-3">📯 Pet Summoning Horns</h3>
+                <div class="horn-controls">
+                    <button class="horn-button horn-a" onclick="triggerHorn('A')">
+                        🔔 Horn A<br><small>Feline Family</small>
+                    </button>
+                    <button class="horn-button horn-b" onclick="triggerHorn('B')">
+                        🎺 Horn B<br><small>Canine Family</small>
+                    </button>
+                    <button class="horn-button horn-c" onclick="triggerHorn('C')">
+                        📯 Horn C<br><small>Matrix Creatures</small>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pet Grid -->
+        <div class="row">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h3>🐾 Your Digital Companions</h3>
+                    <button class="btn btn-primary" onclick="createNewPet()">+ Adopt New Pet</button>
+                </div>
+                <div class="matrix-grid" id="pet-grid">
+                    <!-- Pets will be loaded here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card bg-dark text-white">
+                    <div class="card-header">
+                        <h4>⚡ Quick Actions</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row text-center">
+                            <div class="col-md-3">
+                                <button class="btn btn-warning w-100 mb-2" onclick="refreshPets()">
+                                    🔄 Refresh Pets
+                                </button>
+                            </div>
+                            <div class="col-md-3">
+                                <button class="btn btn-info w-100 mb-2" onclick="viewWatchtower()">
+                                    🔭 Visit Watchtower
+                                </button>
+                            </div>
+                            <div class="col-md-3">
+                                <button class="btn btn-success w-100 mb-2" onclick="checkNearbyMods()">
+                                    👁️ Scan for MODs
+                                </button>
+                            </div>
+                            <div class="col-md-3">
+                                <button class="btn btn-danger w-100 mb-2" onclick="activateOracleHover()" id="oracle-button" style="display:none;">
+                                    🌟 Oracle Hover
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Notification Container -->
+<div id="notification-container"></div>
+
+<script>
+// PetMatrix Protocol JavaScript Controller
+class PetMatrixController {
+    constructor() {
+        this.userId = 'demo-user'; // In production, get from auth
+        this.pets = [];
+        this.snacks = [];
+        this.userAura = null;
+        this.init();
+    }
+
+    async init() {
+        console.log('🐾 PetMatrix Protocol Initializing...');
+        await this.loadUserData();
+        await this.loadPets();
+        await this.loadSnacks();
+        this.setupEventListeners();
+        this.startPeriodicUpdates();
+    }
+
+    async loadUserData() {
+        try {
+            const response = await fetch(`/api/petmatrix/aura/my-rank?userId=${this.userId}`);
+            this.userAura = await response.json();
+            this.updateAuraDisplay();
+        } catch (error) {
+            console.error('Error loading user data:', error);
+            this.showNotification('Error loading user data', 'error');
+        }
+    }
+
+    async loadPets() {
+        try {
+            const response = await fetch(`/api/petmatrix/pets/my-pets?userId=${this.userId}`);
+            this.pets = await response.json();
+            this.renderPets();
+        } catch (error) {
+            console.error('Error loading pets:', error);
+            this.showNotification('Error loading pets', 'error');
+        }
+    }
+
+    async loadSnacks() {
+        try {
+            const response = await fetch('/api/petmatrix/shop/snacks');
+            this.snacks = await response.json();
+            this.renderSnacks();
+        } catch (error) {
+            console.error('Error loading snacks:', error);
+            this.showNotification('Error loading snacks', 'error');
+        }
+    }
+
+    updateAuraDisplay() {
+        if (!this.userAura) return;
+
+        document.getElementById('aura-points').textContent = this.userAura.auraPoints.toLocaleString();
+        
+        const badge = document.getElementById('mod-badge');
+        badge.textContent = this.userAura.modRank === 'None' ? 
+            `User (${this.userAura.auraPoints} aura)` : 
+            this.userAura.getRankDisplayName ? this.userAura.getRankDisplayName() : 
+            `${this.userAura.modRank} (${this.userAura.auraPoints} aura)`;
+        
+        badge.className = `mod-badge ${this.userAura.modRank.toLowerCase()}`;
+
+        // Watchtower status
+        const watchtowerStatus = document.getElementById('watchtower-status');
+        if (this.userAura.hasWatchtowerAccess) {
+            watchtowerStatus.innerHTML = '<div class="watchtower-proximity">🔭 Watchtower Access Granted</div>';
+            
+            if (this.userAura.modRank === 'Manager' && this.userAura.watchtowerVisitCount >= 50) {
+                document.getElementById('oracle-button').style.display = 'block';
+            }
+        } else {
+            const needed = 1000 - this.userAura.auraPoints;
+            watchtowerStatus.innerHTML = `<p class="text-warning">🔒 Watchtower locked • Need ${needed} more aura</p>`;
+        }
+    }
+
+    renderPets() {
+        const grid = document.getElementById('pet-grid');
+        
+        if (this.pets.length === 0) {
+            grid.innerHTML = `
+                <div class="col-12 text-center py-5">
+                    <h4>No pets yet!</h4>
+                    <p>Adopt your first digital companion to begin the PetMatrix Protocol.</p>
+                    <button class="btn btn-primary btn-lg" onclick="petMatrix.createNewPet()">🐾 Adopt Your First Pet</button>
+                </div>
+            `;
+            return;
+        }
+
+        grid.innerHTML = this.pets.map(pet => `
+            <div class="pet-card ${pet.isInMatrixMode ? 'matrix-mode' : ''}" data-pet-id="${pet.petId}">
+                <div class="pet-avatar">${this.getPetEmoji(pet.species)}</div>
+                <h4 class="text-center">${pet.name}</h4>
+                <p class="text-center text-muted">${pet.species} • ${pet.family}</p>
+                
+                <div class="trust-bar">
+                    <div class="trust-fill ${pet.isFullyTrusted ? 'fully-trusted' : ''}" 
+                         style="width: ${pet.trustLevel}%"></div>
+                </div>
+                <p class="small text-center">Trust: ${pet.trustLevel.toFixed(1)}% ${pet.isFullyTrusted ? '⭐' : ''}</p>
+                
+                <div class="text-center">
+                    <p class="mb-1"><strong>Mood:</strong> ${this.getMoodEmoji(pet.currentMood)} ${pet.currentMood}</p>
+                    <p class="mb-1"><strong>Tricks:</strong> ${pet.trickCount}</p>
+                    ${pet.isInMatrixMode ? '<p class="text-danger"><strong>⚠️ MATRIX MODE</strong></p>' : ''}
+                </div>
+                
+                <div class="mt-3">
+                    <button class="btn btn-sm btn-primary w-100 mb-1" onclick="petMatrix.feedPet('${pet.petId}')">
+                        🍖 Feed Pet
+                    </button>
+                    <button class="btn btn-sm btn-success w-100" onclick="petMatrix.playWithPet('${pet.petId}')">
+                        🎾 Play
+                    </button>
+                </div>
+                
+                ${pet.isHungry && pet.isHungry() ? '<p class="text-warning small mt-2">😋 Pet is hungry!</p>' : ''}
+            </div>
+        `).join('');
+    }
+
+    renderSnacks() {
+        const snackList = document.getElementById('snack-list');
+        
+        snackList.innerHTML = this.snacks.slice(0, 5).map(snack => `
+            <div class="snack-item ${snack.isRisky ? 'risky' : ''}" data-snack-id="${snack.snackId}">
+                <div>
+                    <strong>${snack.name}</strong>
+                    <small class="d-block text-muted">${snack.brand}</small>
+                    ${snack.isRisky ? '<small class="text-danger">⚠️ Use at your own risk!</small>' : ''}
+                </div>
+                <div class="text-right">
+                    <div class="h5 mb-0">$${snack.price.toFixed(2)}</div>
+                    <button class="btn btn-sm btn-warning" onclick="petMatrix.showPurchaseSnack('${snack.snackId}')">
+                        Buy
+                    </button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    async feedPet(petId) {
+        if (this.snacks.length === 0) {
+            this.showNotification('No snacks available!', 'warning');
+            return;
+        }
+
+        // For demo, use first available snack
+        const snackId = this.snacks[0].snackId;
+        
+        try {
+            const response = await fetch(`/api/petmatrix/pets/${petId}/feed`, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'X-User-Id': this.userId
+                },
+                body: JSON.stringify({ snackId: snackId })
+            });
+
+            const result = await response.json();
+            
+            if (result.success) {
+                this.showNotification(`${result.message} (+${result.trustGained} trust)`, 'success');
+                await this.loadPets();
+                await this.loadUserData(); // Update aura from purchase
+            } else {
+                this.showNotification(result.message, 'error');
+            }
+        } catch (error) {
+            console.error('Error feeding pet:', error);
+            this.showNotification('Error feeding pet', 'error');
+        }
+    }
+
+    async playWithPet(petId) {
+        try {
+            const response = await fetch(`/api/petmatrix/pets/${petId}/play`, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'X-User-Id': this.userId
+                },
+                body: JSON.stringify({ toyName: 'Squeaky Toy' })
+            });
+
+            const result = await response.json();
+            
+            if (result.success) {
+                let message = result.message;
+                if (result.trickPerformed) {
+                    message += result.trickType === 'unique_trick' ? ' ✨ UNIQUE TRICK!' : ' 🎯 Trick performed!';
+                }
+                this.showNotification(message, 'success');
+                await this.loadPets();
+            } else {
+                this.showNotification(result.message, 'error');
+            }
+        } catch (error) {
+            console.error('Error playing with pet:', error);
+            this.showNotification('Error playing with pet', 'error');
+        }
+    }
+
+    async triggerHorn(hornType) {
+        try {
+            const response = await fetch('/api/petmatrix/pets/horn-trigger', {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'X-User-Id': this.userId
+                },
+                body: JSON.stringify({ hornType: hornType })
+            });
+
+            const result = await response.json();
+            
+            if (result.success) {
+                this.showNotification(`${result.description} - ${result.petsResponded}/${result.totalPets} pets responded!`, 'success');
+                await this.loadPets();
+            } else {
+                this.showNotification(result.message, 'error');
+            }
+        } catch (error) {
+            console.error('Error triggering horn:', error);
+            this.showNotification('Error triggering horn', 'error');
+        }
+    }
+
+    async createNewPet() {
+        const name = prompt('Name your new pet:');
+        if (!name) return;
+
+        const species = prompt('Choose species (cat, dog, raccoon, rabbit, fox):') || 'cat';
+
+        try {
+            const response = await fetch('/api/petmatrix/pets/create', {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'X-User-Id': this.userId
+                },
+                body: JSON.stringify({ name: name, species: species })
+            });
+
+            const pet = await response.json();
+            this.showNotification(`Welcome ${pet.name}! Your ${pet.species} has joined the Matrix.`, 'success');
+            await this.loadPets();
+        } catch (error) {
+            console.error('Error creating pet:', error);
+            this.showNotification('Error creating pet', 'error');
+        }
+    }
+
+    showNotification(message, type = 'info') {
+        const container = document.getElementById('notification-container');
+        const notification = document.createElement('div');
+        notification.className = `notification ${type}`;
+        notification.textContent = message;
+        
+        container.appendChild(notification);
+        
+        setTimeout(() => {
+            notification.remove();
+        }, 5000);
+    }
+
+    getPetEmoji(species) {
+        const emojiMap = {
+            'cat': '🐱', 'dog': '🐶', 'raccoon': '🦝', 
+            'rabbit': '🐰', 'fox': '🦊', 'squirrel': '🐿️'
+        };
+        return emojiMap[species.toLowerCase()] || '🐾';
+    }
+
+    getMoodEmoji(mood) {
+        const moodMap = {
+            'happy': '😊', 'content': '😌', 'hungry': '😋',
+            'devoted': '🥰', 'wary': '😐', 'suspicious': '🤨',
+            'matrix_glitched': '🤖', 'curious': '🤔'
+        };
+        return moodMap[mood] || '😊';
+    }
+
+    startPeriodicUpdates() {
+        // Update pet status every 30 seconds
+        setInterval(() => {
+            this.loadPets();
+        }, 30000);
+
+        // Update aura status every minute
+        setInterval(() => {
+            this.loadUserData();
+        }, 60000);
+    }
+
+    setupEventListeners() {
+        // Add any additional event listeners here
+    }
+}
+
+// Global functions for button handlers
+let petMatrix;
+
+function triggerHorn(hornType) {
+    petMatrix.triggerHorn(hornType);
+}
+
+function refreshPets() {
+    petMatrix.loadPets();
+    petMatrix.showNotification('Pets refreshed!', 'success');
+}
+
+function viewWatchtower() {
+    window.location.href = '/Admin/WatchtowerDashboard';
+}
+
+function checkNearbyMods() {
+    petMatrix.showNotification('Scanning for nearby MODs...', 'info');
+    // This would integrate with proximity system
+}
+
+function createNewPet() {
+    petMatrix.createNewPet();
+}
+
+function activateOracleHover() {
+    petMatrix.showNotification('Oracle Hover State activated! 🌟', 'success');
+    // This would call the Oracle API
+}
+
+// Initialize PetMatrix when page loads
+document.addEventListener('DOMContentLoaded', () => {
+    petMatrix = new PetMatrixController();
+    console.log('🔥 PetMatrix Protocol Online - Nova\'s Companions Awakened');
+});
+</script>

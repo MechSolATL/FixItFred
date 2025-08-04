@@ -223,6 +223,16 @@ namespace Data
         // Sprint127_HeroFX_StudioDivision - HeroFX Studio effects and analytics
         public DbSet<HeroImpactEffect> HeroImpactEffects { get; set; } = null!;
         public DbSet<HeroFxAnalyticsLog> HeroFxAnalyticsLogs { get; set; } = null!;
+
+        // Sprint135: PetMatrix Protocol Models
+        public DbSet<Data.Models.PetMatrix.Pet> Pets { get; set; } = null!;
+        public DbSet<Data.Models.PetMatrix.Snack> Snacks { get; set; } = null!;
+        public DbSet<Data.Models.PetMatrix.SnackPurchase> SnackPurchases { get; set; } = null!;
+        public DbSet<Data.Models.PetMatrix.AuraRank> AuraRanks { get; set; } = null!;
+        public DbSet<Data.Models.PetMatrix.WatchtowerProximity> WatchtowerProximities { get; set; } = null!;
+        public DbSet<Data.Models.PetMatrix.HornTrigger> HornTriggers { get; set; } = null!;
+        public DbSet<Data.Models.PetMatrix.PetInteraction> PetInteractions { get; set; } = null!;
+        public DbSet<Data.Models.PetMatrix.PetBehaviorPattern> PetBehaviorPatterns { get; set; } = null!;
         #endregion
 
         #region Fluent Table Mappings
@@ -402,6 +412,53 @@ namespace Data
                 .WithMany(t => t.Technicians)
                 .HasForeignKey(tp => tp.TenantId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            // Sprint135: PetMatrix Protocol Table Mappings
+            _ = modelBuilder.Entity<Data.Models.PetMatrix.Pet>().ToTable("Pets");
+            _ = modelBuilder.Entity<Data.Models.PetMatrix.Snack>().ToTable("Snacks");
+            _ = modelBuilder.Entity<Data.Models.PetMatrix.SnackPurchase>().ToTable("SnackPurchases");
+            _ = modelBuilder.Entity<Data.Models.PetMatrix.AuraRank>().ToTable("AuraRanks");
+            _ = modelBuilder.Entity<Data.Models.PetMatrix.WatchtowerProximity>().ToTable("WatchtowerProximities");
+            _ = modelBuilder.Entity<Data.Models.PetMatrix.HornTrigger>().ToTable("HornTriggers");
+            _ = modelBuilder.Entity<Data.Models.PetMatrix.PetInteraction>().ToTable("PetInteractions");
+            _ = modelBuilder.Entity<Data.Models.PetMatrix.PetBehaviorPattern>().ToTable("PetBehaviorPatterns");
+
+            // Configure PetMatrix relationships
+            modelBuilder.Entity<Data.Models.PetMatrix.SnackPurchase>()
+                .HasOne(sp => sp.Snack)
+                .WithMany()
+                .HasForeignKey(sp => sp.SnackId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Data.Models.PetMatrix.SnackPurchase>()
+                .HasOne(sp => sp.Pet)
+                .WithMany()
+                .HasForeignKey(sp => sp.PetId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Data.Models.PetMatrix.PetInteraction>()
+                .HasOne(pi => pi.Pet)
+                .WithMany()
+                .HasForeignKey(pi => pi.PetId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Data.Models.PetMatrix.PetBehaviorPattern>()
+                .HasOne(pb => pb.Pet)
+                .WithMany()
+                .HasForeignKey(pb => pb.PetId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Data.Models.PetMatrix.WatchtowerProximity>()
+                .HasOne(wp => wp.User)
+                .WithMany()
+                .HasForeignKey(wp => wp.UserId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<Data.Models.PetMatrix.WatchtowerProximity>()
+                .HasOne(wp => wp.NearbyUser)
+                .WithMany()
+                .HasForeignKey(wp => wp.NearbyUserId)
+                .OnDelete(DeleteBehavior.NoAction);
         }
 
         #endregion
