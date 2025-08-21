@@ -1,0 +1,36 @@
+@* SEO Head Partial - Renders meta tags for SEO optimization *@
+@if (ViewData["MetaDescription"] != null)
+{
+    <meta name="description" content="@ViewData["MetaDescription"]" />
+}
+
+@if (ViewData["Keywords"] != null)
+{
+    <meta name="keywords" content="@ViewData["Keywords"]" />
+}
+
+@if (ViewData["Robots"] != null)
+{
+    <meta name="robots" content="@ViewData["Robots"]" />
+}
+else
+{
+    <meta name="robots" content="index,follow" />
+}
+
+<!-- Open Graph meta tags -->
+<meta property="og:title" content="@ViewData["Title"]" />
+@if (ViewData["MetaDescription"] != null)
+{
+    <meta property="og:description" content="@ViewData["MetaDescription"]" />
+}
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="FixItFred MVP-Core" />
+
+<!-- Twitter Card meta tags -->
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:title" content="@ViewData["Title"]" />
+@if (ViewData["MetaDescription"] != null)
+{
+    <meta name="twitter:description" content="@ViewData["MetaDescription"]" />
+}

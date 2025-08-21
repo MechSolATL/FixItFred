@@ -1,25 +1,34 @@
+// Copyright (c) MechSolATL. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
 using System;
 using MVP_Core.Services.Tests;
 
 namespace MVP_Core.Services;
 
 /// <summary>
-/// Test runner for Sprint122_CertumDNSBypass validation
+/// Enhanced test runner for Sprint125 validation
 /// </summary>
 public class TestRunner
 {
+    /// <summary>
+    /// Runs all Sprint125 tests including empathy and SEO compliance
+    /// </summary>
     public static void RunTests()
     {
-        Console.WriteLine("🚀 Starting Sprint122_CertumDNSBypass Test Suite...\n");
+        Console.WriteLine("🚀 Starting Sprint125 Test Suite...\n");
         
         try
         {
-            // Run integration tests
+            // Run original integration tests
+            Console.WriteLine("=== Sprint122 Integration Tests ===");
             Sprint122IntegrationTests.RunAllTests();
             
-            Console.WriteLine("\n🔍 Running empathy failure simulation...");
-            SimulateEmpathyFailure();
+            Console.WriteLine("\n=== Sprint125 Empathy Stability Tests ===");
+            RunEmpathyStabilityTests();
             
+            Console.WriteLine("\n=== Sprint125 SEO Compliance Tests ===");
+            RunSeoComplianceTests();
         }
         catch (Exception ex)
         {
@@ -27,25 +36,53 @@ public class TestRunner
             Console.WriteLine($"Stack trace: {ex.StackTrace}");
         }
         
-        Console.WriteLine("\n📝 Test execution completed. Check logs for detailed results.");
+        Console.WriteLine("\n📝 Sprint125 test execution completed.");
     }
-    
-    private static void SimulateEmpathyFailure()
+
+    private static void RunEmpathyStabilityTests()
     {
-        try
+        var (results, overallPassRate) = EmpathyStabilityTests.RunAllEmpathyTests();
+        
+        foreach (var result in results)
         {
-            // Simulate empathy failure as mentioned in requirements
-            Console.WriteLine("Simulating empathy system failure scenario...");
-            
-            // This would normally be done with revitalize-cli.sh but we'll simulate it
-            Console.WriteLine("⚠️  SIMULATED: Empathy system temporarily unavailable");
-            Console.WriteLine("✅ RECOVERED: Empathy system restored with enhanced resilience");
-            Console.WriteLine("📊 LOGGED: Failure and recovery events captured for analysis");
-            
+            var status = result.Passed ? "✅ PASS" : "❌ FAIL";
+            Console.WriteLine($"{status}: {result.TestName} - {result.Message}");
         }
-        catch (Exception ex)
+        
+        Console.WriteLine($"\n📊 Overall Empathy Pass Rate: {overallPassRate:F1}%");
+        
+        if (overallPassRate >= 90.0)
         {
-            Console.WriteLine($"⚠️  Empathy simulation error: {ex.Message}");
+            Console.WriteLine("🎉 EMPATHY TARGET ACHIEVED - ≥90% pass rate!");
+        }
+        else
+        {
+            Console.WriteLine($"⚠️  Empathy target not met. Need {90.0 - overallPassRate:F1}% improvement.");
+        }
+    }
+
+    private static void RunSeoComplianceTests()
+    {
+        var results = SeoComplianceTests.RunAllSeoTests();
+        
+        var passedTests = 0;
+        foreach (var result in results)
+        {
+            var status = result.Passed ? "✅ PASS" : "❌ FAIL";
+            Console.WriteLine($"{status}: {result.TestName} - {result.Message}");
+            if (result.Passed) passedTests++;
+        }
+        
+        var complianceRate = (double)passedTests / results.Length * 100.0;
+        Console.WriteLine($"\n📊 SEO Compliance Rate: {complianceRate:F1}%");
+        
+        if (complianceRate >= 100.0)
+        {
+            Console.WriteLine("🎉 SEO COMPLIANCE ACHIEVED - All tests green!");
+        }
+        else
+        {
+            Console.WriteLine($"⚠️  SEO compliance gaps found. {results.Length - passedTests} test(s) failed.");
         }
     }
 }
