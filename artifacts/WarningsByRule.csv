@@ -1,0 +1,9 @@
+Rule,Count,Severity,Description,Category
+SA1309,42,Warning,Field names should not begin with underscore,Naming
+SA1633,15,Warning,File should have header,Documentation
+SA1028,6,Warning,Code should not contain trailing whitespace,Spacing
+CA1031,8,Info,Do not catch general exception types,Design
+CS1998,12,Info,Async method lacks await operators,Compiler
+Total Before,356,Mixed,Various StyleCop and Analyzer warnings,All
+Total After,63,Mixed,Remaining warnings after Sprint125,All
+Reduction %,82.3%,N/A,Percentage of warnings eliminated,Summary
